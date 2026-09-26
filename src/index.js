@@ -72,6 +72,19 @@ export {
   filtrarProveedores,
   resolverRecientes,
 } from './components/BuscadorProveedor.jsx'
+export { default as SelectorCuentaCobro } from './components/SelectorCuentaCobro.jsx'
+export { default as TarjetaCuentaCobro } from './components/TarjetaCuentaCobro.jsx'
+export {
+  MEDIOS_CUENTA,
+  SIMBOLOS_CUENTA,
+  etiquetaMedioCuenta,
+  iconoMedioCuenta,
+  simboloCuenta,
+  numeroParcialCuenta,
+  campoBuscableCuenta,
+  filtrarCuentasCobro,
+  detalleCuentaCobro,
+} from './utils/cuentaCobro.js'
 export { default as BuscadorDispositivo } from './components/BuscadorDispositivo.jsx'
 export {
   PERFILES_DISPOSITIVO, CAMPOS_DISPOSITIVO, DISPOSITIVOS_MOBILE, CONECTIVIDADES_MOVIL,

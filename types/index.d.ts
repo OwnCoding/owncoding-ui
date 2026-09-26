@@ -234,6 +234,37 @@ export const TEMA_CLARO: 'claro'
 export const TEMA_OSCURO: 'oscuro'
 export function aplicarTema(tema: Tema, clave?: string | null): void
 export function ThemeToggle(props: { clave?: string | null; alCambiar?: (tema: Tema) => void; etiquetaClaro?: string; etiquetaOscuro?: string; className?: string }): ReactElement
+export function SelectorCuentaCobro(props: {
+  cuentas?: Array<Record<string, any>>
+  cuentaId?: string
+  onSelect?: (cuenta: any) => void
+  onCambiar?: () => void
+  saldoPendientePyg?: number
+  cotizacionPyg?: number
+  logo?: ReactNode | ((cuenta: any) => ReactNode)
+  detalle?: ReactNode | ((cuenta: any) => ReactNode)
+  textoCambiar?: string
+  placeholder?: string
+  ariaLabel?: string
+  vacio?: string
+  limite?: number
+  incluirInactivas?: boolean
+  disabled?: boolean
+  testId?: string
+  className?: string
+}): ReactElement | null
+export function TarjetaCuentaCobro(props: {
+  cuenta?: Record<string, any> | null
+  logo?: ReactNode
+  saldoPendientePyg?: number
+  cotizacionPyg?: number
+  detalle?: ReactNode
+  acciones?: ReactNode
+  onCambiar?: () => void
+  textoCambiar?: string
+  testId?: string
+  className?: string
+}): ReactElement | null
 export function BuscadorProveedor(props: {
   proveedores?: Array<{ id: string; name?: string; nombre?: string; code?: string | null; city?: string | null; phone?: string | null }>
   selectedId?: string
@@ -253,6 +284,15 @@ export function BuscadorProveedor(props: {
   className?: string
   inputProps?: Record<string, any>
 }): ReactElement
+export const MEDIOS_CUENTA: Record<string, { etiqueta: string; icono: string }>
+export const SIMBOLOS_CUENTA: Record<string, string>
+export function etiquetaMedioCuenta(kind?: string): string
+export function iconoMedioCuenta(kind?: string): string
+export function simboloCuenta(currency?: string, currencyLabel?: string | null): string
+export function numeroParcialCuenta(numero?: string | null): string
+export function campoBuscableCuenta(cuenta?: Record<string, any>): string
+export function filtrarCuentasCobro(cuentas?: any[], termino?: string, opciones?: { limite?: number; incluirInactivas?: boolean }): any[]
+export function detalleCuentaCobro(cuenta?: Record<string, any> | null): string
 export function normalizarProveedor(valor?: string): string
 export function nombreProveedor(proveedor?: any): string
 export function detalleProveedor(proveedor?: any): string

@@ -4,6 +4,19 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.42.0 — 2026-09-26
+
+- **Selector de cuenta de cobro (#262):** **`SelectorCuentaCobro`** +
+  **`TarjetaCuentaCobro`** — al elegir una cuenta el buscador **se colapsa** y
+  queda **una sola tarjeta** limpia con nombre, logo o ícono del medio, moneda,
+  tipo de transferencia, **banco una sola vez** (se omite si el nombre ya lo
+  dice) y el **saldo pendiente de la venta** (con equivalente si la cuenta es en
+  otra moneda), más la acción **«Cambiar cuenta»** que reabre la búsqueda.
+  Filtra por nombre, banco/procesadora, titular, número, medio y moneda.
+  Helpers en `utils/cuentaCobro.js` (`MEDIOS_CUENTA`, `simboloCuenta`,
+  `numeroParcialCuenta`, `filtrarCuentasCobro`, `detalleCuentaCobro`…).
+- Docs: `REGLAS.md` §1 y README.
+
 ## v0.41.0 — 2026-09-26
 
 - **Buscador de proveedor (#259):** **`BuscadorProveedor`** — input search con
