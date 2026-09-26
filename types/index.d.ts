@@ -234,6 +234,58 @@ export const TEMA_CLARO: 'claro'
 export const TEMA_OSCURO: 'oscuro'
 export function aplicarTema(tema: Tema, clave?: string | null): void
 export function ThemeToggle(props: { clave?: string | null; alCambiar?: (tema: Tema) => void; etiquetaClaro?: string; etiquetaOscuro?: string; className?: string }): ReactElement
+export function BuscadorCliente(props: {
+  clientes?: Array<Record<string, any>>
+  selectedId?: string
+  onSelect?: (cliente: any) => void
+  onCreate?: (nombre: string) => Promise<any> | any
+  onQueryChange?: (texto: string) => void
+  detectarDuplicado?: (cliente: any) => string[] | boolean | null
+  placeholder?: string
+  textoCrear?: string
+  textoCreando?: string
+  textoDuplicado?: string
+  vacio?: string
+  disabled?: boolean
+  required?: boolean
+  id?: string
+  ariaLabel?: string
+  className?: string
+  inputProps?: Record<string, any>
+}): ReactElement
+export function PreviewFusion(props: {
+  entidades?: Array<{ id: string; titulo?: ReactNode; subtitulo?: ReactNode; datos?: Array<{ etiqueta: ReactNode; valor?: ReactNode }> }>
+  principalId?: string
+  onElegirPrincipal?: (id: string) => void
+  categorias?: Array<{ id: string; etiqueta: ReactNode; cantidad?: number; detalle?: ReactNode }>
+  tituloCategorias?: ReactNode
+  textoPrincipal?: ReactNode
+  nota?: ReactNode
+  acciones?: ReactNode
+  testId?: string
+  className?: string
+}): ReactElement
+export function ConfirmarConPalabra(props: {
+  titulo?: ReactNode
+  resumen?: ReactNode
+  advertencia?: ReactNode
+  palabra?: string
+  confirmLabel?: ReactNode
+  textoOcupado?: ReactNode
+  onConfirmar?: () => void
+  onCancelar?: () => void
+  busy?: boolean
+  error?: ReactNode
+  testId?: string
+  className?: string
+}): ReactElement
+export function campoBuscableCliente(cliente?: Record<string, any>): string
+export function filtrarClientes(clientes?: any[], termino?: string, opciones?: { limite?: number }): any[]
+export function detalleCliente(cliente?: Record<string, any>): string
+export function motivosDuplicadoCliente(cliente?: Record<string, any>, referencia?: Record<string, any>): string[]
+export function digitosCliente(valor?: string | null): string
+export function claveTelefonoCliente(valor?: string | null): string
+export function coincideTelefonoCliente(a?: string | null, b?: string | null): boolean
 export function SelectorCuentaCobro(props: {
   cuentas?: Array<Record<string, any>>
   cuentaId?: string

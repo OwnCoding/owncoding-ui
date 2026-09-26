@@ -72,6 +72,18 @@ export {
   filtrarProveedores,
   resolverRecientes,
 } from './components/BuscadorProveedor.jsx'
+export { default as BuscadorCliente } from './components/BuscadorCliente.jsx'
+export { default as PreviewFusion } from './components/PreviewFusion.jsx'
+export { default as ConfirmarConPalabra } from './components/ConfirmarConPalabra.jsx'
+export {
+  campoBuscableCliente,
+  filtrarClientes,
+  detalleCliente,
+  motivosDuplicadoCliente,
+  digitosCliente,
+  claveTelefonoCliente,
+  coincideTelefonoCliente,
+} from './utils/cliente.js'
 export { default as SelectorCuentaCobro } from './components/SelectorCuentaCobro.jsx'
 export { default as TarjetaCuentaCobro } from './components/TarjetaCuentaCobro.jsx'
 export {

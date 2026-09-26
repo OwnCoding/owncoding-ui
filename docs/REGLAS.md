@@ -581,6 +581,24 @@ sección:
   `Switch`; el control pelado acepta `ariaLabel` para filas de tabla.
 - **Mapa campo por campo**: `docs/MAPA-CONFIG.md` de MobOS (grupos y detalle).
 
+## 11 ter. Unificar entidades (clientes, #268)
+
+- **Selector de duplicado**: `BuscadorCliente` encuentra por nombre, teléfono
+  (crudo o en dígitos), CI/RUC, correo, facturación o tags, con alta rápida y
+  marca de **«posible duplicado»** (`detectarDuplicado`; los motivos salen de
+  `motivosDuplicadoCliente` y los teléfonos se comparan por **clave nacional**,
+  sin prefijo país ni 0 inicial).
+- **Preview/checklist**: `PreviewFusion` muestra las dos fichas (`entidades`
+  con sus datos), deja elegir **cuál queda como principal** y lista el
+  **checklist de lo que se fusiona** por categoría con conteos (pedidos, pagos y
+  cuotas, créditos/saldo, notas, direcciones, teléfonos/correos, tags, seguro,
+  portal, garantías/servicio…). La ficha fusionada no se borra: queda archivada
+  con un puntero al principal.
+- **Confirmación**: `ConfirmarConPalabra` resume lo que va a pasar, advierte y
+  exige la **palabra exacta** para confirmar, con estado ocupado y error.
+- Al crear un cliente, el aviso previo usa los mismos helpers
+  (`motivosDuplicadoCliente`) comparando teléfono, documento y correo.
+
 ## 12. Abastecimiento F1: demanda y tablero (#250)
 
 El panel «Por comprar» y la lista de compra se arman con estas piezas; ninguna

@@ -4,6 +4,22 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.43.0 — 2026-09-26
+
+- **Unificar clientes duplicados (#268):** componentes del flujo completo.
+  - **`BuscadorCliente`**: input search por nombre, teléfono (crudo o en
+    dígitos), CI/RUC, correo, facturación o tags, con alta rápida y marca de
+    **«posible duplicado»**.
+  - **`PreviewFusion`**: las dos fichas con sus datos, elección de **cuál queda
+    como principal** y **checklist de lo que se fusiona** por categoría con
+    conteos; la ficha fusionada no se borra (queda archivada con puntero).
+  - **`ConfirmarConPalabra`**: confirmación fuerte con resumen, advertencia y la
+    palabra exacta (`FUSIONAR`), ocupado y error.
+  - Helpers en `utils/cliente.js`: `campoBuscableCliente`, `filtrarClientes`,
+    `detalleCliente`, `motivosDuplicadoCliente` (teléfonos por clave nacional:
+    sin 595 ni 0 inicial), `claveTelefonoCliente` y `coincideTelefonoCliente`.
+- Docs: `REGLAS.md` §11 ter y README.
+
 ## v0.42.0 — 2026-09-26
 
 - **Selector de cuenta de cobro (#262):** **`SelectorCuentaCobro`** +
