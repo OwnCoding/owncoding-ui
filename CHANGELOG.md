@@ -4,6 +4,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.40.1 — 2026-09-26
+
+- **Fix del CSS publicado:** el comentario de los tokens de texto de chip
+  contenía `*/` y cerraba el bloque antes de tiempo, así que cualquier app que
+  importara `styles.css` fallaba al compilar (PostCSS: «Unknown word 10–15`»).
+  El comentario ya no usa esa secuencia y `dist/styles.css` vuelve a parsear.
+
 ## v0.40.0 — 2026-09-26
 
 - **Abastecimiento F3–F5 · manifiesto del lote (#250 §11):** **`ManifiestoEnvio`**

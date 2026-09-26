@@ -46,7 +46,7 @@
   --c-accion: 77 124 254;
 
   /* Texto de chips sobre relleno tenue (#5): familia de TEXTO para los tonos
-     que se apoyan en tintes `bg-*/10–15` (Badge, ChipEstado, puntos de estado).
+     que se apoyan en tintes suaves (Badge, ChipEstado, puntos de estado).
      El tono base queda para rellenos, puntos y bordes; esta familia se mide
      ≥4.5:1 sobre blanco y sobre el canvas, y una app con paleta propia la pisa
      (`--c-ok-text`, `--c-warn-text`, …) sin tocar los tonos base. */
