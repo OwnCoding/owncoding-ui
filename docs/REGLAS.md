@@ -635,6 +635,10 @@ pantalla repite los mapas ni los contadores:
 - **Etiqueta de preparación**: `EtiquetaLote` («ENV-… · PRODUCTO n DE N»,
   modelo/variante, IMEI o «IMEI pendiente», pedido/destino y QR del manifiesto);
   se imprime en papel claro y se envuelve con `DocumentoImpresion`.
+- **Manifiesto del lote**: `ManifiestoEnvio` (código, origen → destino, método,
+  empresa/conductor/guía, responsable, compra, fechas, detalle por producto con
+  IMEI conocidos y pendientes, totales y QR del manifiesto público). Papel claro
+  con clases `oc-print-*`, también para envolver con `DocumentoImpresion`.
 - **Recepción**: los resultados de unidad usan `ESTADOS_REVISION`/`FilaRevision`
   (`RECIBIDO` entra como estado ok; `claveRevision` tolera las claves del
   backend) y los conteos, `ResumenRecepcion` (mapa del backend o ítems) +

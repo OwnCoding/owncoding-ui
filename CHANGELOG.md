@@ -4,6 +4,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.40.0 — 2026-09-26
+
+- **Abastecimiento F3–F5 · manifiesto del lote (#250 §11):** **`ManifiestoEnvio`**
+  — el papel que viaja con el envío: código, origen → destino, método,
+  empresa/conductor/guía, responsable, compra, fechas, detalle por producto con
+  los IMEI conocidos y pendientes, totales y QR del manifiesto público. Papel
+  claro con clases `oc-print-*`, para envolver con `DocumentoImpresion` (PRN
+  solo le da el layout).
+- Docs: `REGLAS.md` §13 y README.
+
 ## v0.39.0 — 2026-09-26
 
 Ronda de cosechas: PagaYa (#1), ScaleOS (#2), LedBox (#3/#4) y el fix de

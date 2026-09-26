@@ -9,6 +9,7 @@ import {
   ContadoresCompra,
   ESTADOS_NECESIDAD,
   EtiquetaLote,
+  ManifiestoEnvio,
   ORIGENES_NECESIDAD,
   PASOS_ENVIO,
   PASOS_NECESIDAD,
@@ -145,6 +146,33 @@ describe('abastecimiento F1', () => {
     expect(html).toContain('Bus')
     expect(html).toContain('Depósito 1')
     expect(html).toContain('9 de 12')
+  })
+
+  test('ManifiestoEnvio imprime el lote con IMEI conocidos y pendientes', () => {
+    const html = renderToStaticMarkup(
+      <ManifiestoEnvio
+        codigo="ENV-CDE-ASU-0021"
+        origen="CDE"
+        destino="Asunción"
+        metodo="TRANSPORTADORA"
+        empresa="AEX"
+        guia="123"
+        responsable="Ana"
+        compra="COM-CDE-0048"
+        lineas={[{ producto: 'iPhone 15', capacidad: '128 GB', condicion: 'NEW', cantidad: 6, imeis: ['356789104523178'], pendientes: 3 }]}
+      />,
+    )
+    expect(html).toContain('ENV-CDE-ASU-0021')
+    expect(html).toContain('CDE → Asunción')
+    expect(html).toContain('Transportadora')
+    expect(html).toContain('AEX')
+    expect(html).toContain('COM-CDE-0048')
+    expect(html).toContain('iPhone 15')
+    expect(html).toContain('128 GB · Nuevo')
+    expect(html).toContain('356789104523178')
+    expect(html).toContain('3 IMEI pendientes')
+    expect(html).toContain('6')
+    expect(html).toContain('unidades')
   })
 
   test('EtiquetaLote: PRODUCTO n DE N, IMEI o pendiente y QR', () => {

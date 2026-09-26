@@ -344,6 +344,28 @@ export function TarjetaCompra(props: {
   acciones?: ReactNode
   className?: string
 }): ReactElement
+export function ManifiestoEnvio(props: {
+  codigo?: string
+  origen?: ReactNode
+  destino?: ReactNode
+  metodo?: string
+  empresa?: ReactNode
+  conductor?: ReactNode
+  guia?: ReactNode
+  responsable?: ReactNode
+  compra?: ReactNode
+  salida?: ReactNode
+  eta?: ReactNode
+  llegada?: ReactNode
+  lineas?: Array<{ id?: string; producto?: ReactNode; capacidad?: ReactNode; condicion?: string; cantidad?: number; imeis?: string[]; pendientes?: number }>
+  unidades?: number
+  conImei?: number
+  pendientes?: number
+  enlace?: string
+  qr?: string
+  notas?: ReactNode
+  className?: string
+}): ReactElement
 export function TarjetaRecepcion(props: {
   codigo?: string
   estado?: string

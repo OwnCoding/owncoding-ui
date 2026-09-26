@@ -132,6 +132,7 @@ export { default as TarjetaCompra } from './components/TarjetaCompra.jsx'
 export { default as TarjetaLote } from './components/TarjetaLote.jsx'
 export { default as TarjetaRecepcion } from './components/TarjetaRecepcion.jsx'
 export { default as EtiquetaLote } from './components/EtiquetaLote.jsx'
+export { default as ManifiestoEnvio } from './components/ManifiestoEnvio.jsx'
 export {
   PRIORIDADES_COMPRA,
   claveDePrioridad,
