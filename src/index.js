@@ -64,6 +64,14 @@ export { default as SerialField, normalizarSerial } from './components/SerialFie
 export { imeiValido, separarSeriales, normalizarSeriales } from './utils/serial.js'
 export { default as InstagramField, normalizarInstagram } from './components/InstagramField.jsx'
 export { default as ProductCombobox } from './components/ProductCombobox.jsx'
+export {
+  default as BuscadorProveedor,
+  normalizarProveedor,
+  nombreProveedor,
+  detalleProveedor,
+  filtrarProveedores,
+  resolverRecientes,
+} from './components/BuscadorProveedor.jsx'
 export { default as BuscadorDispositivo } from './components/BuscadorDispositivo.jsx'
 export {
   PERFILES_DISPOSITIVO, CAMPOS_DISPOSITIVO, DISPOSITIVOS_MOBILE, CONECTIVIDADES_MOVIL,

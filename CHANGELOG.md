@@ -4,6 +4,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.41.0 — 2026-09-26
+
+- **Buscador de proveedor (#259):** **`BuscadorProveedor`** — input search con
+  **últimos usados por defecto** (`recientes`, ids o proveedores, resueltos en
+  orden y sin repetir), filtro por **nombre o abreviatura** (`code`, sin
+  acentos) y **alta rápida** desde el campo (`onCreate` async → proveedor
+  creado). Contrato combobox completo (`aria-activedescendant`, ↑↓/Enter/Esc),
+  catálogo por props o al servidor (`onQueryChange`); helpers
+  `normalizarProveedor`/`filtrarProveedores`/`resolverRecientes`.
+- Docs: `REGLAS.md` §1 y README.
+
 ## v0.40.1 — 2026-09-26
 
 - **Fix del CSS publicado:** el comentario de los tokens de texto de chip

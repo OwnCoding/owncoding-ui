@@ -215,9 +215,10 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   `PercentField` (+`parsePercent`/`formatPercent`),
   `CurrencySelect`, `EmailField` (sugerencia de dominios), `PhoneField`
   (código de país + validación), `SerialField` (IMEI/serial), `InstagramField`,
-  `ProductCombobox` (buscar/elegir/crear producto), `RucField` (+`extraerRuc`/
-  `esRuc`: la consulta entra por prop) y `SerialTexto` (serial con los últimos
-  4 siempre visibles).
+  `ProductCombobox` (buscar/elegir/crear producto), `BuscadorProveedor`
+  (últimos usados por defecto, filtro por nombre/abreviatura y alta rápida,
+  #259), `RucField` (+`extraerRuc`/`esRuc`: la consulta entra por prop) y
+  `SerialTexto` (serial con los últimos 4 siempre visibles).
 - **Acceso (sin API):** `GoogleButton` (+`GoogleMark`, `OAuthDivider`),
   `AuthLayout` (slots de logo/copy/acciones/pie), `ProductFooter`,
   `LoadingScreen` y `PegarEnlaceToken` (extrae el token del enlace). No leen

@@ -234,6 +234,30 @@ export const TEMA_CLARO: 'claro'
 export const TEMA_OSCURO: 'oscuro'
 export function aplicarTema(tema: Tema, clave?: string | null): void
 export function ThemeToggle(props: { clave?: string | null; alCambiar?: (tema: Tema) => void; etiquetaClaro?: string; etiquetaOscuro?: string; className?: string }): ReactElement
+export function BuscadorProveedor(props: {
+  proveedores?: Array<{ id: string; name?: string; nombre?: string; code?: string | null; city?: string | null; phone?: string | null }>
+  selectedId?: string
+  onSelect?: (proveedor: any) => void
+  onCreate?: (nombre: string) => Promise<any> | any
+  onQueryChange?: (texto: string) => void
+  recientes?: Array<string | any>
+  placeholder?: string
+  textoRecientes?: string
+  textoCrear?: string
+  textoCreando?: string
+  vacio?: string
+  disabled?: boolean
+  required?: boolean
+  id?: string
+  ariaLabel?: string
+  className?: string
+  inputProps?: Record<string, any>
+}): ReactElement
+export function normalizarProveedor(valor?: string): string
+export function nombreProveedor(proveedor?: any): string
+export function detalleProveedor(proveedor?: any): string
+export function filtrarProveedores(proveedores?: any[], termino?: string, opciones?: { limite?: number }): any[]
+export function resolverRecientes(proveedores?: any[], recientes?: any[], opciones?: { limite?: number }): any[]
 export function ProductCombobox(props: Record<string, any> & {
   products?: Array<{ id: string; nombre?: string; name?: string; sku?: string; model?: string; capacity?: string; color?: string; category?: string; [clave: string]: any }>
   selectedId?: string
