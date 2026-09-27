@@ -234,6 +234,23 @@ export const TEMA_CLARO: 'claro'
 export const TEMA_OSCURO: 'oscuro'
 export function aplicarTema(tema: Tema, clave?: string | null): void
 export function ThemeToggle(props: { clave?: string | null; alCambiar?: (tema: Tema) => void; etiquetaClaro?: string; etiquetaOscuro?: string; className?: string }): ReactElement
+export function NavegacionSeccion(props: {
+  items?: Array<{ id: string; label: ReactNode; icono?: string; descripcion?: ReactNode } | [string, ReactNode]>
+  value?: string
+  onChange?: (id: string) => void
+  colapsado?: boolean
+  onToggle?: (siguiente: boolean) => void
+  variante?: 'auto' | 'riel' | 'horizontal'
+  ariaLabel?: string
+  textoExpandir?: string
+  textoColapsar?: string
+  mostrarDescripcion?: boolean
+  testId?: string
+  testIdDescripcion?: string
+  className?: string
+  classNameContenido?: string
+  children?: ReactNode
+}): ReactElement | null
 export function BloquePago(props: {
   etiqueta?: ReactNode
   encabezado?: ReactNode

@@ -577,6 +577,13 @@ sección:
   compuestos por patrón; cada campo nuevo se busca antes de crearlo. El control
   de duplicación de MobOS (`docs/CAMPOS.md` §6 y
   `src/lib/camposReglas.test.js`) falla si un objeto publicado se reimplementa.
+- **Navegación interna**: `NavegacionSeccion` — el riel de los 7 grupos que
+  **colapsa a solo íconos** (tooltip + `aria-label`, indicador del activo,
+  `aria-current`) y en mobile es una tira horizontal desplazable;
+  `variante="horizontal"` lo deja horizontal donde convenga. El estado
+  colapsado es **controlado** (`colapsado`/`onToggle`): la app lo recuerda
+  (último usado). Conserva `role="tab"`/`aria-selected`, la descripción del
+  grupo activo y centra la sección al entrar por enlace directo.
 - **Estado de guardado**: `EstadoGuardado` (chip verde «Guardado…» o el error
   en rojo, `aria-live`) va en el lugar donde iría el botón; la app maneja el
   POST y la reautenticación. No se dibuja el chip ni el aviso a mano.

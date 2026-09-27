@@ -73,6 +73,7 @@ export {
   resolverRecientes,
 } from './components/BuscadorProveedor.jsx'
 export { default as BloquePago } from './components/BloquePago.jsx'
+export { default as NavegacionSeccion } from './components/NavegacionSeccion.jsx'
 export { default as BuscadorCliente } from './components/BuscadorCliente.jsx'
 export { default as PreviewFusion } from './components/PreviewFusion.jsx'
 export { default as ChipFusion } from './components/ChipFusion.jsx'

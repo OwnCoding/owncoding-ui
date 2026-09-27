@@ -4,6 +4,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.47.0 — 2026-09-27
+
+- **`NavegacionSeccion` (#267/#253):** el riel de secciones de una pantalla —
+  escritorio con barra lateral que **colapsa a solo íconos** (tooltip,
+  `aria-label`, indicador y `aria-current` del activo) y mobile con tira
+  horizontal desplazable que centra la sección activa; `variante="horizontal"`
+  la deja horizontal en todas las medidas. El colapso es **controlado**
+  (`colapsado`/`onToggle`): la app recuerda el último usado. Conserva
+  `role="tab"`/`aria-selected` y muestra la descripción del grupo activo.
+- Docs: `REGLAS.md` §11 y README.
+
 ## v0.46.0 — 2026-09-26
 
 - **`Cronologia` con estados honestos:** suma `cargando` (esqueleto, no una

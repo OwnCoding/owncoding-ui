@@ -217,7 +217,8 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   (código de país + validación), `SerialField` (IMEI/serial), `InstagramField`,
   `ProductCombobox` (buscar/elegir/crear producto), `BuscadorProveedor`
   (últimos usados por defecto, filtro por nombre/abreviatura y alta rápida,
-  #259), `SelectorCuentaCobro` (+`TarjetaCuentaCobro`: al elegir colapsa el
+  #259), `NavegacionSeccion` (riel de secciones que colapsa a íconos y variante
+  horizontal, #267/#253), `SelectorCuentaCobro` (+`TarjetaCuentaCobro`: al elegir colapsa el
   buscador y muestra una sola tarjeta con «Cambiar cuenta», #262),
   `BloquePago` (la papelera adentro de la tarjeta del medio de pago, #265), el
   flujo de **unificar clientes** (`BuscadorCliente` con posible duplicado,
