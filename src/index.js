@@ -75,6 +75,8 @@ export {
 export { default as BloquePago } from './components/BloquePago.jsx'
 export { default as BuscadorCliente } from './components/BuscadorCliente.jsx'
 export { default as PreviewFusion } from './components/PreviewFusion.jsx'
+export { default as ChipFusion } from './components/ChipFusion.jsx'
+export { CATEGORIAS_FUSION, categoriasFusion, hayFusion } from './utils/fusion.js'
 export { default as ConfirmarConPalabra } from './components/ConfirmarConPalabra.jsx'
 export {
   campoBuscableCliente,

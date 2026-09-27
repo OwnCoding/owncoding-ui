@@ -5,10 +5,14 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 import {
   BuscadorCliente,
+  CATEGORIAS_FUSION,
+  ChipFusion,
   ConfirmarConPalabra,
   PreviewFusion,
+  categoriasFusion,
   detalleCliente,
   filtrarClientes,
+  hayFusion,
   motivosDuplicadoCliente,
 } from '../src/index.js'
 
@@ -68,6 +72,28 @@ describe('unificar clientes', () => {
     expect(html).toContain('Pedidos')
     expect(html).toContain('Notas')
     expect(html).toContain('no se borra')
+  })
+
+  test('las categorías canónicas del preview llevan el orden y los conteos', () => {
+    const filas = categoriasFusion({ pedidos: 3, notas: 0, contacto: 1 })
+    expect(filas[0]).toMatchObject({ id: 'pedidos', etiqueta: 'Pedidos', cantidad: 3 })
+    expect(filas.map((f) => f.id).slice(0, 3)).toEqual(['pedidos', 'pagos', 'creditos'])
+    // Un id fuera del catálogo se agrega al final con su id como etiqueta.
+    expect(filas.at(-1)).toMatchObject({ id: 'contacto', etiqueta: 'contacto', cantidad: 1 })
+    expect(CATEGORIAS_FUSION.map((c) => c.id)).toContain('garantias')
+    expect(hayFusion(filas)).toBe(true)
+    expect(hayFusion(categoriasFusion({ notas: 0 }))).toBe(false)
+  })
+
+  test('el chip de ficha fusionada apunta a la principal', () => {
+    const html = renderToStaticMarkup(
+      <ChipFusion principal={{ id: 'c1', name: 'Ana Giménez' }} fusionadoEl="2026-09-26T12:00:00Z" por="Dario" onAbrirPrincipal={() => {}} />,
+    )
+    expect(html).toContain('Fusionado con')
+    expect(html).toContain('Ana Giménez')
+    expect(html).toContain('Ver la principal')
+    expect(html).toContain('text-info-text')
+    expect(renderToStaticMarkup(<ChipFusion principal={null} />)).toBe('')
   })
 
   test('la confirmación exige la palabra y ofrece el error', () => {

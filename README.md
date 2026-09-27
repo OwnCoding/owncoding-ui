@@ -221,7 +221,8 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   buscador y muestra una sola tarjeta con «Cambiar cuenta», #262),
   `BloquePago` (la papelera adentro de la tarjeta del medio de pago, #265), el
   flujo de **unificar clientes** (`BuscadorCliente` con posible duplicado,
-  `PreviewFusion` y `ConfirmarConPalabra`, #268), `RucField`
+  `PreviewFusion`, `CATEGORIAS_FUSION`/`categoriasFusion`, `ConfirmarConPalabra`
+  y `ChipFusion` para la ficha archivada, #268), `RucField`
   (+`extraerRuc`/`esRuc`: la consulta entra por prop) y `SerialTexto` (serial
   con los últimos 4 siempre visibles).
 - **Acceso (sin API):** `GoogleButton` (+`GoogleMark`, `OAuthDivider`),

@@ -276,6 +276,19 @@ export function PreviewFusion(props: {
   testId?: string
   className?: string
 }): ReactElement
+export function ChipFusion(props: {
+  principal?: string | Record<string, any> | null
+  fusionadoEl?: string | number | Date | null
+  por?: ReactNode
+  onAbrirPrincipal?: () => void
+  texto?: ReactNode
+  textoAbrir?: ReactNode
+  testId?: string
+  className?: string
+}): ReactElement | null
+export const CATEGORIAS_FUSION: Array<{ id: string; etiqueta: string }>
+export function categoriasFusion(conteos?: Record<string, number> | Array<{ id: string; cantidad?: number }>): Array<{ id: string; etiqueta: string; cantidad: number }>
+export function hayFusion(categorias?: Array<{ cantidad?: number }>): boolean
 export function ConfirmarConPalabra(props: {
   titulo?: ReactNode
   resumen?: ReactNode

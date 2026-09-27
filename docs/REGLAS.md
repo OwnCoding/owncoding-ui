@@ -601,6 +601,13 @@ sección:
   con un puntero al principal.
 - **Confirmación**: `ConfirmarConPalabra` resume lo que va a pasar, advierte y
   exige la **palabra exacta** para confirmar, con estado ocupado y error.
+- **Categorías canónicas**: `CATEGORIAS_FUSION` + `categoriasFusion(conteos)`
+  arman el checklist en el orden y con las etiquetas de la casa (pedidos, pagos
+  y cuotas, créditos y saldo, notas, direcciones, teléfonos y correos, tags,
+  seguro de ventas, portal, garantías y servicio); `hayFusion` dice si hay algo
+  que mover.
+- **Ficha fusionada**: `ChipFusion` marca el registro archivado con la ficha
+  principal, cuándo y quién lo hizo, y ofrece abrir la principal.
 - Al crear un cliente, el aviso previo usa los mismos helpers
   (`motivosDuplicadoCliente`) comparando teléfono, documento y correo.
 

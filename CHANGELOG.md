@@ -4,6 +4,18 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.45.0 — 2026-09-26
+
+- **Unificar clientes (#268), lo que faltaba del flujo:**
+  - **`ChipFusion`**: marca la **ficha archivada** con la principal, cuándo y
+    quién la fusionó, y abre la principal (los enlaces y tokens siguen vivos).
+  - **`CATEGORIAS_FUSION` + `categoriasFusion(conteos)`**: el checklist del
+    preview con el orden y las etiquetas canónicas (pedidos, pagos y cuotas,
+    créditos y saldo, notas, direcciones, teléfonos y correos, tags, seguro de
+    ventas, portal, garantías y servicio); `hayFusion` dice si hay algo que
+    mover. Los ids fuera del catálogo se agregan al final.
+- Docs: `REGLAS.md` §11 ter y README.
+
 ## v0.44.0 — 2026-09-26
 
 - **Bloque de pago (#265):** **`BloquePago`** — la tarjeta de cada medio de pago
