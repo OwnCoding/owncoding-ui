@@ -379,7 +379,7 @@ export {
   AVANCES_FIRMA,
   VARIANTES_CORTE,
 } from './printing/escpos.js'
-export { paginaDePrueba, paginaDePruebaSimple, TIPOS_PRUEBA, TIPOS_TICKET_PRUEBA } from './printing/prueba.js'
+export { paginaDePrueba, paginaDePruebaSimple, TIPOS_PRUEBA, TIPOS_TICKET_PRUEBA, ANCHOS_PRUEBA, CORTES_PRUEBA, PLANTILLA_PRUEBA, plantillaDePrueba } from './printing/prueba.js'
 export { TAMANOS_CAMPO, anchoParaLargo } from './utils/tamanos.js'
 export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO } from './utils/modal.js'
 export { GRILLA_DOS_COLUMNAS, GRILLA_DOS_COLUMNAS_COMPACTA, PIE_ACCIONES, PIE_ACCIONES_REVERSO } from './utils/formulario.js'

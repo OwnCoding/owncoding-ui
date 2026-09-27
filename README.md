@@ -272,8 +272,8 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
 - **Piezas de formulario:** `GRILLA_DOS_COLUMNAS` (+ `_COMPACTA`) y
   `PIE_ACCIONES`/`PIE_ACCIONES_REVERSO` en `utils/formulario.js`.
 - **Impresión — modelos:** `crearTicket` (ESC/POS 58/80 mm) y `paginaDePrueba`
-  (verificador con validación de 4 dígitos y secciones por tipo). Ver
-  `docs/IMPRESION.md`.
+  (verificador con validación de 4 dígitos, ticket **corto predeterminado** y
+  secciones por tipo, con `PLANTILLA_PRUEBA`). Ver `docs/IMPRESION.md`.
 - **Estados y avisos:** `Aviso` (error/ok/warn, con contenedor), `Nota`
   (aclaración sin `role`: warn/info/neutra, `compact`), `EmptyState`,
   `ErrorState`, `Skeleton`, `Badge`, `Dot`.

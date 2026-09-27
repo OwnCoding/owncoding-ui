@@ -57,7 +57,7 @@ cups:<cola>           → cola local del sistema (USB o compartida)
 | Apartado | Objeto | Estado |
 | --- | --- | --- |
 | Constructor térmico 58/80 mm | `crearTicket` + `columnasDeAncho`/`envolver`/`repartirLinea` (`printing/escpos.js`) | ✅ en la librería (con CP850, cortes y firmas) |
-| Página de prueba / verificador | `paginaDePrueba` (`printing/prueba.js`) con tipos `corta`, `pedido`, `qr`, `venta`, `caracteres`, `corte`, validación de 4 dígitos y pie auditable | ✅ en la librería (la app pasa el QR si lo tiene) |
+| Página de prueba / verificador | `paginaDePrueba` (`printing/prueba.js`): **corto predeterminado** (`corta` = título + validación + fecha opcional, #277), `completa` con pie auditable y códigos, más `pedido`, `qr`, `venta`, `caracteres` y `corte`; `PLANTILLA_PRUEBA`/`plantillaDePrueba` (tipo, ancho 58/80, corte, copias) | ✅ en la librería (la app pasa el QR si lo tiene y persiste la plantilla) |
 | Estado y verificación | `printing/estadoImpresoras.js` | ✅ en la librería |
 | Configuración LAN/USB | `AjustesImpresion` | ✅ en la librería |
 | Disparo de impresión | `BotonImprimir` | ✅ en la librería |

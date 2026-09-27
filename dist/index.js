@@ -10062,6 +10062,7 @@ function bloqueFirma(t, roles = [], { ancho = 80, observaciones = true } = {}) {
 // src/printing/prueba.js
 var TIPOS_PRUEBA = {
   corta: "Prueba corta",
+  completa: "Prueba completa",
   pedido: "Ticket de pedido",
   qr: "Ticket con QR",
   venta: "Ticket completo de venta",
@@ -10069,13 +10070,30 @@ var TIPOS_PRUEBA = {
   corte: "Prueba de corte"
 };
 var TIPOS_TICKET_PRUEBA = TIPOS_PRUEBA;
+var ANCHOS_PRUEBA = [58, 80];
+var CORTES_PRUEBA = VARIANTES_CORTE;
+var PLANTILLA_PRUEBA = { tipo: "corta", ancho: 80, incluyeFecha: false, corte: "completo", copias: 1 };
+function plantillaDePrueba(datos = {}) {
+  const base = datos && typeof datos === "object" ? datos : {};
+  const tipo = Object.hasOwn(TIPOS_PRUEBA, base.tipo) ? base.tipo : PLANTILLA_PRUEBA.tipo;
+  const ancho = ANCHOS_PRUEBA.includes(Number(base.ancho)) ? Number(base.ancho) : PLANTILLA_PRUEBA.ancho;
+  const copias = Number(base.copias);
+  const corte = CORTES_PRUEBA.includes(base.corte) ? base.corte : PLANTILLA_PRUEBA.corte;
+  return {
+    tipo,
+    ancho,
+    incluyeFecha: Boolean(base.incluyeFecha),
+    corte,
+    copias: Number.isSafeInteger(copias) && copias >= 1 && copias <= 5 ? copias : PLANTILLA_PRUEBA.copias
+  };
+}
 var azar = (max) => Math.floor(Math.random() * max);
 var validacionDe = () => String(azar(1e4)).padStart(4, "0");
 var sufijoDe = () => String(azar(10));
 var refDePrueba = () => `TEST-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(16).slice(2, 6).toUpperCase()}`;
 var fechaCorta2 = (iso) => new Date(iso).toLocaleString("es-PY", { dateStyle: "short", timeStyle: "short" });
 function paginaDePrueba({
-  tipo = "caracteres",
+  tipo = "corta",
   ancho = 80,
   impresora = "",
   nombre = "",
@@ -10089,6 +10107,8 @@ function paginaDePrueba({
   marca = "",
   nombreApp = "OwnCoding",
   validacion: validacionFija = "",
+  incluyeFecha = false,
+  corte = PLANTILLA_PRUEBA.corte,
   qr = null
 } = {}) {
   const metodoReal = metodo || (/^(usb|cups):/.test(String(impresora || "")) ? "CUPS (cola local)" : "LAN (TCP directo)");
@@ -10099,6 +10119,7 @@ function paginaDePrueba({
   const ref = refDePrueba();
   const ahora = (/* @__PURE__ */ new Date()).toISOString();
   const t = crearTicket({ ancho }).iniciar();
+  const minimo = tipo === "corta";
   const pie = () => {
     t.linea();
     t.negrita().centrado(`VALIDACI\xD3N ${validador}`).negrita(false);
@@ -10125,17 +10146,25 @@ function paginaDePrueba({
     t.linea();
     t.texto("Acentos: \xE1 \xE9 \xED \xF3 \xFA \xFC \xF1 \xD1 \xBF? \xA1!");
   };
-  t.centrado(nombreApp).negrita().doble().centrado("TICKET DE PRUEBA").doble(false).negrita(false);
-  t.centrado(TIPOS_PRUEBA[tipo] || "Prueba");
-  if (marca) t.centrado(`Comparativa ${marca}`);
-  t.linea();
-  t.negrita().doble().centrado(`VALIDACI\xD3N ${validador}`).doble(false).negrita(false);
-  t.linea();
-  if (tipo === "corta") {
+  if (minimo) {
+    t.negrita().centrado(`TICKET DE PRUEBA ${nombreApp}`).negrita(false);
+    t.linea();
+    t.negrita().doble().centrado(`VALIDACI\xD3N ${validador}`).doble(false).negrita(false);
+    if (incluyeFecha) t.par("Fecha", fechaCorta2(ahora));
+    t.linea();
+  } else {
+    t.centrado(nombreApp).negrita().doble().centrado("TICKET DE PRUEBA").doble(false).negrita(false);
+    t.centrado(TIPOS_PRUEBA[tipo] || "Prueba");
+    if (marca) t.centrado(`Comparativa ${marca}`);
+    t.linea();
+    t.negrita().doble().centrado(`VALIDACI\xD3N ${validador}`).doble(false).negrita(false);
+    t.linea();
+  }
+  if (tipo === "completa") {
     t.par("Prueba", metodoReal);
     t.par("Destino", impresora || "\u2014");
     t.par("Resultado", "PENDIENTE");
-    codigos("CORTA");
+    codigos("COMPLETA");
   }
   if (tipo === "pedido") {
     t.par("Pedido", `P-${validacionDe()}`);
@@ -10208,8 +10237,8 @@ function paginaDePrueba({
     t.texto("Si ninguna cort\xF3, revis\xE1 Cutter Enable: YES y que el rollo est\xE9 bien cargado.");
     codigos("CORTE");
   }
-  pie();
-  t.avanza(2).corte();
+  if (!minimo) pie();
+  t.avanza(2).corte(corte);
   return { base64: () => t.base64(), lineas: () => t.lineas(), ref, validacion, sufijo, validador, corte: t.corteEnviado() };
 }
 function paginaDePruebaSimple(opciones = {}) {
@@ -10217,6 +10246,7 @@ function paginaDePruebaSimple(opciones = {}) {
 }
 export {
   ANCHOS_PAPEL,
+  ANCHOS_PRUEBA,
   AVANCES_FIRMA,
   AVISO_REFRESCO,
   AjustesImpresion,
@@ -10257,6 +10287,7 @@ export {
   COLOR_DE_TONO,
   CONDICION_UNIDAD,
   CONECTIVIDADES_MOVIL,
+  CORTES_PRUEBA,
   Calendario,
   CampanaAvisos,
   CampoSeriales,
@@ -10376,6 +10407,7 @@ export {
   PERIODOS_FECHA,
   PIE_ACCIONES,
   PIE_ACCIONES_REVERSO,
+  PLANTILLA_PRUEBA,
   PRIORIDADES_COMPRA,
   PageHeader,
   PaletaComandos,
@@ -10626,6 +10658,7 @@ export {
   parseUsdInput,
   partirSerial,
   periodoDeRango,
+  plantillaDePrueba,
   porcentajeBarra,
   prepararImagen,
   preseleccionDeCuenta,

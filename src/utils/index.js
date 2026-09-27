@@ -224,7 +224,7 @@ export {
   agregarEstado,
 } from '../printing/estadoImpresoras.js'
 export { crearTicket, columnasDeAncho, envolver, repartirLinea, bloqueFirma, AVANCES_FIRMA, VARIANTES_CORTE } from '../printing/escpos.js'
-export { paginaDePrueba, paginaDePruebaSimple, TIPOS_PRUEBA, TIPOS_TICKET_PRUEBA } from '../printing/prueba.js'
+export { paginaDePrueba, paginaDePruebaSimple, TIPOS_PRUEBA, TIPOS_TICKET_PRUEBA, ANCHOS_PRUEBA, CORTES_PRUEBA, PLANTILLA_PRUEBA, plantillaDePrueba } from '../printing/prueba.js'
 
 // ── Ciclo de guardado y overlays (cosecha de ScaleOS) ───────────────────────
 export { AVISO_REFRESCO, crearEnvioUnico, completeSave } from './guardado.js'

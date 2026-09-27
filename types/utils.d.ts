@@ -327,10 +327,14 @@ export function repartirLinea(izquierda: string, derecha: string, ancho: number)
 export function bloqueFirma(opciones?: any): string
 export const AVANCES_FIRMA: any
 export const VARIANTES_CORTE: any
-export function paginaDePrueba(opciones?: any): string
-export function paginaDePruebaSimple(opciones?: any): string
-export const TIPOS_PRUEBA: any
-export const TIPOS_TICKET_PRUEBA: any
+export function paginaDePrueba(opciones?: any): { base64: () => string; lineas: () => string[]; ref: string; validacion: string; sufijo: string; validador: string; corte: string }
+export function paginaDePruebaSimple(opciones?: any): { base64: () => string; lineas: () => string[]; ref: string; validacion: string; sufijo: string; validador: string; corte: string }
+export const TIPOS_PRUEBA: Record<string, string>
+export const TIPOS_TICKET_PRUEBA: Record<string, string>
+export const ANCHOS_PRUEBA: number[]
+export const CORTES_PRUEBA: string[]
+export const PLANTILLA_PRUEBA: { tipo: string; ancho: number; incluyeFecha: boolean; corte: string; copias: number }
+export function plantillaDePrueba(datos?: Record<string, any>): { tipo: string; ancho: number; incluyeFecha: boolean; corte: string; copias: number }
 
 // ── Ciclo de guardado y overlays (cosecha de ScaleOS) ───────────────────────
 

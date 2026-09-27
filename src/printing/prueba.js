@@ -1,4 +1,4 @@
-import { crearTicket } from './escpos.js'
+import { VARIANTES_CORTE, crearTicket } from './escpos.js'
 
 // Página de prueba para verificar una impresora térmica: mismo texto en todas
 // las impresoras para reconocer el papel, validación de 4 dígitos para el
@@ -8,6 +8,7 @@ import { crearTicket } from './escpos.js'
 
 export const TIPOS_PRUEBA = {
   corta: 'Prueba corta',
+  completa: 'Prueba completa',
   pedido: 'Ticket de pedido',
   qr: 'Ticket con QR',
   venta: 'Ticket completo de venta',
@@ -16,6 +17,30 @@ export const TIPOS_PRUEBA = {
 }
 
 export const TIPOS_TICKET_PRUEBA = TIPOS_PRUEBA
+
+// Plantilla de la prueba (#277): qué tipo se imprime, el ancho del papel, si el
+// ticket corto lleva fecha/hora, cómo corta y cuántas copias. La app decide
+// dónde la persiste (último usado como predeterminado, patrón #209); acá vive
+// la forma canónica y la normalización.
+export const ANCHOS_PRUEBA = [58, 80]
+export const CORTES_PRUEBA = VARIANTES_CORTE
+export const PLANTILLA_PRUEBA = { tipo: 'corta', ancho: 80, incluyeFecha: false, corte: 'completo', copias: 1 }
+
+/** Plantilla válida: completa lo que falte y descarta lo que no corresponde. */
+export function plantillaDePrueba(datos = {}) {
+  const base = datos && typeof datos === 'object' ? datos : {}
+  const tipo = Object.hasOwn(TIPOS_PRUEBA, base.tipo) ? base.tipo : PLANTILLA_PRUEBA.tipo
+  const ancho = ANCHOS_PRUEBA.includes(Number(base.ancho)) ? Number(base.ancho) : PLANTILLA_PRUEBA.ancho
+  const copias = Number(base.copias)
+  const corte = CORTES_PRUEBA.includes(base.corte) ? base.corte : PLANTILLA_PRUEBA.corte
+  return {
+    tipo,
+    ancho,
+    incluyeFecha: Boolean(base.incluyeFecha),
+    corte,
+    copias: Number.isSafeInteger(copias) && copias >= 1 && copias <= 5 ? copias : PLANTILLA_PRUEBA.copias,
+  }
+}
 
 const azar = (max) => Math.floor(Math.random() * max)
 const validacionDe = () => String(azar(10000)).padStart(4, '0')
@@ -28,7 +53,7 @@ const fechaCorta = (iso) => new Date(iso).toLocaleString('es-PY', { dateStyle: '
  * @returns {{ base64: () => string, lineas: () => string[], ref: string, validacion: string, sufijo: string, validador: string, corte: string }}
  */
 export function paginaDePrueba({
-  tipo = 'caracteres',
+  tipo = 'corta',
   ancho = 80,
   impresora = '',
   nombre = '',
@@ -42,6 +67,8 @@ export function paginaDePrueba({
   marca = '',
   nombreApp = 'OwnCoding',
   validacion: validacionFija = '',
+  incluyeFecha = false,
+  corte = PLANTILLA_PRUEBA.corte,
   qr = null,
 } = {}) {
   const metodoReal = metodo || (/^(usb|cups):/.test(String(impresora || '')) ? 'CUPS (cola local)' : 'LAN (TCP directo)')
@@ -52,6 +79,10 @@ export function paginaDePrueba({
   const ref = refDePrueba()
   const ahora = new Date().toISOString()
   const t = crearTicket({ ancho }).iniciar()
+  // El ticket corto (#277) es solo el título y la validación (con fecha/hora
+  // opcional): menos papel y más rápido. El resto de los tipos conserva la
+  // cabecera completa, los códigos y el pie auditable.
+  const minimo = tipo === 'corta'
 
   // Pie común: todo lo que hace auditable la prueba desde el papel.
   const pie = () => {
@@ -83,18 +114,27 @@ export function paginaDePrueba({
     t.texto('Acentos: á é í ó ú ü ñ Ñ ¿? ¡!')
   }
 
-  t.centrado(nombreApp).negrita().doble().centrado('TICKET DE PRUEBA').doble(false).negrita(false)
-  t.centrado(TIPOS_PRUEBA[tipo] || 'Prueba')
-  if (marca) t.centrado(`Comparativa ${marca}`)
-  t.linea()
-  t.negrita().doble().centrado(`VALIDACIÓN ${validador}`).doble(false).negrita(false)
-  t.linea()
+  if (minimo) {
+    // Ticket corto (#277): solo título + validación (+ fecha/hora opcional).
+    t.negrita().centrado(`TICKET DE PRUEBA ${nombreApp}`).negrita(false)
+    t.linea()
+    t.negrita().doble().centrado(`VALIDACIÓN ${validador}`).doble(false).negrita(false)
+    if (incluyeFecha) t.par('Fecha', fechaCorta(ahora))
+    t.linea()
+  } else {
+    t.centrado(nombreApp).negrita().doble().centrado('TICKET DE PRUEBA').doble(false).negrita(false)
+    t.centrado(TIPOS_PRUEBA[tipo] || 'Prueba')
+    if (marca) t.centrado(`Comparativa ${marca}`)
+    t.linea()
+    t.negrita().doble().centrado(`VALIDACIÓN ${validador}`).doble(false).negrita(false)
+    t.linea()
+  }
 
-  if (tipo === 'corta') {
+  if (tipo === 'completa') {
     t.par('Prueba', metodoReal)
     t.par('Destino', impresora || '—')
     t.par('Resultado', 'PENDIENTE')
-    codigos('CORTA')
+    codigos('COMPLETA')
   }
 
   if (tipo === 'pedido') {
@@ -173,8 +213,8 @@ export function paginaDePrueba({
     codigos('CORTE')
   }
 
-  pie()
-  t.avanza(2).corte()
+  if (!minimo) pie()
+  t.avanza(2).corte(corte)
   return { base64: () => t.base64(), lineas: () => t.lineas(), ref, validacion, sufijo, validador, corte: t.corteEnviado() }
 }
 

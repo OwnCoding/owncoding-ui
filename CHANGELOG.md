@@ -4,6 +4,20 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.49.0 — 2026-09-27
+
+- **Ticket de prueba con corto predeterminado y plantilla (#277):**
+  - `paginaDePrueba` gana el tipo **`corta` minimal** (solo «TICKET DE PRUEBA» +
+    «VALIDACIÓN XXXX-X» y, si la plantilla lo pide, fecha/hora): menos papel y
+    más rápido. El ticket **`completa`** conserva lo que hacía el corto anterior
+    (destino, método, pie auditable, QR/barras y acentos).
+  - **`PLANTILLA_PRUEBA` + `plantillaDePrueba(datos)`**: tipo, ancho (58/80),
+    `incluyeFecha`, corte (`VARIANTES_CORTE`) y copias (1–5), normalizando lo
+    que venga; `paginaDePrueba` la aplica (`incluyeFecha`, `corte`).
+  - Tests: `test/prueba.test.js` (corto sin pie ni códigos, fecha opcional,
+    completo con trazabilidad, plantilla válida/basura).
+- Docs: `docs/IMPRESION.md` y README.
+
 ## v0.48.2 — 2026-09-27
 
 - **`Avatar` no pinta la imagen anterior (#271):** al cambiar `src` (otra
