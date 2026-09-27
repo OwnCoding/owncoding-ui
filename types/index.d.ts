@@ -342,6 +342,9 @@ export function SelectorCuentaCobro(props: {
   vacio?: string
   limite?: number
   incluirInactivas?: boolean
+  preseleccionar?: boolean
+  ultimoUsadoId?: string
+  predeterminadaId?: string
   disabled?: boolean
   testId?: string
   className?: string
@@ -379,13 +382,17 @@ export function BuscadorProveedor(props: {
 }): ReactElement
 export const MEDIOS_CUENTA: Record<string, { etiqueta: string; icono: string }>
 export const SIMBOLOS_CUENTA: Record<string, string>
+export const LIMITE_CUENTAS: number
 export function etiquetaMedioCuenta(kind?: string): string
 export function iconoMedioCuenta(kind?: string): string
 export function simboloCuenta(currency?: string, currencyLabel?: string | null): string
 export function numeroParcialCuenta(numero?: string | null): string
 export function campoBuscableCuenta(cuenta?: Record<string, any>): string
 export function filtrarCuentasCobro(cuentas?: any[], termino?: string, opciones?: { limite?: number; incluirInactivas?: boolean }): any[]
+export function preseleccionDeCuenta(cuentas?: any[], opciones?: { ultimoUsadoId?: string; predeterminadaId?: string; incluirInactivas?: boolean }): any
 export function detalleCuentaCobro(cuenta?: Record<string, any> | null): string
+export const MARGEN_VENTANA: number
+export function ventanaDeLista(opciones?: { total?: number; scrollTop?: number; altoVista?: number; altoFila?: number; margen?: number }): { inicio: number; fin: number }
 export function normalizarProveedor(valor?: string): string
 export function nombreProveedor(proveedor?: any): string
 export function detalleProveedor(proveedor?: any): string

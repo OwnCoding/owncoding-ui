@@ -51,12 +51,27 @@ export function campoBuscableCuenta(cuenta) {
   ].filter(Boolean).join(' '))
 }
 
+/** Tope de la lista del selector (#262): hasta 100 cuentas con scroll estable. */
+export const LIMITE_CUENTAS = 100
+
 /** Cuentas activas filtradas por el término (máx. `limite`). */
-export function filtrarCuentasCobro(cuentas = [], termino = '', { limite = 8, incluirInactivas = false } = {}) {
+export function filtrarCuentasCobro(cuentas = [], termino = '', { limite = LIMITE_CUENTAS, incluirInactivas = false } = {}) {
   const lista = (Array.isArray(cuentas) ? cuentas : []).filter((cuenta) => incluirInactivas || cuenta?.isActive !== false)
   const q = normalizar(termino)
   if (!q) return lista.slice(0, limite)
   return lista.filter((cuenta) => campoBuscableCuenta(cuenta).includes(q)).slice(0, limite)
+}
+
+/**
+ * Cuenta que el selector propone sin elegir (#262): la **última usada** de este
+ * dispositivo manda (es la mejor pista del vendedor) y, si no hay, la
+ * **predeterminada** que marque la app. Una cuenta inactiva no se propone nunca
+ * (salvo `incluirInactivas`). Devuelve `null` si no hay nada que proponer.
+ */
+export function preseleccionDeCuenta(cuentas = [], { ultimoUsadoId = '', predeterminadaId = '', incluirInactivas = false } = {}) {
+  const lista = Array.isArray(cuentas) ? cuentas : []
+  const elegible = (id) => (id ? lista.find((cuenta) => cuenta?.id === id && (incluirInactivas || cuenta.isActive !== false)) || null : null)
+  return elegible(ultimoUsadoId) || elegible(predeterminadaId) || null
 }
 
 /** Línea secundaria de una cuenta (sin el banco, que va aparte): titular, número, llave, referencia. */

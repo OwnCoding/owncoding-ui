@@ -4,6 +4,29 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.48.0 — 2026-09-27
+
+- **`SelectorCuentaCobro` con preselección y lista larga estable (#262, con
+  POS):**
+  - **Preselección**: con `preseleccionar` el selector propone solo la
+    **última cuenta usada** (`ultimoUsadoId`, la guarda la app) o, si no hay,
+    la **predeterminada** (`predeterminadaId`) y avisa por `onSelect`; una
+    cuenta inactiva o que ya no existe no se propone. Helper puro
+    `preseleccionDeCuenta(cuentas, { ultimoUsadoId, predeterminadaId })`.
+  - **Hasta 100 cuentas** (`LIMITE_CUENTAS`, `limite` configurable) con
+    **virtualización**: solo se montan las filas visibles (margen de 2),
+    `aria-posinset`/`aria-setsize` mantienen la posición real y el alto que
+    falta se reserva con el relleno de la lista. La fila mide 48 px y se
+    corrige con la fila real al montar (zoom/tipografía del dispositivo).
+  - **Mobile estable**: la lista scrollea con `overscroll-contain` y hasta
+    `min(60vh, 18rem)`; las flechas mueven el resaltado desplazando **solo la
+    lista** (antes `scrollIntoView` podía arrastrar la página).
+  - Se mantiene el buscador y el **colapso de #262** (una sola tarjeta con
+    «Cambiar cuenta»).
+  - Nuevo helper puro `ventanaDeLista` (+`MARGEN_VENTANA`) en `utils/ventana.js`
+    para listas largas de cualquier pantalla.
+- Docs: `REGLAS.md` §1 y README.
+
 ## v0.47.0 — 2026-09-27
 
 - **`NavegacionSeccion` (#267/#253):** el riel de secciones de una pantalla —

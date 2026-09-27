@@ -3169,11 +3169,17 @@ function campoBuscableCuenta(cuenta) {
     cuenta?.currencyLabel
   ].filter(Boolean).join(" "));
 }
-function filtrarCuentasCobro(cuentas = [], termino = "", { limite = 8, incluirInactivas = false } = {}) {
+var LIMITE_CUENTAS = 100;
+function filtrarCuentasCobro(cuentas = [], termino = "", { limite = LIMITE_CUENTAS, incluirInactivas = false } = {}) {
   const lista = (Array.isArray(cuentas) ? cuentas : []).filter((cuenta) => incluirInactivas || cuenta?.isActive !== false);
   const q = normalizar2(termino);
   if (!q) return lista.slice(0, limite);
   return lista.filter((cuenta) => campoBuscableCuenta(cuenta).includes(q)).slice(0, limite);
+}
+function preseleccionDeCuenta(cuentas = [], { ultimoUsadoId = "", predeterminadaId = "", incluirInactivas = false } = {}) {
+  const lista = Array.isArray(cuentas) ? cuentas : [];
+  const elegible = (id) => id ? lista.find((cuenta) => cuenta?.id === id && (incluirInactivas || cuenta.isActive !== false)) || null : null;
+  return elegible(ultimoUsadoId) || elegible(predeterminadaId) || null;
 }
 function detalleCuentaCobro(cuenta) {
   if (!cuenta) return "";
@@ -3247,8 +3253,28 @@ function TarjetaCuentaCobro({
   );
 }
 
+// src/utils/ventana.js
+var MARGEN_VENTANA = 2;
+function ventanaDeLista({ total = 0, scrollTop = 0, altoVista = 0, altoFila = 0, margen = MARGEN_VENTANA } = {}) {
+  const cantidad = Math.max(0, Math.floor(Number(total) || 0));
+  if (cantidad === 0) return { inicio: 0, fin: 0 };
+  const fila = Number(altoFila) || 0;
+  const vista = Number(altoVista) || 0;
+  if (fila <= 0 || vista <= 0) return { inicio: 0, fin: cantidad };
+  const margenSeguro = Math.max(0, Math.floor(Number(margen) || 0));
+  const visibles = Math.max(1, Math.ceil(vista / fila));
+  const primero = Math.min(cantidad - 1, Math.max(0, Math.floor((Number(scrollTop) || 0) / fila)));
+  return {
+    inicio: Math.max(0, primero - margenSeguro),
+    fin: Math.min(cantidad, primero + visibles + margenSeguro)
+  };
+}
+
 // src/components/SelectorCuentaCobro.jsx
 import { jsx as jsx28, jsxs as jsxs21 } from "react/jsx-runtime";
+var ALTO_OPCION = 48;
+var ALTO_VISTA = 224;
+var MARGEN = 2;
 function SelectorCuentaCobro({
   cuentas = [],
   cuentaId = "",
@@ -3262,8 +3288,11 @@ function SelectorCuentaCobro({
   placeholder = "Buscar cuenta\u2026",
   ariaLabel = "Cuenta de cobro",
   vacio = "Sin cuentas que coincidan.",
-  limite = 8,
+  limite = LIMITE_CUENTAS,
   incluirInactivas = false,
+  preseleccionar = false,
+  ultimoUsadoId = "",
+  predeterminadaId = "",
   disabled = false,
   testId = "cuenta-cobro",
   className
@@ -3271,8 +3300,12 @@ function SelectorCuentaCobro({
   const [eligiendo, setEligiendo] = useState9(!cuentaId);
   const [consulta, setConsulta] = useState9("");
   const [resaltado, setResaltado] = useState9(0);
+  const [scrollTop, setScrollTop] = useState9(0);
+  const [altoVista, setAltoVista] = useState9(ALTO_VISTA);
+  const [altoOpcion, setAltoOpcion] = useState9(ALTO_OPCION);
   const listaId = useId8();
   const raiz = useRef8(null);
+  const lista = useRef8(null);
   const seleccionada = useMemo5(
     () => (Array.isArray(cuentas) ? cuentas : []).find((cuenta) => cuenta.id === cuentaId) || null,
     [cuentas, cuentaId]
@@ -3281,11 +3314,25 @@ function SelectorCuentaCobro({
   useEffect8(() => {
     setEligiendo(!idSeleccionado);
     setConsulta("");
+    setScrollTop(0);
   }, [idSeleccionado]);
+  const sugeridaRef = useRef8("");
+  useEffect8(() => {
+    if (!preseleccionar) return;
+    if (idSeleccionado) {
+      sugeridaRef.current = "";
+      return;
+    }
+    const sugerida = preseleccionDeCuenta(cuentas, { ultimoUsadoId, predeterminadaId, incluirInactivas });
+    if (!sugerida || sugerida.id === sugeridaRef.current) return;
+    sugeridaRef.current = sugerida.id;
+    onSelect?.(sugerida);
+  }, [preseleccionar, idSeleccionado, cuentas, ultimoUsadoId, predeterminadaId, incluirInactivas, onSelect]);
   useEffect8(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setConsulta("");
+      setScrollTop(0);
       if (idSeleccionado) setEligiendo(false);
     };
     document.addEventListener("click", cerrarFuera);
@@ -3296,19 +3343,48 @@ function SelectorCuentaCobro({
     [cuentas, consulta, limite, incluirInactivas]
   );
   const listaVisible = eligiendo && !disabled && resultados.length > 0;
+  const ventana = useMemo5(
+    () => ventanaDeLista({ total: resultados.length, scrollTop, altoVista, altoFila: altoOpcion, margen: MARGEN }),
+    [resultados.length, scrollTop, altoVista, altoOpcion]
+  );
+  const visibles = resultados.slice(ventana.inicio, ventana.fin);
+  useEffect8(() => {
+    const nodo = lista.current;
+    if (!nodo) return;
+    const fila = nodo.querySelector('[role="option"]')?.getBoundingClientRect().height;
+    if (fila && Math.round(fila) !== altoOpcion) setAltoOpcion(Math.round(fila));
+    if (nodo.clientHeight > 0 && nodo.clientHeight !== altoVista) setAltoVista(nodo.clientHeight);
+  }, [listaVisible, consulta, altoOpcion, altoVista]);
   useEffect8(() => {
     if (!listaVisible) return;
-    raiz.current?.querySelector(`#${CSS.escape(`${listaId}-${resaltado}`)}`)?.scrollIntoView({ block: "nearest" });
-  }, [listaVisible, resaltado, listaId]);
+    const nodo = lista.current;
+    if (!nodo) return;
+    const arriba = resaltado * altoOpcion;
+    const abajo = arriba + altoOpcion;
+    if (arriba < nodo.scrollTop) nodo.scrollTop = arriba;
+    else if (abajo > nodo.scrollTop + nodo.clientHeight) nodo.scrollTop = abajo - nodo.clientHeight;
+  }, [resaltado, listaVisible, altoOpcion]);
   function elegir(cuenta) {
     onSelect?.(cuenta);
     setEligiendo(false);
     setConsulta("");
     setResaltado(0);
+    setScrollTop(0);
+  }
+  function alEscribir(event) {
+    setConsulta(event.target.value);
+    setResaltado(0);
+    setScrollTop(0);
+    if (lista.current) lista.current.scrollTop = 0;
+  }
+  function alDesplazar(event) {
+    setScrollTop(event.currentTarget.scrollTop);
+    if (event.currentTarget.clientHeight > 0) setAltoVista(event.currentTarget.clientHeight);
   }
   function alTeclear(event) {
     if (event.key === "Escape") {
       setConsulta("");
+      setScrollTop(0);
       if (idSeleccionado) setEligiendo(false);
       return;
     }
@@ -3358,10 +3434,7 @@ function SelectorCuentaCobro({
         value: consulta,
         placeholder,
         "data-testid": `${testId}-buscar`,
-        onChange: (event) => {
-          setConsulta(event.target.value);
-          setResaltado(0);
-        },
+        onChange: alEscribir,
         onFocus: () => setEligiendo(true),
         onKeyDown: alTeclear
       }
@@ -3369,11 +3442,18 @@ function SelectorCuentaCobro({
     listaVisible && /* @__PURE__ */ jsx28(
       "ul",
       {
+        ref: lista,
         id: listaId,
         role: "listbox",
         "aria-label": "Cuentas de cobro",
-        className: "absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border border-ink-500 bg-ink p-1 shadow-float",
-        children: resultados.map((cuenta, indice) => {
+        onScroll: alDesplazar,
+        style: {
+          paddingTop: 4 + ventana.inicio * altoOpcion,
+          paddingBottom: 4 + Math.max(0, resultados.length - ventana.fin) * altoOpcion
+        },
+        className: "absolute left-0 right-0 top-full z-30 mt-1 max-h-[min(60vh,18rem)] overflow-y-auto overscroll-contain rounded-xl border border-ink-500 bg-ink p-1 shadow-float",
+        children: visibles.map((cuenta, posicion) => {
+          const indice = ventana.inicio + posicion;
           const logoCuenta = typeof logo === "function" ? logo(cuenta) : null;
           const dato = [cuenta.holder, cuenta.accountNumber ? numeroParcialCuenta(cuenta.accountNumber) : null].filter(Boolean).join(" \xB7 ");
           return /* @__PURE__ */ jsxs21(
@@ -3382,11 +3462,13 @@ function SelectorCuentaCobro({
               id: `${listaId}-${indice}`,
               role: "option",
               "aria-selected": indice === resaltado,
+              "aria-posinset": indice + 1,
+              "aria-setsize": resultados.length,
               onMouseDown: (event) => event.preventDefault(),
               onMouseEnter: () => setResaltado(indice),
               onClick: () => elegir(cuenta),
               className: cn(
-                "flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm transition",
+                "flex h-12 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm transition",
                 indice === resaltado ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
               ),
               children: [
@@ -10240,6 +10322,7 @@ export {
   IndicadorConexion,
   Input,
   InstagramField,
+  LIMITE_CUENTAS,
   LIMITE_MONTO_ALMACENABLE,
   LIMITE_MONTO_GENERAL,
   LIMITE_MONTO_VENTAS,
@@ -10249,6 +10332,7 @@ export {
   ListGridToggle,
   LoadingScreen,
   MARCAS_ACCESORIOS,
+  MARGEN_VENTANA,
   MEDIOS_CUENTA,
   MENSAJE_RUC,
   MENSAJE_RUC_CONSULTA,
@@ -10530,6 +10614,7 @@ export {
   periodoDeRango,
   porcentajeBarra,
   prepararImagen,
+  preseleccionDeCuenta,
   primerNombre,
   prioridadDe,
   progresoChecklist,
@@ -10578,6 +10663,7 @@ export {
   useTableroOptimista,
   useToast,
   validarImagen,
+  ventanaDeLista,
   whatsappUrl
 };
 //# sourceMappingURL=index.js.map

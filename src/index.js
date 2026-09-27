@@ -93,14 +93,17 @@ export { default as TarjetaCuentaCobro } from './components/TarjetaCuentaCobro.j
 export {
   MEDIOS_CUENTA,
   SIMBOLOS_CUENTA,
+  LIMITE_CUENTAS,
   etiquetaMedioCuenta,
   iconoMedioCuenta,
   simboloCuenta,
   numeroParcialCuenta,
   campoBuscableCuenta,
   filtrarCuentasCobro,
+  preseleccionDeCuenta,
   detalleCuentaCobro,
 } from './utils/cuentaCobro.js'
+export { MARGEN_VENTANA, ventanaDeLista } from './utils/ventana.js'
 export { default as BuscadorDispositivo } from './components/BuscadorDispositivo.jsx'
 export {
   PERFILES_DISPOSITIVO, CAMPOS_DISPOSITIVO, DISPOSITIVOS_MOBILE, CONECTIVIDADES_MOVIL,

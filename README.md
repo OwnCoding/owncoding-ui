@@ -219,7 +219,9 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   (últimos usados por defecto, filtro por nombre/abreviatura y alta rápida,
   #259), `NavegacionSeccion` (riel de secciones que colapsa a íconos y variante
   horizontal, #267/#253), `SelectorCuentaCobro` (+`TarjetaCuentaCobro`: al elegir colapsa el
-  buscador y muestra una sola tarjeta con «Cambiar cuenta», #262),
+  buscador y muestra una sola tarjeta con «Cambiar cuenta», preselección de la
+  última usada/predeterminada y hasta 100 cuentas con scroll virtualizado
+  estable en mobile, #262),
   `BloquePago` (la papelera adentro de la tarjeta del medio de pago, #265), el
   flujo de **unificar clientes** (`BuscadorCliente` con posible duplicado,
   `PreviewFusion`, `CATEGORIAS_FUSION`/`categoriasFusion`, `ConfirmarConPalabra`
