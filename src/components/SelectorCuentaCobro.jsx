@@ -106,7 +106,11 @@ export default function SelectorCuentaCobro({
   }, [preseleccionar, idSeleccionado, cuentas, ultimoUsadoId, predeterminadaId, incluirInactivas, onSelect])
 
   // Clic afuera: se limpia la consulta y, si había una cuenta, vuelve la tarjeta.
+  // Solo hace falta mientras se busca: en modo tarjeta el clic de «Cambiar
+  // cuenta» reabre la búsqueda y este oyente (montado después del clic) no debe
+  // volver a cerrarla.
   useEffect(() => {
+    if (!eligiendo) return undefined
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return
       setConsulta('')
@@ -115,7 +119,7 @@ export default function SelectorCuentaCobro({
     }
     document.addEventListener('click', cerrarFuera)
     return () => document.removeEventListener('click', cerrarFuera)
-  }, [idSeleccionado])
+  }, [eligiendo, idSeleccionado])
 
   const resultados = useMemo(
     () => filtrarCuentasCobro(cuentas, consulta, { limite, incluirInactivas }),

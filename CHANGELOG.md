@@ -4,6 +4,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.48.1 — 2026-09-27
+
+- **`SelectorCuentaCobro`**: «Cambiar cuenta» reabre la búsqueda de verdad.
+  Antes el oyente de clic afuera quedaba activo en modo tarjeta (el `ref` no
+  estaba montado) y la cerraba en el mismo clic. Ahora vive solo mientras se
+  busca. Lo cubre el test de navegador nuevo.
+- Tests: el paquete suma `jsdom` y `test/selectorCuentaCobro.test.jsx` con las
+  interacciones reales —preselección, buscar/elegir/colapsar, teclado que no
+  arrastra la página y virtualización al desplazar la lista.
+
 ## v0.48.0 — 2026-09-27
 
 - **`SelectorCuentaCobro` con preselección y lista larga estable (#262, con

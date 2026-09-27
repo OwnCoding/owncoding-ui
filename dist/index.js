@@ -3329,6 +3329,7 @@ function SelectorCuentaCobro({
     onSelect?.(sugerida);
   }, [preseleccionar, idSeleccionado, cuentas, ultimoUsadoId, predeterminadaId, incluirInactivas, onSelect]);
   useEffect8(() => {
+    if (!eligiendo) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setConsulta("");
@@ -3337,7 +3338,7 @@ function SelectorCuentaCobro({
     };
     document.addEventListener("click", cerrarFuera);
     return () => document.removeEventListener("click", cerrarFuera);
-  }, [idSeleccionado]);
+  }, [eligiendo, idSeleccionado]);
   const resultados = useMemo5(
     () => filtrarCuentasCobro(cuentas, consulta, { limite, incluirInactivas }),
     [cuentas, consulta, limite, incluirInactivas]
