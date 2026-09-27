@@ -1,5 +1,5 @@
 import Icon from './Icon.jsx'
-import { EmptyState } from './ui.jsx'
+import { Button, EmptyState, Skeleton } from './ui.jsx'
 import { puntoDeTono } from '../utils/tonos.js'
 import { fechaDia, fechaHora, fechaValida } from '../utils/fecha.js'
 import { cn } from '../utils/cn.js'
@@ -169,20 +169,78 @@ export default function Cronologia({
   mostrarTipo = false,
   /** Nombre de la lista para lectores de pantalla. */
   etiqueta = 'Cronología',
+  /** Cargando: esqueleto honesto en lugar de una lista vacía. */
+  cargando = false,
+  /** Error de carga: se muestra con reintento si hay `onReintentar`. */
+  error = '',
+  errorTitulo = 'No se pudo cargar la cronología',
+  onReintentar,
+  /** Acción de actualizar + texto de la cabecera (opcional). */
+  onActualizar,
+  textoActualizar = 'Actualizar',
+  textoCabecera = 'Movimientos más recientes primero.',
   vacioTitulo = 'Todavía no hay hitos',
   vacioDetalle,
   className,
 }) {
-  if (!hitos?.length) {
-    return <EmptyState compact icon="clock" title={vacioTitulo} description={vacioDetalle} className={className} />
-  }
-
   const fila = (hito) => (
     <FilaHito key={hito.id} hito={hito} iconos={iconos} tonos={tonos} etiquetas={etiquetas} mostrarTipo={mostrarTipo} />
   )
 
+  const cabecera = onActualizar ? (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      {textoCabecera ? <p className="text-xs text-mute">{textoCabecera}</p> : null}
+      <button
+        type="button"
+        disabled={cargando}
+        onClick={onActualizar}
+        className="rounded-lg border border-ink-500 px-3 py-1.5 text-xs font-semibold text-mute transition hover:border-fono hover:text-fore disabled:opacity-40"
+      >
+        {textoActualizar}
+      </button>
+    </div>
+  ) : null
+
+  if (cargando) {
+    return (
+      <div className={className}>
+        {cabecera}
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={className}>
+        {cabecera}
+        <EmptyState
+          compact
+          icon="alert"
+          title={errorTitulo}
+          description={error}
+          action={onReintentar ? <Button onClick={onReintentar}>Reintentar</Button> : undefined}
+        />
+      </div>
+    )
+  }
+
+  if (!hitos?.length) {
+    return (
+      <div className={className}>
+        {cabecera}
+        <EmptyState compact icon="clock" title={vacioTitulo} description={vacioDetalle} />
+      </div>
+    )
+  }
+
   return (
     <div className={className}>
+      {cabecera}
       {agrupar ? (
         <div className="space-y-3">
           {agruparHitos(hitos).map((grupo) => (

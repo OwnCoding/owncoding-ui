@@ -8784,18 +8784,72 @@ function Cronologia({
   mostrarTipo = false,
   /** Nombre de la lista para lectores de pantalla. */
   etiqueta = "Cronolog\xEDa",
+  /** Cargando: esqueleto honesto en lugar de una lista vacía. */
+  cargando = false,
+  /** Error de carga: se muestra con reintento si hay `onReintentar`. */
+  error = "",
+  errorTitulo = "No se pudo cargar la cronolog\xEDa",
+  onReintentar,
+  /** Acción de actualizar + texto de la cabecera (opcional). */
+  onActualizar,
+  textoActualizar = "Actualizar",
+  textoCabecera = "Movimientos m\xE1s recientes primero.",
   vacioTitulo = "Todav\xEDa no hay hitos",
   vacioDetalle,
   className
 }) {
-  if (!hitos?.length) {
-    return /* @__PURE__ */ jsx96(EmptyState, { compact: true, icon: "clock", title: vacioTitulo, description: vacioDetalle, className });
-  }
   const fila = (hito) => /* @__PURE__ */ jsx96(FilaHito, { hito, iconos, tonos, etiquetas, mostrarTipo }, hito.id);
-  return /* @__PURE__ */ jsx96("div", { className, children: agrupar ? /* @__PURE__ */ jsx96("div", { className: "space-y-3", children: agruparHitos(hitos).map((grupo) => /* @__PURE__ */ jsxs78("section", { children: [
-    /* @__PURE__ */ jsx96("h3", { className: "mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute", children: grupo.etiqueta }),
-    /* @__PURE__ */ jsx96("ol", { className: "space-y-2.5", "aria-label": `${etiqueta} \xB7 ${grupo.etiqueta}`, children: grupo.hitos.map(fila) })
-  ] }, grupo.clave)) }) : /* @__PURE__ */ jsx96("ol", { className: "space-y-2.5", "aria-label": etiqueta, children: hitos.map(fila) }) });
+  const cabecera = onActualizar ? /* @__PURE__ */ jsxs78("div", { className: "mb-3 flex flex-wrap items-center justify-between gap-2", children: [
+    textoCabecera ? /* @__PURE__ */ jsx96("p", { className: "text-xs text-mute", children: textoCabecera }) : null,
+    /* @__PURE__ */ jsx96(
+      "button",
+      {
+        type: "button",
+        disabled: cargando,
+        onClick: onActualizar,
+        className: "rounded-lg border border-ink-500 px-3 py-1.5 text-xs font-semibold text-mute transition hover:border-fono hover:text-fore disabled:opacity-40",
+        children: textoActualizar
+      }
+    )
+  ] }) : null;
+  if (cargando) {
+    return /* @__PURE__ */ jsxs78("div", { className, children: [
+      cabecera,
+      /* @__PURE__ */ jsxs78("div", { className: "space-y-2", "aria-busy": "true", children: [
+        /* @__PURE__ */ jsx96(Skeleton, { className: "h-16" }),
+        /* @__PURE__ */ jsx96(Skeleton, { className: "h-16" }),
+        /* @__PURE__ */ jsx96(Skeleton, { className: "h-16" })
+      ] })
+    ] });
+  }
+  if (error) {
+    return /* @__PURE__ */ jsxs78("div", { className, children: [
+      cabecera,
+      /* @__PURE__ */ jsx96(
+        EmptyState,
+        {
+          compact: true,
+          icon: "alert",
+          title: errorTitulo,
+          description: error,
+          action: onReintentar ? /* @__PURE__ */ jsx96(Button, { onClick: onReintentar, children: "Reintentar" }) : void 0
+        }
+      )
+    ] });
+  }
+  if (!hitos?.length) {
+    return /* @__PURE__ */ jsxs78("div", { className, children: [
+      cabecera,
+      /* @__PURE__ */ jsx96(EmptyState, { compact: true, icon: "clock", title: vacioTitulo, description: vacioDetalle })
+    ] });
+  }
+  return /* @__PURE__ */ jsxs78("div", { className, children: [
+    cabecera,
+    agrupar ? /* @__PURE__ */ jsx96("div", { className: "space-y-3", children: agruparHitos(hitos).map((grupo) => /* @__PURE__ */ jsxs78("section", { children: [
+      /* @__PURE__ */ jsx96("h3", { className: "mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute", children: grupo.etiqueta }),
+      /* @__PURE__ */ jsx96("ol", { className: "space-y-2.5", "aria-label": `${etiqueta} \xB7 ${grupo.etiqueta}`, children: grupo.hitos.map(fila) })
+    ] }, grupo.clave)) }) : /* @__PURE__ */ jsx96("ol", { className: "space-y-2.5", "aria-label": etiqueta, children: hitos.map(fila) })
+  ] });
 }
 
 // src/components/PlanPagos.jsx

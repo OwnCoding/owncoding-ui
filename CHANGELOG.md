@@ -4,6 +4,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.46.0 — 2026-09-26
+
+- **`Cronologia` con estados honestos:** suma `cargando` (esqueleto, no una
+  lista vacía), `error` + `onReintentar` (aviso con reintento) y `onActualizar`
+  + `textoActualizar`/`textoCabecera` (cabecera con el botón de actualizar).
+  Con eso la pantalla solo hace el fetch y mapea los hitos; la lista, los
+  estados y la accesibilidad viven en el objeto.
+- Docs: `REGLAS.md` §8 ter y README.
+
 ## v0.45.0 — 2026-09-26
 
 - **Unificar clientes (#268), lo que faltaba del flujo:**

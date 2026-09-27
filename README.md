@@ -412,8 +412,11 @@ con agrupación por día opcional y estado vacío.
 
 Props: `hitos` (`[{ id, fecha, tipo, titulo, detalle?, actor?, tono?, icono? }]`),
 `iconos`, `tonos`, `etiquetas`, `agrupar`, `mostrarTipo`, `etiqueta`,
-`vacioTitulo`, `vacioDetalle`, `className`. Exporta `ICONOS_HITO`, `TONOS_HITO`,
-`ETIQUETAS_HITO`, `etiquetaDeHito` y `agruparHitos`.
+`vacioTitulo`, `vacioDetalle`, `className`, y los estados honestos
+`cargando` (esqueleto), `error` + `onReintentar` y `onActualizar` +
+`textoActualizar`/`textoCabecera` (la pantalla hace el fetch y avisa).
+Exporta `ICONOS_HITO`, `TONOS_HITO`, `ETIQUETAS_HITO`, `etiquetaDeHito` y
+`agruparHitos`.
 
 **Qué NO hace:** no ordena ni filtra hitos (llegan ordenados por el API y el
 consumidor decide la audiencia); no inventa hitos: si un hecho no está, no se

@@ -49,6 +49,19 @@ describe('Cronologia', () => {
     expect(html).toContain('Cronología · 22/9/2026')
   })
 
+  test('los estados honestos de carga y error (#268)', () => {
+    const cargando = renderToStaticMarkup(<Cronologia hitos={HITOS} cargando onActualizar={() => {}} />)
+    expect(cargando).toContain('aria-busy="true"')
+    expect(cargando).toContain('Actualizar')
+    expect(cargando).toContain('Movimientos más recientes primero.')
+    expect(cargando).not.toContain('Presupuesto creado')
+
+    const error = renderToStaticMarkup(<Cronologia error="Falló la red." onReintentar={() => {}} />)
+    expect(error).toContain('No se pudo cargar la cronología')
+    expect(error).toContain('Falló la red.')
+    expect(error).toContain('Reintentar')
+  })
+
   test('el vacío y los mapas compartidos', () => {
     const vacio = renderToStaticMarkup(<Cronologia vacioTitulo="Sin movimientos" vacioDetalle="Aparecen solos." />)
     expect(vacio).toContain('Sin movimientos')
