@@ -48,11 +48,15 @@ describe('Avatar', () => {
     expect(html).not.toContain('<img')
   })
 
-  test('con imagen: la <img> usa la URL y no repite el texto', () => {
+  test('con imagen: la <img> usa la URL y el placeholder tapa la espera', () => {
     const html = renderToStaticMarkup(<Avatar nombre="Ana Pérez" src="https://cdn.test/ana.png" />)
     expect(html).toContain('src="https://cdn.test/ana.png"')
     expect(html).toContain('object-cover')
-    expect(html).not.toContain('>AP<')
+    // Sin `load` (SSR) la imagen va transparente sobre el placeholder neutro:
+    // nunca se pinta la anterior mientras resuelve (#271).
+    expect(html).toContain('>AP<')
+    expect(html).toContain('opacity-0')
+    expect(html).toContain('aria-hidden="true"')
   })
 
   test('empresa: cuadrado redondeado y tamaño grande', () => {

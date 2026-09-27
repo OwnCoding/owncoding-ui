@@ -4,6 +4,19 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.48.2 — 2026-09-27
+
+- **`Avatar` no pinta la imagen anterior (#271):** al cambiar `src` (otra
+  persona, otra versión de la foto) monta un nodo nuevo (`key` por URL) y, hasta
+  que la nueva carga, queda el **placeholder neutro de iniciales**; el navegador
+  ya no puede mantener la imagen vieja en el mismo `<img>` (eso producía el
+  flash de la foto previa al recargar). Si la imagen falla, cae a iniciales y
+  avisa por `onError` para que la app pase a la fuente siguiente.
+- Tests de navegador (`test/avatar-carga.test.jsx`) y guarda nueva: los
+  componentes no cachean datos en el módulo (`test/sin-cache.test.js`), revisada
+  contra los objetos de los lotes de Inventario, Finanzas, Config y cobros.
+- Docs: `REGLAS.md` §6.
+
 ## v0.48.1 — 2026-09-27
 
 - **`SelectorCuentaCobro`**: «Cambiar cuenta» reabre la búsqueda de verdad.

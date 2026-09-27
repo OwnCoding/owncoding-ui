@@ -213,6 +213,12 @@ compatibilidad).
   (`name`/`nombre`, `avatarUrl`/`foto`/`photoURL`, `picture`, `hasAvatar`) y
   `ESTADOS_PRESENCIA` define la etiqueta y el punto de cada estado. La app no
   vuelve a pluckear campos ni dibuja la foto a mano.
+- **Cambio de imagen sin foto vieja (#271):** al cambiar `src`/`foto`, el
+  `Avatar` monta un nodo nuevo (`key` por URL) y muestra el **placeholder
+  neutro** de iniciales hasta que la imagen carga; el navegador no puede
+  mantener la imagen anterior (eso producía el flash de la foto previa al
+  recargar el bloqueo). Si la imagen falla, cae a iniciales y avisa por
+  `onError` (la app pasa a la fuente siguiente: local → Google).
 - `primerNombre` para contextos compactos (la cronología) — ya en la librería.
 - `normalizarNombre` respeta las **razones sociales** (`esRazonSocial`): un
   nombre de empresa con tipo societario (S.A., S.R.L., LTDA, cooperativa…)

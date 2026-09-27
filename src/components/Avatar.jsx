@@ -6,6 +6,11 @@ import { colorDeNombre, inicialesDeNombre } from '../utils/avatar.js'
 // iniciales pintadas con un color estable derivado del nombre. Nunca queda un
 // cuadro roto: si la imagen falla, se muestran las iniciales.
 //
+// Al cambiar `src` (otra persona, otra versión de la foto) **no se pinta la
+// imagen anterior**: se monta un nodo nuevo y, hasta que la nueva carga, queda
+// el placeholder neutro de iniciales (#271). El nodo anterior se descarta
+// (`key={src}`) porque el navegador mantiene la imagen vieja en el mismo `<img>`.
+//
 // Portable: recibe el nombre y la URL de la imagen por props (la app resuelve
 // si tiene foto, logo o ninguna). `forma="cuadrado"` es para empresas/logos;
 // `forma="redondo"` (predeterminado) para personas. `tamano`: `xs`…`xl`.
@@ -36,17 +41,23 @@ export default function Avatar({
   onError,
   className,
 }) {
-  const [fallo, setFallo] = useState(false)
+  // `cargada`/`fallo` se guardan por URL: al cambiar la imagen, la anterior no
+  // puede quedar pintada (el navegador mantiene la vieja en el mismo nodo)
+  // mientras la nueva carga, y el placeholder de iniciales la tapa (#271).
+  const [cargada, setCargada] = useState('')
+  const [fallo, setFallo] = useState('')
+  const url = String(src || '')
 
-  // Una URL nueva (otra persona, otra versión) vuelve a intentar la imagen.
   useEffect(() => {
-    setFallo(false)
-  }, [src])
+    setCargada('')
+    setFallo('')
+  }, [url])
 
   const cuadro = empresa ? 'cuadrado' : forma || 'redondo'
   const redondo = cuadro !== 'cuadrado'
   const etiqueta = ariaLabel || title || String(nombre ?? '').trim() || 'Identidad'
-  const conImagen = Boolean(src) && !fallo
+  const conImagen = Boolean(url) && fallo !== url
+  const visible = conImagen && cargada === url
 
   return (
     <span
@@ -55,25 +66,30 @@ export default function Avatar({
       aria-hidden={decorativo || undefined}
       title={title}
       className={cn(
-        'inline-flex shrink-0 items-center justify-center overflow-hidden font-bold uppercase',
+        'relative inline-flex shrink-0 items-center justify-center overflow-hidden font-bold uppercase',
         redondo ? 'rounded-full' : 'rounded-lg',
-        !conImagen && colorDeNombre(nombre),
+        !visible && colorDeNombre(nombre),
         TAMANOS_AVATAR[tamano] || TAMANOS_AVATAR.md,
         className,
       )}
     >
+      {visible ? null : <span aria-hidden="true">{inicialesDeNombre(nombre)}</span>}
       {conImagen ? (
         <img
-          src={src}
+          key={url}
+          src={url}
           alt=""
           decoding="async"
           referrerPolicy="no-referrer"
-          onError={(event) => { setFallo(true); onError?.(event) }}
-          className={cn('h-full w-full', redondo ? 'object-cover' : 'object-contain')}
+          onLoad={() => setCargada(url)}
+          onError={(event) => { setFallo(url); onError?.(event) }}
+          className={cn(
+            'absolute inset-0 h-full w-full',
+            redondo ? 'object-cover' : 'object-contain',
+            visible ? 'opacity-100' : 'opacity-0',
+          )}
         />
-      ) : (
-        <span aria-hidden="true">{inicialesDeNombre(nombre)}</span>
-      )}
+      ) : null}
     </span>
   )
 }
