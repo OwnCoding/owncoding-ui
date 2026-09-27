@@ -234,6 +234,17 @@ export const TEMA_CLARO: 'claro'
 export const TEMA_OSCURO: 'oscuro'
 export function aplicarTema(tema: Tema, clave?: string | null): void
 export function ThemeToggle(props: { clave?: string | null; alCambiar?: (tema: Tema) => void; etiquetaClaro?: string; etiquetaOscuro?: string; className?: string }): ReactElement
+export function BloquePago(props: {
+  etiqueta?: ReactNode
+  encabezado?: ReactNode
+  acento?: 'ok' | 'warn' | 'bad' | 'fono' | null
+  onQuitar?: () => void
+  etiquetaQuitar?: string
+  deshabilitado?: boolean
+  testId?: string
+  className?: string
+  children?: ReactNode
+}): ReactElement
 export function BuscadorCliente(props: {
   clientes?: Array<Record<string, any>>
   selectedId?: string

@@ -218,10 +218,12 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   `ProductCombobox` (buscar/elegir/crear producto), `BuscadorProveedor`
   (últimos usados por defecto, filtro por nombre/abreviatura y alta rápida,
   #259), `SelectorCuentaCobro` (+`TarjetaCuentaCobro`: al elegir colapsa el
-  buscador y muestra una sola tarjeta con «Cambiar cuenta», #262), el flujo de
-  **unificar clientes** (`BuscadorCliente` con posible duplicado, `PreviewFusion`
-  y `ConfirmarConPalabra`, #268), `RucField` (+`extraerRuc`/`esRuc`: la consulta
-  entra por prop) y `SerialTexto` (serial con los últimos 4 siempre visibles).
+  buscador y muestra una sola tarjeta con «Cambiar cuenta», #262),
+  `BloquePago` (la papelera adentro de la tarjeta del medio de pago, #265), el
+  flujo de **unificar clientes** (`BuscadorCliente` con posible duplicado,
+  `PreviewFusion` y `ConfirmarConPalabra`, #268), `RucField`
+  (+`extraerRuc`/`esRuc`: la consulta entra por prop) y `SerialTexto` (serial
+  con los últimos 4 siempre visibles).
 - **Acceso (sin API):** `GoogleButton` (+`GoogleMark`, `OAuthDivider`),
   `AuthLayout` (slots de logo/copy/acciones/pie), `ProductFooter`,
   `LoadingScreen` y `PegarEnlaceToken` (extrae el token del enlace). No leen

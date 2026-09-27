@@ -72,6 +72,11 @@ compatibilidad).
   fantasma. No se restylean sin pedido.
 - Botón solo-icono: `IconAction` (trae `aria-label` y `title`).
 - Deshabilitado: opacidad reducida y `cursor: not-allowed`; foco visible.
+- **Bloque de pago (`BloquePago`, #265):** al mostrar varios medios de pago, el
+  contenido de cada uno (medio/cuenta/monto) va dentro de la tarjeta y la
+  **papelera va adentro**, arriba a la derecha (`IconAction` `tone="bad"`
+  `size="touch"`, con tooltip), así la fila gana el ancho completo. La
+  confirmación de quitar, si hace falta, es de la pantalla.
 - **Alto táctil ≥44 px (móvil, #249):** los controles agrupados crecen con
   `min-h-11` (`SegmentedField`, `Subtabs`, barra inferior) y los que no pueden
   cambiar su dibujo suman la utilidad **`.toque-44`** (pseudo-elemento centrado

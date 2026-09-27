@@ -4,6 +4,18 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.44.0 — 2026-09-26
+
+- **Bloque de pago (#265):** **`BloquePago`** — la tarjeta de cada medio de pago
+  con la **papelera adentro** (arriba a la derecha, `IconAction` con tooltip y
+  44 px de toque), el contenido con el ancho completo y un `acento` opcional
+  para el borde izquierdo (pagado/no pagado). El contenido entra por `children`
+  y quitar se avisa por `onQuitar`; la confirmación es de la pantalla.
+- Docs: `REGLAS.md` §2 y README.
+- Recordatorio del lote: el selector de cuenta de cobro (#262, v0.42.0:
+  `SelectorCuentaCobro`/`TarjetaCuentaCobro`) y los componentes de unificación
+  de clientes (#268, v0.43.0) quedan publicados y documentados.
+
 ## v0.43.0 — 2026-09-26
 
 - **Unificar clientes duplicados (#268):** componentes del flujo completo.
