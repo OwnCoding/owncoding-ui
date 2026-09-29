@@ -62,6 +62,10 @@ permisos; el shell solo dibuja y navega.
   33): `buscar` reparte entre los 8 grupos de la API y el elegido navega por
   `datos`; `conAtajo={false}` deja el Ctrl+K del shell y `className="max-w-3xl"`
   conserva el ancho «amplio» del estándar de modales (#237).
+- **Densidad en escritorio (`≥1280`):** encabezado de una sola fila (56–64 px),
+  barra de acciones en una fila, KPIs de 112–140 px y ritmo `gap` 12–16 /
+  tarjetas 16–20 / secciones 16–24; el detalle, en tooltip. Regla completa y
+  verificación: `REGLAS.md` §17.
 
 ## 4. Tokens v2 y contraste AA (shell v2, #241)
 
@@ -167,7 +171,11 @@ export function Shell({ usuario, nav, activo, ir, buscar }) {
 - [ ] Barra inferior con `ESPACIO_BARRA_INFERIOR` en el contenido.
 - [ ] Contraste AA verificado en claro y oscuro (`test/contraste-tokens.test.js`
       en esta biblioteca; en la app, su propia guarda).
-- [ ] Capturas antes/después en mobile y escritorio, sin scroll horizontal.
+- [ ] **Pase de compactación de escritorio** hecho (`REGLAS.md` §17):
+      encabezado y barra de acciones de una fila, KPIs de 112–140 px y ritmo
+      12–16/16–20/16–24.
+- [ ] Capturas antes/después en mobile y escritorio, sin scroll horizontal
+      (compactación: 1440×900 y 390×844, claro y oscuro).
 
 ## 7. Estado de la migración (con DSN, #241)
 

@@ -4,6 +4,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.53.0 — 2026-09-29
+
+- **Compactación de escritorio (#7):** `REGLAS.md` **§17** fija el pase de
+  densidad operativa —auditar primero (`PageHeader`, barra de acciones, KPIs,
+  tabs y contenedores compartidos) y ajustar después— con las medidas
+  adoptables por cualquier app: fila única de encabezado (**56–64 px**), barra
+  de acciones en una fila, KPIs de **112–140 px**, ritmo (`gap` 12–16, tarjetas
+  16–20, secciones 16–24), mobile con **≥44 px** y tabs con scroll horizontal,
+  las prohibiciones (no recortar funciones ni esconder acciones, sin altura
+  fija para contenido dinámico, sin variantes locales) y la verificación a
+  **1440×900** con capturas 1440×900/390×844 en claro y oscuro.
+- Referencias cruzadas sin duplicar: `SHELL.md` §3 (anatomía por breakpoint) y
+  §6 (checklist), `REGLAS.md` §10 (shell) y §15.11 (rendimiento), y
+  `ADOPCION-V2.md` §10 (checklist de cierre).
+- **Referencia real:** Scale OS (`dariodeoli/scale-os#89`–`#96`): medición de
+  Inventario **−37 %** de altura a 1440 px (453 → 285 px al primer equipo) y
+  capturas `docs/qa/compact-*`.
+
 ## v0.52.0 — 2026-09-29
 
 - **Reglas del ecosistema (Segundo Cerebro) anexadas:** nuevo
