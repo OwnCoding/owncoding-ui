@@ -152,6 +152,9 @@ verde y el inventario de duplicados en 0 (paso 8).
 - [ ] Guarda de contraste en la app (claro y oscuro) en verde.
 - [ ] Shell con los objetos y 44 px de alto táctil.
 - [ ] Pantallas migradas de a una, con capturas antes/después.
+- [ ] **Pase de compactación de escritorio** hecho (`REGLAS.md` §17): encabezado
+      y barra de acciones de una fila, KPIs de 112–140 px, ritmo 12–16/16–20/16–24
+      y capturas 1440×900 antes/después.
 - [ ] Bloque local v2 retirado; inventario de duplicados en 0.
 - [ ] Íconos: todo nombre usado existe en `ICONOS` (los desconocidos no dibujan).
 - [ ] Puentes sin lógica para lo migrado; lo divergente, publicado primero.

@@ -580,7 +580,9 @@ El **shell** se arma como en **`docs/SHELL.md`**: scope `tema-v2` con los tonos
 de texto AA, ítem activo con `aria-current="page"`, grupos plegables con
 `aria-expanded`, identidad con `PersonaChip` en el pie, presencia con
 `PilaPersonas`, miga de sección con `PageHeader migas=[…]` y el contenido con
-`ESPACIO_BARRA_INFERIOR` cuando hay barra inferior.
+`ESPACIO_BARRA_INFERIOR` cuando hay barra inferior. La **densidad operativa** de
+escritorio (encabezado y barra de acciones de una fila, KPIs y ritmo) va con
+**§17**.
 
 ## 11. Configuración: tarjetas, solapas y encabezados (#253)
 
@@ -810,7 +812,9 @@ complementan (acceso, seguridad, infra, pagos, correo) viven en
     Ayuda. Objetos: `ProductFooter`, `utils/version.js`, `AyudaModulo`.
 11. **Rendimiento por defecto.** Pantallas lazy, chunk de entrada liviano y
     listas grandes acotadas o **virtualizadas** (`ventanaDeLista`). Objetos:
-    `utils/ventana.js`, `ListGridToggle` para tablas densas.
+    `utils/ventana.js`, `ListGridToggle` para tablas densas. La **densidad
+    visual** de la pantalla se completa con el pase de **§17** (no reemplaza la
+    virtualización ni justifica recortar datos).
 
 ## 16. Formato de notificaciones (#293)
 
@@ -867,3 +871,58 @@ hay lógica de avisos duplicada por canal.
   no lleva lógica. El correo **siempre** incluye el enlace de respaldo visible
   (`docs/TOKENS.md`).
 - WhatsApp: mensaje corto armado con `whatsappUrl`; sin datos de más.
+
+## 17. Compactación de escritorio (densidad operativa, #7)
+
+**Más contenido útil arriba del pliegue, sin eliminar funciones.** Un pase de
+compactación se hace **auditando primero** (`PageHeader`, barra de acciones,
+tarjetas de KPI, tabs y contenedores compartidos) y ajustando después; no se
+crea CSS nuevo para lo que ya resuelven los objetos y los tokens (§8). La
+anatomía del shell por breakpoint está en **`docs/SHELL.md` §3**.
+
+### Escritorio (≥1280 px)
+
+- **Fila única de encabezado (56–64 px):** título + contador/contexto + acción
+  primaria. El subtítulo va en **una línea** (lo que no entra, al tooltip); no
+  se apila en varios renglones.
+- **Ritmo:** `gap` 12–16 px; padding de tarjetas 16–20 px; separación entre
+  secciones 16–24 px.
+- **Barra de acciones en una sola fila**; el wrap, solo en breakpoints reales.
+  Una tarjeta grande no aloja solo un buscador, filtros o botones.
+- **KPIs de 112–140 px:** rótulo chico, valor prominente (`Stat`) y **una**
+  línea de explicación; el detalle restante, en tooltip.
+- **Información secundaria** como chip, texto auxiliar o tooltip; nunca como
+  bloque alto. El vacío ocupa una línea (`EmptyState compact`) cuando se pueda.
+- **Tabs** en una barra horizontal compacta; sin botones enormes ni varias
+  filas.
+
+### Mobile
+
+- Objetivos táctiles de **≥44 px** (§2 y §15.4); apilar solo donde haga falta;
+  tabs con **scroll horizontal** y sin texto cortado.
+
+### Prohibiciones
+
+- No eliminar funciones, permisos, endpoints, datos ni lógica de negocio; no
+  esconder acciones importantes.
+- No usar altura fija para contenido dinámico.
+- No crear variantes locales de objetos publicados: **la `prop` es el camino**
+  (§9).
+
+### Verificación
+
+- A **1440×900** cada pantalla muestra contenido real sin scroll innecesario
+  después del encabezado y los controles; la barra de acciones no suma capas
+  visuales.
+- Capturas **desktop (1440×900) y mobile (390×844)**, claro y oscuro, y medición
+  antes/después de la altura al primer contenido cuando aplique (§15.4).
+- Tests de layout/contrato de la app que fijen lo adoptado (los que tenga).
+
+**Referencia real:** Scale OS (`dariodeoli/scale-os#89`–`#96`): medición de
+Inventario **−37 %** a 1440 px (453 → 285 px al primer equipo) y capturas
+`docs/qa/compact-*` de ese repositorio. **Adopción:** checklist de
+`docs/SHELL.md` §6 y cierre de `docs/ADOPCION-V2.md` §10.
+
+Esto es **densidad visual**, no rendimiento: §15.11 (listas acotadas o
+virtualizadas) sigue vigente y compactar no justifica recortar datos ni
+funciones.
