@@ -27,7 +27,7 @@ permisos; el shell solo dibuja y navega.
 | Presencia | `PilaPersonas` | Avatares superpuestos con punto de presencia y contador «+N»; `resumenPresencia` arma el texto («Ana en línea», «3 en línea») |
 | Avisos | `CampanaAvisos` | Contador de no leídos (`99+`) + panel; abrir/elegir se avisan por callback |
 | Identidad de la sesión | `Avatar` | Foto → iniciales con color estable; vive en el `pie` de la barra o del menú |
-| Pie institucional | `ProductFooter` | Versión, crédito y textos por props (la biblioteca no conoce la marca) |
+| Pie institucional | `ProductFooter` | **Obligatorio en todas las páginas** (#291): © + nombre + versión + crédito «Desarrollado por Owncoding» con enlace; marca y versión entran por props (la biblioteca no conoce la marca) |
 | Ajustes con formulario | `PanelDerecho` + `TarjetaAjuste` | Contenido/lista a la izquierda; formulario fijo a la derecha desde `lg` y apilado en móvil |
 
 ## 2. Props (resumen)
@@ -44,7 +44,7 @@ permisos; el shell solo dibuja y navega.
 | `PilaPersonas` | `personas` (objetos o strings), `max` (4), `size`, `onMas`, `resumen`, `ariaLabel`, `title`, `className` |
 | `CampanaAvisos` | `avisos` `[{ id, titulo, detalle?, tono?, fecha?, href?, onClick?, leido? }]`, `onAbrir`, `onElegir`, `pie`, `anclaje` |
 | `Avatar` | `nombre`, `src`, `tamano` (`sm`/`md`/`lg`), `forma` (`redondo`/`cuadrado`), `empresa`, `title`, `ariaLabel`, `decorativo` |
-| `ProductFooter` | `nombre`, `version`, `credito`, `creditoUrl`, `anio`, `leading`, `children` |
+| `ProductFooter` | `nombre`, `version`, `credito` (default «Desarrollado por Owncoding»), `creditoUrl` (default `https://owncoding.dev/`), `anio` (default: año actual), `leading`, `children`, `className` |
 
 ## 3. Anatomía por breakpoint
 
@@ -158,6 +158,12 @@ export function Shell({ usuario, nav, activo, ir, buscar }) {
 - [ ] Un solo buscador global (`PaletaComandos`) y ayuda por pantalla
       (`AyudaModulo`) si la pantalla es densa.
 - [ ] Identidad de la sesión con `Avatar` (nunca iniciales a mano).
+- [ ] **Pie institucional (#291) en las cuatro superficies**: shell del panel,
+      acceso (login/registro/recuperación/verificación/invitación), públicas y
+      tokenizadas (seguimiento de pedido, informe, certificado, prueba de
+      impresión, ficha pública de producto, portal, estado). El puente de la
+      app pasa `nombre`, `version` y el crédito; se verifica
+      `data-testid="product-footer"` por pantalla (regla en `REGLAS.md` §14).
 - [ ] Barra inferior con `ESPACIO_BARRA_INFERIOR` en el contenido.
 - [ ] Contraste AA verificado en claro y oscuro (`test/contraste-tokens.test.js`
       en esta biblioteca; en la app, su propia guarda).

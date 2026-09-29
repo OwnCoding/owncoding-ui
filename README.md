@@ -229,7 +229,8 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   (+`extraerRuc`/`esRuc`: la consulta entra por prop) y `SerialTexto` (serial
   con los últimos 4 siempre visibles).
 - **Acceso (sin API):** `GoogleButton` (+`GoogleMark`, `OAuthDivider`),
-  `AuthLayout` (slots de logo/copy/acciones/pie), `ProductFooter`,
+  `AuthLayout` (slots de logo/copy/acciones/pie), `ProductFooter` (el pie
+  institucional **obligatorio en todas las páginas**, #291),
   `LoadingScreen` y `PegarEnlaceToken` (extrae el token del enlace). No leen
   sesión ni llaman a la API: reciben props y avisan por callback.
 - **Acciones y contenedores:** `Button`, `IconAction` (con `size="touch"` para
@@ -241,7 +242,8 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   `Toggle`).
 - **Navegación y shell:** `NavLateral` (colapsable y con grupos plegables,
   modelo `[{id,label,icono,contador}]` o `grupos`), `MenuDesplegable` (usuario,
-  acciones de fila), `AuthLayout`, `ProductFooter`, `LoadingScreen`. Las reglas
+  acciones de fila), `AuthLayout`, `ProductFooter` (**pie institucional
+  obligatorio**, #291), `LoadingScreen`. Las reglas
   de navegación del v2 (activo AA, rótulos y foco) viajan en `styles.css`; el
   armado completo (breakpoints, barra inferior, paleta y contraste) está en
   **`docs/SHELL.md`**.

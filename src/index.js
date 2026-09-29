@@ -133,7 +133,7 @@ export {
 // Acceso y shell (sin API: todo por props)
 export { default as GoogleButton, GoogleMark, OAuthDivider } from './components/GoogleButton.jsx'
 export { default as AuthLayout } from './components/AuthLayout.jsx'
-export { default as ProductFooter } from './components/ProductFooter.jsx'
+export { default as ProductFooter, CREDITO_PIE, CREDITO_PIE_URL } from './components/ProductFooter.jsx'
 export { default as LoadingScreen } from './components/LoadingScreen.jsx'
 export { default as PegarEnlaceToken } from './components/PegarEnlaceToken.jsx'
 export { default as NavLateral } from './components/NavLateral.jsx'

@@ -91,7 +91,8 @@ compatibilidad).
 
 - `GoogleButton` (+ `GoogleMark`, `OAuthDivider`) para el acceso con Google;
   `AuthLayout` arma la pantalla (slots de logo, copy de marca, acciones y pie);
-  `ProductFooter` y `LoadingScreen` son institucionales y van por props.
+  `ProductFooter` y `LoadingScreen` son institucionales y van por props
+  (**regla del pie institucional: §14**).
 - `PegarEnlaceToken` resuelve los enlaces de correo que llegan incompletos.
 - Todos son **sin API**: no leen sesión ni llaman al backend; la app maneja el
   flujo y pasa callbacks.
@@ -692,4 +693,41 @@ pantalla repite los mapas ni los contadores:
   `DestinoRecepcion` y el escaneo con `CampoSeriales`/`SerialField`; el stock
   nace recién al confirmar (regla de la épica).
 
+## 14. Pie institucional (#291)
 
+**Toda página de toda app muestra el pie institucional**: el shell del panel
+(todas las pantallas), las pantallas de acceso (login, registro, recuperación,
+verificación, invitación) y las páginas públicas o tokenizadas (seguimiento de
+pedido, informe, certificado, prueba de impresión, ficha pública de producto,
+portal, estado del sistema). No hay superficies exceptuadas.
+
+- **Objeto único: `ProductFooter`.** Nadie dibuja el `<footer>` institucional a
+  mano ni repite el texto en cada pantalla. Si una página no puede usar el
+  componente (por ejemplo, un lienzo de impresión), la excepción se documenta
+  en la app.
+- **Contenido mínimo** (en este orden, en una línea):
+  **© + año + nombre de la app + versión de la app + crédito
+  «Desarrollado por Owncoding» con enlace**.
+  `ProductFooter` lo garantiza: el crédito viene por defecto
+  (`CREDITO_PIE`/`CREDITO_PIE_URL`) y la app puede pisarlo, no quitarlo.
+- **La app inyecta su identidad** (la biblioteca no conoce la marca):
+  `nombre`, `version`, `credito`/`creditoUrl` si quiere otro crédito, `anio` si
+  lo necesita fijo y `leading`/`children` para textos propios (por ejemplo,
+  «Estado del sistema ·» o un enlace a términos).
+- **La versión es la real publicada**: sale de la fuente única de la app (su
+  `brand`/`version.json`), no de un literal en cada pantalla.
+- **`data-testid="product-footer"`**: las apps pueden asertar en e2e que cada
+  superficie (panel, auth, públicas) lo tiene; el enlace del crédito cumple el
+  área táctil de 44 px (`toque-44`, §1).
+
+```jsx
+import { ProductFooter } from 'owncoding-ui'
+import { APP_NAME, APP_VERSION, APP_CREDIT, APP_CREDIT_URL } from '@/lib/brand'
+
+<ProductFooter nombre={APP_NAME} version={APP_VERSION}
+  credito={APP_CREDIT} creditoUrl={APP_CREDIT_URL} />
+```
+
+**Adopción**: checklist en `docs/SHELL.md` §6 (panel, auth, públicas y
+tokenizadas). Referencia real: MobOS (`src/components/app/ProductFooter.jsx`,
+puente a este objeto) y sus páginas de acceso y públicas.

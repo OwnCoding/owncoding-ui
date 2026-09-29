@@ -646,7 +646,18 @@ export function GoogleButton(props: Record<string, any> & { onClick?: () => void
 export function GoogleMark(props: { className?: string }): ReactElement
 export function OAuthDivider(props: { texto?: string; className?: string }): ReactElement
 export function AuthLayout(props: Record<string, any> & { children?: ReactNode; className?: string }): ReactElement
-export function ProductFooter(props: Record<string, any> & { className?: string }): ReactElement
+export const CREDITO_PIE: string
+export const CREDITO_PIE_URL: string
+export function ProductFooter(props: {
+  nombre?: string
+  version?: string
+  credito?: string | null
+  creditoUrl?: string
+  anio?: number
+  leading?: ReactNode
+  children?: ReactNode
+  className?: string
+}): ReactElement
 export function LoadingScreen(props: { label?: string; logo?: ReactNode; className?: string }): ReactElement
 export function PegarEnlaceToken(props: Record<string, any> & { onToken?: (token: string) => void }): ReactElement
 export const NavLateral: ForwardRefExoticComponent<

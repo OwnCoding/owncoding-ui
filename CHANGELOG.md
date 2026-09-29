@@ -4,6 +4,22 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.50.0 — 2026-09-29
+
+- **Pie institucional obligatorio (#291):** `ProductFooter` es el objeto único
+  para el pie de **todas** las páginas (panel, acceso y públicas/tokenizadas):
+  © + nombre + **versión de la app** + crédito **«Desarrollado por Owncoding»**
+  con enlace. El crédito y su URL ahora vienen por defecto
+  (`CREDITO_PIE`/`CREDITO_PIE_URL`; la app puede pisarlos, no quitarlos), el
+  enlace suma el área táctil de 44 px (`toque-44`), el pie expone
+  `data-testid="product-footer"` para asertar la adopción por pantalla y sin
+  `nombre` ya no queda un punto suelto.
+- Docs: **`REGLAS.md` §14 «Pie institucional»** (regla y ejemplo) y
+  `SHELL.md` (fila, props y checklist de adopción: panel, auth, públicas y
+  tokenizadas).
+- Tests: `test/product-footer.test.jsx` (contenido mínimo, crédito por defecto
+  y pisado, 44 px, año, leading/children).
+
 ## v0.49.0 — 2026-09-27
 
 - **Ticket de prueba con corto predeterminado y plantilla (#277):**

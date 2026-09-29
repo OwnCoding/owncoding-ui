@@ -4266,35 +4266,52 @@ function AuthLayout({ logo, aside, acciones, pie, children, className }) {
 
 // src/components/ProductFooter.jsx
 import { Fragment as Fragment5, jsx as jsx38, jsxs as jsxs30 } from "react/jsx-runtime";
+var CREDITO_PIE = "Desarrollado por Owncoding";
+var CREDITO_PIE_URL = "https://owncoding.dev/";
 function ProductFooter({
   nombre = "",
   version = "",
-  credito = "",
-  creditoUrl = "",
+  credito = CREDITO_PIE,
+  creditoUrl = CREDITO_PIE_URL,
   anio = (/* @__PURE__ */ new Date()).getFullYear(),
   leading,
   children,
   className
 }) {
-  return /* @__PURE__ */ jsxs30("footer", { className: cn("border-t border-fore/10 bg-transparent px-4 py-3 text-center text-[11px] text-mute", className), children: [
-    leading,
-    /* @__PURE__ */ jsxs30("span", { children: [
-      "\xA9 ",
-      anio,
-      " ",
-      nombre,
-      ". Todos los derechos reservados.",
-      version ? ` \xB7 ${version}` : ""
-    ] }),
-    children && /* @__PURE__ */ jsxs30(Fragment5, { children: [
-      " \xB7 ",
-      children
-    ] }),
-    credito && /* @__PURE__ */ jsxs30(Fragment5, { children: [
-      " \xB7 ",
-      /* @__PURE__ */ jsx38("a", { href: creditoUrl, target: "_blank", rel: "noreferrer", className: "font-medium text-fono-dark hover:underline", children: credito })
-    ] })
-  ] });
+  return /* @__PURE__ */ jsxs30(
+    "footer",
+    {
+      "data-testid": "product-footer",
+      className: cn("border-t border-fore/10 bg-transparent px-4 py-3 text-center text-[11px] text-mute", className),
+      children: [
+        leading,
+        /* @__PURE__ */ jsxs30("span", { children: [
+          "\xA9 ",
+          anio,
+          nombre ? ` ${nombre}` : "",
+          ". Todos los derechos reservados.",
+          version ? ` \xB7 ${version}` : ""
+        ] }),
+        children && /* @__PURE__ */ jsxs30(Fragment5, { children: [
+          " \xB7 ",
+          children
+        ] }),
+        credito && /* @__PURE__ */ jsxs30(Fragment5, { children: [
+          " \xB7 ",
+          /* @__PURE__ */ jsx38(
+            "a",
+            {
+              href: creditoUrl,
+              target: "_blank",
+              rel: "noreferrer",
+              className: "toque-44 font-medium text-fono-dark hover:underline",
+              children: credito
+            }
+          )
+        ] })
+      ]
+    }
+  );
 }
 
 // src/components/LoadingScreen.jsx
@@ -10288,6 +10305,8 @@ export {
   CONDICION_UNIDAD,
   CONECTIVIDADES_MOVIL,
   CORTES_PRUEBA,
+  CREDITO_PIE,
+  CREDITO_PIE_URL,
   Calendario,
   CampanaAvisos,
   CampoSeriales,
