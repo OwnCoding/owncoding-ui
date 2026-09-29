@@ -7,9 +7,11 @@ portables y controles que sostienen la migración. Continúa a `docs/ADOPCION.md
 v0.30**.
 
 Referencias: `docs/V2.md` (tokens y objetos) · `docs/SHELL.md` (shell y AA) ·
-`docs/REGLAS.md` (reglas por pieza) · `docs/MIGRACION-V2.md` (una pantalla paso
-a paso) · `docs/ADOPCION.md` (instalación y errores de paquete) ·
-`docs/ALIMENTAR.md` (devolver objetos nuevos).
+`docs/REGLAS.md` (reglas por pieza) · `docs/REGLAS-ECOSISTEMA.md` (reglas del
+ecosistema: acceso, seguridad, infra, pagos, correo, publicación) ·
+`docs/MIGRACION-V2.md` (una pantalla paso a paso) · `docs/ADOPCION.md`
+(instalación y errores de paquete) · `docs/ALIMENTAR.md` (devolver objetos
+nuevos).
 
 ## 0. Qué significa adoptar v2
 

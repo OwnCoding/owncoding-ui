@@ -48,6 +48,11 @@ Requisitos: **React 18+** y **Tailwind CSS 3.4+**.
 > **Adopción v2 en otra app (guía práctica):** de la paleta al shell, el retiro
 > del bloque local, los puentes de migración y los controles que la sostienen,
 > con el caso real de MobOS: **`docs/ADOPCION-V2.md`**.
+>
+> **Reglas del ecosistema (Segundo Cerebro):** acceso, permisos, eliminación,
+> seguridad, Hub/Coolify, correo WEEM, pagos/dominios y publicación —el anexo
+> obligatorio que complementa las reglas de interfaz— en
+> **`docs/REGLAS-ECOSISTEMA.md`**.
 
 ```js
 // tailwind.config.js

@@ -4,6 +4,22 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.52.0 — 2026-09-29
+
+- **Reglas del ecosistema (Segundo Cerebro) anexadas:** nuevo
+  **`docs/REGLAS-ECOSISTEMA.md`** con las 11 secciones vigentes —acceso y
+  cuentas, permisos y datos, eliminación y privacidad, seguridad técnica,
+  diseño/marca/publicación, versionado y pendientes, reutilización,
+  infraestructura OwnCoding Hub, correo WEEM, SaaS/pagos/dominios y
+  demos/RUC/admin/UX— fieles al texto del Segundo Cerebro, con los docs
+  canónicos, el alcance (universales del ecosistema; las reglas propias por app
+  **no** se promueven) y **AEX como referencia opcional**. Tabla de referencias
+  cruzadas con **§14** (pie/versión), **§15** (transversales) y **§16**
+  (notificaciones).
+- Links desde `REGLAS.md` (intro y §15), `README.md`, `ADOPCION.md` y
+  `ADOPCION-V2.md`; queda claro que `REGLAS.md` es la interfaz y el anexo el
+  resto del ecosistema.
+
 ## v0.51.0 — 2026-09-29
 
 - **Reglas transversales (#293):** `REGLAS.md` §15 documenta las 11 reglas

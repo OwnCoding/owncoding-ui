@@ -4,6 +4,12 @@ Reglas vivas, portables a cualquier app del grupo. Antes de crear un campo, un
 aviso o una celda, se busca acá y se usa el objeto del paquete. Si algo falta,
 se crea en `owncoding-ui` y se adopta en todas las apps.
 
+> **Anexo de ecosistema (Segundo Cerebro):** acceso, permisos, eliminación,
+> seguridad, infraestructura (Hub), correo (WEEM), SaaS/pagos/dominios y
+> publicación están en **`docs/REGLAS-ECOSISTEMA.md`**. Este documento (REGLAS)
+> cubre la **interfaz**; el anexo es igual de obligatorio y aplica a todas las
+> apps del grupo.
+
 ## 1. Campos de formulario
 
 ### Tabla por tipo de dato
@@ -754,7 +760,9 @@ versión nueva** (`hayVersionNueva`/`compararVersiones`, `utils/version.js`) y
 
 Aprobadas por Dario el 29-09. Aplican a **toda** pantalla y módulo de todas las
 apps. Donde hay objeto, va con props claras y **test de aserción** (proceso §9);
-las apps adoptan borrando su copia.
+las apps adoptan borrando su copia. Las reglas **de ecosistema** que las
+complementan (acceso, seguridad, infra, pagos, correo) viven en
+**`docs/REGLAS-ECOSISTEMA.md`**.
 
 1. **Cero éxito falso.** Nada se marca como hecho sin la entrega real y ningún
    fallo se silencia: siempre hay mensaje accionable y reintento o salida. El

@@ -5,8 +5,9 @@ a una nueva, sin romper nada. Complementa:
 
 - `docs/V2.md` — tokens y objetos del sistema v2 (qué es cada cosa).
 - `docs/MIGRACION-V2.md` — **cómo adaptar una pantalla** (paso a paso).
-- `docs/REGLAS.md` — reglas de interfaz; `docs/ALIMENTAR.md` — cómo devolver
-  objetos nuevos a la biblioteca.
+- `docs/REGLAS.md` — reglas de interfaz; `docs/REGLAS-ECOSISTEMA.md` — reglas
+  del ecosistema (acceso, seguridad, infra, pagos, correo, publicación);
+  `docs/ALIMENTAR.md` — cómo devolver objetos nuevos a la biblioteca.
 
 ## 1. Requisitos y versión
 
