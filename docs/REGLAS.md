@@ -128,6 +128,9 @@ compatibilidad).
 - Carga: `Skeleton` para placeholders; las pulsaciones decorativas (un ícono,
   un punto de estado) no son skeletons.
 - Errores de pantalla completa: `ErrorState` con reintento.
+- **Transversal (#293):** nada de éxito falso —el resultado sale del dato real—
+  y toda pantalla tiene los cuatro estados: cargando / vacío **con acción** /
+  error **con reintento** / lleno (§15.1 y §15.3).
 - Conexión: `IndicadorConexion` en `variante="chip"` (cola offline) o `variante="banner"` (franja ancha del shell; sin conexión usa la superficie roja con texto legible en cada tema).
 - **Estados de negocio:** también se dibujan con `ChipEstado` (un solo chip en
   toda la app): `borrador`, `enviado`, `aprobado`, `rechazado`, `vencido`,
@@ -266,6 +269,9 @@ compatibilidad).
 
 - Colores, tipografía y sombras salen del preset + `styles.css`; prohibido
   hardcodear colores o usar estilos inline salvo valores dinámicos.
+- **Transversal (#293):** tres temas —claro, oscuro y **alto contraste**— y
+  objetivos táctiles de **≥44 px** en móvil (`.toque-44`/`min-h-11`); las
+  entregas de UI se documentan con capturas (§15.4).
 - **Hojas separadas (22-09-2026):** `tokens.css` trae **solo variables**
   (importable en una app con diseño propio sin que le toque `html`/`body`);
   `base.css` es la base global opt-in (`html`, `body`, tipografías, foco,
@@ -475,6 +481,10 @@ Reglas:
    `test/` (si una app vuelve a copiar el patrón, su test lo marca).
 3. La app adopta el objeto y borra su copia en el mismo cambio.
 
+Las **reglas transversales** (§15) siguen el mismo proceso: donde hay objeto,
+tiene props claras y su test de aserción en este paquete; el aviso al usuario
+sigue el **formato de notificaciones** (§16).
+
 ## 10. Agenda, filtros, shell e identidad (lote 2 — 22-09-2026)
 
 Objetos para las pantallas de trabajo diario: calendario, filtro de fechas,
@@ -601,6 +611,10 @@ sección:
 - **Mapa campo por campo**: `docs/MAPA-CONFIG.md` de MobOS (grupos y detalle).
 
 ## 11 ter. Unificar entidades (clientes, #268)
+
+**Transversal (#293, regla 5):** esta regla no es solo de clientes — si dos
+pantallas muestran lo mismo (pedido, producto, cuenta, unidad), comparten el
+objeto o la derivación. Un dato, un formato.
 
 - **Selector de duplicado**: `BuscadorCliente` encuentra por nombre, teléfono
   (crudo o en dígitos), CI/RUC, correo, facturación o tags, con alta rápida y
@@ -731,3 +745,117 @@ import { APP_NAME, APP_VERSION, APP_CREDIT, APP_CREDIT_URL } from '@/lib/brand'
 **Adopción**: checklist en `docs/SHELL.md` §6 (panel, auth, públicas y
 tokenizadas). Referencia real: MobOS (`src/components/app/ProductFooter.jsx`,
 puente a este objeto) y sus páginas de acceso y públicas.
+
+**Transversal (#293, regla 10):** la versión del pie es la fuente del **aviso de
+versión nueva** (`hayVersionNueva`/`compararVersiones`, `utils/version.js`) y
+`/status` queda accesible desde la Ayuda (`AyudaModulo`).
+
+## 15. Reglas transversales (#293)
+
+Aprobadas por Dario el 29-09. Aplican a **toda** pantalla y módulo de todas las
+apps. Donde hay objeto, va con props claras y **test de aserción** (proceso §9);
+las apps adoptan borrando su copia.
+
+1. **Cero éxito falso.** Nada se marca como hecho sin la entrega real y ningún
+   fallo se silencia: siempre hay mensaje accionable y reintento o salida. El
+   resultado sale del dato real (lo que devolvió el backend, el `ok` del agente
+   de impresión), nunca de una suposición de la pantalla. Un envío sin relay
+   queda **en cola**, no «enviado» (§16). Objetos: `Aviso`, `ErrorState`,
+   `EstadoGuardado`, `IndicadorConexion`, `SaveActions` (§2 ter).
+2. **Paridad demo.** Toda feature o pantalla nueva funciona en la demo con los
+   mismos flujos y datos ficticios: la demo no es un camino aparte. La pantalla
+   no esconde features por ser demo; cambia la fuente (`demoStorage`, seeds) y
+   usa los mismos objetos.
+3. **Cuatro estados por pantalla.** Cargando (`Skeleton`), vacío **con acción**
+   (`EmptyState action`), error **con reintento** (`ErrorState onRetry`) y
+   lleno. Ninguna pantalla en blanco. Se revisan las cuatro ramas y se
+   documentan con capturas.
+4. **Tres temas + toque 44.** Claro, oscuro y **alto contraste**; objetivos
+   táctiles de **≥44 px** en móvil (`.toque-44`, `min-h-11`). **Capturas
+   obligatorias** en toda entrega de UI (mobile y escritorio). Objetos: tokens
+   de `styles.css` y `ThemeToggle` (§8); el alto contraste se declara con los
+   mismos tokens.
+5. **Una entidad, una fuente de verdad.** Si dos pantallas muestran lo mismo,
+   comparten objeto o derivación —extiende §11-ter a **todo** (clientes,
+   pedidos, productos, cuentas, unidades): un dato, un formato. Nada de dos
+   versiones del mismo cálculo repartidas.
+6. **Microcopy es-PY (voseo), sin jerga.** El mensaje dice **qué pasó** y **qué
+   hacer**, en segunda persona («Revisá…», «Probá de nuevo»), con el vocabulario
+   del negocio (venta, pedido, unidad, cobro). Sin nombres internos, códigos
+   técnicos ni inglés. Los textos accionables salen de los objetos
+   (`vacioDetalle`, `ErrorState`, `Aviso`).
+7. **Rutas canónicas.** Toda ruta visible vive declarada en `rutas.js` con su
+   metadata (título, ícono, permisos), sin duplicar slugs dinámicos (`[id]` vs
+   `[userId]`). La compatibilidad **redirige**; no se monta la pantalla dos
+   veces.
+8. **Búsqueda y atajos consistentes.** Ctrl/Cmd+K global en el panel; F1–F4,
+   Cmd/Ctrl+S y Esc documentados y funcionando donde aplican; la ayuda de cada
+   pantalla es `AyudaModulo` y la de la app queda en su sección de ayuda.
+   Objetos: `PaletaComandos` y `AyudaModulo` (`docs/SHELL.md`).
+9. **Dinero y sensibilidad.** La visibilidad de costos depende del rol; las
+   acciones sensibles piden reautenticación; **toda acción crítica se audita**;
+   lo destructivo usa confirmación reforzada. Objetos: `ConfirmarConPalabra`,
+   los bloqueos de autorización de la app y la auditoría del backend.
+10. **Versión visible y novedades.** El pie institucional muestra la versión de
+    la app (§14) y la app avisa cuando hay una **versión nueva**
+    (`hayVersionNueva`/`compararVersiones`); `/status` queda accesible desde la
+    Ayuda. Objetos: `ProductFooter`, `utils/version.js`, `AyudaModulo`.
+11. **Rendimiento por defecto.** Pantallas lazy, chunk de entrada liviano y
+    listas grandes acotadas o **virtualizadas** (`ventanaDeLista`). Objetos:
+    `utils/ventana.js`, `ListGridToggle` para tablas densas.
+
+## 16. Formato de notificaciones (#293)
+
+Un solo formato de aviso al usuario, con contrato canónico por canal. El hecho
+nace **una vez** en la bandeja interna oficial y de ahí se deriva al resto: no
+hay lógica de avisos duplicada por canal.
+
+### Bandeja / campana (`CampanaAvisos`)
+
+- **Aviso**: `{ id, titulo, detalle?, tono?, fecha?, href?, leido?, icono? }`.
+  - `titulo` corto (sin punto final) y `detalle` en **una línea**.
+  - `tono` es uno de `TONOS` (`ok`/`warn`/`bad`/`info`/`mute`); define el punto
+    de color.
+  - `fecha` llega **ya formateada** («hace 5 min»): la calcula la app.
+  - `href` —o `destino`, que se tolera— es la **ruta interna**; nunca una URL
+    externa.
+  - `leido` marca el estado; el contador sale de los no leídos y se muestra
+    hasta **99+**.
+- **Panel**: contador, cabecera, **vacío con acción** (`vacioAccion`) y `pie`
+  opcional. Abrir avisa `onAbrir`; elegir, `onElegir` (la app decide qué se
+  marca como leído). El objeto no consulta nada: los avisos entran por props.
+
+### Push
+
+- Payload **genérico** (`payloadPush`): título = nombre de la app (o uno
+  propio), cuerpo corto y `data` con la **ruta interna** + `id`/`tono`.
+- **Nada sensible en la pantalla bloqueada**: no viajan cliente, montos, motivos
+  ni datos del pedido; el detalle vive en la bandeja.
+- **Horario silencioso** (`enHorarioSilencioso`, 22 → 8 por defecto): no suena,
+  pero el aviso **queda** en la bandeja.
+- Métricas por aviso (`id`): entrega y apertura se miden en la app; la
+  biblioteca no mide nada.
+
+### Toast
+
+- Solo para el **resultado de una acción en pantalla** (`useToast`): «Venta
+  guardada», «Se copió el enlace».
+- **No** para eventos de otros módulos (eso va a la bandeja) ni para novedades
+  que el usuario no pidió.
+
+### Derivación única
+
+- El hecho nace en la bandeja interna (oficial) y de ahí se sirve a push,
+  correo y WhatsApp; ningún canal arma su propio texto o estado por su cuenta.
+- Un envío sin relay configurado queda **en cola**, no «enviado» (regla 1):
+  estados canónicos `enviado`, `encolado`, `duplicado` y `fallido`.
+
+### Plantillas de mensajes (correo/WhatsApp)
+
+- Estructura canónica: **motivo** (qué pasó), **acción** (qué hacer, con
+  enlace), **cierre** (cordial, es-PY) y **firma** (app + «Desarrollado por
+  Owncoding»).
+- Placeholders con llaves (`{{cliente}}`, `{{pedido}}`, `{{enlace}}`); el texto
+  no lleva lógica. El correo **siempre** incluye el enlace de respaldo visible
+  (`docs/TOKENS.md`).
+- WhatsApp: mensaje corto armado con `whatsappUrl`; sin datos de más.

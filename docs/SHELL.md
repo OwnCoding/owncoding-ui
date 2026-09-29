@@ -25,7 +25,7 @@ permisos; el shell solo dibuja y navega.
 | Barra inferior (móvil) | `BarraInferior` | Hasta 4 destinos + «Más»; el contenido suma `ESPACIO_BARRA_INFERIOR` |
 | Estado de la cola | `IndicadorConexion` | Chip de `role="status"`: en línea / sin conexión y pendientes de subir (la app decide el estado) |
 | Presencia | `PilaPersonas` | Avatares superpuestos con punto de presencia y contador «+N»; `resumenPresencia` arma el texto («Ana en línea», «3 en línea») |
-| Avisos | `CampanaAvisos` | Contador de no leídos (`99+`) + panel; abrir/elegir se avisan por callback |
+| Avisos | `CampanaAvisos` | Bandeja oficial del panel (#293): contador de no leídos (`99+`), vacío **con acción** y ruta interna (`href`/`destino`); abrir/elegir se avisan por callback. Contrato por canal en `REGLAS.md` §16 |
 | Identidad de la sesión | `Avatar` | Foto → iniciales con color estable; vive en el `pie` de la barra o del menú |
 | Pie institucional | `ProductFooter` | **Obligatorio en todas las páginas** (#291): © + nombre + versión + crédito «Desarrollado por Owncoding» con enlace; marca y versión entran por props (la biblioteca no conoce la marca) |
 | Ajustes con formulario | `PanelDerecho` + `TarjetaAjuste` | Contenido/lista a la izquierda; formulario fijo a la derecha desde `lg` y apilado en móvil |
@@ -42,7 +42,7 @@ permisos; el shell solo dibuja y navega.
 | `BarraInferior` | `items` (máx. 4) `[{ id, etiqueta, icono, href }]`, `activo`, `onSelect`, `onMas`, `masEtiqueta`, `menuAbierto`, `menuId`, `maxItems` (4) |
 | `IndicadorConexion` | `enLinea`, `pendientes`, `sincronizando`, `onSincronizar`, etiquetas (`etiquetaEnLinea`/`etiquetaSinConexion`/`etiquetaSincronizando`) |
 | `PilaPersonas` | `personas` (objetos o strings), `max` (4), `size`, `onMas`, `resumen`, `ariaLabel`, `title`, `className` |
-| `CampanaAvisos` | `avisos` `[{ id, titulo, detalle?, tono?, fecha?, href?, onClick?, leido? }]`, `onAbrir`, `onElegir`, `pie`, `anclaje` |
+| `CampanaAvisos` | `avisos` `[{ id, titulo, detalle?, tono?, fecha?, href?/destino?, onClick?, leido? }]`, `onAbrir`, `onElegir`, `vacioTitulo`/`vacioDetalle`/`vacioAccion`, `pie`, `anclaje` |
 | `Avatar` | `nombre`, `src`, `tamano` (`sm`/`md`/`lg`), `forma` (`redondo`/`cuadrado`), `empresa`, `title`, `ariaLabel`, `decorativo` |
 | `ProductFooter` | `nombre`, `version`, `credito` (default «Desarrollado por Owncoding»), `creditoUrl` (default `https://owncoding.dev/`), `anio` (default: año actual), `leading`, `children`, `className` |
 

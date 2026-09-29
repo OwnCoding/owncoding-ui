@@ -340,6 +340,7 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   `METODOS_ENVIO`, `PASOS_ENVIO` y `claveRevision` (REGLAS §13).
 - **Tablero (lote 2, sin publicar):** `ImporteDelta` (monto con signo y color),
   `IndicadorConexion` (en línea / pendientes de subir), `CampanaAvisos`
+  (bandeja oficial: contrato por canal en `REGLAS.md` §16, #293)
   (contador + panel por props) y `GraficoBarras` (barras CSS sin dependencias).
 - **Días, rangos y cantidades:** `utils/calendario.js` (clave `YYYY-MM-DD`,
   semana lunes-domingo y etiquetas es-PY), `utils/rangoFecha.js` (atajos y

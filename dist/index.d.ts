@@ -1233,5 +1233,15 @@ export function telefonoVisible(telefono: string, countryCode?: string): string
 export function telefonoValido(telefono: string, countryCode?: string): boolean
 export const MENSAJE_TELEFONO: string
 
+/** Formato de notificaciones (#293): ruta interna y payload genérico del push. */
+export function rutaDeAviso(aviso?: Record<string, any>): string
+export function payloadPush(aviso?: Record<string, any>, opciones?: { app?: string; title?: string; body?: string }): { title: string; body: string; data: { ruta: string; id: string; tono: string } }
+/** Horario silencioso del push (por defecto 22 → 8). */
+export function enHorarioSilencioso(fecha?: Date | string | number, opciones?: { desde?: number; hasta?: number }): boolean
+/** Versión visible y aviso de novedades (#293, regla 10). */
+export function partesVersion(valor?: string): number[]
+export function compararVersiones(a?: string, b?: string): -1 | 0 | 1
+export function hayVersionNueva(actual?: string, publicada?: string): boolean
+
 /** Props de los objetos con superficie abierta (se tipan al adoptarse). */
 export type PropsAbiertas = Record<string, any> & { className?: string; children?: ReactNode }

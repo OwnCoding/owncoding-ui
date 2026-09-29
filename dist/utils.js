@@ -2292,6 +2292,51 @@ function crearRegistroPendientes() {
   };
 }
 
+// src/utils/avisos.js
+function rutaDeAviso(aviso = {}) {
+  return String(aviso?.href ?? aviso?.destino ?? "").trim();
+}
+function payloadPush(aviso = {}, { app = "", title = "", body = "" } = {}) {
+  return {
+    title: String(title || app || "Aviso").trim(),
+    body: String(body || "Ten\xE9s un aviso nuevo.").trim(),
+    data: {
+      ruta: rutaDeAviso(aviso),
+      id: String(aviso?.id ?? ""),
+      tono: String(aviso?.tono ?? "")
+    }
+  };
+}
+function enHorarioSilencioso(fecha = /* @__PURE__ */ new Date(), { desde = 22, hasta = 8 } = {}) {
+  const momento = fecha instanceof Date ? fecha : new Date(fecha);
+  const hora = momento?.getHours?.();
+  if (!Number.isFinite(hora)) return false;
+  const inicio = Number(desde);
+  const fin = Number(hasta);
+  if (!Number.isFinite(inicio) || !Number.isFinite(fin)) return false;
+  if (inicio === fin) return true;
+  return inicio < fin ? hora >= inicio && hora < fin : hora >= inicio || hora < fin;
+}
+
+// src/utils/version.js
+function partesVersion(valor) {
+  return String(valor ?? "").trim().replace(/^v/i, "").split("+")[0].split("-")[0].split(".").map((parte) => Number.parseInt(parte, 10)).map((numero) => Number.isFinite(numero) ? numero : 0);
+}
+function compararVersiones(a, b) {
+  const partesA = partesVersion(a);
+  const partesB = partesVersion(b);
+  const largo = Math.max(partesA.length, partesB.length);
+  for (let i = 0; i < largo; i += 1) {
+    const diferencia = (partesA[i] || 0) - (partesB[i] || 0);
+    if (diferencia !== 0) return diferencia > 0 ? 1 : -1;
+  }
+  return 0;
+}
+function hayVersionNueva(actual, publicada) {
+  if (!String(actual ?? "").trim() || !String(publicada ?? "").trim()) return false;
+  return compararVersiones(publicada, actual) > 0;
+}
+
 // src/utils/qr.js
 var QR_OPCIONES = { nivel: "M", margen: 1, ancho: 220 };
 async function qrDataUrl(valor, { ancho = QR_OPCIONES.ancho, nivel = QR_OPCIONES.nivel, margen = QR_OPCIONES.margen } = {}) {
@@ -2417,6 +2462,7 @@ export {
   colorDeTono,
   colorTrabajo,
   columnasDeAncho,
+  compararVersiones,
   completeSave,
   componerTelefono,
   conexionDeDestino,
@@ -2427,6 +2473,7 @@ export {
   departamentoDe,
   destinoDeConexion,
   diasHasta,
+  enHorarioSilencioso,
   envolver,
   errorMonto,
   esApellidosPrimero,
@@ -2478,6 +2525,7 @@ export {
   formatUsdInput,
   formatoNumero,
   gradoCondicion,
+  hayVersionNueva,
   hoyClave,
   iconoDeCategoria,
   iconoMetodoEnvio,
@@ -2519,7 +2567,9 @@ export {
   parseGsInput,
   parseTelefono,
   parseUsdInput,
+  partesVersion,
   partirSerial,
+  payloadPush,
   periodoDeRango,
   plantillaDePrueba,
   primerNombre,
@@ -2532,6 +2582,7 @@ export {
   rangoSemana,
   repartirLinea,
   resumenPresencia,
+  rutaDeAviso,
   separarSeriales,
   serialEnmascarado,
   signoDe,

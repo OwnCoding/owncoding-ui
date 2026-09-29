@@ -3489,6 +3489,51 @@ function SelectorCuentaCobro({
   ] });
 }
 
+// src/utils/avisos.js
+function rutaDeAviso(aviso = {}) {
+  return String(aviso?.href ?? aviso?.destino ?? "").trim();
+}
+function payloadPush(aviso = {}, { app = "", title = "", body = "" } = {}) {
+  return {
+    title: String(title || app || "Aviso").trim(),
+    body: String(body || "Ten\xE9s un aviso nuevo.").trim(),
+    data: {
+      ruta: rutaDeAviso(aviso),
+      id: String(aviso?.id ?? ""),
+      tono: String(aviso?.tono ?? "")
+    }
+  };
+}
+function enHorarioSilencioso(fecha = /* @__PURE__ */ new Date(), { desde = 22, hasta = 8 } = {}) {
+  const momento = fecha instanceof Date ? fecha : new Date(fecha);
+  const hora = momento?.getHours?.();
+  if (!Number.isFinite(hora)) return false;
+  const inicio = Number(desde);
+  const fin = Number(hasta);
+  if (!Number.isFinite(inicio) || !Number.isFinite(fin)) return false;
+  if (inicio === fin) return true;
+  return inicio < fin ? hora >= inicio && hora < fin : hora >= inicio || hora < fin;
+}
+
+// src/utils/version.js
+function partesVersion(valor) {
+  return String(valor ?? "").trim().replace(/^v/i, "").split("+")[0].split("-")[0].split(".").map((parte) => Number.parseInt(parte, 10)).map((numero) => Number.isFinite(numero) ? numero : 0);
+}
+function compararVersiones(a, b) {
+  const partesA = partesVersion(a);
+  const partesB = partesVersion(b);
+  const largo = Math.max(partesA.length, partesB.length);
+  for (let i = 0; i < largo; i += 1) {
+    const diferencia = (partesA[i] || 0) - (partesB[i] || 0);
+    if (diferencia !== 0) return diferencia > 0 ? 1 : -1;
+  }
+  return 0;
+}
+function hayVersionNueva(actual, publicada) {
+  if (!String(actual ?? "").trim() || !String(publicada ?? "").trim()) return false;
+  return compararVersiones(publicada, actual) > 0;
+}
+
 // src/components/BuscadorDispositivo.jsx
 import { useEffect as useEffect9, useId as useId9, useMemo as useMemo6, useRef as useRef9, useState as useState10 } from "react";
 
@@ -8434,6 +8479,7 @@ function CampanaAvisos({
   anclaje = "right",
   vacioTitulo = "Sin avisos",
   vacioDetalle = "No hay novedades para mostrar.",
+  vacioAccion,
   pie,
   className
 }) {
@@ -8468,6 +8514,7 @@ function CampanaAvisos({
       {
         type: "button",
         onClick: alternar,
+        "data-testid": "campana-avisos",
         "aria-label": ariaLabel,
         "aria-haspopup": "menu",
         "aria-expanded": abierto,
@@ -8496,7 +8543,7 @@ function CampanaAvisos({
               " sin leer"
             ] })
           ] }),
-          /* @__PURE__ */ jsx94("div", { className: "max-h-80 overflow-y-auto p-1", children: avisos.length === 0 ? /* @__PURE__ */ jsx94(EmptyState, { compact: true, icon: "bell", title: vacioTitulo, description: vacioDetalle }) : avisos.map((aviso) => {
+          /* @__PURE__ */ jsx94("div", { className: "max-h-80 overflow-y-auto p-1", children: avisos.length === 0 ? /* @__PURE__ */ jsx94(EmptyState, { compact: true, icon: "bell", title: vacioTitulo, description: vacioDetalle, action: vacioAccion }) : avisos.map((aviso) => {
             const tono = TONOS.punto[aviso.tono] || TONOS.punto.mute;
             const contenido = /* @__PURE__ */ jsxs77(Fragment16, { children: [
               /* @__PURE__ */ jsx94("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", tono), children: /* @__PURE__ */ jsx94(Icon, { name: aviso.icono || "bell", className: "h-3.5 w-3.5" }) }),
@@ -8507,11 +8554,12 @@ function CampanaAvisos({
               ] })
             ] });
             const clases = "flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-ink-700/60";
-            return aviso.href ? /* @__PURE__ */ jsx94(
+            const ruta = aviso.href ?? aviso.destino;
+            return ruta ? /* @__PURE__ */ jsx94(
               "a",
               {
                 role: "menuitem",
-                href: aviso.href,
+                href: ruta,
                 className: clases,
                 onClick: () => {
                   setAbierto(false);
@@ -10545,6 +10593,7 @@ export {
   colorTrabajo,
   columnasDeAncho,
   columnasDelTablero,
+  compararVersiones,
   completeSave,
   componerTelefono,
   conFormulario,
@@ -10563,6 +10612,7 @@ export {
   detalleProveedor,
   diasHasta,
   digitosCliente,
+  enHorarioSilencioso,
   envolver,
   errorMonto,
   esApellidosPrimero,
@@ -10623,6 +10673,7 @@ export {
   formatoNumero,
   gradoCondicion,
   hayFusion,
+  hayVersionNueva,
   hoyClave,
   iconoDeCategoria,
   iconoMedioCuenta,
@@ -10675,7 +10726,9 @@ export {
   parsePercent,
   parseTelefono,
   parseUsdInput,
+  partesVersion,
   partirSerial,
+  payloadPush,
   periodoDeRango,
   plantillaDePrueba,
   porcentajeBarra,
@@ -10693,6 +10746,7 @@ export {
   repartirLinea,
   resolverRecientes,
   resumenPresencia,
+  rutaDeAviso,
   separarSeriales,
   serialEnmascarado,
   signoDe,

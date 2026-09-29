@@ -353,5 +353,12 @@ export function crearRegistroPendientes(): { registrar(id: symbol, pendiente: bo
 
 // ── Utilidades puntuales ────────────────────────────────────────────────────
 
+export function rutaDeAviso(aviso?: Record<string, any>): string
+export function payloadPush(aviso?: Record<string, any>, opciones?: { app?: string; title?: string; body?: string }): { title: string; body: string; data: { ruta: string; id: string; tono: string } }
+export function enHorarioSilencioso(fecha?: Date | string | number, opciones?: { desde?: number; hasta?: number }): boolean
+export function partesVersion(valor?: string): number[]
+export function compararVersiones(a?: string, b?: string): -1 | 0 | 1
+export function hayVersionNueva(actual?: string, publicada?: string): boolean
+
 export const QR_OPCIONES: { ancho: number; nivel: string; margen: number }
 export function qrDataUrl(valor: string, opciones?: { ancho?: number; nivel?: string; margen?: number }): Promise<string>

@@ -104,6 +104,8 @@ export {
   detalleCuentaCobro,
 } from './utils/cuentaCobro.js'
 export { MARGEN_VENTANA, ventanaDeLista } from './utils/ventana.js'
+export { rutaDeAviso, payloadPush, enHorarioSilencioso } from './utils/avisos.js'
+export { partesVersion, compararVersiones, hayVersionNueva } from './utils/version.js'
 export { default as BuscadorDispositivo } from './components/BuscadorDispositivo.jsx'
 export {
   PERFILES_DISPOSITIVO, CAMPOS_DISPOSITIVO, DISPOSITIVOS_MOBILE, CONECTIVIDADES_MOVIL,

@@ -4,6 +4,27 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.51.0 — 2026-09-29
+
+- **Reglas transversales (#293):** `REGLAS.md` §15 documenta las 11 reglas
+  aprobadas (cero éxito falso, paridad demo, cuatro estados, tres temas + toque
+  44, una entidad una fuente de verdad, microcopy es-PY, rutas canónicas,
+  búsqueda y atajos, dinero y sensibilidad, versión visible y novedades,
+  rendimiento por defecto), con el objeto y la verificación de cada una; §3, §8,
+  §9, §11-ter y §14 quedan ampliadas con el puntero correspondiente.
+- **Formato de notificaciones (#293):** nueva sección `REGLAS.md` §16 con el
+  contrato por canal —bandeja (`CampanaAvisos`), push genérico + horario
+  silencioso, toast solo de acción en pantalla, derivación única y «sin relay →
+  en cola» (estados `enviado`/`encolado`/`duplicado`/`fallido`), y la estructura
+  canónica de las plantillas de correo/WhatsApp.
+  - `CampanaAvisos`: **vacío con acción** (`vacioAccion`), ruta interna que
+    tolera `destino` además de `href` y `data-testid="campana-avisos"`.
+  - Nuevos helpers puros: `rutaDeAviso`, `payloadPush` (nada sensible en la
+    pantalla bloqueada) y `enHorarioSilencioso`; `partesVersion`,
+    `compararVersiones` y `hayVersionNueva` (aviso de versión nueva, regla 10).
+- Tests: `test/notificaciones.test.js` y `test/campana-avisos.test.jsx`
+  (jsdom: vacío con acción, ruta y elegir).
+
 ## v0.50.0 — 2026-09-29
 
 - **Pie institucional obligatorio (#291):** `ProductFooter` es el objeto único

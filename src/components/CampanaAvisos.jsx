@@ -4,10 +4,13 @@ import { EmptyState } from './ui.jsx'
 import { cn } from '../utils/cn.js'
 import { TONOS } from '../utils/estadoEquipo.js'
 
-// Campana de avisos: botón con contador + panel de avisos que le pasa el
-// consumidor. Cada aviso es `{ id, titulo, detalle?, tono?, href?, onClick?,
-// leido? }`; el panel no marca nada solo: avisar que se abrió es `onAbrir` y
-// elegir un aviso es `onElegir` (la app decide qué se marca como leído).
+// Campana de avisos (#293): bandeja oficial del panel. Botón con contador
+// (99+) + panel. Cada aviso es `{ id, titulo, detalle?, tono?, fecha?, href?,
+// onClick?, leido? }` —`tono` es uno de los de `TONOS` (ok/warn/bad/info/mute),
+// `fecha` llega ya formateada («hace 5 min») y `href`/`destino` es la **ruta
+// interna**—. El panel no marca nada solo: avisar que se abrió es `onAbrir` y
+// elegir un aviso es `onElegir` (la app decide qué se marca como leído). Vacío
+// con acción, siempre.
 //
 // Portable: sin fetch ni router; los avisos son datos. El contador sale de los
 // avisos no leídos cuando traen `leido`; si no, cuenta todos. Cierra con Escape
@@ -35,6 +38,7 @@ export default function CampanaAvisos({
   anclaje = 'right',
   vacioTitulo = 'Sin avisos',
   vacioDetalle = 'No hay novedades para mostrar.',
+  vacioAccion,
   pie,
   className,
 }) {
@@ -71,6 +75,7 @@ export default function CampanaAvisos({
       <button
         type="button"
         onClick={alternar}
+        data-testid="campana-avisos"
         aria-label={ariaLabel}
         aria-haspopup="menu"
         aria-expanded={abierto}
@@ -101,7 +106,7 @@ export default function CampanaAvisos({
 
           <div className="max-h-80 overflow-y-auto p-1">
             {avisos.length === 0 ? (
-              <EmptyState compact icon="bell" title={vacioTitulo} description={vacioDetalle} />
+              <EmptyState compact icon="bell" title={vacioTitulo} description={vacioDetalle} action={vacioAccion} />
             ) : (
               avisos.map((aviso) => {
                 const tono = TONOS.punto[aviso.tono] || TONOS.punto.mute
@@ -120,11 +125,12 @@ export default function CampanaAvisos({
                   </>
                 )
                 const clases = 'flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-ink-700/60'
-                return aviso.href ? (
+                const ruta = aviso.href ?? aviso.destino
+                return ruta ? (
                   <a
                     key={aviso.id ?? aviso.titulo}
                     role="menuitem"
-                    href={aviso.href}
+                    href={ruta}
                     className={clases}
                     onClick={() => {
                       setAbierto(false)
