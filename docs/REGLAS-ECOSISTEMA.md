@@ -55,6 +55,10 @@ notificaciones) sigue en `docs/REGLAS.md`.
 ## 5. Diseño, marca y publicación
 
 - Componentes compartidos para footer/versión, OAuth, botones, favicon, SEO y layouts.
+- **Un componente por tipo de dato** (moneda, correo, RUC/CI, teléfono, fecha,
+  búsqueda, porcentaje…): el campo sale de la biblioteca y la pantalla no
+  reimplementa su lógica; editar el objeto corrige a todas las apps (interfaz:
+  `docs/REGLAS.md` §1).
 - Un solo activo visual canónico para logo, favicon, PWA, emails y tarjetas.
 - Cada ruta debe tener URL recuperable, autorización y footer común con versión real.
 - Antes de publicar: build, flujos críticos, permisos sin privilegios, HTTPS, dominio, health y smoke test.
@@ -70,6 +74,13 @@ notificaciones) sigue en `docs/REGLAS.md`.
 - Antes de crear algo nuevo, buscar bases/componentes en GitHub.
 - Evaluar licencia, actividad, seguridad, compatibilidad y costo de personalización.
 - Personalizar producto, UX, datos y marca; no copiar interfaces sin revisión.
+- **Biblioteca primero, sin duplicar:** si el objeto existe en este paquete, se
+  usa ese y la variante se pide por **prop**; la copia local se borra en el
+  mismo cambio. Reimplementar un campo o su lógica por pantalla queda prohibido
+  (fuente única por tipo de dato, interfaz en `docs/REGLAS.md` §1).
+- **Editar una vez, corregir todas:** la lógica compartida (validación,
+  normalización, formato y alineación de los campos) vive en la biblioteca; el
+  arreglo entra ahí y las apps lo reciben al subir la versión fija.
 
 ## 8. Infraestructura OwnCoding Hub
 

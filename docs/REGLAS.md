@@ -81,6 +81,51 @@ con versión/fecha/canal y se revoca con el mismo peso. Objetos
 `AvisoPrivacidad` y `ConsentimientoDatos`; regla completa en
 `docs/REGLAS-ECOSISTEMA.md` §12.
 
+### Un componente por tipo de dato (#10)
+
+- **Biblioteca primero, sin duplicar.** Si el tipo de dato ya tiene objeto en
+  `owncoding-ui` (moneda, correo, RUC/CI, teléfono, fechas, porcentaje,
+  búsqueda, serial, ciudad…), el formulario usa **ese** componente; la lógica
+  (normalización, caret, validación, formato, teclado móvil) vive una sola vez
+  y **editar el componente corrige a todas las apps**.
+- **Prohibido reimplementar el campo por pantalla**, aunque parezca «solo un
+  input»: la copia deja variantes que se desincronizan. Si la pantalla necesita
+  otra cosa, se agrega una **prop** al objeto (o se porta el caso nuevo a la
+  biblioteca, §9) y la copia local se borra en el mismo cambio.
+- **Un solo objeto por tipo dentro de cada app:** no conviven dos campos de
+  correo, dos selectores de fecha ni dos buscadores para lo mismo. La app puede
+  **frenar la duplicación** con su test de contrato (referencia real: MobOS,
+  `docs/CAMPOS.md` §6 y `src/lib/camposReglas.test.js`).
+- El alta de un dato nuevo sigue **§9**: objeto con props claras, test en
+  `test/` y regla en este documento.
+
+### Alineación garantizada (#10)
+
+- En una fila o grilla, los controles (inputs, selects, botones) comparten
+  **línea base**: arrancan a la misma altura, en horizontal y en vertical.
+- El **label arriba y el hint/error abajo no pueden desalinear el control**: la
+  garantía vive en el objeto/CSS del campo (el mensaje ocupa su lugar sin
+  empujar ni descuadrar la fila). La pantalla no compensa con márgenes,
+  `min-h` ni alturas fijas: no se pelea el layout a mano.
+- Campo y botón en la misma fila alinean por el **borde del control**, no por
+  su texto; los controles que no cambian su dibujo usan las utilidades del kit
+  (`.toque-44`, `PIE_ACCIONES`, `GRILLA_DOS_COLUMNAS`).
+- El error/hint usa el mecanismo del campo (`FormField`, §1 y §3): **uno u
+  otro, nunca los dos**, con `aria-describedby`/`aria-invalid`, y su aparición
+  no mueve el control.
+- La verificación se **mide sobre el render real**; no se declara por CSS.
+
+**Checklist de verificación (#10):**
+
+- [ ] Cada dato usa el objeto de la biblioteca si existe; no hay copias locales
+      del campo ni de su validación.
+- [ ] Un solo componente por tipo en el repo (sin variantes espejo).
+- [ ] Misma línea base con `label` y sin `label`.
+- [ ] Misma línea base con `hint`, con `error` y sin mensaje.
+- [ ] Campo + botón en la misma fila alinean por el borde del control.
+- [ ] Grilla de dos columnas sin saltos de altura entre celdas/filas.
+- [ ] Medido a **390 px** y **1440 px**, en claro y oscuro.
+
 ## 2. Botones y acciones
 
 - Jerarquía: primario (marca), secundario/outline, peligro (rojo, nunca marca),
@@ -134,6 +179,9 @@ con versión/fecha/canal y se revoca con el mismo peso. Objetos
   `alert`), `tono="ok"`/`tono="warn"` (role `status`), `compact` para el tamaño
   chico, `como="div"` cuando el contenido es estructurado (ícono o botón de
   reintentar). No se copia el `<p>` con borde y fondo de color.
+- **Error/hint de un campo:** se dibuja con el mecanismo del campo (`FormField`
+  con `role="alert"` y `id`, §1), no con `Aviso`; uno u otro, nunca los dos, y
+  su aparición **no mueve el control** (alineación garantizada, §1).
 - `Nota` es la aclaración que **no** es resultado (no anuncia con `role`):
   `tono="warn"` (predeterminado, borde ámbar), `tono="info"` o `tono="neutro"`,
   `compact` para el tamaño chico y `como="div"` si lleva estructura. Tampoco se

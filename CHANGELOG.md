@@ -4,6 +4,27 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.55.0 — 2026-09-30
+
+- **Fuente única por tipo de dato (#10):** `REGLAS.md` §1 suma «Un componente
+  por tipo de dato» —todo campo repetido (moneda, correo, RUC/CI, teléfono,
+  fechas, porcentaje, búsqueda, serial, ciudad…) usa **un solo objeto** de la
+  biblioteca; la lógica vive una vez y **editar el componente corrige a todas
+  las apps**—. Prohibido reimplementar el campo por pantalla; la variante se
+  pide por **prop** (o se porta el caso nuevo, §9) y la copia local se borra en
+  el mismo cambio; sin objetos espejo dentro de una app.
+- **Alineación garantizada de formularios (#10):** `REGLAS.md` §1 suma la regla
+  —controles con **línea base** en horizontal y vertical; label arriba y
+  hint/error abajo **no pueden desalinear** el control, porque la garantía vive
+  en el objeto/CSS del campo y no en márgenes de la pantalla—, el cruce de
+  error/hint de campo en §3 y el **checklist de verificación** (un objeto por
+  tipo; con/sin `label`; con `hint`, con `error` y sin mensaje; campo + botón;
+  grilla; medido a **390/1440**, claro y oscuro).
+- **Ecosistema:** §5 y §7 de `REGLAS-ECOSISTEMA.md` refuerzan **biblioteca
+  primero, sin duplicar**: componente compartido por tipo de dato, variante por
+  prop y «editar una vez, corregir todas».
+- Docs-only: sin cambios de API ni de componentes.
+
 ## v0.54.0 — 2026-09-30
 
 - **Protección de datos personales (Ley 7593/2025, #8):** `REGLAS-ECOSISTEMA.md`
