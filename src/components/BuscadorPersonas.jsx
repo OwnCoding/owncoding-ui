@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Input } from './ui.jsx'
 import Avatar from './Avatar.jsx'
 import Icon from './Icon.jsx'
@@ -55,6 +55,8 @@ export default function BuscadorPersonas({
   const [uso, setUso] = useState(() => leerUsoPersonas(claveUso))
   const listaId = useId()
   const lista = useRef(null)
+  const raiz = useRef(null)
+  const [abierto, setAbierto] = useState(false)
 
   const opciones = useMemo(() => {
     const fijas = (Array.isArray(opcionesFijas) ? opcionesFijas : []).map((opcion) => ({ ...opcion, fija: true }))
@@ -64,8 +66,31 @@ export default function BuscadorPersonas({
     return [...fijas, ...vacia, ...limite]
   }, [personas, opcionesFijas, opcionVacia, query, uso, maxResultados])
 
+  // En toolbars (`desplegable`) la lista es un menú: se abre al enfocar o
+  // escribir y se cierra al elegir, con clic afuera o Esc (#104). En formularios
+  // la lista vive debajo del input y queda siempre visible (#101).
+  const listaVisible = (!desplegable || abierto) && (opciones.length > 0 || Boolean(query))
+
+  useEffect(() => {
+    if (!desplegable || !abierto) return
+    const cerrarFuera = (event) => {
+      if (event.target instanceof Node && raiz.current?.contains(event.target)) return
+      setAbierto(false)
+    }
+    const cerrarEscape = (event) => {
+      if (event.key === 'Escape') setAbierto(false)
+    }
+    document.addEventListener('mousedown', cerrarFuera)
+    document.addEventListener('keydown', cerrarEscape)
+    return () => {
+      document.removeEventListener('mousedown', cerrarFuera)
+      document.removeEventListener('keydown', cerrarEscape)
+    }
+  }, [desplegable, abierto])
+
   function elegir(opcion) {
     if (!opcion) return
+    setAbierto(false)
     if (opcion.fija) {
       onCambiar?.(opcion.valor !== undefined ? opcion.valor : opcion)
       setQuery('')
@@ -85,11 +110,17 @@ export default function BuscadorPersonas({
   function alTeclear(event) {
     if (event.key === 'Escape') {
       setQuery('')
+      setAbierto(false)
       return
     }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault()
       if (!opciones.length) return
+      if (desplegable && !abierto) {
+        setResaltado(0)
+        setAbierto(true)
+        return
+      }
       const paso = event.key === 'ArrowDown' ? 1 : -1
       const siguiente = (resaltado + paso + opciones.length) % opciones.length
       setResaltado(siguiente)
@@ -111,15 +142,15 @@ export default function BuscadorPersonas({
   }
 
   return (
-    <div className={cn(desplegable ? 'relative' : '', className)}>
+    <div ref={raiz} className={cn(desplegable ? 'relative' : '', className)}>
       <Input
         id={id}
         type="search"
         role="combobox"
-        aria-expanded
+        aria-expanded={listaVisible}
         aria-controls={listaId}
         aria-autocomplete="list"
-        aria-activedescendant={opciones[resaltado] ? `${listaId}-${resaltado}` : undefined}
+        aria-activedescendant={listaVisible && opciones[resaltado] ? `${listaId}-${resaltado}` : undefined}
         aria-label={ariaLabel}
         aria-required={required || undefined}
         autoComplete="off"
@@ -127,13 +158,19 @@ export default function BuscadorPersonas({
         disabled={disabled}
         value={query}
         placeholder={placeholder}
+        onFocus={() => {
+          if (!desplegable) return
+          setAbierto(true)
+          setResaltado(0)
+        }}
         onChange={(event) => {
           setQuery(event.target.value)
           setResaltado(0)
+          if (desplegable) setAbierto(true)
         }}
         onKeyDown={alTeclear}
       />
-      {opciones.length > 0 || query ? (
+      {listaVisible ? (
         <ul
           id={listaId}
           ref={lista}

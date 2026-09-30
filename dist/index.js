@@ -2805,7 +2805,7 @@ function BuscadorCliente({
 }
 
 // src/components/BuscadorPersonas.jsx
-import { useId as useId6, useMemo as useMemo5, useRef as useRef8, useState as useState9 } from "react";
+import { useEffect as useEffect8, useId as useId6, useMemo as useMemo5, useRef as useRef8, useState as useState9 } from "react";
 
 // src/components/Avatar.jsx
 import { useEffect as useEffect7, useState as useState8 } from "react";
@@ -3002,6 +3002,8 @@ function BuscadorPersonas({
   const [uso, setUso] = useState9(() => leerUsoPersonas(claveUso));
   const listaId = useId6();
   const lista = useRef8(null);
+  const raiz = useRef8(null);
+  const [abierto, setAbierto] = useState9(false);
   const opciones = useMemo5(() => {
     const fijas = (Array.isArray(opcionesFijas) ? opcionesFijas : []).map((opcion) => ({ ...opcion, fija: true }));
     const vacia = opcionVacia ? [{ id: "__vacia__", vacia: true, nombre: opcionVacia, icono: "user" }] : [];
@@ -3009,8 +3011,26 @@ function BuscadorPersonas({
     const limite = Number(maxResultados) > 0 ? filtradas.slice(0, Number(maxResultados)) : filtradas;
     return [...fijas, ...vacia, ...limite];
   }, [personas, opcionesFijas, opcionVacia, query, uso, maxResultados]);
+  const listaVisible = (!desplegable || abierto) && (opciones.length > 0 || Boolean(query));
+  useEffect8(() => {
+    if (!desplegable || !abierto) return;
+    const cerrarFuera = (event) => {
+      if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
+      setAbierto(false);
+    };
+    const cerrarEscape = (event) => {
+      if (event.key === "Escape") setAbierto(false);
+    };
+    document.addEventListener("mousedown", cerrarFuera);
+    document.addEventListener("keydown", cerrarEscape);
+    return () => {
+      document.removeEventListener("mousedown", cerrarFuera);
+      document.removeEventListener("keydown", cerrarEscape);
+    };
+  }, [desplegable, abierto]);
   function elegir(opcion) {
     if (!opcion) return;
+    setAbierto(false);
     if (opcion.fija) {
       onCambiar?.(opcion.valor !== void 0 ? opcion.valor : opcion);
       setQuery("");
@@ -3029,11 +3049,17 @@ function BuscadorPersonas({
   function alTeclear(event) {
     if (event.key === "Escape") {
       setQuery("");
+      setAbierto(false);
       return;
     }
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       if (!opciones.length) return;
+      if (desplegable && !abierto) {
+        setResaltado(0);
+        setAbierto(true);
+        return;
+      }
       const paso = event.key === "ArrowDown" ? 1 : -1;
       const siguiente = (resaltado + paso + opciones.length) % opciones.length;
       setResaltado(siguiente);
@@ -3050,17 +3076,17 @@ function BuscadorPersonas({
     if (opcion.vacia) return valor === "" || valor == null;
     return opcion.id === valor;
   }
-  return /* @__PURE__ */ jsxs18("div", { className: cn(desplegable ? "relative" : "", className), children: [
+  return /* @__PURE__ */ jsxs18("div", { ref: raiz, className: cn(desplegable ? "relative" : "", className), children: [
     /* @__PURE__ */ jsx25(
       Input,
       {
         id,
         type: "search",
         role: "combobox",
-        "aria-expanded": true,
+        "aria-expanded": listaVisible,
         "aria-controls": listaId,
         "aria-autocomplete": "list",
-        "aria-activedescendant": opciones[resaltado] ? `${listaId}-${resaltado}` : void 0,
+        "aria-activedescendant": listaVisible && opciones[resaltado] ? `${listaId}-${resaltado}` : void 0,
         "aria-label": ariaLabel,
         "aria-required": required || void 0,
         autoComplete: "off",
@@ -3068,14 +3094,20 @@ function BuscadorPersonas({
         disabled,
         value: query,
         placeholder,
+        onFocus: () => {
+          if (!desplegable) return;
+          setAbierto(true);
+          setResaltado(0);
+        },
         onChange: (event) => {
           setQuery(event.target.value);
           setResaltado(0);
+          if (desplegable) setAbierto(true);
         },
         onKeyDown: alTeclear
       }
     ),
-    opciones.length > 0 || query ? /* @__PURE__ */ jsxs18(
+    listaVisible ? /* @__PURE__ */ jsxs18(
       "ul",
       {
         id: listaId,
@@ -3385,7 +3417,7 @@ function hayFusion(categorias = []) {
 }
 
 // src/components/ConfirmarConPalabra.jsx
-import { useEffect as useEffect8, useId as useId8, useState as useState10 } from "react";
+import { useEffect as useEffect9, useId as useId8, useState as useState10 } from "react";
 import { jsx as jsx28, jsxs as jsxs21 } from "react/jsx-runtime";
 function ConfirmarConPalabra({
   titulo: titulo2 = "Confirmar unificaci\xF3n",
@@ -3403,7 +3435,7 @@ function ConfirmarConPalabra({
 }) {
   const [texto, setTexto] = useState10("");
   const campoId = useId8();
-  useEffect8(() => {
+  useEffect9(() => {
     setTexto("");
   }, [palabra]);
   const listo = texto.trim().toUpperCase() === String(palabra).toUpperCase();
@@ -3451,7 +3483,7 @@ function ConfirmarConPalabra({
 }
 
 // src/components/SelectorCuentaCobro.jsx
-import { useEffect as useEffect9, useId as useId9, useMemo as useMemo6, useRef as useRef9, useState as useState11 } from "react";
+import { useEffect as useEffect10, useId as useId9, useMemo as useMemo6, useRef as useRef9, useState as useState11 } from "react";
 
 // src/utils/cuentaCobro.js
 var MEDIOS_CUENTA = {
@@ -3629,13 +3661,13 @@ function SelectorCuentaCobro({
     [cuentas, cuentaId]
   );
   const idSeleccionado = seleccionada?.id || "";
-  useEffect9(() => {
+  useEffect10(() => {
     setEligiendo(!idSeleccionado);
     setConsulta("");
     setScrollTop(0);
   }, [idSeleccionado]);
   const sugeridaRef = useRef9("");
-  useEffect9(() => {
+  useEffect10(() => {
     if (!preseleccionar) return;
     if (idSeleccionado) {
       sugeridaRef.current = "";
@@ -3646,7 +3678,7 @@ function SelectorCuentaCobro({
     sugeridaRef.current = sugerida.id;
     onSelect?.(sugerida);
   }, [preseleccionar, idSeleccionado, cuentas, ultimoUsadoId, predeterminadaId, incluirInactivas, onSelect]);
-  useEffect9(() => {
+  useEffect10(() => {
     if (!eligiendo) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
@@ -3667,14 +3699,14 @@ function SelectorCuentaCobro({
     [resultados.length, scrollTop, altoVista, altoOpcion]
   );
   const visibles = resultados.slice(ventana.inicio, ventana.fin);
-  useEffect9(() => {
+  useEffect10(() => {
     const nodo = lista.current;
     if (!nodo) return;
     const fila = nodo.querySelector('[role="option"]')?.getBoundingClientRect().height;
     if (fila && Math.round(fila) !== altoOpcion) setAltoOpcion(Math.round(fila));
     if (nodo.clientHeight > 0 && nodo.clientHeight !== altoVista) setAltoVista(nodo.clientHeight);
   }, [listaVisible, consulta, altoOpcion, altoVista]);
-  useEffect9(() => {
+  useEffect10(() => {
     if (!listaVisible) return;
     const nodo = lista.current;
     if (!nodo) return;
@@ -3853,7 +3885,7 @@ function hayVersionNueva(actual, publicada) {
 }
 
 // src/components/BuscadorDispositivo.jsx
-import { useEffect as useEffect10, useId as useId10, useMemo as useMemo7, useRef as useRef10, useState as useState12 } from "react";
+import { useEffect as useEffect11, useId as useId10, useMemo as useMemo7, useRef as useRef10, useState as useState12 } from "react";
 
 // src/catalog/productos.js
 var MODELOS_IPHONE = [
@@ -4047,10 +4079,10 @@ function BuscadorDispositivo({
   const [resaltado, setResaltado] = useState12(0);
   const listaId = useId10();
   const raiz = useRef10(null);
-  useEffect10(() => {
+  useEffect11(() => {
     setTexto(valor.modelo || "");
   }, [valor.modelo]);
-  useEffect10(() => {
+  useEffect11(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -4875,12 +4907,12 @@ function NavLateral({
 }
 
 // src/components/MenuDesplegable.jsx
-import { useEffect as useEffect11, useRef as useRef11, useState as useState19 } from "react";
+import { useEffect as useEffect12, useRef as useRef11, useState as useState19 } from "react";
 import { jsx as jsx44, jsxs as jsxs36 } from "react/jsx-runtime";
 function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel = "Men\xFA", className }) {
   const [abierto, setAbierto] = useState19(false);
   const raiz = useRef11(null);
-  useEffect11(() => {
+  useEffect12(() => {
     if (!abierto) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
@@ -5461,7 +5493,7 @@ function BotonImprimir({
 }
 
 // src/components/BancoCombobox.jsx
-import { useEffect as useEffect12, useId as useId14, useMemo as useMemo9, useRef as useRef12, useState as useState22 } from "react";
+import { useEffect as useEffect13, useId as useId14, useMemo as useMemo9, useRef as useRef12, useState as useState22 } from "react";
 
 // src/utils/bancos.js
 var BANCOS_PARAGUAY = [
@@ -5614,7 +5646,7 @@ function BancoCombobox({
   const listaId = useId14();
   const raiz = useRef12(null);
   const lista = useRef12(null);
-  useEffect12(() => {
+  useEffect13(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -5623,7 +5655,7 @@ function BancoCombobox({
     return () => document.removeEventListener("click", cerrarFuera);
   }, []);
   const sugerencias = useMemo9(() => sugerenciasDeBanco(value, catalogo), [value, catalogo]);
-  useEffect12(() => {
+  useEffect13(() => {
     if (!abierto) return;
     lista.current?.querySelector(`#${CSS.escape(`${listaId}-${resaltado}`)}`)?.scrollIntoView({ block: "nearest" });
   }, [abierto, resaltado, listaId]);
@@ -5706,7 +5738,7 @@ function BancoCombobox({
 }
 
 // src/components/CityAutocomplete.jsx
-import { useEffect as useEffect13, useRef as useRef13, useState as useState23 } from "react";
+import { useEffect as useEffect14, useRef as useRef13, useState as useState23 } from "react";
 
 // src/catalog/ciudades.js
 var MUNICIPIOS = [
@@ -6042,7 +6074,7 @@ function CityAutocomplete({
   const [error, setError] = useState23("");
   const timer = useRef13(null);
   const raiz = useRef13(null);
-  useEffect13(() => {
+  useEffect14(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -6050,7 +6082,7 @@ function CityAutocomplete({
     document.addEventListener("mousedown", cerrarFuera);
     return () => document.removeEventListener("mousedown", cerrarFuera);
   }, []);
-  useEffect13(() => () => {
+  useEffect14(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
   function resolver(texto) {
@@ -6933,7 +6965,7 @@ function TarjetaRecepcion({
 }
 
 // src/components/CodigoQr.jsx
-import { useEffect as useEffect14, useState as useState24 } from "react";
+import { useEffect as useEffect15, useState as useState24 } from "react";
 
 // src/utils/qr.js
 var QR_OPCIONES = { nivel: "M", margen: 1, ancho: 220 };
@@ -6952,7 +6984,7 @@ async function qrDataUrl(valor, { ancho = QR_OPCIONES.ancho, nivel = QR_OPCIONES
 import { jsx as jsx73 } from "react/jsx-runtime";
 function CodigoQr({ valor, ancho = 220, nivel = "M", margen = 1, alt = "C\xF3digo QR", className, ...props }) {
   const [imagen, setImagen] = useState24("");
-  useEffect14(() => {
+  useEffect15(() => {
     let activo = true;
     qrDataUrl(valor, { ancho, nivel, margen }).then((data) => {
       if (activo) setImagen(data);
@@ -8050,7 +8082,7 @@ function RangoFecha({
 }
 
 // src/components/PaletaComandos.jsx
-import { useEffect as useEffect15, useId as useId17, useMemo as useMemo11, useRef as useRef15, useState as useState28 } from "react";
+import { useEffect as useEffect16, useId as useId17, useMemo as useMemo11, useRef as useRef15, useState as useState28 } from "react";
 import { Fragment as Fragment13, jsx as jsx91, jsxs as jsxs74 } from "react/jsx-runtime";
 var CAPITALIZAR = (texto) => texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : texto;
 function agruparResultados(resultados = [], { etiquetasTipo = {}, iconosTipo = {} } = {}) {
@@ -8129,7 +8161,7 @@ function PaletaComandos({
     if (!controlada) setInterna(false);
     onCerrar?.();
   }
-  useEffect15(() => {
+  useEffect16(() => {
     if (!conAtajo) return void 0;
     const onKeyDown2 = (event) => {
       if (event.defaultPrevented || event.altKey || event.shiftKey) return;
@@ -8142,7 +8174,7 @@ function PaletaComandos({
     document.addEventListener("keydown", onKeyDown2);
     return () => document.removeEventListener("keydown", onKeyDown2);
   }, [conAtajo, atajo, controlada]);
-  useEffect15(() => {
+  useEffect16(() => {
     if (!visible) return void 0;
     setConsulta("");
     setResultados(null);
@@ -8153,7 +8185,7 @@ function PaletaComandos({
     const frame = requestAnimationFrame(() => entrada.current?.focus());
     return () => cancelAnimationFrame(frame);
   }, [visible]);
-  useEffect15(() => {
+  useEffect16(() => {
     if (!visible) return void 0;
     const termino2 = consulta.trim();
     if (termino2.length < minimo) {
@@ -8191,10 +8223,10 @@ function PaletaComandos({
   const planos = useMemo11(() => grupos.flatMap((grupo) => grupo.items), [grupos]);
   const estado = estadoPaleta({ listo, cargando, error, total: planos.length });
   const indice = useMemo11(() => new Map(planos.map((item, posicion) => [item, posicion])), [planos]);
-  useEffect15(() => {
+  useEffect16(() => {
     setActivo(0);
   }, [resultados]);
-  useEffect15(() => {
+  useEffect16(() => {
     if (!visible) return;
     raiz.current?.querySelector(`[data-paleta-index="${activo}"]`)?.scrollIntoView?.({ block: "nearest" });
   }, [activo, visible, planos.length]);
@@ -8521,7 +8553,7 @@ function BarraInferior({
 }
 
 // src/components/PersonaChip.jsx
-import { useEffect as useEffect16, useState as useState30 } from "react";
+import { useEffect as useEffect17, useState as useState30 } from "react";
 
 // src/utils/identidad.js
 var primerTexto = (...valores) => {
@@ -8583,7 +8615,7 @@ function PersonaChip({
   const local = foto ?? (identidad.hasAvatar === false ? "" : identidad.fotoLocal);
   const google = picture ?? identidad.picture;
   const [localRota, setLocalRota] = useState30(false);
-  useEffect16(() => {
+  useEffect17(() => {
     setLocalRota(false);
   }, [local]);
   const src = !localRota && local ? local : google;
@@ -8790,7 +8822,7 @@ function IndicadorConexion({
 }
 
 // src/components/CampanaAvisos.jsx
-import { useEffect as useEffect17, useRef as useRef16, useState as useState31 } from "react";
+import { useEffect as useEffect18, useRef as useRef16, useState as useState31 } from "react";
 import { Fragment as Fragment16, jsx as jsx98, jsxs as jsxs80 } from "react/jsx-runtime";
 function contarSinLeer(avisos = []) {
   const conEstado = avisos.filter((aviso) => aviso && typeof aviso.leido === "boolean");
@@ -8817,7 +8849,7 @@ function CampanaAvisos({
   const [abierto, setAbierto] = useState31(false);
   const raiz = useRef16(null);
   const sinLeer = contarSinLeer(avisos);
-  useEffect17(() => {
+  useEffect18(() => {
     if (!abierto) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
@@ -8997,7 +9029,7 @@ function GraficoBarras({
 }
 
 // src/components/TableroKanban.jsx
-import { useCallback as useCallback4, useEffect as useEffect18, useMemo as useMemo12, useRef as useRef17, useState as useState32 } from "react";
+import { useCallback as useCallback4, useEffect as useEffect19, useMemo as useMemo12, useRef as useRef17, useState as useState32 } from "react";
 import { jsx as jsx100, jsxs as jsxs82 } from "react/jsx-runtime";
 var SIN_MOVIMIENTOS = /* @__PURE__ */ new Set();
 function columnasDelTablero(columnas = [], tarjetas = []) {
@@ -9024,13 +9056,13 @@ function useTableroOptimista({ tarjetas = [], onMover, onError } = {}) {
   const tarjetasRef = useRef17(tarjetas);
   const overridesRef = useRef17(overrides);
   const enVueloRef = useRef17(/* @__PURE__ */ new Set());
-  useEffect18(() => {
+  useEffect19(() => {
     tarjetasRef.current = tarjetas;
   }, [tarjetas]);
-  useEffect18(() => {
+  useEffect19(() => {
     overridesRef.current = overrides;
   }, [overrides]);
-  useEffect18(() => {
+  useEffect19(() => {
     setOverrides((actual) => {
       const entradas = Object.entries(actual);
       if (entradas.length === 0) return actual;
