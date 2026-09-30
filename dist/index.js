@@ -1828,7 +1828,7 @@ function PhoneField({
   const [tocado, setTocado] = useState4(false);
   const invalido = tocado && Boolean(String(phone).trim()) && !telefonoValido(phone, countryCode);
   return /* @__PURE__ */ jsxs10("div", { className, children: [
-    /* @__PURE__ */ jsxs10("div", { className: "flex gap-2", children: [
+    /* @__PURE__ */ jsxs10("div", { className: "flex flex-wrap items-center gap-2", children: [
       /* @__PURE__ */ jsx15(
         Input,
         {
@@ -1838,7 +1838,7 @@ function PhoneField({
           value: `+${soloDigitos2(countryCode)}`,
           onChange: (event) => onCountryCodeChange?.(`+${soloDigitos2(event.target.value)}`),
           "aria-label": countryAriaLabel,
-          className: "w-[92px] shrink-0 text-center"
+          className: "w-24 shrink-0 text-center"
         }
       ),
       /* @__PURE__ */ jsx15("datalist", { id, children: codigos.map((codigo) => /* @__PURE__ */ jsx15("option", { value: codigo }, codigo)) }),
@@ -1854,7 +1854,7 @@ function PhoneField({
           placeholder,
           "aria-label": phoneAriaLabel,
           onBlur: () => setTocado(true),
-          className: "min-w-0 flex-1"
+          className: "min-w-[8.5rem] flex-1"
         }
       )
     ] }),

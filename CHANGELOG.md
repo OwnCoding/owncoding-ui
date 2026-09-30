@@ -4,6 +4,20 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.53.1 — 2026-09-29
+
+- **Campos cortos sin truncar (`PhoneField`):** el número del teléfono ya no se
+  comprime por debajo de un ancho legible (`min-w-[8.5rem]` en lugar del
+  `min-w-0` que lo aplastaba) y la fila **código de país + número** envuelve
+  (`flex-wrap`) cuando el contenedor no alcanza: un ancho corto como el `w-44`
+  de `TAMANOS_CAMPO.telefono` —o una grilla de dos columnas— manda el número a
+  la línea siguiente en vez de recortar el texto. El código de país pasa de
+  `w-[92px]` a `w-24` (96 px): entra «+» y hasta los 6 dígitos de `MAX_CODIGO`
+  también con el `text-base` de móvil. Sin cambios de API.
+- Tests: `test/campos-cortos.test.jsx` (mínimo del número, fila que envuelve y
+  `TAMANOS_CAMPO.telefono` respetado).
+- Docs: `REGLAS.md` §1 (teléfono) y el listado del README.
+
 ## v0.53.0 — 2026-09-29
 
 - **Compactación de escritorio (#7):** `REGLAS.md` **§17** fija el pase de

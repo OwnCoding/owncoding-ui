@@ -7,6 +7,12 @@ import { CODIGOS_PAIS, telefonoValido, MENSAJE_TELEFONO } from '../utils/telefon
 // sugeridos se pasan por prop y el mensaje de error es configurable. Los
 // helpers puros (`parseTelefono`, `componerTelefono`, `CODIGOS_PAIS`) viven en
 // `utils/telefono.js` y también salen por `owncoding-ui/utils`.
+//
+// Anchos: el código de país entra «+» y hasta `MAX_CODIGO` dígitos (w-24) y el
+// número conserva un mínimo legible en vez de comprimirse con `min-w-0`. La
+// fila envuelve (`flex-wrap`), así un contenedor corto —el `w-44` de
+// `TAMANOS_CAMPO.telefono`, una grilla de dos columnas— manda el número a la
+// línea siguiente en lugar de recortarlo.
 
 const MAX_CODIGO = 6
 const MAX_NUMERO = 30
@@ -39,7 +45,7 @@ export default function PhoneField({
   const invalido = tocado && Boolean(String(phone).trim()) && !telefonoValido(phone, countryCode)
   return (
     <div className={className}>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Input
           inputMode="numeric"
           list={id}
@@ -47,7 +53,7 @@ export default function PhoneField({
           value={`+${soloDigitos(countryCode)}`}
           onChange={(event) => onCountryCodeChange?.(`+${soloDigitos(event.target.value)}`)}
           aria-label={countryAriaLabel}
-          className="w-[92px] shrink-0 text-center"
+          className="w-24 shrink-0 text-center"
         />
         <datalist id={id}>
           {codigos.map((codigo) => <option key={codigo} value={codigo} />)}
@@ -62,7 +68,7 @@ export default function PhoneField({
           placeholder={placeholder}
           aria-label={phoneAriaLabel}
           onBlur={() => setTocado(true)}
-          className="min-w-0 flex-1"
+          className="min-w-[8.5rem] flex-1"
         />
       </div>
       {invalido && <span className="block pt-1 text-[11px] text-bad-text">{mensajeInvalido}</span>}

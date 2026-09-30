@@ -219,7 +219,8 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   `SearchField`, `BotonDentroCampo` (acción trailing dentro del input),
   `PercentField` (+`parsePercent`/`formatPercent`),
   `CurrencySelect`, `EmailField` (sugerencia de dominios), `PhoneField`
-  (código de país + validación), `SerialField` (IMEI/serial), `InstagramField`,
+  (código de país + validación; el número conserva un ancho mínimo y la fila
+  envuelve en contenedores cortos en vez de aplastarlo), `SerialField` (IMEI/serial), `InstagramField`,
   `ProductCombobox` (buscar/elegir/crear producto), `BuscadorProveedor`
   (últimos usados por defecto, filtro por nombre/abreviatura y alta rápida,
   #259), `NavegacionSeccion` (riel de secciones que colapsa a íconos y variante
