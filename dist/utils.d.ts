@@ -363,3 +363,11 @@ export function hayVersionNueva(actual?: string, publicada?: string): boolean
 
 export const QR_OPCIONES: { ancho: number; nivel: string; margen: number }
 export function qrDataUrl(valor: string, opciones?: { ancho?: number; nivel?: string; margen?: number }): Promise<string>
+
+export function normalizarPersonaTexto(texto?: unknown): string
+export function etiquetaPersona(persona?: Record<string, any>): string
+export function filtrarPersonas(personas?: Array<Record<string, any>>, termino?: string): Array<Record<string, any>>
+export function ordenarPersonas(personas?: Array<Record<string, any>>, uso?: Record<string, { usos: number; ultima: number }>, opciones?: { priorizarActivos?: boolean }): Array<Record<string, any>>
+export const CLAVE_USO_PERSONAS: string
+export function leerUsoPersonas(clave?: string, almacen?: Storage | null): Record<string, { usos: number; ultima: number }>
+export function registrarUsoPersona(clave?: string, id?: string, almacen?: Storage | null, ahora?: number): void

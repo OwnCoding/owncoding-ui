@@ -235,3 +235,13 @@ export { registroConsentimiento } from './consentimiento.js'
 export { rutaDeAviso, payloadPush, enHorarioSilencioso } from './avisos.js'
 export { partesVersion, compararVersiones, hayVersionNueva } from './version.js'
 export { QR_OPCIONES, qrDataUrl } from './qr.js'
+
+export {
+  normalizarPersonaTexto,
+  etiquetaPersona,
+  filtrarPersonas,
+  ordenarPersonas,
+  CLAVE_USO_PERSONAS,
+  leerUsoPersonas,
+  registrarUsoPersona,
+} from './personas.js'

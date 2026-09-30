@@ -281,6 +281,25 @@ export function BuscadorCliente(props: {
   className?: string
   inputProps?: Record<string, any>
 }): ReactElement
+export function BuscadorPersonas(props: {
+  personas?: Array<{ id: string; nombre: string; rol?: string; especialidad?: string; email?: string; detalle?: string; fotoUrl?: string | null; activo?: boolean }>
+  valor?: string
+  onCambiar?: (persona: any) => void
+  placeholder?: string
+  ariaLabel?: string
+  vacio?: string
+  etiquetaLista?: string
+  claveUso?: string
+  desplegable?: boolean
+  opcionesFijas?: Array<{ id?: string; valor?: string; nombre: string; icono?: string }>
+  opcionVacia?: string
+  maxResultados?: number
+  disabled?: boolean
+  required?: boolean
+  id?: string
+  className?: string
+}): ReactElement
+
 export function PreviewFusion(props: {
   entidades?: Array<{ id: string; titulo?: ReactNode; subtitulo?: ReactNode; datos?: Array<{ etiqueta: ReactNode; valor?: ReactNode }> }>
   principalId?: string
@@ -1241,6 +1260,14 @@ export function rutaDeAviso(aviso?: Record<string, any>): string
 export function payloadPush(aviso?: Record<string, any>, opciones?: { app?: string; title?: string; body?: string }): { title: string; body: string; data: { ruta: string; id: string; tono: string } }
 /** Horario silencioso del push (por defecto 22 → 8). */
 export function enHorarioSilencioso(fecha?: Date | string | number, opciones?: { desde?: number; hasta?: number }): boolean
+export function normalizarPersonaTexto(texto?: unknown): string
+export function etiquetaPersona(persona?: Record<string, any>): string
+export function filtrarPersonas(personas?: Array<Record<string, any>>, termino?: string): Array<Record<string, any>>
+export function ordenarPersonas(personas?: Array<Record<string, any>>, uso?: Record<string, { usos: number; ultima: number }>, opciones?: { priorizarActivos?: boolean }): Array<Record<string, any>>
+export const CLAVE_USO_PERSONAS: string
+export function leerUsoPersonas(clave?: string, almacen?: Storage | null): Record<string, { usos: number; ultima: number }>
+export function registrarUsoPersona(clave?: string, id?: string, almacen?: Storage | null, ahora?: number): void
+
 /** Versión visible y aviso de novedades (#293, regla 10). */
 export function partesVersion(valor?: string): number[]
 export function compararVersiones(a?: string, b?: string): -1 | 0 | 1

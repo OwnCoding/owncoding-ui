@@ -2369,6 +2369,57 @@ async function qrDataUrl(valor, { ancho = QR_OPCIONES.ancho, nivel = QR_OPCIONES
     return "";
   }
 }
+
+// src/utils/personas.js
+function normalizarPersonaTexto(texto) {
+  return String(texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+function etiquetaPersona(persona) {
+  return [persona?.nombre, persona?.rol, persona?.especialidad, persona?.email, persona?.detalle].filter(Boolean).join(" ");
+}
+function filtrarPersonas(personas, termino) {
+  const lista = Array.isArray(personas) ? personas : [];
+  const texto = normalizarPersonaTexto(termino);
+  if (!texto) return lista;
+  return lista.filter((persona) => normalizarPersonaTexto(etiquetaPersona(persona)).includes(texto));
+}
+function ordenarPersonas(personas, uso = {}, opciones = {}) {
+  const priorizarActivos = opciones.priorizarActivos !== false;
+  const lista = [...Array.isArray(personas) ? personas : []];
+  const datos = (persona) => uso?.[persona?.id] ?? { usos: 0, ultima: 0 };
+  return lista.sort((a, b) => {
+    if (priorizarActivos) {
+      const inactivaA = a?.activo === false ? 1 : 0;
+      const inactivaB = b?.activo === false ? 1 : 0;
+      if (inactivaA !== inactivaB) return inactivaA - inactivaB;
+    }
+    const usoA = datos(a);
+    const usoB = datos(b);
+    if (usoA.usos !== usoB.usos) return usoB.usos - usoA.usos;
+    if (usoA.ultima !== usoB.ultima) return usoB.ultima - usoA.ultima;
+    return String(a?.nombre ?? "").localeCompare(String(b?.nombre ?? ""), "es", { sensitivity: "base" });
+  });
+}
+var CLAVE_USO_PERSONAS = "owncoding:personas:uso:";
+function leerUsoPersonas(clave, almacen = globalThis?.localStorage) {
+  if (!clave || !almacen) return {};
+  try {
+    const crudo = almacen.getItem(`${CLAVE_USO_PERSONAS}${clave}`);
+    const valor = crudo ? JSON.parse(crudo) : {};
+    return valor && typeof valor === "object" ? valor : {};
+  } catch {
+    return {};
+  }
+}
+function registrarUsoPersona(clave, id, almacen = globalThis?.localStorage, ahora = Date.now()) {
+  if (!clave || !id || !almacen) return;
+  try {
+    const actual = leerUsoPersonas(clave, almacen)[id] ?? { usos: 0, ultima: 0 };
+    const siguiente = { ...leerUsoPersonas(clave, almacen), [id]: { usos: actual.usos + 1, ultima: ahora } };
+    almacen.setItem(`${CLAVE_USO_PERSONAS}${clave}`, JSON.stringify(siguiente));
+  } catch {
+  }
+}
 export {
   ANCHOS_PRUEBA,
   AVANCES_FIRMA,
@@ -2384,6 +2435,7 @@ export {
   CELDA_IDENTIDAD_GRANDE,
   CELDA_NUMERO,
   CIUDADES_PARAGUAY,
+  CLAVE_USO_PERSONAS,
   CODIGOS_PAIS,
   COLORES_AVATAR,
   COLORES_BANCO_RESPALDO,
@@ -2522,6 +2574,7 @@ export {
   etiquetaMetodoEnvio,
   etiquetaNecesidad,
   etiquetaOrigen,
+  etiquetaPersona,
   etiquetaPluralRevision,
   etiquetaPrioridad,
   etiquetaRecepcion,
@@ -2538,6 +2591,7 @@ export {
   fechaLista,
   fechaListaCorta,
   fechaValida,
+  filtrarPersonas,
   formatGs,
   formatGsInput,
   formatMoney,
@@ -2557,6 +2611,7 @@ export {
   inicialesDeNombre,
   internationalPhone,
   largoMaximoMonto,
+  leerUsoPersonas,
   limiteMonto,
   limpiarDependientes,
   limpiarTaxId,
@@ -2575,11 +2630,13 @@ export {
   normalizarCategoria,
   normalizarMontoInput,
   normalizarNombre,
+  normalizarPersonaTexto,
   normalizarSeriales,
   normalizarTelefono,
   normalizeTaxId,
   opcionesDependiente,
   ordenDePrioridad,
+  ordenarPersonas,
   ordenarPorPrioridad,
   origenDe,
   paginaDePrueba,
@@ -2600,6 +2657,7 @@ export {
   rangoInvertido,
   rangoMes,
   rangoSemana,
+  registrarUsoPersona,
   registroConsentimiento,
   repartirLinea,
   resumenPresencia,

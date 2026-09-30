@@ -1,0 +1,188 @@
+import { useId, useMemo, useRef, useState } from 'react'
+import { Input } from './ui.jsx'
+import Avatar from './Avatar.jsx'
+import Icon from './Icon.jsx'
+import { cn } from '../utils/cn.js'
+import {
+  filtrarPersonas,
+  leerUsoPersonas,
+  ordenarPersonas,
+  registrarUsoPersona,
+} from '../utils/personas.js'
+
+// Selector de personas del equipo (#101): **input que filtra al escribir** y
+// **lista visible debajo** (o flotante en toolbars con `desplegable`). No es un
+// dropdown nativo: buscás por nombre o rol/especialidad, la lista va ordenada
+// por **uso por usuario** (más usadas/recientes primero, fallback alfabético;
+// inactivas al final), muestra **foto** y se navega con ↑↓ / Enter / Esc.
+// Mobile-first y AA en claro/oscuro (tokens del sistema).
+//
+//   <BuscadorPersonas
+//     personas={profesionales.map((p) => ({ id: p.id, nombre: p.nombre, rol: p.especialidad, fotoUrl: p.fotoUrl, activo: p.activo }))}
+//     valor={staffId}
+//     onCambiar={(persona) => setStaffId(persona?.id ?? '')}
+//     claveUso={`agenda:profesional:${usuarioId}`}
+//     ariaLabel="Profesional"
+//   />
+//
+// Los ids y las fotos los resuelve la app; acá solo se presentan y ordenan.
+
+export default function BuscadorPersonas({
+  personas = [],
+  valor = '',
+  onCambiar,
+  placeholder = 'Buscar persona…',
+  ariaLabel = 'Persona',
+  vacio = 'Sin personas que coincidan.',
+  etiquetaLista,
+  /** Ámbito del uso por usuario (localStorage); vacío = orden base. */
+  claveUso = '',
+  /** Lista flotante (toolbars) en vez de empujar el contenido. */
+  desplegable = false,
+  /** Opciones fijas siempre visibles (p. ej. «Todos» o «Sin responsable»). */
+  opcionesFijas = [],
+  /** Texto de la opción «sin asignar»; al elegirla se llama `onCambiar(null)`. */
+  opcionVacia,
+  /** 0 = sin límite. */
+  maxResultados = 0,
+  disabled = false,
+  required = false,
+  id,
+  className,
+}) {
+  const [query, setQuery] = useState('')
+  const [resaltado, setResaltado] = useState(0)
+  const [uso, setUso] = useState(() => leerUsoPersonas(claveUso))
+  const listaId = useId()
+  const lista = useRef(null)
+
+  const opciones = useMemo(() => {
+    const fijas = (Array.isArray(opcionesFijas) ? opcionesFijas : []).map((opcion) => ({ ...opcion, fija: true }))
+    const vacia = opcionVacia ? [{ id: '__vacia__', vacia: true, nombre: opcionVacia, icono: 'user' }] : []
+    const filtradas = ordenarPersonas(filtrarPersonas(personas, query), uso)
+    const limite = Number(maxResultados) > 0 ? filtradas.slice(0, Number(maxResultados)) : filtradas
+    return [...fijas, ...vacia, ...limite]
+  }, [personas, opcionesFijas, opcionVacia, query, uso, maxResultados])
+
+  function elegir(opcion) {
+    if (!opcion) return
+    if (opcion.fija) {
+      onCambiar?.(opcion.valor !== undefined ? opcion.valor : opcion)
+      setQuery('')
+      return
+    }
+    if (opcion.vacia) {
+      onCambiar?.(null)
+      setQuery('')
+      return
+    }
+    registrarUsoPersona(claveUso, opcion.id)
+    setUso(leerUsoPersonas(claveUso))
+    onCambiar?.(opcion)
+    setQuery('')
+  }
+
+  function alTeclear(event) {
+    if (event.key === 'Escape') {
+      setQuery('')
+      return
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      if (!opciones.length) return
+      const paso = event.key === 'ArrowDown' ? 1 : -1
+      const siguiente = (resaltado + paso + opciones.length) % opciones.length
+      setResaltado(siguiente)
+      lista.current
+        ?.querySelector(`#${CSS.escape(`${listaId}-${siguiente}`)}`)
+        ?.scrollIntoView?.({ block: 'nearest' })
+      return
+    }
+    if (event.key === 'Enter' && opciones[resaltado]) {
+      event.preventDefault()
+      elegir(opciones[resaltado])
+    }
+  }
+
+  function esElegida(opcion) {
+    if (opcion.fija) return opcion.valor === valor
+    if (opcion.vacia) return valor === '' || valor == null
+    return opcion.id === valor
+  }
+
+  return (
+    <div className={cn(desplegable ? 'relative' : '', className)}>
+      <Input
+        id={id}
+        type="search"
+        role="combobox"
+        aria-expanded
+        aria-controls={listaId}
+        aria-autocomplete="list"
+        aria-activedescendant={opciones[resaltado] ? `${listaId}-${resaltado}` : undefined}
+        aria-label={ariaLabel}
+        aria-required={required || undefined}
+        autoComplete="off"
+        enterKeyHint="done"
+        disabled={disabled}
+        value={query}
+        placeholder={placeholder}
+        onChange={(event) => {
+          setQuery(event.target.value)
+          setResaltado(0)
+        }}
+        onKeyDown={alTeclear}
+      />
+      {opciones.length > 0 || query ? (
+        <ul
+          id={listaId}
+          ref={lista}
+          role="listbox"
+          aria-label={etiquetaLista ?? ariaLabel}
+          className={cn(
+            'mt-1 max-h-56 overflow-y-auto rounded-xl border border-ink-500 bg-ink p-1 shadow-float',
+            desplegable ? 'absolute left-0 right-0 top-full z-30' : 'w-full',
+          )}
+        >
+          {opciones.map((opcion, indice) => {
+            const elegida = esElegida(opcion)
+            const inactiva = !opcion.fija && !opcion.vacia && opcion.activo === false
+            return (
+              <li
+                key={opcion.fija || opcion.vacia ? `fija-${opcion.id ?? opcion.valor ?? opcion.nombre}` : opcion.id}
+                id={`${listaId}-${indice}`}
+                role="option"
+                aria-selected={elegida}
+                onMouseEnter={() => setResaltado(indice)}
+                onClick={() => elegir(opcion)}
+                className={cn(
+                  'flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition',
+                  indice === resaltado ? 'bg-fono/10 text-fore' : 'text-mute hover:bg-ink-700/60 hover:text-fore',
+                )}
+              >
+                {opcion.fija ? (
+                  <Icon name={opcion.icono ?? 'user'} className="h-4 w-4 shrink-0 text-mute" aria-hidden />
+                ) : (
+                  <Avatar nombre={opcion.nombre ?? ''} src={opcion.fotoUrl} tamano="sm" decorativo />
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-fore">{opcion.nombre}</span>
+                  {opcion.rol || opcion.detalle ? (
+                    <span className="block truncate text-xs text-mute">{opcion.rol ?? opcion.detalle}</span>
+                  ) : null}
+                </span>
+                {inactiva ? (
+                  <span className="shrink-0 rounded border border-ink-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mute">
+                    Inactiva
+                  </span>
+                ) : null}
+                {elegida ? <Icon name="check" className="h-4 w-4 shrink-0 text-ok-text" aria-hidden /> : null}
+              </li>
+            )
+          })}
+          {!opciones.length && query ? <li className="px-2.5 py-2 text-sm text-mute">{vacio}</li> : null}
+        </ul>
+      ) : null}
+    </div>
+  )
+}
