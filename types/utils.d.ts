@@ -353,6 +353,7 @@ export function crearRegistroPendientes(): { registrar(id: symbol, pendiente: bo
 
 // ── Utilidades puntuales ────────────────────────────────────────────────────
 
+export function registroConsentimiento(datos?: { finalidad?: string; aceptado?: boolean; version?: string | number; canal?: string; fecha?: Date | string | number; titular?: string }): { finalidad: string; aceptado: boolean; version: string; canal: string; fecha: string; titular: string }
 export function rutaDeAviso(aviso?: Record<string, any>): string
 export function payloadPush(aviso?: Record<string, any>, opciones?: { app?: string; title?: string; body?: string }): { title: string; body: string; data: { ruta: string; id: string; tono: string } }
 export function enHorarioSilencioso(fecha?: Date | string | number, opciones?: { desde?: number; hasta?: number }): boolean

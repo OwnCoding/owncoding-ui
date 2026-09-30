@@ -141,6 +141,12 @@ export { default as PegarEnlaceToken } from './components/PegarEnlaceToken.jsx'
 export { default as NavLateral } from './components/NavLateral.jsx'
 export { default as MenuDesplegable } from './components/MenuDesplegable.jsx'
 
+// Datos personales (Ley 7593/2025): aviso de finalidad y consentimiento
+// explícito, sin pre-tildar, con el registro de versión/fecha/canal.
+export { default as AvisoPrivacidad } from './components/AvisoPrivacidad.jsx'
+export { default as ConsentimientoDatos } from './components/ConsentimientoDatos.jsx'
+export { registroConsentimiento } from './utils/consentimiento.js'
+
 // Tema claro/oscuro: la clase `dark` en <html> es el contrato (styles.css)
 export { default as ThemeToggle, aplicarTema, TEMA_CLARO, TEMA_OSCURO } from './components/ThemeToggle.jsx'
 

@@ -2292,6 +2292,26 @@ function crearRegistroPendientes() {
   };
 }
 
+// src/utils/consentimiento.js
+function registroConsentimiento({
+  finalidad = "",
+  aceptado = true,
+  version = "",
+  canal = "web",
+  fecha = /* @__PURE__ */ new Date(),
+  titular = ""
+} = {}) {
+  const momento = fecha instanceof Date ? fecha : new Date(fecha);
+  return {
+    finalidad: String(finalidad || ""),
+    aceptado: Boolean(aceptado),
+    version: String(version || ""),
+    canal: String(canal || "web"),
+    fecha: Number.isNaN(momento.getTime()) ? "" : momento.toISOString(),
+    titular: String(titular || "")
+  };
+}
+
 // src/utils/avisos.js
 function rutaDeAviso(aviso = {}) {
   return String(aviso?.href ?? aviso?.destino ?? "").trim();
@@ -2580,6 +2600,7 @@ export {
   rangoInvertido,
   rangoMes,
   rangoSemana,
+  registroConsentimiento,
   repartirLinea,
   resumenPresencia,
   rutaDeAviso,

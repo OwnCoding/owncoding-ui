@@ -685,6 +685,8 @@ export function PanelDerecho(props: { children?: ReactNode; panel?: ReactNode; i
 export function TarjetaAjuste(props: { titulo?: ReactNode; descripcion?: ReactNode; accion?: ReactNode; icono?: string; tono?: 'normal' | 'peligro'; children?: ReactNode; className?: string; id?: string }): ReactElement
 export function EstadoGuardado(props: { testId?: string; estado?: { ok: boolean; texto: ReactNode } | null; className?: string }): ReactElement
 export function Checkbox(props: { checked?: boolean; onChange?: (event: any) => void; label?: ReactNode; descripcion?: ReactNode; variante?: 'simple' | 'tarjeta'; tono?: 'fono' | 'bad'; disabled?: boolean; id?: string; ariaLabel?: string; className?: string; [clave: string]: any }): ReactElement
+export function AvisoPrivacidad(props: { finalidad?: ReactNode; detalle?: ReactNode; politicaUrl?: string; politicaTexto?: string; onPolitica?: (evento: any) => void; derechosUrl?: string; derechosTexto?: string; onDerechos?: (evento: any) => void; tono?: 'info' | 'neutro' | 'warn'; compact?: boolean; className?: string; children?: ReactNode }): ReactElement | null
+export function ConsentimientoDatos(props: { checked?: boolean; onChange?: (event: any) => void; finalidad?: ReactNode; detalle?: ReactNode; politicaUrl?: string; politicaTexto?: string; onPolitica?: (evento: any) => void; version?: string | number; error?: ReactNode; disabled?: boolean; required?: boolean; id?: string; className?: string; [clave: string]: any }): ReactElement
 export function AjustesImpresion(props: Record<string, any> & { impresoras?: any[]; onGuardar?: (ajustes: any) => void }): ReactElement
 export function BotonImprimir(props: Record<string, any> & { onImprimir?: () => void; etiqueta?: string }): ReactElement
 export function BancoCombobox(props: Record<string, any> & { value?: string; onChange?: (valor: string) => void; onSelect?: (banco: any) => void }): ReactElement
@@ -1234,6 +1236,7 @@ export function telefonoValido(telefono: string, countryCode?: string): boolean
 export const MENSAJE_TELEFONO: string
 
 /** Formato de notificaciones (#293): ruta interna y payload genérico del push. */
+export function registroConsentimiento(datos?: { finalidad?: string; aceptado?: boolean; version?: string | number; canal?: string; fecha?: Date | string | number; titular?: string }): { finalidad: string; aceptado: boolean; version: string; canal: string; fecha: string; titular: string }
 export function rutaDeAviso(aviso?: Record<string, any>): string
 export function payloadPush(aviso?: Record<string, any>, opciones?: { app?: string; title?: string; body?: string }): { title: string; body: string; data: { ruta: string; id: string; tono: string } }
 /** Horario silencioso del push (por defecto 22 → 8). */

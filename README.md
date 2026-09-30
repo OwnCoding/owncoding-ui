@@ -50,8 +50,9 @@ Requisitos: **React 18+** y **Tailwind CSS 3.4+**.
 > con el caso real de MobOS: **`docs/ADOPCION-V2.md`**.
 >
 > **Reglas del ecosistema (Segundo Cerebro):** acceso, permisos, eliminación,
-> seguridad, Hub/Coolify, correo WEEM, pagos/dominios y publicación —el anexo
-> obligatorio que complementa las reglas de interfaz— en
+> seguridad, Hub/Coolify, correo WEEM, pagos/dominios, publicación y
+> **protección de datos personales (Ley 7593/2025, §12)** —el anexo obligatorio
+> que complementa las reglas de interfaz— en
 > **`docs/REGLAS-ECOSISTEMA.md`**.
 >
 > **Infra multi-tenant (wildcard de subdominios):** DNS en Cloudflare, token
@@ -243,6 +244,11 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   institucional **obligatorio en todas las páginas**, #291),
   `LoadingScreen` y `PegarEnlaceToken` (extrae el token del enlace). No leen
   sesión ni llaman a la API: reciben props y avisan por callback.
+- **Privacidad (Ley 7593/2025):** `AvisoPrivacidad` (aviso de finalidad con
+  enlaces a la política y a los derechos del titular) y `ConsentimientoDatos`
+  (casilla explícita con versión visible y **nunca pre-tildada**), más
+  `registroConsentimiento` (registro de versión/fecha/canal para la aceptación
+  y la revocación). Reglas por app en `docs/REGLAS-ECOSISTEMA.md` §12.
 - **Acciones y contenedores:** `Button`, `IconAction` (con `size="touch"` para
   el área táctil de móvil: 36 px de dibujo + 44 de toque con `.toque-44`),
   `Card`, `Stat`,
@@ -681,7 +687,7 @@ src/utils/        lógica compartida pura (moneda, fechas, teléfono, nombre, ba
 src/printing/     estado de impresoras y trabajos (puro)
 src/styles/       tokens.css (solo variables) · base.css (base opt-in) · styles.css (las dos)
 types/            declaraciones .d.ts escritas a mano (el build las copia a dist/)
-docs/             REGLAS.md · SHELL.md · V2.md · MIGRACION-V2.md · ADOPCION.md · ADOPCION-V2.md · MODOS-DE-TRABAJO.md · COMANDOS.md · PLANTILLA-AGENTS.md · IMPRESION.md · ALIMENTAR.md · INFRA-WILDCARD.md
+docs/             REGLAS.md · REGLAS-ECOSISTEMA.md · SHELL.md · V2.md · MIGRACION-V2.md · ADOPCION.md · ADOPCION-V2.md · MODOS-DE-TRABAJO.md · COMANDOS.md · PLANTILLA-AGENTS.md · IMPRESION.md · ALIMENTAR.md · INFRA-WILDCARD.md
 tools/            auto-ht.sh (política automática de integración, ver docs/COMANDOS.md)
 scripts/build.mjs build (esbuild → dist/index.js + dist/index.d.ts + dist/styles.css + tokens.css/base.css)
 test/             smoke de render (vitest + renderToStaticMarkup), lógica y contrato del paquete

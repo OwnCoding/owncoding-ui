@@ -4,6 +4,33 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.54.0 — 2026-09-30
+
+- **Protección de datos personales (Ley 7593/2025, #8):** `REGLAS-ECOSISTEMA.md`
+  suma la **§12** —finalidad determinada y minimización; consentimiento
+  granular, no pre-tildado, registrable y **revocable en cualquier momento**;
+  transparencia (aviso y política versionada, rol plataforma vs. negocio);
+  seguridad y privacidad por defecto (auditoría, PII enmascarada, demos sin
+  datos reales, brechas); derechos del titular (acceso, rectificación,
+  supresión, oposición, portabilidad y revocación, con respuesta en **≤30 días
+  corridos** y exportación/eliminación con doble confirmación y período
+  recuperable); encargados, retención y destrucción (con la excepción del
+  historial financiero auditable) y **checklist por app**. Autoridad de
+  control: Agencia Nacional de Protección de Datos Personales (MITIC). La
+  tabla de referencias cruzadas suma las filas de datos personales.
+- **Interfaz:** `REGLAS.md` §1 exige finalidad + política en todo formulario
+  que recolecte datos personales, sin casillas pre-tildadas y con revocación
+  visible; la intro y §15 apuntan a la §12 del anexo.
+- **Objetos nuevos (aditivos, sin cambios de API):** `AvisoPrivacidad` (aviso
+  de finalidad con enlaces a la política y a los derechos), `ConsentimientoDatos`
+  (casilla explícita con versión visible y **nunca pre-tildada**, con enlace
+  fuera del label y error anunciado) y `registroConsentimiento`
+  (`owncoding-ui/utils`), que normaliza el registro de versión/fecha/canal
+  para aceptar y revocar.
+- Tests: `test/privacidad.test.jsx` (casilla no pre-tildada, enlace fuera del
+  label, error accesible y registro). Docs: README (índice y «Qué incluye») y
+  CHANGELOG.
+
 ## v0.53.1 — 2026-09-29
 
 - **Campos cortos sin truncar (`PhoneField`):** el número del teléfono ya no se

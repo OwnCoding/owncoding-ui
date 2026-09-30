@@ -231,6 +231,7 @@ export { AVISO_REFRESCO, crearEnvioUnico, completeSave } from './guardado.js'
 export { crearPilaCapas, crearRegistroPendientes } from './pilaOverlays.js'
 
 // ── Utilidades puntuales ────────────────────────────────────────────────────
+export { registroConsentimiento } from './consentimiento.js'
 export { rutaDeAviso, payloadPush, enHorarioSilencioso } from './avisos.js'
 export { partesVersion, compararVersiones, hayVersionNueva } from './version.js'
 export { QR_OPCIONES, qrDataUrl } from './qr.js'

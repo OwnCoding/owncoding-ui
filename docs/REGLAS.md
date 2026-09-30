@@ -5,10 +5,11 @@ aviso o una celda, se busca acá y se usa el objeto del paquete. Si algo falta,
 se crea en `owncoding-ui` y se adopta en todas las apps.
 
 > **Anexo de ecosistema (Segundo Cerebro):** acceso, permisos, eliminación,
-> seguridad, infraestructura (Hub), correo (WEEM), SaaS/pagos/dominios y
-> publicación están en **`docs/REGLAS-ECOSISTEMA.md`**. Este documento (REGLAS)
-> cubre la **interfaz**; el anexo es igual de obligatorio y aplica a todas las
-> apps del grupo.
+> seguridad, infraestructura (Hub), correo (WEEM), SaaS/pagos/dominios,
+> publicación y **protección de datos personales (Ley 7593/2025, §12)** están
+> en **`docs/REGLAS-ECOSISTEMA.md`**. Este documento (REGLAS) cubre la
+> **interfaz**; el anexo es igual de obligatorio y aplica a todas las apps del
+> grupo.
 
 ## 1. Campos de formulario
 
@@ -71,6 +72,14 @@ declare en `aria-describedby` incluso cuando el id es generado (`useId`). El
 servidor revalida siempre. El interruptor booleano es **`Switch`** (un solo
 objeto; #186 retiró el alias `Toggle` y la librería no expone alias de
 compatibilidad).
+
+**Datos personales (Ley 7593/2025):** todo formulario que recolecte datos
+personales muestra la **finalidad** y el enlace a la **política de privacidad**
+en el propio punto de recolección; el consentimiento va explícito, por
+finalidad y **sin venir pre-tildado** (nunca atado a los términos), se registra
+con versión/fecha/canal y se revoca con el mismo peso. Objetos
+`AvisoPrivacidad` y `ConsentimientoDatos`; regla completa en
+`docs/REGLAS-ECOSISTEMA.md` §12.
 
 ## 2. Botones y acciones
 
@@ -764,7 +773,9 @@ Aprobadas por Dario el 29-09. Aplican a **toda** pantalla y módulo de todas las
 apps. Donde hay objeto, va con props claras y **test de aserción** (proceso §9);
 las apps adoptan borrando su copia. Las reglas **de ecosistema** que las
 complementan (acceso, seguridad, infra, pagos, correo) viven en
-**`docs/REGLAS-ECOSISTEMA.md`**.
+**`docs/REGLAS-ECOSISTEMA.md`**; la **protección de datos personales (Ley
+7593/2025)** está en su **§12** y usa `AvisoPrivacidad` y
+`ConsentimientoDatos` en cada punto de recolección.
 
 1. **Cero éxito falso.** Nada se marca como hecho sin la entrega real y ningún
    fallo se silencia: siempre hay mensaje accionable y reintento o salida. El
