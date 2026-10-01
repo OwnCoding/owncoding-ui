@@ -3063,6 +3063,7 @@ function BuscadorPersonas({
   }
   function alTeclear(event) {
     if (event.key === "Escape") {
+      event.preventDefault();
       setQuery("");
       setEditando(false);
       setAbierto(false);

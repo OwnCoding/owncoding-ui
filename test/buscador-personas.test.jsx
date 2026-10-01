@@ -228,3 +228,15 @@ describe('BuscadorPersonas · Escape conserva el valor elegido (#108)', () => {
     act(() => root.unmount())
   })
 })
+
+describe('BuscadorPersonas · Escape no lo limpia el navegador (#108)', () => {
+  test('el keydown de Escape previene el default (type=search)', () => {
+    const ui = montar({ desplegable: true })
+    ui.enfocar()
+    const evento = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+    act(() => ui.input.dispatchEvent(evento))
+    expect(evento.defaultPrevented).toBe(true)
+    expect(ui.lista()).toBeNull()
+    ui.desmontar()
+  })
+})

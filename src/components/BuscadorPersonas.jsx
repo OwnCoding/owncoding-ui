@@ -124,6 +124,9 @@ export default function BuscadorPersonas({
 
   function alTeclear(event) {
     if (event.key === 'Escape') {
+      // #108: `type=search` limpia el valor solo en Chrome (dispara onChange y
+      // dejaba el campo vacío); se previene el default y se repone el valor.
+      event.preventDefault()
       setQuery('')
       setEditando(false)
       setAbierto(false)
