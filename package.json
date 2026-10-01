@@ -17,6 +17,10 @@
       "types": "./dist/utils.d.ts",
       "default": "./dist/utils.js"
     },
+    "./ia": {
+      "types": "./dist/ia.d.ts",
+      "default": "./dist/ia.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tokens.css": "./dist/tokens.css",
     "./base.css": "./dist/base.css",

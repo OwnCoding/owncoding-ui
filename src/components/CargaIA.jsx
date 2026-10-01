@@ -71,6 +71,55 @@ export function BotonCargaIA({ onAbrir, texto = IA_BOTON, tooltip = IA_TOOLTIP, 
   )
 }
 
+/**
+ * Botón + diálogo juntos, con **montaje diferido**: la forma corta de adopción
+ * (la app pasa el mismo `esquema` y los callbacks que usaría sueltos). El
+ * diálogo no se monta hasta el primer clic en el botón.
+ */
+export function CargaIA({
+  esquema,
+  analizar,
+  crear,
+  consultarConfig,
+  enlacePrivacidad,
+  texto,
+  tooltip,
+  titulo,
+  placeholder,
+  maxTexto,
+  maxRegistros,
+  className,
+  classNameBoton,
+}) {
+  const [abierto, setAbierto] = useState(false)
+  const [montado, setMontado] = useState(false)
+  function abrir() {
+    setMontado(true)
+    setAbierto(true)
+  }
+  return (
+    <>
+      <BotonCargaIA onAbrir={abrir} texto={texto} tooltip={tooltip} className={classNameBoton} />
+      {montado ? (
+        <DialogoCargaIA
+          abierto={abierto}
+          onCerrar={() => setAbierto(false)}
+          esquema={esquema}
+          analizar={analizar}
+          crear={crear}
+          consultarConfig={consultarConfig}
+          enlacePrivacidad={enlacePrivacidad}
+          titulo={titulo}
+          placeholder={placeholder}
+          maxTexto={maxTexto}
+          maxRegistros={maxRegistros}
+          className={className}
+        />
+      ) : null}
+    </>
+  )
+}
+
 /** Campo del preview dibujado con el objeto de §1 que corresponde al tipo. */
 function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
   const id = useId()

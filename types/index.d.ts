@@ -1388,5 +1388,14 @@ export type DialogoCargaIAProps = {
 }
 export function DialogoCargaIA(props: DialogoCargaIAProps): ReactElement | null
 
+export type CargaIAProps = Omit<DialogoCargaIAProps, 'abierto' | 'onCerrar'> & {
+  /** Solo el botón: texto y tooltip propios. */
+  texto?: string
+  tooltip?: string
+  /** Clase del botón (la del diálogo va en `className`). */
+  classNameBoton?: string
+}
+export function CargaIA(props: CargaIAProps): ReactElement
+
 /** Props de los objetos con superficie abierta (se tipan al adoptarse). */
 export type PropsAbiertas = Record<string, any> & { className?: string; children?: ReactNode }

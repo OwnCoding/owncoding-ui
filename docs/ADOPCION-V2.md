@@ -157,9 +157,11 @@ verde y el inventario de duplicados en 0 (paso 8).
       y capturas 1440×900 antes/después.
 - [ ] **«Carga con IA»** adoptada (`REGLAS.md` §18): `EsquemaIA` con los
       tipos/campos de la app + callbacks `analizar`/`crear` (los registros se
-      crean con los endpoints existentes), endpoint `GET`/`POST` con las guardas
-      (el texto es dato, JSON estricto, no se persiste) y el proveedor de IA
-      registrado como encargado (Ley 7593/2025).
+      crean con los endpoints existentes y sus permisos), endpoint `GET`/`POST`
+      (estado/tipos + texto) con el **motor `owncoding-ui/ia`** y las variables
+      `IA_API_KEY`/`IA_MODELO`/`IA_BASE_URL`, las guardas (el texto es dato,
+      JSON estricto, no se persiste), **rate-limit por organización** y el
+      proveedor de IA registrado como encargado (Ley 7593/2025).
 - [ ] Bloque local v2 retirado; inventario de duplicados en 0.
 - [ ] Íconos: todo nombre usado existe en `ICONOS` (los desconocidos no dibujan).
 - [ ] Puentes sin lógica para lo migrado; lo divergente, publicado primero.

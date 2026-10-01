@@ -10355,6 +10355,48 @@ function BotonCargaIA({ onAbrir, texto = IA_BOTON, tooltip = IA_TOOLTIP, classNa
     }
   );
 }
+function CargaIA({
+  esquema,
+  analizar,
+  crear,
+  consultarConfig,
+  enlacePrivacidad,
+  texto,
+  tooltip,
+  titulo: titulo2,
+  placeholder,
+  maxTexto,
+  maxRegistros,
+  className,
+  classNameBoton
+}) {
+  const [abierto, setAbierto] = useState34(false);
+  const [montado, setMontado] = useState34(false);
+  function abrir() {
+    setMontado(true);
+    setAbierto(true);
+  }
+  return /* @__PURE__ */ jsxs88(Fragment19, { children: [
+    /* @__PURE__ */ jsx106(BotonCargaIA, { onAbrir: abrir, texto, tooltip, className: classNameBoton }),
+    montado ? /* @__PURE__ */ jsx106(
+      DialogoCargaIA,
+      {
+        abierto,
+        onCerrar: () => setAbierto(false),
+        esquema,
+        analizar,
+        crear,
+        consultarConfig,
+        enlacePrivacidad,
+        titulo: titulo2,
+        placeholder,
+        maxTexto,
+        maxRegistros,
+        className
+      }
+    ) : null
+  ] });
+}
 function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
   const id = useId19();
   const htmlFor = `${id}-${campo.id}`;
@@ -11377,6 +11419,7 @@ export {
   CampanaAvisos,
   CampoSeriales,
   Card,
+  CargaIA,
   CeldaMoneda,
   Checkbox,
   ChipEstado,

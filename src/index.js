@@ -360,7 +360,7 @@ export { TONOS, TONOS_ALIAS, tonoCanonico, puntoDeTono, chipDeTono, textoDeTono 
 // «Carga con IA» (#11): botón de topbar + diálogo declarativo. La app pasa el
 // esquema de tipos/campos y los callbacks `analizar`/`crear`; nada se crea sin
 // confirmación. Reglas: docs/REGLAS.md §18.
-export { BotonCargaIA, default as DialogoCargaIA } from './components/CargaIA.jsx'
+export { BotonCargaIA, CargaIA, default as DialogoCargaIA } from './components/CargaIA.jsx'
 export {
   IA_TEXTO_MAX,
   IA_REGISTROS_MAX,

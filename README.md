@@ -249,12 +249,16 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   (casilla explícita con versión visible y **nunca pre-tildada**), más
   `registroConsentimiento` (registro de versión/fecha/canal para la aceptación
   y la revocación). Reglas por app en `docs/REGLAS-ECOSISTEMA.md` §12.
-- **Carga con IA (#11):** `BotonCargaIA` (topbar, ✨ y tooltip) y
-  `DialogoCargaIA` (pegado con contador, revisión editable por tarjetas con
-  avisos, incluir/descartar, «Crear todo» con confirmación y resumen). La app
-  pasa un **esquema declarativo** (`EsquemaIA` con tipos y campos) y los
-  callbacks `analizar`/`crear`; el paquete no hace `fetch`, no conoce
-  proveedores y no persiste el texto. Reglas: `docs/REGLAS.md` §18.
+- **Carga con IA (#11/#12):** `CargaIA` (botón + diálogo con apertura
+  diferida), `BotonCargaIA` (topbar, ✨ y tooltip) y `DialogoCargaIA` (pegado
+  con contador, revisión editable por tarjetas con avisos, incluir/descartar,
+  «Crear todo» con confirmación y resumen). La app pasa un **esquema
+  declarativo** (`EsquemaIA` con tipos y campos) y los callbacks
+  `analizar`/`crear`; el componente no hace `fetch`, no conoce proveedores y no
+  persiste el texto. Motor server portable en **`owncoding-ui/ia`**
+  (`motorIA`, OpenAI-compatible por `IA_API_KEY`/`IA_MODELO`/`IA_BASE_URL`,
+  JSON estricto, `fetch` inyectable y rate-limit). Reglas: `docs/REGLAS.md`
+  §18.
 - **Acciones y contenedores:** `Button`, `IconAction` (con `size="touch"` para
   el área táctil de móvil: 36 px de dibujo + 44 de toque con `.toque-44`),
   `Card`, `Stat`,
@@ -567,7 +571,7 @@ Props: `hechas`, `total`, `vencidas`, `riesgo`, `sustantivo`, `porcentaje`,
 calculados por la pantalla. Sin tareas no dibuja una barra en 0 %: dice «Sin
 datos».
 
-## «Carga con IA» — asistente declarativo (#11)
+## «Carga con IA» — asistente declarativo y motor portable (#11/#12)
 
 **Para qué sirve:** cargar datos desde texto libre sin planillas: la persona
 pega un mensaje o una lista, la IA detecta los registros y el diálogo muestra
@@ -612,13 +616,71 @@ Props del diálogo: `abierto`, `onCerrar`, `esquema`, `analizar`, `crear`,
 `BotonCargaIA` recibe `onAbrir`, `texto` y `tooltip`; el diálogo se monta recién
 al abrirlo.
 
+**Forma corta:** `CargaIA` envuelve botón + diálogo con **apertura diferida**
+(el diálogo no se monta hasta el primer clic):
+
+```jsx
+<CargaIA
+  esquema={esquema}
+  consultarConfig={() => api.get('/api/ia/carga')} // → { configurada, modelo, tipos }
+  analizar={(texto, tipos) => api.post('/api/ia/carga', { texto, tipos })} // → { clientes: [...], avisos: [] }
+  crear={(registros) => api.post('/api/ia/crear', { registros })} // → { creados, errores }
+/>
+```
+
+### Adopción en 3 pasos (motor incluido)
+
+1. **Esquema** (arriba): los tipos y campos de la app, una sola vez.
+2. **Endpoint** con el motor server `owncoding-ui/ia` (variables del servidor:
+   `IA_API_KEY`, `IA_MODELO`, `IA_BASE_URL`; sin key queda apagado con aviso
+   claro):
+
+```js
+// app/api/ia/carga/route.ts (Next route handler)
+import { IAError, crearLimitadorIA, motorIA, estadoIA } from 'owncoding-ui/ia'
+
+const motor = motorIA({ esquema, tipos: ['clientes'], aplicacion: 'MiApp' })
+const limite = crearLimitadorIA()
+
+export async function GET() {
+  return Response.json({ ...estadoIA(), tipos: tiposPermitidos }) // { configurada, modelo, tipos }
+}
+
+export async function POST(request) {
+  const { texto, tipos = ['clientes'] } = await request.json()
+  const cupo = limite.permitir(`ia:${organizacionActiva}`)
+  if (!cupo.permitido) {
+    return Response.json({ error: 'Probá en unos minutos.' }, {
+      status: 429,
+      headers: { 'Retry-After': String(Math.ceil(cupo.esperaMs / 1000)) },
+    })
+  }
+  try {
+    return Response.json(await motor.analizar(texto, tipos)) // { clientes: [...], avisos: [] }
+  } catch (falla) {
+    if (falla instanceof IAError) {
+      return Response.json({ error: falla.message }, { status: falla.codigo === 'ia_no_configurada' ? 503 : 502 })
+    }
+    throw falla
+  }
+}
+```
+
+3. **UI**: `CargaIA` (o botón + diálogo) con `analizar` apuntando al endpoint y
+   `crear` a los endpoints propios de alta (mismos permisos, aislamiento y
+   auditoría).
+
 El contrato puro (`EsquemaIA`, `AnalisisIA`, `RegistroIA`,
 `normalizarAnalisisIA`, `validarRegistrosIA`, `IA_TEXTO_MAX`, `IA_REGISTROS_MAX`,
 `IA_RATE_LIMIT`, …) vive en `utils/cargaIA.js` y sale por `owncoding-ui` y por
-`owncoding-ui/utils`. **Qué NO hace:** no hace `fetch`, no conoce endpoints,
-permisos ni proveedores y no persiste el texto pegado; los registros se crean
-con los endpoints de la app (mismos permisos, aislamiento y auditoría). Reglas:
-`docs/REGLAS.md` §18.
+`owncoding-ui/utils`. El **motor** (`motorIA`, `proveedorIA`,
+`validarAnalisisIA`, `parsearSalidaIA`, `crearLimitadorIA`, `IAError`, …) sale
+por `owncoding-ui/ia` (sin React y sin banner de cliente); el `fetch` del
+proveedor es **inyectable**, así se prueba mockeado y sin red. **Qué NO hace:**
+el componente no hace `fetch`, no conoce endpoints, permisos ni proveedores; el
+motor no persiste el texto, no lo loguea ni escribe en la base: solo analiza y
+devuelve registros para revisar, y la app los crea con sus endpoints después de
+la confirmación humana. Reglas: `docs/REGLAS.md` §18.
 
 ## Formatos, estados, íconos y tipos (cierre del piloto de LedBox)
 

@@ -11,6 +11,7 @@ import { describe, expect, test, vi } from 'vitest'
 import {
   BotonCargaIA,
   CAMPOS_IA,
+  CargaIA,
   DialogoCargaIA,
   IA_BOTON,
   IA_RATE_LIMIT,
@@ -208,6 +209,23 @@ describe('BotonCargaIA y DialogoCargaIA', () => {
     expect(boton.querySelector('svg')).not.toBeNull()
     ui.clic(boton)
     expect(abrir).toHaveBeenCalledTimes(1)
+    ui.desmontar()
+  })
+
+  test('CargaIA monta el diálogo recién al primer clic (apertura diferida)', async () => {
+    const consultarConfig = vi.fn(async () => ({ configurada: true, modelo: 'mock' }))
+    const ui = montar(
+      <CargaIA esquema={ESQUEMA} consultarConfig={consultarConfig} analizar={async () => ({})} crear={async () => ({})} />,
+    )
+    expect(ui.contenedor.querySelector('textarea')).toBeNull()
+    expect(ui.contenedor.querySelector('[role="dialog"]')).toBeNull()
+    expect(consultarConfig).not.toHaveBeenCalled()
+
+    await ui.clicAsync(ui.boton(IA_BOTON))
+    await ui.espera()
+    expect(ui.contenedor.querySelector('[role="dialog"]')).not.toBeNull()
+    expect(ui.contenedor.querySelector('textarea')).not.toBeNull()
+    expect(consultarConfig).toHaveBeenCalledTimes(1)
     ui.desmontar()
   })
 
