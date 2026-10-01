@@ -3170,6 +3170,7 @@ function BuscadorPersonas({
                 id: `${listaId}-${indice}`,
                 role: "option",
                 "aria-selected": elegida,
+                onMouseDown: (evento) => evento.preventDefault(),
                 onMouseEnter: () => setResaltado(indice),
                 onClick: () => elegir(opcion),
                 className: cn(

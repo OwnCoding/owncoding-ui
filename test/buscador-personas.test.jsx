@@ -176,3 +176,18 @@ describe('BuscadorPersonas · limpiar y un solo desplegable (#108)', () => {
     ui.desmontar()
   })
 })
+
+describe('BuscadorPersonas · clic en opciones con cierre por focusout (#108)', () => {
+  test('el mousedown del option no roba el foco (la lista sigue hasta el click)', () => {
+    const elegidas = []
+    const ui = montar({ desplegable: true, onCambiar: (persona) => elegidas.push(persona) })
+    ui.enfocar()
+    const opcion = ui.opciones()[0]
+    const evento = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    act(() => opcion.dispatchEvent(evento))
+    expect(evento.defaultPrevented).toBe(true)
+    act(() => opcion.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    expect(elegidas).toHaveLength(1)
+    ui.desmontar()
+  })
+})

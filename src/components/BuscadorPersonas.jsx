@@ -237,6 +237,9 @@ export default function BuscadorPersonas({
                 id={`${listaId}-${indice}`}
                 role="option"
                 aria-selected={elegida}
+                // #108: evita que el mousedown saque el foco del input (y que el
+                // cierre por focusout desmonte la lista antes del click).
+                onMouseDown={(evento) => evento.preventDefault()}
                 onMouseEnter={() => setResaltado(indice)}
                 onClick={() => elegir(opcion)}
                 className={cn(
