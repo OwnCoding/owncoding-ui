@@ -582,7 +582,7 @@ function Button({ className, variant = "primary", ...props }) {
     "button",
     {
       className: cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg px-4 font-semibold transition",
+        "inline-flex select-none items-center justify-center gap-2 rounded-lg px-4 font-semibold transition",
         "h-11 md:h-9 text-sm disabled:opacity-30 disabled:cursor-not-allowed active:scale-[.98]",
         VARIANTS[variant],
         className
@@ -1537,7 +1537,7 @@ var OPTIONS = [
   { key: "grid", icon: "grid", label: "Ver como cuadr\xEDcula" }
 ];
 function ListGridToggle({ value, onChange, className }) {
-  return /* @__PURE__ */ jsx10("div", { className: cn("flex overflow-hidden rounded-lg border border-ink-600 bg-ink-800", className), role: "group", "aria-label": "Cambiar vista", children: OPTIONS.map((option) => /* @__PURE__ */ jsx10(
+  return /* @__PURE__ */ jsx10("div", { className: cn("flex select-none overflow-hidden rounded-lg border border-ink-600 bg-ink-800", className), role: "group", "aria-label": "Cambiar vista", children: OPTIONS.map((option) => /* @__PURE__ */ jsx10(
     "button",
     {
       type: "button",

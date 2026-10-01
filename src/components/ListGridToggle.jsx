@@ -9,7 +9,7 @@ const OPTIONS = [
 // Selector lista/cuadrícula solo con íconos: sin texto, accesible con etiqueta.
 export default function ListGridToggle({ value, onChange, className }) {
   return (
-    <div className={cn('flex overflow-hidden rounded-lg border border-ink-600 bg-ink-800', className)} role="group" aria-label="Cambiar vista">
+    <div className={cn('flex select-none overflow-hidden rounded-lg border border-ink-600 bg-ink-800', className)} role="group" aria-label="Cambiar vista">
       {OPTIONS.map(option => (
         <button
           key={option.key}
