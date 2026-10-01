@@ -126,6 +126,8 @@ export function DataTable<Row = Record<string, unknown>>(props: {
   emptyLabel?: string
   loading?: boolean
   mobileCard?: (row: Row) => ReactNode
+  /** Encabezado pegajoso bajo el header del panel (solo si el scroller es la página). */
+  encabezadoFijo?: boolean
   className?: string
 }): ReactElement
 

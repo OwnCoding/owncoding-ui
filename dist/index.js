@@ -1131,7 +1131,7 @@ function PageHeader({ title, subtitle, actions, backTo, eyebrow, migas }) {
     actions && /* @__PURE__ */ jsx2("div", { className: "flex shrink-0 flex-wrap items-center gap-2", children: actions })
   ] });
 }
-function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", loading = false, mobileCard, className }) {
+function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", loading = false, mobileCard, encabezadoFijo = false, className }) {
   if (loading) {
     return /* @__PURE__ */ jsxs("div", { className: cn("space-y-2 p-4", className), "aria-busy": "true", children: [
       /* @__PURE__ */ jsx2(Skeleton, { className: "h-4 w-1/3" }),
@@ -1143,7 +1143,7 @@ function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", load
   if (!rows?.length) return /* @__PURE__ */ jsx2(EmptyState, { title: emptyLabel, description: "", className });
   return /* @__PURE__ */ jsxs("div", { className, children: [
     /* @__PURE__ */ jsx2("div", { className: "hidden overflow-x-auto md:block", children: /* @__PURE__ */ jsxs("table", { className: "w-full text-sm", children: [
-      /* @__PURE__ */ jsx2("thead", { className: "sticky top-12 z-10 select-none bg-ink-800", children: /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute", children: columns.map((column) => /* @__PURE__ */ jsx2("th", { className: cn("px-2.5 py-1.5 font-medium", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.label }, column.key)) }) }),
+      /* @__PURE__ */ jsx2("thead", { className: cn("border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute select-none bg-ink-800", encabezadoFijo && "sticky top-12 z-10"), children: /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute", children: columns.map((column) => /* @__PURE__ */ jsx2("th", { className: cn("px-2.5 py-1.5 font-medium", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.label }, column.key)) }) }),
       /* @__PURE__ */ jsx2("tbody", { children: rows.map((row) => /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600/60 last:border-0", children: columns.map((column) => /* @__PURE__ */ jsx2("td", { className: cn("px-2.5 py-1.5 text-fore", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.render ? column.render(row) : row[column.key] }, column.key)) }, row.id ?? row.key ?? JSON.stringify(row))) })
     ] }) }),
     /* @__PURE__ */ jsx2("div", { className: "grid grid-cols-1 gap-2 p-2.5 md:hidden", children: mobileCard ? rows.map((row) => /* @__PURE__ */ jsx2("div", { children: mobileCard(row) }, row.id ?? row.key ?? JSON.stringify(row))) : /* @__PURE__ */ jsx2(EmptyState, { icon: "filter", title: emptyLabel }) })

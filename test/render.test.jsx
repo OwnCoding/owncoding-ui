@@ -533,8 +533,14 @@ describe('DataTable (#109)', () => {
     expect(html).toContain('overflow-x-auto')
     expect(html).not.toContain('max-h-')
     expect(html).not.toContain('overflow-auto')
-    expect(html).toContain('sticky top-12')
+    // #114: el encabezado no es pegajoso por defecto (evita superponerse).
+    expect(html).not.toContain('sticky top-12')
     expect(html).toContain('select-none')
+
+    const fijo = renderToStaticMarkup(
+      <DataTable encabezadoFijo columns={[{ key: 'nombre', label: 'Nombre' }]} rows={[{ id: 'a', nombre: 'Ana' }]} />,
+    )
+    expect(fijo).toContain('sticky top-12')
   })
 })
 

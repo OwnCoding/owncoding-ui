@@ -761,7 +761,11 @@ export function PageHeader({ title, subtitle, actions, backTo, eyebrow, migas })
 // ── DataTable ───────────────────────────────────────────────────────
 // En md+ una tabla real con cabecera; en móvil tarjetas apiladas vía
 // mobileCard(row). Sin mobileCard, el móvil muestra un EmptyState chico.
-export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.', loading = false, mobileCard, className }) {
+// El encabezado **no** es pegajoso por defecto (#114): con el scroll de página
+// (#109) un `sticky` puede montarse sobre filas cuando la tabla vive en un
+// scroller interno (p. ej. Finanzas). `encabezadoFijo` lo habilita solo donde
+// el contenedor sea la página.
+export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.', loading = false, mobileCard, encabezadoFijo = false, className }) {
   if (loading) {
     return (
       <div className={cn('space-y-2 p-4', className)} aria-busy="true">
@@ -776,11 +780,12 @@ export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.
   return (
     <div className={className}>
       {/* #109: la página scrollea; acá solo queda el scroll horizontal de
-          tablas anchas. El encabezado se ancla debajo del header del panel
-          (h-12) y el chrome no se selecciona. */}
+          tablas anchas. El chrome no se selecciona y el encabezado solo se
+          ancla si la pantalla lo pide (`encabezadoFijo`), debajo del header
+          del panel (h-12). */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
-          <thead className="sticky top-12 z-10 select-none bg-ink-800">
+          <thead className={cn('border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute select-none bg-ink-800', encabezadoFijo && 'sticky top-12 z-10')}>
             <tr className="border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute">
               {columns.map(column => (
                 <th key={column.key} className={cn('px-2.5 py-1.5 font-medium', column.align === 'right' && 'text-right', column.align === 'center' && 'text-center')}>{column.label}</th>
