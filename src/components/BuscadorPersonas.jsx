@@ -185,6 +185,11 @@ export default function BuscadorPersonas({
           setAbierto(true)
           setResaltado(0)
         }}
+        // #108: con el foco ya en el input, el clic vuelve a abrir la lista.
+        onClick={() => {
+          if (!desplegable) return
+          setAbierto(true)
+        }}
         onChange={(event) => {
           setQuery(event.target.value)
           setEditando(true)

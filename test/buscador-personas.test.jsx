@@ -191,3 +191,16 @@ describe('BuscadorPersonas · clic en opciones con cierre por focusout (#108)', 
     ui.desmontar()
   })
 })
+
+describe('BuscadorPersonas · reabrir con clic (#108)', () => {
+  test('con el foco en el input, un clic vuelve a abrir la lista', () => {
+    const ui = montar({ desplegable: true })
+    ui.enfocar()
+    expect(ui.lista()).not.toBeNull()
+    ui.tecla('Escape')
+    expect(ui.lista()).toBeNull()
+    act(() => ui.input.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    expect(ui.lista()).not.toBeNull()
+    ui.desmontar()
+  })
+})

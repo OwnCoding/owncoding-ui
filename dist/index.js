@@ -3118,6 +3118,10 @@ function BuscadorPersonas({
           setAbierto(true);
           setResaltado(0);
         },
+        onClick: () => {
+          if (!desplegable) return;
+          setAbierto(true);
+        },
         onChange: (event) => {
           setQuery(event.target.value);
           setEditando(true);
