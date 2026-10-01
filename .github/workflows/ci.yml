@@ -11,13 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run build
+      - run: npm run test:types
+      - run: npm run test:package
+      - run: npm run check:bundle
       - run: npm test
+      - run: npm run gallery:check
+      - run: npm run gallery:build
+      - run: npm run readme:check
+      - name: Verifica whitespace del rango publicado
+        env:
+          CI_EVENT_NAME: ${{ github.event_name }}
+          CI_BEFORE_SHA: ${{ github.event.before }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/ci-diff-check.mjs
       - name: El paquete se arma y exporta
         run: |
           npm pack --dry-run >/dev/null

@@ -80,12 +80,13 @@ export default function ManifiestoEnvio({
       </div>
 
       <table className="oc-print-tabla mt-3 w-full">
+        <caption className="sr-only">Detalle de productos, variantes, cantidades e identificadores del envío</caption>
         <thead>
           <tr>
-            <th>Producto</th>
-            <th>Variante</th>
-            <th className="oc-print-num">Cantidad</th>
-            <th>IMEI / serial</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Variante</th>
+            <th scope="col" className="oc-print-num">Cantidad</th>
+            <th scope="col">IMEI / serial</th>
           </tr>
         </thead>
         <tbody>

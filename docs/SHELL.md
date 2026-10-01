@@ -27,7 +27,8 @@ permisos; el shell solo dibuja y navega.
 | Presencia | `PilaPersonas` | Avatares superpuestos con punto de presencia y contador «+N»; `resumenPresencia` arma el texto («Ana en línea», «3 en línea») |
 | Avisos | `CampanaAvisos` | Bandeja oficial del panel (#293): contador de no leídos (`99+`), vacío **con acción** y ruta interna (`href`/`destino`); abrir/elegir se avisan por callback. Contrato por canal en `REGLAS.md` §16 |
 | Identidad de la sesión | `Avatar` | Foto → iniciales con color estable; vive en el `pie` de la barra o del menú |
-| Pie institucional | `ProductFooter` | **Obligatorio en todas las páginas** (#291): © + nombre + versión + crédito «Desarrollado por Owncoding» con enlace; marca y versión entran por props (la biblioteca no conoce la marca) |
+| Prefooter opcional | `ProductPrefooter` | Columnas, acción y redes con modelos `enlaces`/`accion`/`completo`; no reemplaza el pie institucional |
+| Pie institucional | `ProductFooter` | **Obligatorio en todas las páginas** (#291): identidad, versión y crédito; modelos `compacto`/`apilado`/`distribuido` |
 | Ajustes con formulario | `PanelDerecho` + `TarjetaAjuste` | Contenido/lista a la izquierda; formulario fijo a la derecha desde `lg` y apilado en móvil |
 
 ## 2. Props (resumen)
@@ -35,7 +36,7 @@ permisos; el shell solo dibuja y navega.
 | Objeto | Props |
 | --- | --- |
 | `PageHeader` | `title` (único `h1`), `migas` `[{ etiqueta, href? }]`, `eyebrow`, `subtitle`, `actions`, `backTo` |
-| `NavLateral` | `items` `[{ id, label, icono?, contador? }]` o `grupos` `[{ titulo, items }]`, `gruposPlegados`/`onToggleGrupo(titulo)`, `activeId`, `onSelect(id)`, `colapsado`, `onToggle`, `cabecera`, `pie`, `ancho` (`w-64`), `ariaLabel` |
+| `NavLateral` | `items` `[{ id, label, icono?, contador? }]` o `grupos` `[{ titulo, items }]`, controlado con `gruposPlegados`/`colapsado`, no controlado con `defaultGruposPlegados`/`defaultColapsado`, `onToggleGrupo(titulo, plegado)`, `onToggle(colapsado)`, `activeId`, `onSelect(id)`, `cabecera`, `pie`, `ancho` (`w-64`), `ariaLabel` |
 | `MenuDesplegable` | `trigger`, `items` `[{ id?, label, icono?, onClick?, peligro?, disabled?, separador? }]`, `alineacion` (`right`/`left`), `ariaLabel` |
 | `PaletaComandos` | `abierta`/`onAbrir`/`onCerrar`, `buscar(consulta)` async, `onElegir(resultado)`, `etiquetasTipo`, `iconosTipo`, `atajo`, `atajoTexto`, `conAtajo`, `minimo` (2), `espera` (220 ms), `boton`, `textoBoton` |
 | `AyudaModulo` | `titulo`, `resumen`, `puntos` (3–5), `enlaces` `[{ href, etiqueta, onClick? }]`, `abierta`/`onAbrir`/`onCerrar` |
@@ -44,7 +45,8 @@ permisos; el shell solo dibuja y navega.
 | `PilaPersonas` | `personas` (objetos o strings), `max` (4), `size`, `onMas`, `resumen`, `ariaLabel`, `title`, `className` |
 | `CampanaAvisos` | `avisos` `[{ id, titulo, detalle?, tono?, fecha?, href?/destino?, onClick?, leido? }]`, `onAbrir`, `onElegir`, `vacioTitulo`/`vacioDetalle`/`vacioAccion`, `pie`, `anclaje` |
 | `Avatar` | `nombre`, `src`, `tamano` (`sm`/`md`/`lg`), `forma` (`redondo`/`cuadrado`), `empresa`, `title`, `ariaLabel`, `decorativo` |
-| `ProductFooter` | `nombre`, `version`, `credito` (default «Desarrollado por Owncoding»), `creditoUrl` (default `https://owncoding.dev/`), `anio` (default: año actual), `leading`, `children`, `className` |
+| `ProductPrefooter` | `modelo`, `titulo`, `descripcion`, `columnas`, `accion`, `redes`, `children`, `className` |
+| `ProductFooter` | `identidad` (`crearIdentidadApp`), `modelo`, `enlaces`; compatibilidad: `nombre`, `version`, `credito`, `creditoUrl`, `anio`, `leading`, `children`, `className` |
 
 ## 3. Anatomía por breakpoint
 

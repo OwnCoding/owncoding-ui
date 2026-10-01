@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Badge, Input } from './ui.jsx'
 import BotonDentroCampo from './BotonDentroCampo.jsx'
+import { cn } from '../utils/cn.js'
 
 // Campo RUC único del grupo: input con el botón **Extraer** adentro (trailing,
 // con tooltip y estado «Consultando…») contra la consulta que pasa la app
@@ -22,7 +23,13 @@ export default function RucField({
   autoComplete = 'off',
   ariaLabel,
   textoAyuda = 'La razón social se aplica solo si la confirmás.',
+  className,
+  ...inputProps
 }) {
+  const generado = useId()
+  const inputId = id || generado
+  const ayudaId = `${inputId}-ayuda`
+  const errorId = `${inputId}-error`
   const [resultado, setResultado] = useState(null)
   const [consultando, setConsultando] = useState(false)
   const [error, setError] = useState('')
@@ -43,11 +50,14 @@ export default function RucField({
   }
 
   return (
-    <div className="space-y-2">
+    <div className={cn('space-y-2', className)}>
       <div className="relative">
         <Input
-          id={id}
+          {...inputProps}
+          id={inputId}
           aria-label={ariaLabel}
+          aria-describedby={[inputProps['aria-describedby'], puedeExtraer && textoAyuda ? ayudaId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined}
+          aria-invalid={inputProps['aria-invalid'] ?? (error ? true : undefined)}
           className={puedeExtraer ? (consultando ? 'pr-32' : 'pr-11') : undefined}
           maxLength={maxLength}
           autoComplete={autoComplete}
@@ -67,9 +77,9 @@ export default function RucField({
           />
         )}
       </div>
-      {puedeExtraer && textoAyuda && <span className="block text-xs text-mute">{textoAyuda}</span>}
+      {puedeExtraer && textoAyuda && <span id={ayudaId} className="block text-xs text-mute">{textoAyuda}</span>}
       {resultado && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-fono/25 bg-fono/5 p-3 text-sm">
+        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-fono/25 bg-fono/5 p-3 text-sm">
           <span className="min-w-0">
             <span className="flex flex-wrap items-center gap-2">
               <b className="truncate">{resultado.name}</b>
@@ -78,10 +88,10 @@ export default function RucField({
             <span className="block text-mute">RUC {resultado.fullRuc}</span>
             {resultado.simulado && <span className="block text-xs text-mute">Resultado ficticio: la demo no consulta registros reales.</span>}
           </span>
-          <button type="button" className="font-semibold text-fono-light" onClick={() => { onAplicar?.(resultado); setResultado(null) }}>Usar estos datos</button>
+          <button type="button" className="min-h-11 rounded-lg px-2 font-semibold text-fono-light" onClick={() => { onAplicar?.(resultado); setResultado(null) }}>Usar estos datos</button>
         </div>
       )}
-      {error && <p role="alert" className="text-sm text-bad-text">{error}</p>}
+      {error && <p id={errorId} role="alert" className="text-sm text-bad-text">{error}</p>}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import Icon from './Icon.jsx'
 import { Aviso, Button, EmptyState, Skeleton } from './ui.jsx'
 import SearchField from './SearchField.jsx'
 import { cn } from '../utils/cn.js'
+import useDialogFocusTrap from '../hooks/useDialogFocusTrap.js'
 
 // Buscador global del panel (⌘/Ctrl + K): buscador con foco automático y
 // resultados agrupados por tipo, navegables con ↑↓/Enter y cerrables con Escape.
@@ -108,6 +109,10 @@ export default function PaletaComandos({
     onCerrar?.()
   }
 
+  const { esSuperior, requestClose } = useDialogFocusTrap(visible, cerrar, raiz, {
+    initialFocus: () => entrada.current,
+  })
+
   // Atajo global (⌘/Ctrl + tecla): abre la paleta desde cualquier pantalla.
   useEffect(() => {
     if (!conAtajo) return undefined
@@ -123,7 +128,8 @@ export default function PaletaComandos({
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [conAtajo, atajo, controlada])
 
-  // Al abrir: consulta limpia, foco en el buscador y selección en el primero.
+  // Al abrir: consulta limpia y selección en el primero. El foco inicial,
+  // la trampa, el bloqueo de scroll y el retorno viven en el hook compartido.
   useEffect(() => {
     if (!visible) return undefined
     setConsulta('')
@@ -132,8 +138,7 @@ export default function PaletaComandos({
     setCargando(false)
     setActivo(0)
     setIntento(0)
-    const frame = requestAnimationFrame(() => entrada.current?.focus())
-    return () => cancelAnimationFrame(frame)
+    return undefined
   }, [visible])
 
   // Búsqueda con espera y cancelación: la consulta vieja no pisa a la nueva.
@@ -205,11 +210,6 @@ export default function PaletaComandos({
   }
 
   function onKeyDown(event) {
-    if (event.key === 'Escape') {
-      event.stopPropagation()
-      cerrar()
-      return
-    }
     if (event.key === 'ArrowDown') {
       event.preventDefault()
       mover(1)
@@ -239,7 +239,7 @@ export default function PaletaComandos({
           aria-label={`${titulo} · ${atajoTexto}`}
           aria-haspopup="dialog"
           title={`${titulo} · ${atajoTexto}`}
-          className="inline-flex h-9 items-center gap-2 rounded-lg border border-ink-500 px-3 text-sm text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
+          className="toque-44 inline-flex min-h-11 items-center gap-2 rounded-lg border border-interactivo px-3 text-sm text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
         >
           <Icon name="search" className="h-4 w-4" />
           <span className="hidden sm:inline">{textoBoton}</span>
@@ -254,14 +254,15 @@ export default function PaletaComandos({
       {visible && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-3 sm:p-6"
-          onMouseDown={(event) => event.target === event.currentTarget && cerrar()}
+          onMouseDown={(event) => event.target === event.currentTarget && requestClose()}
           onKeyDown={onKeyDown}
         >
           <div
             ref={raiz}
             role="dialog"
-            aria-modal="true"
+            aria-modal={esSuperior ? 'true' : undefined}
             aria-label={titulo}
+            tabIndex={-1}
             className={cn('mt-[8vh] w-full max-w-xl overflow-hidden rounded-2xl border border-ink-600 bg-ink shadow-float', className)}
           >
             <div className="border-b border-ink-600 p-3">
@@ -281,7 +282,7 @@ export default function PaletaComandos({
             </div>
 
             <div id={idLista} className="max-h-[50vh] min-h-[9rem] overflow-y-auto p-2">
-              {estado === 'seguir' && <p className="px-2 py-6 text-center text-sm text-mute">{textoContinuar}</p>}
+              {estado === 'seguir' && <p role="status" className="px-2 py-6 text-center text-sm text-mute">{textoContinuar}</p>}
 
               {estado === 'error' && (
                 <div className="space-y-2 p-2">
@@ -293,7 +294,8 @@ export default function PaletaComandos({
               )}
 
               {estado === 'cargando' && (
-                <div className="space-y-2 p-2" aria-busy="true">
+                <div className="space-y-2 p-2" role="status" aria-live="polite" aria-busy="true">
+                  <span className="sr-only">Buscando…</span>
                   <Skeleton className="h-4 w-1/3" />
                   <Skeleton className="h-9 w-full" />
                   <Skeleton className="h-9 w-full" />
@@ -301,17 +303,21 @@ export default function PaletaComandos({
               )}
 
               {estado === 'vacio' && (
-                <EmptyState
-                  compact
-                  icon="search"
-                  title={textoSinResultados}
-                  description={descripcionVacio || `No encontramos nada para «${termino}». Probá con otro nombre o número.`}
-                />
+                <div role="status">
+                  <EmptyState
+                    compact
+                    icon="search"
+                    title={textoSinResultados}
+                    description={descripcionVacio || `No encontramos nada para «${termino}». Probá con otro nombre o número.`}
+                  />
+                </div>
               )}
 
               {estado === 'listo' && (
-                <div role="listbox" aria-label="Resultados de la búsqueda">
-                  {grupos.map((grupo) => (
+                <>
+                  <span className="sr-only" role="status" aria-live="polite">{planos.length} resultado{planos.length === 1 ? '' : 's'}</span>
+                  <div role="listbox" aria-label="Resultados de la búsqueda">
+                    {grupos.map((grupo) => (
                     <section key={grupo.tipo} role="group" aria-label={grupo.etiqueta}>
                       <p className="px-2 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-mute">{grupo.etiqueta}</p>
                       {grupo.items.map((item) => {
@@ -343,8 +349,9 @@ export default function PaletaComandos({
                         )
                       })}
                     </section>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 

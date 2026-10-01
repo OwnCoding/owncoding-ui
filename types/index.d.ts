@@ -12,6 +12,7 @@ import type {
   ForwardRefExoticComponent,
   HTMLAttributes,
   InputHTMLAttributes,
+  LabelHTMLAttributes,
   ReactElement,
   ReactNode,
   Ref,
@@ -30,6 +31,32 @@ export type Tono = TonoCanonico | 'neutral' | 'neutro' | 'accent' | 'acento' | '
 export type Moneda = 'PYG' | 'USD' | 'BRL' | 'EUR' | 'USDT' | (string & {})
 /** Vistas de tablero/lista. */
 export type Vista = 'lista' | 'tablero' | (string & {})
+
+/** Identidad visible de la app. `version` usa X.Y.Z o X.Y.Z-rc.N. */
+export type AppIdentity = Readonly<{
+  nombre: string
+  version: string
+  etiquetaVersion: string
+  url: string
+  logoUrl: string
+  soporteUrl: string
+  color: string
+  credito: string | null
+  creditoUrl: string
+}>
+export const VERSION_APP_RE: RegExp
+export function esVersionApp(version?: unknown): boolean
+export function etiquetaVersionApp(version: string): string
+export function crearIdentidadApp(identidad: {
+  nombre: string
+  version: string
+  url?: string
+  logoUrl?: string
+  soporteUrl?: string
+  color?: string
+  credito?: string | null
+  creditoUrl?: string
+}): AppIdentity
 
 // ── Primitivas y contenedores ───────────────────────────────────────────────
 
@@ -76,7 +103,7 @@ export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>
 export function Select(props: SelectProps): ReactElement
 export type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>
 export function Textarea(props: TextareaProps): ReactElement
-export type LabelProps = HTMLAttributes<HTMLLabelElement>
+export type LabelProps = LabelHTMLAttributes<HTMLLabelElement>
 export function Label(props: LabelProps): ReactElement
 export function Eyebrow(props: HTMLAttributes<HTMLDivElement>): ReactElement
 export function Card(props: HTMLAttributes<HTMLDivElement>): ReactElement
@@ -103,11 +130,16 @@ export function Badge(props: HTMLAttributes<HTMLSpanElement> & { color?: 'blue' 
 export function Dot(props: { color?: 'green' | 'red' | 'blue' | 'slate' | 'orange'; pulse?: boolean; className?: string }): ReactElement
 export function IconAction(props: { icon: string; label: string; tone?: Tono; onClick?: () => void; disabled?: boolean; size?: 'sm' | 'touch' }): ReactElement
 export function Drawer(props: { open: boolean; onClose?: () => void; title?: ReactNode; children?: ReactNode; side?: 'left' | 'right'; className?: string; busy?: boolean }): ReactElement | null
+export type ToastOptions = { duration?: number; persistent?: boolean }
+export type ToastMethod = {
+  (title: string, description?: string, options?: ToastOptions): void
+  (title: string, options?: ToastOptions): void
+}
 export function ToastProvider(props: { children?: ReactNode; demo?: boolean }): ReactElement
-export function useToast(): { success: (title: string, description?: string) => void; error: (title: string, description?: string) => void; info: (title: string, description?: string) => void }
+export function useToast(): { success: ToastMethod; error: ToastMethod; info: ToastMethod }
 export function Skeleton(props: { className?: string }): ReactElement
 export function EmptyState(props: { icon?: string; title?: ReactNode; description?: ReactNode; action?: ReactNode; compact?: boolean; className?: string }): ReactElement
-export function ErrorState(props: { title?: string; description?: ReactNode; onRetry?: () => void }): ReactElement
+export function ErrorState(props: { title?: string; description?: ReactNode; onRetry?: () => void; compact?: boolean; role?: string; className?: string }): ReactElement
 export function Aviso(props: HTMLAttributes<HTMLElement> & { tono?: 'error' | 'ok' | 'warn'; como?: 'p' | 'div'; compact?: boolean }): ReactElement
 export function Nota(props: HTMLAttributes<HTMLElement> & { tono?: 'warn' | 'info' | 'neutro'; como?: 'p' | 'div'; compact?: boolean }): ReactElement
 export function PageHeader(props: { title?: ReactNode; subtitle?: ReactNode; actions?: ReactNode; backTo?: () => void; eyebrow?: ReactNode; migas?: Array<{ etiqueta: ReactNode; href?: string }> }): ReactElement
@@ -118,6 +150,8 @@ export type DataTableColumn<Row = Record<string, unknown>> = {
   key: string
   label: ReactNode
   align?: 'left' | 'right' | 'center'
+  /** Oculta esta columna solo en las tarjetas genéricas de móvil. */
+  mobile?: boolean
   render?: (row: Row) => ReactNode
 }
 export function DataTable<Row = Record<string, unknown>>(props: {
@@ -128,11 +162,34 @@ export function DataTable<Row = Record<string, unknown>>(props: {
   mobileCard?: (row: Row) => ReactNode
   /** Encabezado pegajoso bajo el header del panel (solo si el scroller es la página). */
   encabezadoFijo?: boolean
+  caption?: ReactNode
+  getRowKey?: (row: Row, index: number) => string | number
   className?: string
 }): ReactElement
 
 export function Stat(props: { label?: ReactNode; valor?: ReactNode; delta?: number; sub?: ReactNode; nota?: ReactNode; tono?: Tono; destacado?: boolean; deltaComo?: 'texto' | 'chip'; barra?: 'fono' | 'ok' | 'bad' | 'warn' | 'info'; className?: string }): ReactElement
-export function Subtabs(props: { value: string; onChange: (id: string) => void; items?: Array<[string, ReactNode, number?]>; className?: string }): ReactElement | null
+export function Subtabs(props: { value: string; onChange: (id: string) => void; items?: Array<[string, ReactNode, number?]>; className?: string; ariaLabel?: string }): ReactElement | null
+export function useComboboxNavigation<T>(props: {
+  options?: T[]
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  onSelect?: (option: T, index: number) => void
+  getOptionKey?: (option: T, index: number) => unknown
+  selectedKey?: unknown
+  listboxId?: string
+  defaultActiveIndex?: number
+}): {
+  activeIndex: number
+  activeOptionId?: string
+  inputRef: any
+  listRef: any
+  listboxId: string
+  setActiveIndex: (index: number | ((current: number) => number)) => void
+  selectIndex: (index: number) => boolean
+  inputProps: Record<string, any>
+  listboxProps: Record<string, any>
+  getOptionProps: (index: number) => Record<string, any>
+}
 export function FilaDato(props: {
   etiqueta?: ReactNode
   valor?: ReactNode
@@ -168,37 +225,90 @@ export const SearchField: ForwardRefExoticComponent<
 >
 export function BotonDentroCampo(props: { etiqueta: string; onClick?: () => void; icono?: string; ocupado?: boolean; disabled?: boolean; className?: string }): ReactElement
 export function SegmentedField(props: { value: string; onChange: (id: string) => void; options?: Array<[string, ReactNode, string?, number?]>; ariaLabel?: string; className?: string }): ReactElement | null
-export function PercentField(props: Omit<InputProps, 'value' | 'onChange'> & { value?: string; onValueChange?: (value: string) => void; className?: string }): ReactElement
+export function PercentField(props: Omit<InputProps, 'value' | 'onChange'> & { value?: string; onChange?: (value: string) => void; onValueChange?: (value: string) => void; className?: string }): ReactElement
 export function parsePercent(valor: unknown): number | null
 export function formatPercent(numero: unknown): string
-export function limpiarPercent(valor: unknown): string
+export function limpiarPercent(valor: unknown, max?: number): string
 export function CurrencySelect(props: SelectProps & { excluir?: string[] }): ReactElement
 export function ListGridToggle(props: { value: 'list' | 'grid' | (string & {}); onChange: (value: string) => void; className?: string }): ReactElement
-export function EmailField(props: Omit<InputProps, 'onChange'> & { value?: string; onChange?: (event: any) => void; dominios?: string[]; sugerir?: boolean }): ReactElement
+export function EmailField(props: Omit<InputProps, 'onChange'> & { value?: string; onChange?: (value: string) => void; dominios?: string[]; sugerir?: boolean; inputClassName?: string }): ReactElement
 export const DOMINIOS_EMAIL: string[]
 export function sugerenciasDe(valor: string, dominios?: string[]): string[]
-export function PhoneField(props: {
+export type PaisTelefono = {
+  /** ISO 3166-1 alpha-2. */
+  country: string
+  /** DDI con `+` (por ejemplo, `+595`). */
+  countryCode: string
+  /** Nombre localizado según `locale`. */
+  name: string
+  /** Bandera Unicode regional-indicator. */
+  flag: string
+  /** Selección neutral para un DDI legado no reconocido. */
+  custom?: boolean
+}
+export type TelefonoInternacional = {
+  country: string
+  countryCode: string
+  phone: string
+  e164: string
+  isValid: boolean
+}
+export type PhoneInternationalMeta = Omit<TelefonoInternacional, 'e164'>
+export type CountryPhoneSelectProps = {
+  country?: string
+  onChange?: (iso2: string) => void
+  countries?: readonly (string | PaisTelefono)[]
+  locale?: string
+  disabled?: boolean
+  ariaLabel?: string
+  searchPlaceholder?: string
+  customCountry?: PaisTelefono & { custom?: boolean }
+  id?: string
+  className?: string
+}
+export function CountryPhoneSelect(props: CountryPhoneSelectProps): ReactElement
+export type PhoneFieldProps = {
   countryCode?: string
+  /** ISO2 controlado; cuando se provee, tiene prioridad sobre `countryCode`. */
+  country?: string
   phone?: string
   onChange?: (valor: string) => void
   onCountryCodeChange?: (codigo: string) => void
+  onCountryChange?: (iso2: string) => void
+  onInternationalChange?: (e164OrEmpty: string, meta: PhoneInternationalMeta) => void
+  countries?: readonly (string | PaisTelefono)[]
+  locale?: string
+  searchPlaceholder?: string
+  autoComplete?: string
+  name?: string
+  inputProps?: Omit<InputProps, 'value' | 'defaultValue' | 'onChange' | 'type' | 'inputMode' | 'disabled' | 'autoComplete' | 'name' | 'maxLength'>
   disabled?: boolean
   placeholder?: string
   countryAriaLabel?: string
   phoneAriaLabel?: string
-  codigos?: string[]
+  codigos?: readonly string[]
   mensajeInvalido?: string
   id?: string
   className?: string
-}): ReactElement
+}
+export function PhoneField(props: PhoneFieldProps): ReactElement
 /** Parte `+595 981 123 456`, `+595981123456` o el pegado `00595 …`. */
 export function parseTelefono(valor: string, countryCodePorDefecto?: string): { countryCode: string; phone: string }
+/** Interpreta un valor local/internacional y conserva el ISO en DDI compartidos. */
+export function parseTelefonoInternacional(valor: string, country?: string, countryCodePorDefecto?: string): TelefonoInternacional
 /** Arma `+<código> <número>`; sin número devuelve `null`. */
 export function componerTelefono(datos?: { countryCode?: string; phone?: string }): string | null
 export const CODIGOS_PAIS: string[]
-export function SerialField(props: Omit<InputProps, 'onChange'> & { value?: string; onChange?: (event: any) => void; normalizar?: (valor: string) => string }): ReactElement
+export const PAISES_TELEFONO: readonly PaisTelefono[]
+export function paisTelefonoPorIso(iso: string, locale?: string): PaisTelefono | null
+export function paisesDeCodigo(countryCode: string, locale?: string, countries?: readonly (string | PaisTelefono)[]): PaisTelefono[]
+export function buscarPaisesTelefono(consulta?: string, countries?: readonly (string | PaisTelefono)[], locale?: string): PaisTelefono[]
+/** Devuelve E.164 cuando es válido; inválido/incompleto devuelve `''`. */
+export function telefonoE164(valor: string, country?: string): string
+export function telefonoInternacionalValido(valor: string, country?: string): boolean
+export function SerialField(props: Omit<InputProps, 'onChange'> & { value?: string; onChange?: (value: string) => void; normalizar?: (valor: string) => string }): ReactElement
 export function normalizarSerial(valor: string): string
-export function InstagramField(props: Omit<InputProps, 'onChange'> & { value?: string; onChange?: (event: any) => void }): ReactElement
+export function InstagramField(props: Omit<InputProps, 'onChange'> & { value?: string; onChange?: (value: string) => void; inputClassName?: string }): ReactElement
 export function normalizarInstagram(valor: string): string
 
 // ── Identificación fiscal (cosecha de PagaYa, #1) ─────────────────────────
@@ -651,7 +761,20 @@ export function ResumenDestinos(props: { destinos?: Array<{ id?: string; etiquet
 export function ResumenIncidencias(props: { incidencias?: Array<{ tipo?: string; etiqueta?: ReactNode; cantidad?: number; tono?: string; detalle?: string }>; sinIncidencias?: string; className?: string }): ReactElement
 export function FilaRevision(props: { etiqueta: ReactNode; serial?: string | null; estado?: string; detalle?: ReactNode; acciones?: ReactNode; compact?: boolean; className?: string }): ReactElement
 export function SelectorIncidencia(props: { valor?: string | null; onChange?: (tipo: string | null) => void; tipos?: string[]; permitirQuitar?: boolean; disabled?: boolean; ariaLabel?: string; className?: string }): ReactElement
-export function DestinoRecepcion(props: { destino?: { id: string; nombre: ReactNode } | null; depositos?: Array<{ id: string; nombre: ReactNode }>; pendientes?: number; recibiendo?: boolean; onRecibir?: (depositoId: string) => void; etiqueta?: string; textoRecibir?: string; className?: string }): ReactElement
+export function DestinoRecepcion(props: {
+  destino?: { id: string; nombre: ReactNode } | null
+  depositos?: Array<{ id: string; nombre: ReactNode }>
+  /** ID controlado. La presencia de la prop activa el modo controlado. */
+  destinoId?: string
+  defaultDestinoId?: string
+  onDestinoChange?: (depositoId: string) => void
+  pendientes?: number
+  recibiendo?: boolean
+  onRecibir?: (depositoId: string) => void
+  etiqueta?: string
+  textoRecibir?: string
+  className?: string
+}): ReactElement
 export const ESTADOS_REVISION: Record<string, { etiqueta: string; etiquetaPlural: string; tono: string }>
 export const INCIDENCIAS: string[]
 export function esIncidencia(estado?: string): boolean
@@ -659,7 +782,17 @@ export function etiquetaRevision(estado?: string): string
 export function etiquetaPluralRevision(estado?: string): string
 export function tonoRevision(estado?: string): string
 export function EstadoBadge(props: { mapa?: Record<string, { label: ReactNode; color?: string }>; valor?: string; vacio?: string }): ReactElement
-export function SeccionColapsable(props: { titulo: ReactNode; resumen?: ReactNode; icono?: string; abierta?: boolean; clave?: string; className?: string; children?: ReactNode }): ReactElement
+export function SeccionColapsable(props: {
+  /** @deprecated Usá `clave`. Se mantendrá por al menos dos releases menores. */
+  id?: string
+  titulo: ReactNode
+  resumen?: ReactNode
+  icono?: string
+  abierta?: boolean
+  clave?: string
+  className?: string
+  children?: ReactNode
+}): ReactElement
 
 // ── Acceso y shell ─────────────────────────────────────────────────────────
 
@@ -669,36 +802,62 @@ export function OAuthDivider(props: { texto?: string; className?: string }): Rea
 export function AuthLayout(props: Record<string, any> & { children?: ReactNode; className?: string }): ReactElement
 export const CREDITO_PIE: string
 export const CREDITO_PIE_URL: string
+export type EnlaceInstitucional = { id?: string; href: string; etiqueta: ReactNode; externo?: boolean; className?: string }
 export function ProductFooter(props: {
+  identidad?: AppIdentity
+  /** @deprecated Usá `identidad.nombre`. Se mantendrá por al menos dos releases menores. */
   nombre?: string
+  /** @deprecated Usá `identidad.version`. Se mantendrá por al menos dos releases menores. */
   version?: string
+  modelo?: 'compacto' | 'apilado' | 'distribuido'
+  enlaces?: EnlaceInstitucional[]
+  /** @deprecated Usá `identidad.credito`. Se mantendrá por al menos dos releases menores. */
   credito?: string | null
+  /** @deprecated Usá `identidad.creditoUrl`. Se mantendrá por al menos dos releases menores. */
   creditoUrl?: string
   anio?: number
   leading?: ReactNode
   children?: ReactNode
   className?: string
 }): ReactElement
-export function LoadingScreen(props: { label?: string; logo?: ReactNode; className?: string }): ReactElement
+export function ProductPrefooter(props: {
+  modelo?: 'enlaces' | 'accion' | 'completo'
+  titulo?: string
+  descripcion?: ReactNode
+  columnas?: Array<{ id?: string; titulo?: string; enlaces?: EnlaceInstitucional[] }>
+  accion?: { titulo: string; descripcion?: ReactNode; enlace?: EnlaceInstitucional }
+  redes?: EnlaceInstitucional[]
+  children?: ReactNode
+  className?: string
+}): ReactElement
+export function LoadingScreen(props: {
+  mensaje?: string
+  /** @deprecated Usá `mensaje`. Se mantendrá por al menos dos releases menores. */
+  label?: string
+  logo?: ReactNode
+  tienda?: { nombre?: string; logo?: string } | null
+  etiqueta?: string
+  className?: string
+}): ReactElement
 export function PegarEnlaceToken(props: Record<string, any> & { onToken?: (token: string) => void }): ReactElement
-export const NavLateral: ForwardRefExoticComponent<
-  {
+export function NavLateral(props: {
     items?: Array<{ id: string; label?: ReactNode; etiqueta?: ReactNode; icono?: string; contador?: number; href?: string; roles?: string[]; [clave: string]: any }>
     grupos?: Array<{ titulo: string; items: Array<{ id: string; label?: ReactNode; icono?: string; contador?: number; hijos?: Array<{ id: string; label?: ReactNode; icono?: string; [clave: string]: any }>; [clave: string]: any }> }>
     gruposPlegados?: Record<string, boolean>
-    onToggleGrupo?: (titulo: string) => void
+    defaultGruposPlegados?: Record<string, boolean>
+    onToggleGrupo?: (titulo: string, plegado: boolean) => void
     activeId?: string
     onSelect?: (id: string) => void
     colapsado?: boolean
+    defaultColapsado?: boolean
     onToggle?: (colapsado: boolean) => void
     cabecera?: ReactNode
     pie?: ReactNode
     ancho?: string
     ariaLabel?: string
     className?: string
-  } & Record<string, any>
->
-export function MenuDesplegable(props: Record<string, any> & { etiqueta?: ReactNode; items?: any[]; className?: string }): ReactElement
+  } & Record<string, any>): ReactElement
+export function MenuDesplegable(props: Record<string, any> & { trigger?: ReactNode; items?: any[]; ariaLabel?: string; alineacion?: 'left' | 'right'; className?: string }): ReactElement
 
 // ── Ajustes, impresión y bancos ────────────────────────────────────────────
 
@@ -710,8 +869,12 @@ export function AvisoPrivacidad(props: { finalidad?: ReactNode; detalle?: ReactN
 export function ConsentimientoDatos(props: { checked?: boolean; onChange?: (event: any) => void; finalidad?: ReactNode; detalle?: ReactNode; politicaUrl?: string; politicaTexto?: string; onPolitica?: (evento: any) => void; version?: string | number; error?: ReactNode; disabled?: boolean; required?: boolean; id?: string; className?: string; [clave: string]: any }): ReactElement
 export function AjustesImpresion(props: Record<string, any> & { impresoras?: any[]; onGuardar?: (ajustes: any) => void }): ReactElement
 export function BotonImprimir(props: Record<string, any> & { onImprimir?: () => void; etiqueta?: string }): ReactElement
-export function BancoCombobox(props: Record<string, any> & { value?: string; onChange?: (valor: string) => void; onSelect?: (banco: any) => void }): ReactElement
-export function BancoLogo(props: Record<string, any> & { banco?: string; logo?: string | null; className?: string }): ReactElement
+export function BancoCombobox(props: Record<string, any> & { value?: string; onChange?: (valor: string) => void; onSelect?: (banco: string) => void }): ReactElement
+/** @deprecated Usá `compacto`. Se mantendrá por al menos dos releases menores. */
+export type VarianteLogoFinancieroLegacy = 'compact'
+export type VarianteLogoFinanciero = 'compacto' | 'horizontal' | VarianteLogoFinancieroLegacy
+export function BancoLogo(props: Record<string, any> & { banco?: string; variante?: VarianteLogoFinanciero; alto?: string; className?: string; soloCatalogo?: boolean; /** @deprecated Los assets ya vienen empaquetados. */ baseAssets?: string; marcas?: Record<string, any>; decorativo?: boolean }): ReactElement | null
+export function MedioPagoLogo(props: Record<string, any> & { marca?: string; variante?: VarianteLogoFinanciero; alto?: string; className?: string; soloCatalogo?: boolean; /** @deprecated Los assets ya vienen empaquetados. */ baseAssets?: string; decorativo?: boolean }): ReactElement | null
 export function CityAutocomplete(props: Record<string, any> & { value?: string; onSelect?: (ciudad: string, departamento?: string) => void; onChange?: (valor: string) => void }): ReactElement
 
 // ── Clases de tabla ────────────────────────────────────────────────────────
@@ -749,7 +912,7 @@ export function FilaChecklist(props: { etiqueta: ReactNode; estado?: string; not
 export function ConteoChecklist(props: { pasan?: number; total?: number; fallas?: number; sustantivo?: string; className?: string }): ReactElement
 export function ChipEstado(props: { estado?: string; etiqueta?: ReactNode; icono?: string; tono?: Tono; title?: string; className?: string }): ReactElement
 export function ChipsLocks(props: { locks?: Array<{ clave: string; estado: string; etiqueta?: string; detalle?: string }>; conEstado?: boolean; className?: string }): ReactElement
-export function MedidorBateria(props: { porcentaje?: number | null; ciclos?: number | null; etiqueta?: string; variante?: 'barra' | 'chip'; compact?: boolean; className?: string }): ReactElement
+export function MedidorBateria(props: { porcentaje?: number | null; ciclos?: number | null; etiqueta?: string; variante?: 'barra' | 'chip'; compact?: boolean; mostrarEtiqueta?: boolean; className?: string }): ReactElement
 export function GradoBadge(props: { grado: string; conDescripcion?: boolean; className?: string }): ReactElement
 export function TileEquipo(props: Record<string, any> & { modelo?: string; imei?: string; detalle?: ReactNode; foto?: string; estado?: string; grado?: string; bateria?: number | null; ciclos?: number | null; locks?: any[]; acciones?: ReactNode; onOpen?: () => void }): ReactElement
 export function ColumnaLote(props: { etiqueta: ReactNode; tono?: string; contador?: number; acciones?: ReactNode; children?: ReactNode; vacio?: string; testId?: string; className?: string }): ReactElement
@@ -842,6 +1005,7 @@ export function RangoFecha(props: {
   periodoPorDefecto?: string
   atajos?: string[]
   hoy?: string
+  ariaLabel?: string
   mostrarCampos?: boolean
   className?: string
 }): ReactElement
@@ -877,8 +1041,8 @@ export function PaletaComandos(props: {
   mostrarAtajoEnBoton?: boolean
   className?: string
 }): ReactElement
-export function agruparResultados(resultados: any[]): Array<{ tipo: string; resultados: any[] }>
-export function estadoPaleta(props: { consulta?: string; cargando?: boolean; error?: unknown; resultados?: any[]; minimo?: number }): string
+export function agruparResultados(resultados?: any[], opciones?: { etiquetasTipo?: Record<string, string>; iconosTipo?: Record<string, string> }): Array<{ tipo: string; etiqueta: string; icono: string; items: any[] }>
+export function estadoPaleta(props?: { listo?: boolean; cargando?: boolean; error?: unknown; total?: number }): 'seguir' | 'error' | 'listo' | 'cargando' | 'vacio'
 export function AyudaModulo(props: { titulo?: ReactNode; resumen?: ReactNode; puntos?: ReactNode[]; enlaces?: Array<{ href: string; etiqueta: ReactNode; onClick?: () => void }>; abierta?: boolean; onAbrir?: () => void; onCerrar?: () => void; className?: string }): ReactElement | null
 export function BarraInferior(props: { items?: Array<{ id: string; etiqueta: ReactNode; icono?: string; href?: string }>; activo?: string; onSelect?: (item: any) => void; onMas?: () => void; masEtiqueta?: string; menuAbierto?: boolean; menuId?: string; maxItems?: number; className?: string }): ReactElement | null
 export const ESPACIO_BARRA_INFERIOR: string
@@ -1103,34 +1267,134 @@ export function nombrePartes(nombre: string): { nombres: string; apellidos: stri
 export function esApellidosPrimero(nombre: string): boolean
 export function esRazonSocial(nombre: string): boolean
 
-/** Nombres del catálogo por defecto (`BANCOS_PARAGUAY`, listado vigente del BCP). */
-export type BancoParaguay = string
-
-/** Registro de logo: archivo del host, marca vectorial o monograma. */
-export type RegistroLogoBanco =
-  | { banco: string; tipo: 'archivo'; archivo: string; chip?: boolean }
-  | { banco: string; tipo: 'marca'; marca: string }
-  | { banco: string; tipo: 'monograma'; iniciales: string; color: string; generico?: boolean }
-
-/** Entrada del registro `LOGOS_BANCOS` (el nombre canónico es la clave). */
-export type EntradaLogoBanco = {
+/** Tratamiento visual verificable de una marca financiera. */
+export type VisualFinanciero = {
+  tipo: 'archivo' | 'horizontal-contained' | 'monograma' | 'texto'
+  estado: 'oficial' | 'fallback' | 'permiso-pendiente' | 'producto-padre' | string
   archivo?: string
-  marca?: string
-  monograma?: string
-  color?: string
-  chip?: boolean
-  alias?: string[]
+  asset?: string
+  empaquetado?: string
+  marcaPadre?: string
+  fondo?: string
+  padding?: boolean
+}
+export type EvidenciaRedistribucionMarca = Readonly<{
+  permitida: boolean
+  evidencia: string | null
+}>
+
+/** Nombres del catálogo financiero predeterminado de Paraguay. */
+export type BancoParaguay = string
+export type RegistroLogoBanco = ({
+  banco: string
+  categoria: 'banco' | 'financiera' | 'cooperativa' | 'desconocida' | string
+  estado: string
+  variante: 'compacto' | 'horizontal'
+  visual: VisualFinanciero
+  redistribucion?: EvidenciaRedistribucionMarca
+  fuenteOficial?: string | null
+  verificadoEn?: string | null
+  aliasHistorico?: string
+  generico?: boolean
+} & (
+  | { tipo: 'archivo'; archivo: string; chip?: boolean; marca?: string }
+  | { tipo: 'marca'; marca: string }
+  | { tipo: 'monograma'; iniciales: string; color: string }
+))
+
+export type EntradaLogoBanco =
+  | {
+      redirigeA?: never
+      archivo?: string
+      marca?: string
+      monograma?: string
+      color?: string
+      chip?: boolean
+      alias?: string[]
+      categoria: string
+      estado: string
+      fuenteOficial?: string
+      verificadoEn?: string
+      redistribucion?: EvidenciaRedistribucionMarca
+      variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
+    }
+  | {
+      redirigeA: string
+      alias?: string[]
+      categoria: 'legado'
+      estado: 'legado'
+      verificadoEn?: string
+      fuenteOficial?: string
+      variantes?: never
+    }
+
+export type CoberturaMarcaFinanciera = {
+  nombre: string
+  categoria: string
+  estado: string
+  fuenteOficial: string | null
+  verificadoEn?: string
+  redistribucion?: EvidenciaRedistribucionMarca
+  marcaPadre?: string | null
+  variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
 }
 
 export const BANCOS_PARAGUAY: string[]
+export const BANCOS_Y_FINANCIERAS_PARAGUAY: string[]
+export const COOPERATIVAS_PARAGUAY: string[]
 export const LOGOS_BANCOS: Record<string, EntradaLogoBanco>
 export const COLORES_BANCO_RESPALDO: string[]
+export const FECHA_VERIFICACION_MARCAS_FINANCIERAS: string
 export function normalizarBanco(nombre: string): string
 export function inicialesDeBanco(nombre: string): string
 export function colorDeBanco(nombre: string): string
-/** Resuelve archivo/marca/monograma por nombre o alias; sin nombre, `null`. */
-export function logoDeBanco(nombre: string): RegistroLogoBanco | null
+export function logoDeBanco(nombre: string, variante?: 'compacto' | 'horizontal' | 'compact'): RegistroLogoBanco | null
+export function coberturaBancos(catalogo?: readonly string[]): CoberturaMarcaFinanciera[]
 export function sugerenciasDeBanco(consulta?: string, bancos?: readonly string[]): string[]
+
+export type EntradaMarcaMedioPago =
+  | {
+      redirigeA?: never
+      categoria: string
+      alias?: string[]
+      monograma?: string
+      color?: string
+      fuenteOficial?: string
+      verificadoEn?: string
+      estado: string
+      redistribucion?: EvidenciaRedistribucionMarca
+      marcaPadre?: string
+      variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
+    }
+  | {
+      redirigeA: string
+      categoria: 'legado'
+      alias?: string[]
+      estado: 'legado'
+      verificadoEn?: string
+      variantes?: never
+    }
+export type RegistroLogoMedioPago = {
+  marca: string
+  tipo: 'archivo' | 'monograma'
+  iniciales: string
+  color: string
+  categoria: string
+  estado: string
+  redistribucion?: EvidenciaRedistribucionMarca
+  variante: 'compacto' | 'horizontal'
+  visual: VisualFinanciero
+  fuenteOficial?: string | null
+  verificadoEn?: string | null
+  marcaPadre?: string
+  aliasHistorico?: string
+  generico?: boolean
+}
+export const MARCAS_MEDIOS_PAGO: Record<string, EntradaMarcaMedioPago>
+export const MEDIOS_PAGO_CON_MARCA: string[]
+export function normalizarMarcaPago(nombre: string): string
+export function logoDeMedioPago(nombre: string, variante?: 'compacto' | 'horizontal' | 'compact'): RegistroLogoMedioPago | null
+export function coberturaMediosPago(catalogo?: readonly string[]): CoberturaMarcaFinanciera[]
 
 export const ESTADO_IMPRESORA: Record<string, string>
 export const ETIQUETA_ESTADO: Record<string, string>

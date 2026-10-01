@@ -1109,3 +1109,22 @@ server** en `owncoding-ui/ia`. No duplica reglas: los campos salen de la
 
 **Referencia real:** LedBox `#120` (rama `feat/plataforma`) y Scale OS
 `#117`/`#118`. Adopción: checklist de `docs/ADOPCION-V2.md` §10.
+
+## 19. Fronteras de paquete, control y compatibilidad
+
+- Importar desde el subpath más angosto: `ia`, `app-identity`, `email` y
+  `financial-metadata` son puros/servidor; `phone` y `financial` son cliente.
+  `utils` no puede importar React, componentes ni bytes SVG/PNG.
+- Los assets financieros solo pueden vivir en `financial` cuando existe una
+  licencia o autorización de redistribución explícita y auditable. Sin esa
+  evidencia, todos los subpaths y la galería usan fallback tipográfico;
+  metadatos, alias, procedencia y estados siguen disponibles sin cargar bytes.
+- Un componente controlado se decide por **presencia de prop**, no por verdad
+  del valor ni por presencia del callback. En modo controlado emite intención y
+  espera el nuevo prop; en modo no controlado usa `default*` y estado interno.
+- Los alias `@deprecated` tienen una ventana mínima de dos releases menores.
+  No se borra ningún export sin auditoría de uso en todas las apps, migración
+  documentada y changelog.
+- `dist/` se regenera solo con `npm run build`. CI compila un consumidor
+  TypeScript real, instala el tarball en un directorio temporal y controla
+  presupuestos raw/gzip.

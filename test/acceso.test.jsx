@@ -61,6 +61,7 @@ describe('acceso (sin API)', () => {
     expect(html).toContain('role="status"')
     expect(html).toContain('Aurora')
     expect(html).toContain('MobOS')
+    expect(renderToStaticMarkup(<LoadingScreen label="Alias compatible" />)).toContain('Alias compatible')
   })
 
   test('pegar enlace extrae el token sin llamar a nada', () => {

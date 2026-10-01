@@ -335,7 +335,7 @@ function avisar() {
   for (const oyente of oyentes) oyente();
 }
 function useDialogFocusTrap(open, onClose, ref, { initialFocus, bloquearScroll = true, busy = false } = {}) {
-  const id = useRef(Symbol("capa")).current;
+  const id = useRef(/* @__PURE__ */ Symbol("capa")).current;
   const [esSuperior, setEsSuperior] = useState(true);
   const cerrar = useRef(onClose);
   const opciones = useRef({ initialFocus, bloquearScroll, busy });
@@ -597,7 +597,7 @@ var Input = forwardRef(function Input2({ className, ...props }, ref) {
     {
       ref,
       className: cn(
-        "w-full rounded-lg border border-ink-500 bg-ink-800 px-3.5 text-fore",
+        "w-full rounded-lg border border-interactivo bg-ink-800 px-3.5 text-fore",
         "h-11 md:h-9 text-base md:text-sm outline-none transition",
         "focus:border-fono focus:ring-1 focus:ring-fono/40 placeholder:text-mute/60",
         className
@@ -647,7 +647,7 @@ function PinInput({ value, onChange, onComplete, length = 4, autoFocus = false, 
         },
         placeholder: "",
         "aria-label": ariaLabel || `PIN de ${largoMax} d\xEDgitos`,
-        className: "pin-oculto h-full w-full rounded-2xl border border-ink-500 bg-paper text-center text-3xl font-bold tracking-[.45em] shadow-card transition-all duration-150 focus:border-fono focus:ring-2 focus:ring-fono/30 focus:outline-none"
+        className: "pin-oculto h-full w-full rounded-2xl border border-interactivo bg-paper text-center text-3xl font-bold tracking-[.45em] shadow-card transition-all duration-150 focus:border-fono focus:ring-2 focus:ring-fono/30 focus:outline-none"
       }
     ),
     /* @__PURE__ */ jsx2("span", { "aria-hidden": "true", className: "pointer-events-none absolute inset-0 flex items-center justify-center gap-[.5em]", children: Array.from({ length: largoMax }, (_, indice) => /* @__PURE__ */ jsx2(
@@ -659,12 +659,17 @@ function PinInput({ value, onChange, onComplete, length = 4, autoFocus = false, 
     )) })
   ] });
 }
-function MoneyInput({ currency = "PYG", symbol, value, onValueChange, className, max = LIMITE_MONTO_GENERAL, maxLength, integerOnly = false, onKeyDown, ...props }) {
+var MoneyInput = forwardRef(function MoneyInput2({ currency = "PYG", symbol, value, onValueChange, className, max = LIMITE_MONTO_GENERAL, maxLength, integerOnly = false, onKeyDown, ...props }, ref) {
   const soloEnteros = currency === "PYG" || integerOnly;
   const prefix = String(symbol ?? "").trim() || SIMBOLOS_MONEDA[currency] || currency;
   const display = soloEnteros ? formatGsInput(String(value ?? "").split(".")[0]) : formatUsdInput(value);
   const excede = excedeMonto(value, max);
   const inputRef = useRef2(null);
+  const establecerRef = useCallback2((node) => {
+    inputRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  }, [ref]);
   const topeLargo = maxLength ?? largoMaximoMonto(max, { decimales: !soloEnteros });
   return /* @__PURE__ */ jsxs("div", { className: "relative", children: [
     /* @__PURE__ */ jsx2("span", { className: "pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-xs font-semibold text-mute", children: prefix }),
@@ -672,7 +677,7 @@ function MoneyInput({ currency = "PYG", symbol, value, onValueChange, className,
       Input,
       {
         ...props,
-        ref: inputRef,
+        ref: establecerRef,
         "aria-invalid": excede || void 0,
         title: excede ? `El monto supera el m\xE1ximo permitido (${max.toLocaleString("es-PY")})` : props.title,
         inputMode: soloEnteros ? "numeric" : "decimal",
@@ -702,7 +707,7 @@ function MoneyInput({ currency = "PYG", symbol, value, onValueChange, className,
       }
     )
   ] });
-}
+});
 function Money({ value, currency = "PYG", simbolo, className }) {
   const amount = Number(value);
   if (!Number.isFinite(amount)) return /* @__PURE__ */ jsx2("span", { className, children: "\u2014" });
@@ -713,7 +718,7 @@ function Select({ className, children, ...props }) {
     "select",
     {
       className: cn(
-        "w-full rounded-lg border border-ink-500 bg-ink-800 px-3 text-fore",
+        "w-full rounded-lg border border-interactivo bg-ink-800 px-3 text-fore",
         "h-11 md:h-9 text-base md:text-sm outline-none transition cursor-pointer",
         "focus:border-fono focus:ring-1 focus:ring-fono/40",
         "[&>option]:bg-ink-800 [&>option]:text-fore",
@@ -729,7 +734,7 @@ function Textarea({ className, ...props }) {
     "textarea",
     {
       className: cn(
-        "w-full rounded-lg border border-ink-500 bg-ink-800 px-3.5 py-2.5 text-fore",
+        "w-full rounded-lg border border-interactivo bg-ink-800 px-3.5 py-2.5 text-fore",
         "text-base md:text-sm outline-none transition focus:border-fono focus:ring-1 focus:ring-fono/40",
         "placeholder:text-mute/60 resize-none",
         className
@@ -770,7 +775,7 @@ function useDialogClose() {
 }
 function useDialogPending(pendiente) {
   const contexto = useContext(ContextoDialogo);
-  const id = useRef2(Symbol("formulario")).current;
+  const id = useRef2(/* @__PURE__ */ Symbol("formulario")).current;
   useEfectoLayout(() => {
     contexto?.registrar(id, Boolean(pendiente));
     return () => contexto?.registrar(id, false);
@@ -978,16 +983,65 @@ var ToastContext = createContext(null);
 var toastCounter = 0;
 var TOAST_ICON = { success: "check", error: "alert", info: "info" };
 var TOAST_TONE = { success: "text-ok-text", error: "text-bad-text", info: "text-fono-light" };
+function ToastItem({ toast, dismiss, demo }) {
+  const timer = useRef2(null);
+  const startedAt = useRef2(0);
+  const remaining = useRef2(toast.duration);
+  const pause = useCallback2(() => {
+    if (!timer.current) return;
+    clearTimeout(timer.current);
+    timer.current = null;
+    remaining.current = Math.max(0, remaining.current - (Date.now() - startedAt.current));
+  }, []);
+  const resume = useCallback2(() => {
+    if (toast.persistent || timer.current || remaining.current <= 0) return;
+    startedAt.current = Date.now();
+    timer.current = setTimeout(() => dismiss(toast.id), remaining.current);
+  }, [dismiss, toast.id, toast.persistent]);
+  useEffect2(() => {
+    resume();
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [resume]);
+  return /* @__PURE__ */ jsxs(
+    "div",
+    {
+      role: toast.variant === "error" ? "alert" : "status",
+      "aria-live": toast.variant === "error" ? "assertive" : "polite",
+      onMouseEnter: pause,
+      onMouseLeave: resume,
+      onFocusCapture: pause,
+      onBlurCapture: (event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) resume();
+      },
+      className: cn("pointer-events-auto flex items-start gap-3 rounded-xl border bg-ink-700 p-3.5 shadow-card", toast.variant === "error" ? "border-bad/40" : toast.variant === "success" ? "border-ok/40" : "border-ink-500"),
+      children: [
+        /* @__PURE__ */ jsx2(Icon, { name: TOAST_ICON[toast.variant], className: cn("mt-0.5 h-4 w-4", TOAST_TONE[toast.variant]), "aria-hidden": true }),
+        /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
+          /* @__PURE__ */ jsx2("p", { className: "text-sm font-semibold text-fore", children: toast.title }),
+          toast.description && /* @__PURE__ */ jsx2("p", { className: "mt-0.5 text-xs text-mute", children: toast.description }),
+          demo && /* @__PURE__ */ jsx2("p", { className: "mt-1 inline-flex rounded border border-fono/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-light", children: "Demo \xB7 no se guard\xF3 en la tienda" })
+        ] }),
+        /* @__PURE__ */ jsx2("button", { type: "button", onClick: () => dismiss(toast.id), className: "toque-44 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-600 hover:text-fore", "aria-label": "Cerrar aviso", children: "\xD7" })
+      ]
+    }
+  );
+}
 function ToastProvider({ children, demo = false }) {
   const [toasts, setToasts] = useState2([]);
   const [mounted, setMounted] = useState2(false);
   useEffect2(() => setMounted(true), []);
   const dismiss = useCallback2((id) => setToasts((current) => current.filter((toast2) => toast2.id !== id)), []);
-  const toast = useCallback2((variant, title, description) => {
+  const toast = useCallback2((variant, title, description, options) => {
+    const detalles = description && typeof description === "object" && !isValidElement(description) ? description : options;
+    const texto = detalles === description ? void 0 : description;
     const id = `toast-${++toastCounter}`;
-    setToasts((current) => [...current, { id, variant: TOAST_ICON[variant] ? variant : "info", title, description }]);
-    setTimeout(() => dismiss(id), 4e3);
-  }, [dismiss]);
+    const variantResolved = TOAST_ICON[variant] ? variant : "info";
+    const persistent = detalles?.persistent ?? variantResolved === "error";
+    const duration = Math.max(0, Number(detalles?.duration ?? 4e3));
+    setToasts((current) => [...current, { id, variant: variantResolved, title, description: texto, persistent, duration }]);
+  }, []);
   useEffect2(() => {
     if (!demo) return void 0;
     let ultimo = 0;
@@ -1001,22 +1055,14 @@ function ToastProvider({ children, demo = false }) {
     return () => window.removeEventListener("mobos:demo-guardado", aviso);
   }, [demo, toast]);
   const value = useMemo(() => ({
-    success: (title, description) => toast("success", title, description),
-    error: (title, description) => toast("error", title, description),
-    info: (title, description) => toast("info", title, description)
+    success: (title, description, options) => toast("success", title, description, options),
+    error: (title, description, options) => toast("error", title, description, options),
+    info: (title, description, options) => toast("info", title, description, options)
   }), [toast]);
   if (!mounted) return children;
   return /* @__PURE__ */ jsxs(ToastContext.Provider, { value, children: [
     children,
-    /* @__PURE__ */ jsx2("div", { className: "pointer-events-none fixed bottom-4 left-4 right-4 z-[60] flex max-w-sm flex-col gap-2 sm:left-auto sm:w-full", "aria-live": "polite", role: "status", children: toasts.map((toast2) => /* @__PURE__ */ jsxs("div", { className: cn("pointer-events-auto flex items-start gap-3 rounded-xl border bg-ink-700 p-3.5 shadow-card", toast2.variant === "error" ? "border-bad/40" : toast2.variant === "success" ? "border-ok/40" : "border-ink-500"), children: [
-      /* @__PURE__ */ jsx2(Icon, { name: TOAST_ICON[toast2.variant], className: cn("mt-0.5 h-4 w-4", TOAST_TONE[toast2.variant]) }),
-      /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
-        /* @__PURE__ */ jsx2("p", { className: "text-sm font-semibold text-fore", children: toast2.title }),
-        toast2.description && /* @__PURE__ */ jsx2("p", { className: "mt-0.5 text-xs text-mute", children: toast2.description }),
-        demo && /* @__PURE__ */ jsx2("p", { className: "mt-1 inline-flex rounded border border-fono/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-light", children: "Demo \xB7 no se guard\xF3 en la tienda" })
-      ] }),
-      /* @__PURE__ */ jsx2("button", { type: "button", onClick: () => dismiss(toast2.id), className: "rounded-md p-1 text-mute transition hover:bg-ink-600 hover:text-fore", "aria-label": "Cerrar aviso", children: "\xD7" })
-    ] }, toast2.id)) })
+    /* @__PURE__ */ jsx2("div", { className: "pointer-events-none fixed bottom-4 left-4 right-4 z-[60] flex max-w-sm flex-col gap-2 sm:left-auto sm:w-full", children: toasts.map((item) => /* @__PURE__ */ jsx2(ToastItem, { toast: item, dismiss, demo }, item.id)) })
   ] });
 }
 function useToast() {
@@ -1131,9 +1177,11 @@ function PageHeader({ title, subtitle, actions, backTo, eyebrow, migas }) {
     actions && /* @__PURE__ */ jsx2("div", { className: "flex shrink-0 flex-wrap items-center gap-2", children: actions })
   ] });
 }
-function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", loading = false, mobileCard, encabezadoFijo = false, className }) {
+function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", loading = false, mobileCard, encabezadoFijo = false, caption = "Datos", getRowKey, className }) {
+  const claveDeFila = (row, index) => getRowKey?.(row, index) ?? row?.id ?? row?.key ?? index;
   if (loading) {
-    return /* @__PURE__ */ jsxs("div", { className: cn("space-y-2 p-4", className), "aria-busy": "true", children: [
+    return /* @__PURE__ */ jsxs("div", { className: cn("space-y-2 p-4", className), role: "status", "aria-busy": "true", children: [
+      /* @__PURE__ */ jsx2("span", { className: "sr-only", children: "Cargando datos\u2026" }),
       /* @__PURE__ */ jsx2(Skeleton, { className: "h-4 w-1/3" }),
       /* @__PURE__ */ jsx2(Skeleton, { className: "h-10 w-full" }),
       /* @__PURE__ */ jsx2(Skeleton, { className: "h-10 w-full" }),
@@ -1143,20 +1191,47 @@ function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", load
   if (!rows?.length) return /* @__PURE__ */ jsx2(EmptyState, { title: emptyLabel, description: "", className });
   return /* @__PURE__ */ jsxs("div", { className, children: [
     /* @__PURE__ */ jsx2("div", { className: "hidden overflow-x-auto md:block", children: /* @__PURE__ */ jsxs("table", { className: "w-full text-sm", children: [
-      /* @__PURE__ */ jsx2("thead", { className: cn("border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute select-none bg-ink-800", encabezadoFijo && "sticky top-12 z-10"), children: /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute", children: columns.map((column) => /* @__PURE__ */ jsx2("th", { className: cn("px-2.5 py-1.5 font-medium", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.label }, column.key)) }) }),
-      /* @__PURE__ */ jsx2("tbody", { children: rows.map((row) => /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600/60 last:border-0", children: columns.map((column) => /* @__PURE__ */ jsx2("td", { className: cn("px-2.5 py-1.5 text-fore", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.render ? column.render(row) : row[column.key] }, column.key)) }, row.id ?? row.key ?? JSON.stringify(row))) })
+      caption ? /* @__PURE__ */ jsx2("caption", { className: "sr-only", children: caption }) : null,
+      /* @__PURE__ */ jsx2("thead", { className: cn("select-none bg-ink-800", encabezadoFijo && "sticky top-12 z-10"), children: /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute", children: columns.map((column) => /* @__PURE__ */ jsx2("th", { scope: "col", className: cn("px-2.5 py-1.5 font-medium", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.label }, column.key)) }) }),
+      /* @__PURE__ */ jsx2("tbody", { children: rows.map((row, index) => /* @__PURE__ */ jsx2("tr", { className: "border-b border-ink-600/60 last:border-0", children: columns.map((column) => /* @__PURE__ */ jsx2("td", { className: cn("px-2.5 py-1.5 text-fore", column.align === "right" && "text-right", column.align === "center" && "text-center"), children: column.render ? column.render(row) : row[column.key] }, column.key)) }, claveDeFila(row, index))) })
     ] }) }),
-    /* @__PURE__ */ jsx2("div", { className: "grid grid-cols-1 gap-2 p-2.5 md:hidden", children: mobileCard ? rows.map((row) => /* @__PURE__ */ jsx2("div", { children: mobileCard(row) }, row.id ?? row.key ?? JSON.stringify(row))) : /* @__PURE__ */ jsx2(EmptyState, { icon: "filter", title: emptyLabel }) })
+    /* @__PURE__ */ jsx2("div", { className: "grid grid-cols-1 gap-2 p-2.5 md:hidden", children: mobileCard ? rows.map((row, index) => /* @__PURE__ */ jsx2("div", { children: mobileCard(row) }, claveDeFila(row, index))) : rows.map((row, index) => /* @__PURE__ */ jsx2("dl", { className: "rounded-xl border border-ink-600 bg-ink-800 p-3 shadow-card", children: columns.filter((column) => column.mobile !== false).map((column) => /* @__PURE__ */ jsxs("div", { className: "flex items-start justify-between gap-4 border-b border-ink-600/60 py-2 first:pt-0 last:border-0 last:pb-0", children: [
+      /* @__PURE__ */ jsx2("dt", { className: "text-xs font-medium text-mute", children: column.label }),
+      /* @__PURE__ */ jsx2("dd", { className: cn("min-w-0 text-right text-sm text-fore", column.align === "left" && "text-left"), children: column.render ? column.render(row) : row[column.key] })
+    ] }, column.key)) }, claveDeFila(row, index))) })
   ] });
+}
+function mergeIds(...values) {
+  return [...new Set(values.flatMap((value) => String(value || "").split(/\s+/)).filter(Boolean))].join(" ") || void 0;
+}
+function relacionarControl(children, { htmlFor, mensajeId, error }, estado = { aplicado: false }) {
+  return Children.map(children, (child) => {
+    if (!isValidElement(child) || estado.aplicado) return child;
+    const esNativo = ["input", "select", "textarea"].includes(child.type);
+    const coincideId = Boolean(htmlFor && child.props.id === htmlFor);
+    const esComponenteDirecto = typeof child.type !== "string" && !child.props.children;
+    if (coincideId || !htmlFor && (esNativo || esComponenteDirecto)) {
+      estado.aplicado = true;
+      return cloneElement(child, {
+        "aria-describedby": mensajeId ? mergeIds(child.props["aria-describedby"], mensajeId) : child.props["aria-describedby"],
+        "aria-invalid": error ? true : child.props["aria-invalid"]
+      });
+    }
+    if (child.props.children) {
+      return cloneElement(child, void 0, relacionarControl(child.props.children, { htmlFor, mensajeId, error }, estado));
+    }
+    return child;
+  });
 }
 function FormField({ label, hint, error, children, htmlFor, descripcionId, accion, className }) {
   const mensajeId = descripcionId || (htmlFor ? `${htmlFor}-descripcion` : void 0);
+  const control = (error || hint) && mensajeId ? relacionarControl(children, { htmlFor, mensajeId, error }) : children;
   return /* @__PURE__ */ jsxs("div", { className, children: [
     label && /* @__PURE__ */ jsx2(Label, { htmlFor, children: label }),
     accion ? /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-stretch gap-2", children: [
-      /* @__PURE__ */ jsx2("div", { className: "min-w-0 flex-1", children }),
+      /* @__PURE__ */ jsx2("div", { className: "min-w-0 flex-1", children: control }),
       /* @__PURE__ */ jsx2("div", { className: "flex shrink-0 items-stretch", children: accion })
-    ] }) : children,
+    ] }) : control,
     error ? /* @__PURE__ */ jsx2("p", { id: mensajeId, role: "alert", className: "mt-1.5 text-xs text-bad-text", children: error }) : hint ? /* @__PURE__ */ jsx2("p", { id: mensajeId, className: "mt-1.5 text-xs text-mute", children: hint }) : null
   ] });
 }
@@ -1195,17 +1270,37 @@ function Stat({ label, valor, delta, sub, nota, tono, destacado = false, deltaCo
     }
   );
 }
-function Subtabs({ value, onChange, items = [], className }) {
+function Subtabs({ value, onChange, items = [], className, ariaLabel = "Secciones" }) {
+  const baseId = useId();
+  const refs = useRef2([]);
   if (!items.length) return null;
-  return /* @__PURE__ */ jsx2("div", { className: cn("mb-5 flex flex-wrap gap-2 rounded-2xl border border-fore/10 bg-ink p-2", className), role: "tablist", children: items.map(([id, label, contador]) => {
+  function mover(event, indice) {
+    let siguiente;
+    if (event.key === "ArrowRight") siguiente = (indice + 1) % items.length;
+    else if (event.key === "ArrowLeft") siguiente = (indice - 1 + items.length) % items.length;
+    else if (event.key === "Home") siguiente = 0;
+    else if (event.key === "End") siguiente = items.length - 1;
+    else return;
+    event.preventDefault();
+    const id = items[siguiente]?.[0];
+    onChange?.(id);
+    requestAnimationFrame(() => refs.current[siguiente]?.focus());
+  }
+  return /* @__PURE__ */ jsx2("div", { className: cn("mb-5 flex flex-wrap gap-2 rounded-2xl border border-fore/10 bg-ink p-2", className), role: "tablist", "aria-label": ariaLabel, children: items.map(([id, label, contador], indice) => {
     const numero = Number(contador);
     const tieneContador = contador !== void 0 && contador !== null && contador !== "" && Number.isFinite(numero);
     return /* @__PURE__ */ jsxs(
       "button",
       {
+        id: `${baseId}-tab-${id}`,
+        ref: (node) => {
+          refs.current[indice] = node;
+        },
         type: "button",
         role: "tab",
         "aria-selected": value === id,
+        tabIndex: value === id ? 0 : -1,
+        onKeyDown: (event) => mover(event, indice),
         onClick: () => onChange(id),
         className: cn(
           "min-h-11 rounded-xl px-3 py-2 text-sm font-medium transition",
@@ -1252,6 +1347,131 @@ function BarraProgreso({ valor = 0, max = 100, tono = "fono", alto = "md", etiqu
   );
 }
 
+// src/hooks/useComboboxNavigation.js
+import { useEffect as useEffect3, useId as useId2, useMemo as useMemo2, useRef as useRef3, useState as useState3 } from "react";
+function hashOption(value) {
+  const text = String(value ?? "");
+  let hash = 2166136261;
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+function useComboboxNavigation({
+  options = [],
+  open,
+  onOpenChange,
+  onSelect,
+  getOptionKey = (option, index) => option?.id ?? option?.value ?? option?.label ?? index,
+  selectedKey,
+  listboxId,
+  defaultActiveIndex = 0
+} = {}) {
+  const generatedId = useId2();
+  const resolvedListboxId = listboxId || `${generatedId}-listbox`;
+  const [activeIndex, setActiveIndex] = useState3(defaultActiveIndex);
+  const listRef = useRef3(null);
+  const inputRef = useRef3(null);
+  const optionIds = useMemo2(() => {
+    const seen = /* @__PURE__ */ new Map();
+    return options.map((option, index) => {
+      const base = hashOption(getOptionKey(option, index));
+      const occurrence = seen.get(base) || 0;
+      seen.set(base, occurrence + 1);
+      return `${resolvedListboxId}-option-${base}${occurrence ? `-${occurrence}` : ""}`;
+    });
+  }, [options, getOptionKey, resolvedListboxId]);
+  useEffect3(() => {
+    if (!options.length) {
+      setActiveIndex(0);
+      return;
+    }
+    setActiveIndex((current) => Math.min(Math.max(0, current), options.length - 1));
+  }, [options.length]);
+  useEffect3(() => {
+    if (!open) return;
+    const optionId = optionIds[activeIndex];
+    if (!optionId) return;
+    document.getElementById(optionId)?.scrollIntoView?.({ block: "nearest" });
+  }, [activeIndex, open, optionIds]);
+  function selectIndex(index) {
+    const option = options[index];
+    if (option === void 0) return false;
+    onSelect?.(option, index);
+    return true;
+  }
+  function onKeyDown(event) {
+    const count = options.length;
+    if (event.key === "Escape") {
+      if (open) {
+        event.preventDefault();
+        onOpenChange?.(false);
+      }
+      return;
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!open) {
+        const next = event.key === "ArrowDown" ? 0 : Math.max(0, count - 1);
+        setActiveIndex(next);
+        onOpenChange?.(true);
+        return;
+      }
+      if (!count) return;
+      const delta = event.key === "ArrowDown" ? 1 : -1;
+      setActiveIndex((current) => (current + delta + count) % count);
+      return;
+    }
+    if (!open || !count) return;
+    if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      setActiveIndex(event.key === "Home" ? 0 : count - 1);
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      selectIndex(activeIndex);
+    }
+  }
+  const activeOptionId = open ? optionIds[activeIndex] : void 0;
+  return {
+    activeIndex,
+    activeOptionId,
+    inputRef,
+    listRef,
+    listboxId: resolvedListboxId,
+    setActiveIndex,
+    selectIndex,
+    inputProps: {
+      ref: inputRef,
+      role: "combobox",
+      "aria-expanded": Boolean(open),
+      "aria-controls": resolvedListboxId,
+      "aria-autocomplete": "list",
+      "aria-activedescendant": activeOptionId,
+      onKeyDown
+    },
+    listboxProps: {
+      id: resolvedListboxId,
+      ref: listRef,
+      role: "listbox"
+    },
+    getOptionProps(index) {
+      const option = options[index];
+      const key = getOptionKey(option, index);
+      return {
+        id: optionIds[index],
+        role: "option",
+        "aria-selected": selectedKey !== void 0 ? key === selectedKey : index === activeIndex,
+        onMouseDown: (event) => event.preventDefault(),
+        onMouseEnter: () => setActiveIndex(index),
+        onClick: () => selectIndex(index)
+      };
+    }
+  };
+}
+
 // src/components/Switch.jsx
 import { jsx as jsx3, jsxs as jsxs2 } from "react/jsx-runtime";
 function Switch({ checked, onChange, disabled = false, id, ariaLabel, className, ...props }) {
@@ -1296,7 +1516,7 @@ function Switch({ checked, onChange, disabled = false, id, ariaLabel, className,
 }
 
 // src/components/Checkbox.jsx
-import { useId as useId2 } from "react";
+import { useId as useId3 } from "react";
 import { jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
 function Checkbox({
   checked,
@@ -1311,7 +1531,7 @@ function Checkbox({
   className,
   ...props
 }) {
-  const generado = useId2();
+  const generado = useId3();
   const campoId = id || generado;
   const control = /* @__PURE__ */ jsx4(
     "input",
@@ -1494,6 +1714,7 @@ function limpiarPercent(valor, max = 100) {
 function PercentField({
   value = "",
   onChange,
+  onValueChange,
   disabled = false,
   placeholder = "0",
   max = 100,
@@ -1501,6 +1722,10 @@ function PercentField({
   id,
   ...props
 }) {
+  function notificar(siguiente) {
+    onChange?.(siguiente);
+    if (onValueChange && onValueChange !== onChange) onValueChange(siguiente);
+  }
   return /* @__PURE__ */ jsx8(
     Input,
     {
@@ -1514,7 +1739,7 @@ function PercentField({
       placeholder,
       ...props,
       value: limpiarPercent(value, max),
-      onChange: (event) => onChange?.(limpiarPercent(event.target.value, max))
+      onChange: (event) => notificar(limpiarPercent(event.target.value, max))
     }
   );
 }
@@ -1575,7 +1800,7 @@ function NumericKeypad({ value = "", onChange, max, className, ariaLabel = "Tecl
     const siguiente = `${value || ""}${tecla}`.replace(/^0+(?=\d)/, "");
     onChange(max ? siguiente.slice(0, max) : siguiente);
   }
-  return /* @__PURE__ */ jsxs7("div", { className: className ?? "mt-2 grid max-w-[19rem] grid-cols-3 gap-2", "aria-label": ariaLabel, children: [
+  return /* @__PURE__ */ jsxs7("div", { role: "group", className: className ?? "mt-2 grid max-w-[19rem] grid-cols-3 gap-2", "aria-label": ariaLabel, children: [
     TECLAS.map((tecla) => /* @__PURE__ */ jsx12(
       "button",
       {
@@ -1614,7 +1839,7 @@ function BarraLote({ cantidad = 0, onLimpiar, children, etiqueta, className }) {
 }
 
 // src/components/EmailField.jsx
-import { useRef as useRef3, useState as useState3 } from "react";
+import { useRef as useRef4, useState as useState4 } from "react";
 import { jsx as jsx14, jsxs as jsxs9 } from "react/jsx-runtime";
 var DOMINIOS_EMAIL = [
   "gmail.com",
@@ -1643,32 +1868,46 @@ function EmailField({
   disabled = false,
   placeholder = "vos@tutienda.com",
   dominios = DOMINIOS_EMAIL,
+  sugerir = true,
   className,
   inputClassName,
   onKeyDown,
   onBlur,
   ...props
 }) {
-  const [open, setOpen] = useState3(false);
-  const tecleando = useRef3(false);
-  const tipeoReciente = useRef3(false);
-  const inputRef = useRef3(null);
+  const [open, setOpen] = useState4(false);
+  const tecleando = useRef4(false);
+  const tipeoReciente = useRef4(false);
+  const inputRef = useRef4(null);
   const sugerencias = sugerenciasDe(value, dominios);
+  function elegir(sugerencia) {
+    onChange?.(sugerencia);
+    tecleando.current = false;
+    setOpen(false);
+    inputRef.current?.focus();
+  }
+  const listaVisible = sugerir && open && tecleando.current && sugerencias.length > 0;
+  const navegacion = useComboboxNavigation({
+    options: sugerencias,
+    open: listaVisible,
+    onOpenChange: setOpen,
+    onSelect: elegir,
+    getOptionKey: (sugerencia) => sugerencia
+  });
+  function asignarInput(node) {
+    inputRef.current = node;
+    navegacion.inputRef.current = node;
+  }
   function manejarKeyDown(event) {
     onKeyDown?.(event);
     if (event.defaultPrevented) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") tecleando.current = true;
+    navegacion.inputProps.onKeyDown(event);
     if (event.key === "Escape") {
       tecleando.current = false;
-      setOpen(false);
       return;
     }
-    if (event.key === "Enter") {
-      if (open && sugerencias.length > 0) {
-        event.preventDefault();
-        elegir(sugerencias[0]);
-      }
-      return;
-    }
+    if (["Enter", "ArrowDown", "ArrowUp", "Home", "End", "Tab"].includes(event.key)) return;
     tecleando.current = true;
     tipeoReciente.current = true;
   }
@@ -1676,14 +1915,8 @@ function EmailField({
     onChange?.(event.target.value);
     if (tipeoReciente.current) {
       tipeoReciente.current = false;
-      setOpen(sugerenciasDe(event.target.value, dominios).length > 0);
+      setOpen(sugerir && sugerenciasDe(event.target.value, dominios).length > 0);
     }
-  }
-  function elegir(sugerencia) {
-    onChange?.(sugerencia);
-    tecleando.current = false;
-    setOpen(false);
-    inputRef.current?.focus();
   }
   function perderFoco(event) {
     onBlur?.(event);
@@ -1695,7 +1928,7 @@ function EmailField({
       Input,
       {
         ...props,
-        ref: inputRef,
+        ref: asignarInput,
         type: "email",
         className: cn("w-full", inputClassName),
         value,
@@ -1703,36 +1936,307 @@ function EmailField({
         placeholder,
         onChange: manejarChange,
         onKeyDown: manejarKeyDown,
-        onBlur: perderFoco
+        onBlur: perderFoco,
+        role: "combobox",
+        "aria-expanded": listaVisible,
+        "aria-controls": navegacion.listboxId,
+        "aria-autocomplete": "list",
+        "aria-activedescendant": navegacion.activeOptionId
       }
     ),
-    open && tecleando.current && sugerencias.length > 0 && /* @__PURE__ */ jsx14(
+    listaVisible && /* @__PURE__ */ jsx14(
       "ul",
       {
-        role: "listbox",
+        ...navegacion.listboxProps,
         "aria-label": "Sugerencias de correo",
         className: "absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-ink-500 bg-ink shadow-float",
-        children: sugerencias.map((sugerencia) => /* @__PURE__ */ jsx14("li", { children: /* @__PURE__ */ jsx14(
-          "button",
+        children: sugerencias.map((sugerencia, indice) => /* @__PURE__ */ jsx14(
+          "li",
           {
-            type: "button",
-            className: "w-full px-3 py-2 text-left text-sm text-fore transition hover:bg-ink-700",
-            onMouseDown: (event) => event.preventDefault(),
-            onClick: () => elegir(sugerencia),
+            ...navegacion.getOptionProps(indice),
+            className: cn(
+              "min-h-11 cursor-pointer px-3 py-2 text-left text-sm text-fore transition",
+              indice === navegacion.activeIndex ? "bg-ink-700" : "hover:bg-ink-700"
+            ),
             children: sugerencia
-          }
-        ) }, sugerencia))
+          },
+          sugerencia
+        ))
       }
     )
   ] });
 }
 
 // src/components/PhoneField.jsx
-import { useState as useState4 } from "react";
+import { useMemo as useMemo4, useState as useState6 } from "react";
+
+// src/components/CountryPhoneSelect.jsx
+import { useEffect as useEffect4, useId as useId4, useMemo as useMemo3, useRef as useRef5, useState as useState5 } from "react";
+
+// src/utils/paisesTelefono.js
+import { getCountries, getCountryCallingCode } from "libphonenumber-js/min";
+var PAIS_PREDETERMINADO = "PY";
+var PAIS_PRINCIPAL_POR_DDI = Object.freeze({
+  "+1": "US",
+  "+7": "RU",
+  "+44": "GB"
+});
+var cacheCatalogos = /* @__PURE__ */ new Map();
+function isoValido(value) {
+  const iso = String(value || "").trim().toUpperCase();
+  return /^[A-Z]{2}$/.test(iso) && getCountries().includes(iso) ? iso : "";
+}
+function banderaDeIso(iso) {
+  return [...iso].map((letra) => String.fromCodePoint(127397 + letra.charCodeAt(0))).join("");
+}
+function nombreDePais(iso, locale) {
+  try {
+    return new Intl.DisplayNames([locale || "es"], { type: "region" }).of(iso) || iso;
+  } catch {
+    return iso;
+  }
+}
+function compararPaises(a, b, locale) {
+  return a.name.localeCompare(b.name, locale || "es", { sensitivity: "base" });
+}
+function catalogoParaLocale(locale = "es") {
+  const clave = String(locale || "es");
+  if (cacheCatalogos.has(clave)) return cacheCatalogos.get(clave);
+  const catalogo = getCountries().map((country) => Object.freeze({
+    country,
+    countryCode: `+${getCountryCallingCode(country)}`,
+    name: nombreDePais(country, clave),
+    flag: banderaDeIso(country)
+  })).sort((a, b) => a.country === PAIS_PREDETERMINADO ? -1 : b.country === PAIS_PREDETERMINADO ? 1 : compararPaises(a, b, clave));
+  const congelado = Object.freeze(catalogo);
+  cacheCatalogos.set(clave, congelado);
+  return congelado;
+}
+function textoBuscable(value) {
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase().trim();
+}
+function catalogoNormalizado(countries, locale) {
+  const catalogo = catalogoParaLocale(locale);
+  if (!Array.isArray(countries) || countries.length === 0) return [...catalogo];
+  const porIso = new Map(catalogo.map((pais) => [pais.country, pais]));
+  const vistos = /* @__PURE__ */ new Set();
+  return countries.flatMap((entrada3) => {
+    if (typeof entrada3 === "object" && entrada3?.custom === true) {
+      const country = String(entrada3.country || "").trim();
+      const countryCode = `+${String(entrada3.countryCode || "").replace(/\D/g, "")}`;
+      if (!country || countryCode === "+" || vistos.has(country)) return [];
+      vistos.add(country);
+      return [Object.freeze({
+        country,
+        countryCode,
+        name: String(entrada3.name || `C\xF3digo internacional ${countryCode}`),
+        flag: String(entrada3.flag || "\u{1F310}"),
+        custom: true
+      })];
+    }
+    const iso = isoValido(typeof entrada3 === "string" ? entrada3 : entrada3?.country);
+    if (!iso || vistos.has(iso)) return [];
+    vistos.add(iso);
+    const base = porIso.get(iso);
+    return base ? [base] : [];
+  });
+}
+var PAISES_TELEFONO = catalogoParaLocale("es");
+function paisTelefonoPorIso(iso, locale = "es") {
+  const country = isoValido(iso);
+  return country ? catalogoParaLocale(locale).find((pais) => pais.country === country) || null : null;
+}
+function paisesDeCodigo(countryCode, locale = "es", countries = PAISES_TELEFONO) {
+  const codigo = `+${String(countryCode || "").replace(/\D/g, "")}`;
+  const principal = PAIS_PRINCIPAL_POR_DDI[codigo];
+  return catalogoNormalizado(countries, locale).filter((pais) => pais.countryCode === codigo).sort((a, b) => {
+    if (a.country === principal) return -1;
+    if (b.country === principal) return 1;
+    return compararPaises(a, b, locale);
+  });
+}
+function buscarPaisesTelefono(consulta = "", countries = PAISES_TELEFONO, locale = "es") {
+  const termino = textoBuscable(consulta);
+  const digitos = termino.replace(/\D/g, "");
+  const catalogo = catalogoNormalizado(countries, locale);
+  const resultados = termino ? catalogo.filter((pais) => {
+    const texto = textoBuscable(`${pais.name} ${pais.country} ${pais.countryCode}`);
+    return texto.includes(termino) || digitos && pais.countryCode.replace(/\D/g, "").includes(digitos);
+  }) : catalogo;
+  return resultados.sort((a, b) => {
+    if (!termino && a.country === PAIS_PREDETERMINADO) return -1;
+    if (!termino && b.country === PAIS_PREDETERMINADO) return 1;
+    return compararPaises(a, b, locale);
+  });
+}
+function resolverPaisesTelefono(countries, locale = "es") {
+  return buscarPaisesTelefono("", countries, locale);
+}
+
+// src/components/CountryPhoneSelect.jsx
+import { jsx as jsx15, jsxs as jsxs10 } from "react/jsx-runtime";
+function CountryPhoneSelect({
+  country = "PY",
+  onChange,
+  countries,
+  locale = "es",
+  disabled = false,
+  ariaLabel = "C\xF3digo de pa\xEDs",
+  searchPlaceholder = "Buscar pa\xEDs o c\xF3digo",
+  customCountry,
+  id,
+  className
+}) {
+  const reactId = useId4();
+  const baseId = id || `pais-telefono-${reactId.replace(/:/g, "")}`;
+  const listId = `${baseId}-lista`;
+  const triggerRef = useRef5(null);
+  const searchRef = useRef5(null);
+  const rootRef = useRef5(null);
+  const [open, setOpen] = useState5(false);
+  const [query, setQuery] = useState5("");
+  const [activeIndex, setActiveIndex] = useState5(0);
+  const catalog = useMemo3(() => {
+    const base = resolverPaisesTelefono(countries, locale);
+    if (!customCountry?.countryCode) return base;
+    return [customCountry, ...base.filter((pais) => pais.country !== customCountry.country)];
+  }, [countries, customCountry, locale]);
+  const selected = catalog.find((pais) => pais.country === country) || paisTelefonoPorIso(country, locale) || paisTelefonoPorIso("PY", locale);
+  const options = useMemo3(() => buscarPaisesTelefono(query, catalog, locale), [catalog, locale, query]);
+  const activeOption = options[activeIndex];
+  const close = (restoreFocus = false) => {
+    setOpen(false);
+    setQuery("");
+    if (restoreFocus) setTimeout(() => triggerRef.current?.focus(), 0);
+  };
+  const openPicker = () => {
+    if (disabled) return;
+    setOpen(true);
+    setQuery("");
+    const selectedIndex = catalog.findIndex((pais) => pais.country === selected.country);
+    setActiveIndex(Math.max(0, selectedIndex));
+  };
+  const choose = (pais) => {
+    if (!pais) return;
+    onChange?.(pais.country);
+    close(true);
+  };
+  useEffect4(() => {
+    if (!open) return void 0;
+    searchRef.current?.focus();
+    const onPointerDown = (event) => {
+      if (!rootRef.current?.contains(event.target)) close(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
+  useEffect4(() => {
+    setActiveIndex((current) => Math.min(current, Math.max(0, options.length - 1)));
+  }, [options.length]);
+  const navigate = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      close(true);
+      return;
+    }
+    if (event.key === "Tab") {
+      setTimeout(() => close(false), 0);
+      return;
+    }
+    if (!options.length) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((current) => (current + 1) % options.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((current) => (current - 1 + options.length) % options.length);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      setActiveIndex(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      setActiveIndex(options.length - 1);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      choose(activeOption);
+    }
+  };
+  return /* @__PURE__ */ jsxs10("div", { ref: rootRef, className: `relative w-24 shrink-0 ${className || ""}`.trim(), children: [
+    /* @__PURE__ */ jsxs10(
+      "button",
+      {
+        ref: triggerRef,
+        type: "button",
+        role: "combobox",
+        "aria-label": ariaLabel,
+        "aria-haspopup": "listbox",
+        "aria-expanded": open,
+        "aria-controls": listId,
+        disabled,
+        onClick: () => open ? close(false) : openPicker(),
+        onKeyDown: (event) => {
+          if (["Enter", " ", "ArrowDown"].includes(event.key)) {
+            event.preventDefault();
+            openPicker();
+          }
+        },
+        className: "flex h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-ink-500 bg-ink-800 px-2 text-sm text-fore outline-none transition hover:border-interactivo focus:border-fono focus:ring-1 focus:ring-fono/40 disabled:cursor-not-allowed disabled:opacity-50",
+        children: [
+          /* @__PURE__ */ jsx15("span", { "aria-hidden": "true", className: "text-base leading-none", children: selected.flag }),
+          /* @__PURE__ */ jsx15("span", { className: "tabular-nums", children: selected.countryCode }),
+          /* @__PURE__ */ jsx15("span", { "aria-hidden": "true", className: "text-[10px] text-mute", children: "\u25BE" })
+        ]
+      }
+    ),
+    open ? /* @__PURE__ */ jsxs10("div", { className: "absolute left-0 top-full z-50 mt-1 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-ink-500 bg-ink-800 shadow-xl", children: [
+      /* @__PURE__ */ jsx15("div", { className: "p-2", children: /* @__PURE__ */ jsx15(
+        Input,
+        {
+          ref: searchRef,
+          role: "combobox",
+          "aria-label": "Buscar pa\xEDs",
+          "aria-autocomplete": "list",
+          "aria-expanded": "true",
+          "aria-controls": listId,
+          "aria-activedescendant": activeOption ? `${baseId}-opcion-${activeOption.country}` : void 0,
+          value: query,
+          onChange: (event) => {
+            setQuery(event.target.value);
+            setActiveIndex(0);
+          },
+          onKeyDown: navigate,
+          placeholder: searchPlaceholder,
+          autoComplete: "off"
+        }
+      ) }),
+      /* @__PURE__ */ jsx15("ul", { id: listId, role: "listbox", "aria-label": "Pa\xEDses", className: "max-h-64 overflow-y-auto p-1", children: options.map((pais, index) => /* @__PURE__ */ jsxs10(
+        "li",
+        {
+          id: `${baseId}-opcion-${pais.country}`,
+          role: "option",
+          "aria-selected": pais.country === selected.country,
+          onMouseDown: (event) => event.preventDefault(),
+          onMouseEnter: () => setActiveIndex(index),
+          onClick: () => choose(pais),
+          className: `flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${index === activeIndex ? "bg-ink-700 text-fore" : "text-mute hover:bg-ink-700 hover:text-fore"}`,
+          children: [
+            /* @__PURE__ */ jsx15("span", { "aria-hidden": "true", className: "text-lg leading-none", children: pais.flag }),
+            /* @__PURE__ */ jsx15("span", { className: "min-w-0 flex-1 truncate text-left", children: pais.name }),
+            /* @__PURE__ */ jsx15("span", { className: "text-xs font-medium uppercase text-mute", children: pais.country }),
+            /* @__PURE__ */ jsx15("span", { className: "tabular-nums text-fore", children: pais.countryCode })
+          ]
+        },
+        pais.country
+      )) }),
+      !options.length ? /* @__PURE__ */ jsx15("p", { role: "status", "aria-live": "polite", className: "px-3 py-4 text-center text-sm text-mute", children: "No se encontraron pa\xEDses" }) : null
+    ] }) : null
+  ] });
+}
 
 // src/utils/telefono.js
+import { parsePhoneNumberFromString } from "libphonenumber-js/min";
 var CODIGOS_PAIS = ["+595", "+55", "+54", "+56", "+591", "+598", "+1", "+34", "+44", "+351"];
-var CODIGOS_ORDENADOS = CODIGOS_PAIS.map((codigo) => codigo.replace(/\D/g, "")).filter(Boolean).sort((a, b) => b.length - a.length);
+var CODIGOS_INTERNACIONALES_ORDENADOS = [...new Set(PAISES_TELEFONO.map((pais) => pais.countryCode.replace(/\D/g, "")))].sort((a, b) => b.length - a.length);
 function normalizarTelefono(phone, countryCode = "+595") {
   return telefonoVisible(phone, countryCode);
 }
@@ -1776,7 +2280,7 @@ function telefonoValido(value, countryCode = "+595") {
 }
 function partirCeroCero(digitos, countryCodePorDefecto) {
   if (!digitos) return null;
-  for (const codigo of CODIGOS_ORDENADOS) {
+  for (const codigo of CODIGOS_INTERNACIONALES_ORDENADOS) {
     if (digitos.startsWith(codigo)) return { countryCode: `+${codigo}`, phone: digitos.slice(codigo.length) };
   }
   const porDefecto = String(countryCodePorDefecto || "").replace(/\D/g, "");
@@ -1785,10 +2289,20 @@ function partirCeroCero(digitos, countryCodePorDefecto) {
   }
   return { countryCode: `+${digitos.slice(0, 3)}`, phone: digitos.slice(3) };
 }
+function partirConMas(texto) {
+  const digitos = texto.replace(/\D/g, "");
+  const codigo = CODIGOS_INTERNACIONALES_ORDENADOS.find((prefijo) => digitos.startsWith(prefijo));
+  if (!codigo) return null;
+  const indiceCodigo = texto.indexOf(codigo);
+  const resto = texto.slice(indiceCodigo + codigo.length).trim();
+  return { countryCode: `+${codigo}`, phone: resto };
+}
 function parseTelefono(value, countryCodePorDefecto = "+595") {
   const texto = String(value || "").trim();
-  const conMas = texto.match(/^\+(\d{1,3})\s*(.*)$/);
-  if (conMas) return { countryCode: `+${conMas[1]}`, phone: conMas[2].trim() };
+  if (texto.startsWith("+")) {
+    const partes = partirConMas(texto);
+    if (partes) return partes;
+  }
   const conCeroCero = texto.match(/^00[\s.-]*(.*)$/);
   if (conCeroCero) {
     const resto = conCeroCero[1].trim();
@@ -1796,6 +2310,58 @@ function parseTelefono(value, countryCodePorDefecto = "+595") {
     if (partes) return partes;
   }
   return { countryCode: countryCodePorDefecto, phone: texto };
+}
+function paisCompatible(country, countryCode) {
+  const preferido = paisTelefonoPorIso(country);
+  return preferido?.countryCode === countryCode ? preferido.country : "";
+}
+function estadoInternacionalVacio(country = "PY") {
+  const pais = paisTelefonoPorIso(country) || paisTelefonoPorIso("PY");
+  return { country: pais.country, countryCode: pais.countryCode, phone: "", e164: "", isValid: false };
+}
+function parseTelefonoInternacional(value, country = "PY", countryCodePorDefecto = "") {
+  const texto = String(value || "").trim();
+  if (!texto) return estadoInternacionalVacio(country);
+  const internacional = texto.startsWith("+") || /^00/.test(texto);
+  const entrada3 = /^00/.test(texto) ? `+${texto.replace(/^00[\s.-]*/, "")}` : texto;
+  const paisPreferido = paisTelefonoPorIso(country) || paisTelefonoPorIso("PY");
+  const parsed = parsePhoneNumberFromString(entrada3, internacional ? void 0 : paisPreferido.country);
+  if (parsed) {
+    const countryCode = `+${parsed.countryCallingCode}`;
+    const pais = paisCompatible(paisPreferido.country, countryCode) || parsed.country || paisesDeCodigo(countryCode)[0]?.country || paisPreferido.country;
+    const phone = parsed.nationalNumber || "";
+    const pyValido = pais !== "PY" || /^9\d{8}$/.test(phone);
+    const isValid = parsed.isValid() && pyValido;
+    return { country: pais, countryCode, phone, e164: isValid ? parsed.number : "", isValid };
+  }
+  if (internacional) {
+    const digitos = entrada3.replace(/\D/g, "");
+    const codigo = CODIGOS_INTERNACIONALES_ORDENADOS.find((prefijo) => digitos.startsWith(prefijo));
+    if (codigo) {
+      const countryCode = `+${codigo}`;
+      const pais = paisCompatible(paisPreferido.country, countryCode) || paisesDeCodigo(countryCode)[0]?.country || paisPreferido.country;
+      return { country: pais, countryCode, phone: digitos.slice(codigo.length), e164: "", isValid: false };
+    }
+    const codigoExplicito = codigoPais(countryCodePorDefecto);
+    const codigoExplicitoDigitos = codigoExplicito.replace(/\D/g, "");
+    const codigoDesconocido = codigoExplicitoDigitos && digitos.startsWith(codigoExplicitoDigitos) ? codigoExplicitoDigitos : digitos.slice(0, Math.min(3, digitos.length));
+    if (codigoDesconocido) {
+      return {
+        country: "",
+        countryCode: `+${codigoDesconocido}`,
+        phone: digitos.slice(codigoDesconocido.length),
+        e164: "",
+        isValid: false
+      };
+    }
+  }
+  return { ...estadoInternacionalVacio(paisPreferido.country), phone: texto };
+}
+function telefonoE164(value, country = "PY") {
+  return parseTelefonoInternacional(value, country).e164;
+}
+function telefonoInternacionalValido(value, country = "PY") {
+  return parseTelefonoInternacional(value, country).isValid;
 }
 function componerTelefono({ countryCode = "+595", phone = "" } = {}) {
   const numero = String(phone || "").trim().replace(/\s+/g, " ");
@@ -1806,63 +2372,158 @@ function componerTelefono({ countryCode = "+595", phone = "" } = {}) {
 var MENSAJE_TELEFONO = "Tel\xE9fono inv\xE1lido. Para Paraguay us\xE1 un m\xF3vil de 9 d\xEDgitos, ej: 981 123 456 o +595 971 234567.";
 
 // src/components/PhoneField.jsx
-import { jsx as jsx15, jsxs as jsxs10 } from "react/jsx-runtime";
-var MAX_CODIGO = 6;
+import { jsx as jsx16, jsxs as jsxs11 } from "react/jsx-runtime";
 var MAX_NUMERO = 30;
-function soloDigitos2(value) {
-  return String(value || "").replace(/\D/g, "").slice(0, MAX_CODIGO);
-}
 function soloNumero(value) {
   return String(value || "").replace(/[^\d\s()-]/g, "").slice(0, MAX_NUMERO);
 }
+function catalogoDelCampo(countries, codigos, locale) {
+  if (countries) return resolverPaisesTelefono(countries, locale);
+  const catalogo = resolverPaisesTelefono(void 0, locale);
+  if (!codigos) return catalogo;
+  const permitidos = new Set(codigos.map((codigo) => codigoPais(codigo)).filter(Boolean));
+  return catalogo.filter((pais) => permitidos.has(pais.countryCode));
+}
 function PhoneField({
   countryCode = "+595",
+  country,
   phone = "",
   onChange,
   onCountryCodeChange,
+  onCountryChange,
+  onInternationalChange,
+  countries,
+  locale = "es",
+  searchPlaceholder = "Buscar pa\xEDs o c\xF3digo",
+  autoComplete = "tel",
+  name,
+  inputProps,
   disabled = false,
   placeholder = "981 123 456",
   countryAriaLabel = "C\xF3digo de pa\xEDs",
   phoneAriaLabel = "Tel\xE9fono",
-  codigos = CODIGOS_PAIS,
+  codigos,
   mensajeInvalido = MENSAJE_TELEFONO,
   id = "telefono-codigos",
   className
 }) {
-  const [tocado, setTocado] = useState4(false);
-  const invalido = tocado && Boolean(String(phone).trim()) && !telefonoValido(phone, countryCode);
-  return /* @__PURE__ */ jsxs10("div", { className, children: [
-    /* @__PURE__ */ jsxs10("div", { className: "flex flex-wrap items-center gap-2", children: [
-      /* @__PURE__ */ jsx15(
-        Input,
+  const catalog = useMemo4(() => catalogoDelCampo(countries, codigos, locale), [codigos, countries, locale]);
+  const paisControlado = country === void 0 ? null : paisTelefonoPorIso(country, locale);
+  const codigoSolicitado = codigoPais(countryCode) || "+595";
+  const codigoControlado = paisControlado?.countryCode || codigoSolicitado;
+  const paisesCompatibles = paisesDeCodigo(codigoControlado, locale, catalog);
+  const paisDesconocido = !paisControlado && paisesCompatibles.length === 0 ? {
+    country: `ZZ-${codigoControlado.replace(/\D/g, "")}`,
+    countryCode: codigoControlado,
+    name: `C\xF3digo internacional ${codigoControlado}`,
+    flag: "\u{1F310}",
+    custom: true
+  } : null;
+  const [paisInterno, setPaisInterno] = useState6(() => paisControlado?.country || paisesCompatibles[0]?.country || paisDesconocido?.country || "PY");
+  const paisInternoCompatible = paisTelefonoPorIso(paisInterno, locale)?.countryCode === codigoControlado;
+  const paisSeleccionado = paisControlado?.country || (paisDesconocido ? paisDesconocido.country : null) || (paisInternoCompatible ? paisInterno : paisesCompatibles[0]?.country) || "PY";
+  const [tocado, setTocado] = useState6(false);
+  const invalido = tocado && Boolean(String(phone).trim()) && !(paisDesconocido ? telefonoValido(phone, codigoControlado) : telefonoInternacionalValido(phone, paisSeleccionado));
+  const errorId = `${id}-error`;
+  const {
+    className: inputClassName,
+    onBlur: inputOnBlur,
+    "aria-describedby": inputDescribedBy,
+    ...safeInputProps
+  } = inputProps || {};
+  const describedBy = [inputDescribedBy, invalido ? errorId : ""].filter(Boolean).join(" ") || void 0;
+  const emitirInternacional = (local, iso, estado) => {
+    if (!onInternationalChange) return;
+    if (iso === paisDesconocido?.country || !paisTelefonoPorIso(iso, locale)) {
+      onInternationalChange("", {
+        country: "",
+        countryCode: estado?.countryCode || codigoControlado,
+        phone: local,
+        isValid: false
+      });
+      return;
+    }
+    const countryData = paisTelefonoPorIso(iso, locale) || paisTelefonoPorIso("PY", locale);
+    const e164 = estado?.e164 ?? telefonoE164(local, countryData.country);
+    const isValid = estado?.isValid ?? Boolean(e164);
+    onInternationalChange(isValid ? e164 : "", {
+      country: countryData.country,
+      countryCode: estado?.countryCode || countryData.countryCode,
+      phone: local,
+      isValid
+    });
+  };
+  const cambiarPais = (iso) => {
+    if (iso === paisDesconocido?.country) {
+      setPaisInterno(iso);
+      onCountryChange?.("");
+      emitirInternacional(phone, iso, { countryCode: codigoControlado, isValid: false, e164: "" });
+      return;
+    }
+    const siguiente = paisTelefonoPorIso(iso, locale);
+    if (!siguiente) return;
+    setPaisInterno(siguiente.country);
+    onCountryChange?.(siguiente.country);
+    if (siguiente.countryCode !== codigoControlado) onCountryCodeChange?.(siguiente.countryCode);
+    emitirInternacional(phone, siguiente.country);
+  };
+  const cambiarNumero = (event) => {
+    const raw = event.target.value;
+    if (/^(\+|00)/.test(raw.trimStart())) {
+      const parsed = parseTelefonoInternacional(raw, paisDesconocido ? "" : paisSeleccionado, codigoControlado);
+      const siguientePais = parsed.country || (parsed.countryCode === codigoControlado ? paisDesconocido?.country : "");
+      if (siguientePais) setPaisInterno(siguientePais);
+      onCountryChange?.(parsed.country);
+      if (parsed.countryCode !== codigoControlado) onCountryCodeChange?.(parsed.countryCode);
+      onChange?.(parsed.phone);
+      emitirInternacional(parsed.phone, parsed.country, parsed);
+      return;
+    }
+    const local = soloNumero(raw);
+    onChange?.(local);
+    emitirInternacional(local, paisSeleccionado);
+  };
+  return /* @__PURE__ */ jsxs11("div", { className, children: [
+    /* @__PURE__ */ jsxs11("div", { className: "flex flex-wrap items-center gap-2", children: [
+      /* @__PURE__ */ jsx16(
+        CountryPhoneSelect,
         {
-          inputMode: "numeric",
-          list: id,
+          id: `${id}-pais`,
+          country: paisSeleccionado,
+          customCountry: paisDesconocido,
+          onChange: cambiarPais,
+          countries: catalog,
+          locale,
           disabled,
-          value: `+${soloDigitos2(countryCode)}`,
-          onChange: (event) => onCountryCodeChange?.(`+${soloDigitos2(event.target.value)}`),
-          "aria-label": countryAriaLabel,
-          className: "w-24 shrink-0 text-center"
+          ariaLabel: countryAriaLabel,
+          searchPlaceholder
         }
       ),
-      /* @__PURE__ */ jsx15("datalist", { id, children: codigos.map((codigo) => /* @__PURE__ */ jsx15("option", { value: codigo }, codigo)) }),
-      /* @__PURE__ */ jsx15(
+      /* @__PURE__ */ jsx16(
         Input,
         {
+          ...safeInputProps,
           type: "tel",
           inputMode: "tel",
+          autoComplete,
+          name,
           maxLength: MAX_NUMERO,
           disabled,
           value: phone,
-          onChange: (event) => onChange?.(soloNumero(event.target.value)),
+          onChange: cambiarNumero,
           placeholder,
           "aria-label": phoneAriaLabel,
-          onBlur: () => setTocado(true),
-          className: "min-w-[8.5rem] flex-1"
+          "aria-invalid": invalido || void 0,
+          "aria-describedby": describedBy,
+          onBlur: (event) => {
+            setTocado(true);
+            inputOnBlur?.(event);
+          },
+          className: cn("min-w-[8.5rem] flex-1", inputClassName)
         }
       )
     ] }),
-    invalido && /* @__PURE__ */ jsx15("span", { className: "block pt-1 text-[11px] text-bad-text", children: mensajeInvalido })
+    invalido ? /* @__PURE__ */ jsx16("span", { id: errorId, role: "alert", className: "block pt-1 text-[11px] text-bad-text", children: mensajeInvalido }) : null
   ] });
 }
 
@@ -1931,7 +2592,7 @@ function normalizarSeriales(texto, { validar, limite = 9999, maxLargo = 32 } = {
 }
 
 // src/components/SerialField.jsx
-import { jsx as jsx16 } from "react/jsx-runtime";
+import { jsx as jsx17 } from "react/jsx-runtime";
 function SerialField({
   value = "",
   onChange,
@@ -1941,7 +2602,7 @@ function SerialField({
   maxLength = 32,
   ...props
 }) {
-  return /* @__PURE__ */ jsx16(
+  return /* @__PURE__ */ jsx17(
     Input,
     {
       autoCapitalize: "characters",
@@ -1958,31 +2619,32 @@ function SerialField({
 }
 
 // src/components/InstagramField.jsx
-import { jsx as jsx17, jsxs as jsxs11 } from "react/jsx-runtime";
+import { jsx as jsx18, jsxs as jsxs12 } from "react/jsx-runtime";
 var MAX_USERNAME = 30;
 function normalizarInstagram(value) {
   const texto = String(value || "").trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/^instagram\.com\//i, "").replace(/^@+/, "");
   return texto.split(/[/?#]/)[0].replace(/\s+/g, "").replace(/[^A-Za-z0-9._]/g, "").slice(0, MAX_USERNAME);
 }
-function InstagramField({ value = "", onChange, disabled = false, placeholder = "usuario", className }) {
-  return /* @__PURE__ */ jsxs11("div", { className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx17("span", { "aria-hidden": "true", className: "pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-mute", children: "@" }),
-    /* @__PURE__ */ jsx17(
+function InstagramField({ value = "", onChange, disabled = false, placeholder = "usuario", className, inputClassName, ...props }) {
+  return /* @__PURE__ */ jsxs12("div", { className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx18("span", { "aria-hidden": "true", className: "pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-mute", children: "@" }),
+    /* @__PURE__ */ jsx18(
       Input,
       {
+        ...props,
         maxLength: MAX_USERNAME,
         disabled,
         value: normalizarInstagram(value),
         onChange: (event) => onChange?.(normalizarInstagram(event.target.value)),
         placeholder,
-        className: "pl-8"
+        className: cn("pl-8", inputClassName)
       }
     )
   ] });
 }
 
 // src/components/ProductCombobox.jsx
-import { useCallback as useCallback3, useEffect as useEffect3, useId as useId3, useMemo as useMemo2, useRef as useRef4, useState as useState5 } from "react";
+import { useCallback as useCallback3, useEffect as useEffect5, useMemo as useMemo5, useRef as useRef6, useState as useState7 } from "react";
 
 // src/utils/categorias.js
 var CATEGORIAS_PRODUCTO = [
@@ -2013,7 +2675,7 @@ var iconoDeCategoria = (texto) => normalizarCategoria(texto).icono;
 var etiquetaDeCategoria = (texto) => normalizarCategoria(texto).etiqueta;
 
 // src/components/IconoCategoria.jsx
-import { jsx as jsx18 } from "react/jsx-runtime";
+import { jsx as jsx19 } from "react/jsx-runtime";
 var GLIFOS_CATEGORIA = {
   // Celular: marco redondeado con parlante y botón.
   mobile: "M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2ZM10 5h4M11 18.5h2",
@@ -2031,8 +2693,8 @@ var GLIFOS_CATEGORIA = {
 function IconoCategoria({ categoria, icono, className, ...props }) {
   const glifo = icono || iconoDeCategoria(categoria);
   const clases = cn("shrink-0", className || "h-5 w-5");
-  if (!GLIFOS_CATEGORIA[glifo]) return /* @__PURE__ */ jsx18(Icon, { name: glifo, className: clases, ...props });
-  return /* @__PURE__ */ jsx18(
+  if (!GLIFOS_CATEGORIA[glifo]) return /* @__PURE__ */ jsx19(Icon, { name: glifo, className: clases, ...props });
+  return /* @__PURE__ */ jsx19(
     "svg",
     {
       viewBox: "0 0 24 24",
@@ -2044,25 +2706,23 @@ function IconoCategoria({ categoria, icono, className, ...props }) {
       "aria-hidden": "true",
       className: clases,
       ...props,
-      children: /* @__PURE__ */ jsx18("path", { d: GLIFOS_CATEGORIA[glifo] })
+      children: /* @__PURE__ */ jsx19("path", { d: GLIFOS_CATEGORIA[glifo] })
     }
   );
 }
 
 // src/components/ProductCombobox.jsx
-import { jsx as jsx19, jsxs as jsxs12 } from "react/jsx-runtime";
+import { jsx as jsx20, jsxs as jsxs13 } from "react/jsx-runtime";
 var MAX_SUGGESTIONS = 8;
 function productName(product) {
   return product?.nombre || product?.name || "";
 }
 function ProductCombobox({ products = [], selectedId = "", onSelect, onCreate, onQueryChange, placeholder = "Buscar producto\u2026", disabled = false, className }) {
-  const [query, setQuery] = useState5("");
-  const [open, setOpen] = useState5(false);
-  const [highlight, setHighlight] = useState5(0);
-  const [creating, setCreating] = useState5(false);
-  const listId = useId3();
-  const rootRef = useRef4(null);
-  useEffect3(() => {
+  const [query, setQuery] = useState7("");
+  const [open, setOpen] = useState7(false);
+  const [creating, setCreating] = useState7(false);
+  const rootRef = useRef6(null);
+  useEffect5(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && rootRef.current?.contains(event.target)) return;
       close();
@@ -2074,27 +2734,28 @@ function ProductCombobox({ products = [], selectedId = "", onSelect, onCreate, o
     setQuery(next);
     onQueryChange?.(next);
   }, [onQueryChange]);
-  useEffect3(() => {
+  useEffect5(() => {
     if (!selectedId) return;
     const selected = products.find((product) => product.id === selectedId);
     if (selected) setearQuery(productName(selected));
   }, [selectedId, products, setearQuery]);
   const term = query.trim().toLowerCase();
-  const suggestions = useMemo2(() => {
+  const suggestions = useMemo5(() => {
     if (!term) return [];
     const coincide = (product) => [productName(product), product.sku, product.model, product.capacity, product.color].some((valor) => String(valor || "").toLowerCase().includes(term));
     return products.filter(coincide).slice(0, MAX_SUGGESTIONS);
   }, [products, term]);
   const canCreate = Boolean(term && onCreate && suggestions.length === 0);
-  const optionCount = suggestions.length + (canCreate ? 1 : 0);
+  const options = useMemo5(
+    () => canCreate ? [...suggestions, { id: "__create__", __create: true }] : suggestions,
+    [canCreate, suggestions]
+  );
   function close() {
     setOpen(false);
-    setHighlight(0);
   }
   function choose(product) {
     setearQuery(productName(product));
     setOpen(false);
-    setHighlight(0);
     onSelect?.(product);
   }
   async function createNew() {
@@ -2113,42 +2774,28 @@ function ProductCombobox({ products = [], selectedId = "", onSelect, onCreate, o
       setCreating(false);
     }
   }
-  function onKeyDown(event) {
-    if (event.key === "Escape") {
-      close();
-      return;
-    }
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      if (!open) {
-        setOpen(true);
-        return;
-      }
-      if (!optionCount) return;
-      const delta = event.key === "ArrowDown" ? 1 : -1;
-      setHighlight((current) => (current + delta + optionCount) % optionCount);
-      return;
-    }
-    if (event.key === "Enter") {
-      event.preventDefault();
-      if (!open || !term) return;
-      if (canCreate && highlight >= suggestions.length) {
-        createNew();
-        return;
-      }
-      const product = suggestions[highlight];
-      if (product) choose(product);
-    }
-  }
-  return /* @__PURE__ */ jsxs12("div", { ref: rootRef, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx19(
+  const listaVisible = open && Boolean(term);
+  const navegacion = useComboboxNavigation({
+    options,
+    open: listaVisible,
+    onOpenChange: setOpen,
+    onSelect: (option) => {
+      if (option.__create) void createNew();
+      else choose(option);
+    },
+    getOptionKey: (option) => option.id
+  });
+  return /* @__PURE__ */ jsxs13("div", { ref: rootRef, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx20(
       Input,
       {
         type: "text",
+        ref: navegacion.inputRef,
         role: "combobox",
-        "aria-expanded": open,
-        "aria-controls": listId,
+        "aria-expanded": listaVisible,
+        "aria-controls": navegacion.listboxId,
         "aria-autocomplete": "list",
+        "aria-activedescendant": navegacion.activeOptionId,
         autoComplete: "off",
         disabled,
         value: query,
@@ -2156,60 +2803,45 @@ function ProductCombobox({ products = [], selectedId = "", onSelect, onCreate, o
         onChange: (event) => {
           setearQuery(event.target.value);
           setOpen(true);
-          setHighlight(0);
+          navegacion.setActiveIndex(0);
         },
         onFocus: () => setOpen(true),
         onBlur: () => setTimeout(close, 120),
-        onKeyDown
+        onKeyDown: navegacion.inputProps.onKeyDown
       }
     ),
-    open && term && /* @__PURE__ */ jsxs12("ul", { id: listId, role: "listbox", className: "mt-1 max-h-48 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float", children: [
-      suggestions.map((product, index) => /* @__PURE__ */ jsx19("li", { children: /* @__PURE__ */ jsxs12(
-        "button",
+    listaVisible && /* @__PURE__ */ jsxs13("ul", { ...navegacion.listboxProps, className: "mt-1 max-h-48 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float", children: [
+      suggestions.map((product, index) => /* @__PURE__ */ jsxs13(
+        "li",
         {
-          type: "button",
-          role: "option",
-          "aria-selected": index === highlight,
-          tabIndex: -1,
-          className: cn("flex w-full items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition", index === highlight ? "bg-ink-700" : ""),
-          onMouseDown: (event) => {
-            event.preventDefault();
-            choose(product);
-          },
-          onMouseEnter: () => setHighlight(index),
+          ...navegacion.getOptionProps(index),
+          className: cn("flex min-h-11 cursor-pointer items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition", index === navegacion.activeIndex ? "bg-ink-700" : ""),
           children: [
-            /* @__PURE__ */ jsxs12("span", { className: "flex min-w-0 items-center gap-2", children: [
-              /* @__PURE__ */ jsx19(IconoCategoria, { categoria: product.category || productName(product), className: "h-4 w-4 text-mute" }),
-              /* @__PURE__ */ jsx19("span", { className: "truncate text-fore", children: productName(product) })
+            /* @__PURE__ */ jsxs13("span", { className: "flex min-w-0 items-center gap-2", children: [
+              /* @__PURE__ */ jsx20(IconoCategoria, { categoria: product.category || productName(product), className: "h-4 w-4 text-mute" }),
+              /* @__PURE__ */ jsx20("span", { className: "truncate text-fore", children: productName(product) })
             ] }),
-            product.sku ? /* @__PURE__ */ jsx19("span", { className: "shrink-0 text-xs text-mute", children: product.sku }) : null
+            product.sku ? /* @__PURE__ */ jsx20("span", { className: "shrink-0 text-xs text-mute", children: product.sku }) : null
           ]
-        }
-      ) }, product.id)),
-      canCreate && /* @__PURE__ */ jsx19("li", { children: /* @__PURE__ */ jsx19(
-        "button",
+        },
+        product.id
+      )),
+      canCreate && /* @__PURE__ */ jsx20(
+        "li",
         {
-          type: "button",
-          role: "option",
-          "aria-selected": highlight >= suggestions.length,
-          tabIndex: -1,
-          disabled: creating,
-          className: cn("flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-fono-light transition disabled:opacity-50", highlight >= suggestions.length ? "bg-ink-700" : ""),
-          onMouseDown: (event) => {
-            event.preventDefault();
-            createNew();
-          },
-          onMouseEnter: () => setHighlight(suggestions.length),
+          ...navegacion.getOptionProps(suggestions.length),
+          "aria-disabled": creating || void 0,
+          className: cn("flex min-h-11 cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-fono-light transition", creating && "pointer-events-none opacity-50", navegacion.activeIndex >= suggestions.length ? "bg-ink-700" : ""),
           children: creating ? "Creando\u2026" : `\uFF0B Agregar \xAB${query.trim()}\xBB como producto nuevo`
         }
-      ) })
+      )
     ] })
   ] });
 }
 
 // src/components/BuscadorProveedor.jsx
-import { useEffect as useEffect4, useId as useId4, useMemo as useMemo3, useRef as useRef5, useState as useState6 } from "react";
-import { Fragment as Fragment3, jsx as jsx20, jsxs as jsxs13 } from "react/jsx-runtime";
+import { useEffect as useEffect6, useId as useId5, useMemo as useMemo6, useRef as useRef7, useState as useState8 } from "react";
+import { Fragment as Fragment3, jsx as jsx21, jsxs as jsxs14 } from "react/jsx-runtime";
 var MAX_RESULTADOS = 8;
 function normalizarProveedor(valor) {
   return String(valor ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -2256,14 +2888,14 @@ function BuscadorProveedor({
   className,
   inputProps
 }) {
-  const [query, setQuery] = useState6("");
-  const [abierto, setAbierto] = useState6(false);
-  const [resaltado, setResaltado] = useState6(0);
-  const [creando, setCreando] = useState6(false);
-  const listaId = useId4();
-  const raiz = useRef5(null);
-  const lista = useRef5(null);
-  useEffect4(() => {
+  const [query, setQuery] = useState8("");
+  const [abierto, setAbierto] = useState8(false);
+  const [resaltado, setResaltado] = useState8(0);
+  const [creando, setCreando] = useState8(false);
+  const listaId = useId5();
+  const raiz = useRef7(null);
+  const lista = useRef7(null);
+  useEffect6(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -2271,24 +2903,24 @@ function BuscadorProveedor({
     document.addEventListener("click", cerrarFuera);
     return () => document.removeEventListener("click", cerrarFuera);
   }, []);
-  useEffect4(() => {
+  useEffect6(() => {
     if (!selectedId) return;
     const elegido = (Array.isArray(proveedores) ? proveedores : []).find((proveedor) => proveedor.id === selectedId);
     if (elegido) setQuery(nombreProveedor(elegido));
   }, [selectedId, proveedores]);
   const termino = query.trim();
-  const usados = useMemo3(() => resolverRecientes(proveedores, recientes), [proveedores, recientes]);
-  const coincidencias = useMemo3(() => filtrarProveedores(proveedores, termino), [proveedores, termino]);
+  const usados = useMemo6(() => resolverRecientes(proveedores, recientes), [proveedores, recientes]);
+  const coincidencias = useMemo6(() => filtrarProveedores(proveedores, termino), [proveedores, termino]);
   const enFoco = !termino && usados.length > 0 ? usados : coincidencias;
   const encabezado = !termino && usados.length > 0 ? textoRecientes : null;
-  const exacto = useMemo3(
+  const exacto = useMemo6(
     () => (Array.isArray(proveedores) ? proveedores : []).some((proveedor) => normalizarProveedor(nombreProveedor(proveedor)) === normalizarProveedor(termino) || normalizarProveedor(proveedor?.code) === normalizarProveedor(termino)),
     [proveedores, termino]
   );
   const puedeCrear = Boolean(termino.length >= 2 && onCreate && !exacto);
   const opciones = puedeCrear ? [...enFoco, { crear: termino }] : enFoco;
   const listaVisible = abierto && !disabled && (opciones.length > 0 || Boolean(termino));
-  useEffect4(() => {
+  useEffect6(() => {
     if (!listaVisible) return;
     lista.current?.querySelector(`#${CSS.escape(`${listaId}-${resaltado}`)}`)?.scrollIntoView({ block: "nearest" });
   }, [listaVisible, resaltado, listaId]);
@@ -2340,8 +2972,8 @@ function BuscadorProveedor({
       elegir(opciones[resaltado]);
     }
   }
-  return /* @__PURE__ */ jsxs13("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx20(
+  return /* @__PURE__ */ jsxs14("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx21(
       Input,
       {
         id,
@@ -2367,7 +2999,7 @@ function BuscadorProveedor({
         ...inputProps
       }
     ),
-    listaVisible && /* @__PURE__ */ jsxs13(
+    listaVisible && /* @__PURE__ */ jsxs14(
       "ul",
       {
         id: listaId,
@@ -2376,13 +3008,13 @@ function BuscadorProveedor({
         "aria-label": "Proveedores",
         className: "absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border border-ink-500 bg-ink p-1 shadow-float",
         children: [
-          encabezado ? /* @__PURE__ */ jsxs13("li", { className: "flex items-center gap-1.5 px-2.5 pb-1 pt-1.5 text-[10px] font-bold uppercase tracking-wider text-mute", "aria-hidden": "true", children: [
-            /* @__PURE__ */ jsx20(Icon, { name: "clock", className: "h-3 w-3" }),
+          encabezado ? /* @__PURE__ */ jsxs14("li", { className: "flex items-center gap-1.5 px-2.5 pb-1 pt-1.5 text-[10px] font-bold uppercase tracking-wider text-mute", "aria-hidden": "true", children: [
+            /* @__PURE__ */ jsx21(Icon, { name: "clock", className: "h-3 w-3" }),
             encabezado
           ] }) : null,
           opciones.map((opcion, indice) => {
             const creado = Boolean(opcion.crear);
-            return /* @__PURE__ */ jsx20(
+            return /* @__PURE__ */ jsx21(
               "li",
               {
                 id: `${listaId}-${indice}`,
@@ -2395,21 +3027,21 @@ function BuscadorProveedor({
                   "flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition",
                   indice === resaltado ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
                 ),
-                children: creado ? /* @__PURE__ */ jsxs13(Fragment3, { children: [
-                  /* @__PURE__ */ jsx20(Icon, { name: "plus", className: "h-4 w-4 shrink-0 text-fono-light" }),
-                  /* @__PURE__ */ jsx20("span", { className: "min-w-0 flex-1 truncate", children: creando ? textoCreando : `${textoCrear} \xAB${opcion.crear}\xBB` })
-                ] }) : /* @__PURE__ */ jsxs13(Fragment3, { children: [
-                  /* @__PURE__ */ jsxs13("span", { className: "min-w-0 flex-1", children: [
-                    /* @__PURE__ */ jsx20("span", { className: "block truncate font-medium text-fore", children: nombreProveedor(opcion) }),
-                    detalleProveedor(opcion) ? /* @__PURE__ */ jsx20("span", { className: "block truncate text-xs text-mute", children: detalleProveedor(opcion) }) : null
+                children: creado ? /* @__PURE__ */ jsxs14(Fragment3, { children: [
+                  /* @__PURE__ */ jsx21(Icon, { name: "plus", className: "h-4 w-4 shrink-0 text-fono-light" }),
+                  /* @__PURE__ */ jsx21("span", { className: "min-w-0 flex-1 truncate", children: creando ? textoCreando : `${textoCrear} \xAB${opcion.crear}\xBB` })
+                ] }) : /* @__PURE__ */ jsxs14(Fragment3, { children: [
+                  /* @__PURE__ */ jsxs14("span", { className: "min-w-0 flex-1", children: [
+                    /* @__PURE__ */ jsx21("span", { className: "block truncate font-medium text-fore", children: nombreProveedor(opcion) }),
+                    detalleProveedor(opcion) ? /* @__PURE__ */ jsx21("span", { className: "block truncate text-xs text-mute", children: detalleProveedor(opcion) }) : null
                   ] }),
-                  opcion.code ? /* @__PURE__ */ jsx20("span", { className: "shrink-0 rounded border border-ink-500 bg-ink-700/40 px-1.5 py-0.5 font-mono text-[10px] font-bold text-fono-light", children: opcion.code }) : null
+                  opcion.code ? /* @__PURE__ */ jsx21("span", { className: "shrink-0 rounded border border-ink-500 bg-ink-700/40 px-1.5 py-0.5 font-mono text-[10px] font-bold text-fono-light", children: opcion.code }) : null
                 ] })
               },
               creado ? `crear-${opcion.crear}` : opcion.id
             );
           }),
-          !opciones.length && termino ? /* @__PURE__ */ jsx20("li", { className: "px-2.5 py-2 text-sm text-mute", children: vacio }) : null
+          !opciones.length && termino ? /* @__PURE__ */ jsx21("li", { className: "px-2.5 py-2 text-sm text-mute", children: vacio }) : null
         ]
       }
     )
@@ -2417,7 +3049,7 @@ function BuscadorProveedor({
 }
 
 // src/components/BloquePago.jsx
-import { jsx as jsx21, jsxs as jsxs14 } from "react/jsx-runtime";
+import { jsx as jsx22, jsxs as jsxs15 } from "react/jsx-runtime";
 var ACENTO = {
   ok: "border-l-2 border-l-ok/60",
   warn: "border-l-2 border-l-warn/70",
@@ -2435,7 +3067,7 @@ function BloquePago({
   className,
   children
 }) {
-  return /* @__PURE__ */ jsxs14(
+  return /* @__PURE__ */ jsxs15(
     "article",
     {
       "data-testid": testId,
@@ -2447,20 +3079,20 @@ function BloquePago({
         className
       ),
       children: [
-        etiqueta || encabezado ? /* @__PURE__ */ jsxs14("div", { className: "mb-2 flex flex-wrap items-center gap-2", children: [
-          etiqueta ? /* @__PURE__ */ jsx21("span", { className: "text-[11px] font-semibold uppercase tracking-wider text-mute", children: etiqueta }) : null,
+        etiqueta || encabezado ? /* @__PURE__ */ jsxs15("div", { className: "mb-2 flex flex-wrap items-center gap-2", children: [
+          etiqueta ? /* @__PURE__ */ jsx22("span", { className: "text-[11px] font-semibold uppercase tracking-wider text-mute", children: etiqueta }) : null,
           encabezado
         ] }) : null,
-        /* @__PURE__ */ jsx21("div", { className: "min-w-0", children }),
-        onQuitar ? /* @__PURE__ */ jsx21("span", { className: "absolute right-1.5 top-1.5", children: /* @__PURE__ */ jsx21(IconAction, { icon: "trash", tone: "bad", size: "touch", label: etiquetaQuitar, disabled: deshabilitado, onClick: onQuitar }) }) : null
+        /* @__PURE__ */ jsx22("div", { className: "min-w-0", children }),
+        onQuitar ? /* @__PURE__ */ jsx22("span", { className: "absolute right-1.5 top-1.5", children: /* @__PURE__ */ jsx22(IconAction, { icon: "trash", tone: "bad", size: "touch", label: etiquetaQuitar, disabled: deshabilitado, onClick: onQuitar }) }) : null
       ]
     }
   );
 }
 
 // src/components/NavegacionSeccion.jsx
-import { useEffect as useEffect5, useRef as useRef6 } from "react";
-import { jsx as jsx22, jsxs as jsxs15 } from "react/jsx-runtime";
+import { useEffect as useEffect7, useId as useId6, useRef as useRef8 } from "react";
+import { jsx as jsx23, jsxs as jsxs16 } from "react/jsx-runtime";
 function NavegacionSeccion({
   items = [],
   value,
@@ -2478,15 +3110,29 @@ function NavegacionSeccion({
   classNameContenido,
   children
 }) {
-  const activoRef = useRef6(null);
+  const activoRef = useRef8(null);
+  const tabsRef = useRef8([]);
+  const baseId = useId6();
   const lista = (Array.isArray(items) ? items : []).map((item) => Array.isArray(item) ? { id: item[0], label: item[1] } : item).filter((item) => item && item.id);
   const activo = lista.find((item) => item.id === value) || lista[0];
+  const activeId = activo?.id;
   const conRiel = variante !== "horizontal";
-  useEffect5(() => {
+  function mover(event, indice) {
+    let siguiente;
+    if (event.key === "ArrowRight") siguiente = (indice + 1) % lista.length;
+    else if (event.key === "ArrowLeft") siguiente = (indice - 1 + lista.length) % lista.length;
+    else if (event.key === "Home") siguiente = 0;
+    else if (event.key === "End") siguiente = lista.length - 1;
+    else return;
+    event.preventDefault();
+    onChange?.(lista[siguiente].id);
+    requestAnimationFrame(() => tabsRef.current[siguiente]?.focus());
+  }
+  useEffect7(() => {
     activoRef.current?.scrollIntoView?.({ inline: "center", block: "nearest" });
   }, [value]);
   if (!lista.length) return null;
-  return /* @__PURE__ */ jsxs15(
+  return /* @__PURE__ */ jsxs16(
     "div",
     {
       className: cn(
@@ -2496,8 +3142,8 @@ function NavegacionSeccion({
         className
       ),
       children: [
-        /* @__PURE__ */ jsxs15("div", { className: cn(conRiel && "lg:sticky lg:top-3"), children: [
-          onToggle && conRiel ? /* @__PURE__ */ jsx22("div", { className: cn("mb-1.5 hidden lg:flex", colapsado ? "lg:justify-center" : "lg:justify-end"), children: /* @__PURE__ */ jsx22(
+        /* @__PURE__ */ jsxs16("div", { className: cn(conRiel && "lg:sticky lg:top-3"), children: [
+          onToggle && conRiel ? /* @__PURE__ */ jsx23("div", { className: cn("mb-1.5 hidden lg:flex", colapsado ? "lg:justify-center" : "lg:justify-end"), children: /* @__PURE__ */ jsx23(
             "button",
             {
               type: "button",
@@ -2507,11 +3153,11 @@ function NavegacionSeccion({
               "aria-controls": testId,
               title: colapsado ? textoExpandir : textoColapsar,
               "aria-label": colapsado ? textoExpandir : textoColapsar,
-              className: "grid h-9 w-9 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-700 hover:text-fore",
-              children: /* @__PURE__ */ jsx22(Icon, { name: "chevron", className: cn("h-4 w-4 transition-transform", colapsado ? "-rotate-90" : "rotate-90") })
+              className: "toque-44 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-700 hover:text-fore",
+              children: /* @__PURE__ */ jsx23(Icon, { name: "chevron", className: cn("h-4 w-4 transition-transform", colapsado ? "-rotate-90" : "rotate-90") })
             }
           ) }) : null,
-          /* @__PURE__ */ jsx22(
+          /* @__PURE__ */ jsx23(
             "nav",
             {
               id: testId,
@@ -2523,28 +3169,35 @@ function NavegacionSeccion({
                 conRiel && "lg:mb-0 lg:flex-col lg:gap-0.5 lg:overflow-visible",
                 conRiel && colapsado && "lg:items-center lg:p-1.5"
               ),
-              children: lista.map((item) => {
-                const esta = item.id === value;
-                return /* @__PURE__ */ jsxs15(
+              children: lista.map((item, indice) => {
+                const esta = item.id === activeId;
+                return /* @__PURE__ */ jsxs16(
                   "button",
                   {
+                    id: `${baseId}-tab-${item.id}`,
                     type: "button",
                     role: "tab",
                     "aria-selected": esta,
                     "aria-current": esta ? "page" : void 0,
+                    "aria-controls": `${baseId}-panel-${item.id}`,
+                    tabIndex: esta ? 0 : -1,
                     "aria-label": item.label,
                     title: item.label,
-                    ref: esta ? activoRef : void 0,
+                    ref: (node) => {
+                      tabsRef.current[indice] = node;
+                      if (esta) activoRef.current = node;
+                    },
                     onClick: () => onChange?.(item.id),
+                    onKeyDown: (event) => mover(event, indice),
                     className: cn(
                       "group relative flex min-h-11 shrink-0 items-center gap-2 rounded-[10px] border px-3 text-left text-[13px] leading-snug transition",
                       conRiel && (colapsado ? "lg:w-12 lg:justify-center lg:px-0" : "lg:w-full"),
                       esta ? "border-fono/30 bg-gradient-to-r from-fono/[.16] to-fono/[.05] font-semibold text-fore" : "border-transparent text-mute hover:bg-ink-700/70 hover:text-fore"
                     ),
                     children: [
-                      esta && /* @__PURE__ */ jsx22("span", { "aria-hidden": true, className: cn("absolute left-0 top-1/2 hidden h-5 w-[2px] -translate-y-1/2 rounded-full bg-fono", conRiel && "lg:block") }),
-                      item.icono ? /* @__PURE__ */ jsx22(Icon, { name: item.icono, className: cn("h-4 w-4 shrink-0", esta ? "text-fono-light" : "group-hover:text-fore") }) : null,
-                      /* @__PURE__ */ jsx22("span", { className: cn("truncate", conRiel && colapsado && "lg:hidden"), children: item.label })
+                      esta && /* @__PURE__ */ jsx23("span", { "aria-hidden": true, className: cn("absolute left-0 top-1/2 hidden h-5 w-[2px] -translate-y-1/2 rounded-full bg-fono", conRiel && "lg:block") }),
+                      item.icono ? /* @__PURE__ */ jsx23(Icon, { name: item.icono, className: cn("h-4 w-4 shrink-0", esta ? "text-fono-light" : "group-hover:text-fore") }) : null,
+                      /* @__PURE__ */ jsx23("span", { className: cn("truncate", conRiel && colapsado && "lg:hidden"), children: item.label })
                     ]
                   },
                   item.id
@@ -2553,20 +3206,30 @@ function NavegacionSeccion({
             }
           )
         ] }),
-        /* @__PURE__ */ jsxs15("div", { className: cn("min-w-0 space-y-3", classNameContenido), children: [
-          mostrarDescripcion && activo?.descripcion ? /* @__PURE__ */ jsxs15("p", { "data-testid": testIdDescripcion || `${testId}-descripcion`, className: "flex items-start gap-2 px-0.5 text-sm text-mute", children: [
-            /* @__PURE__ */ jsx22(Icon, { name: activo.icono, className: "mt-0.5 h-4 w-4 shrink-0 text-fono-light" }),
-            /* @__PURE__ */ jsx22("span", { children: activo.descripcion })
-          ] }) : null,
-          children
-        ] })
+        /* @__PURE__ */ jsxs16(
+          "div",
+          {
+            id: `${baseId}-panel-${activeId}`,
+            role: "tabpanel",
+            "aria-labelledby": `${baseId}-tab-${activeId}`,
+            tabIndex: 0,
+            className: cn("min-w-0 space-y-3", classNameContenido),
+            children: [
+              mostrarDescripcion && activo?.descripcion ? /* @__PURE__ */ jsxs16("p", { "data-testid": testIdDescripcion || `${testId}-descripcion`, className: "flex items-start gap-2 px-0.5 text-sm text-mute", children: [
+                /* @__PURE__ */ jsx23(Icon, { name: activo.icono, className: "mt-0.5 h-4 w-4 shrink-0 text-fono-light" }),
+                /* @__PURE__ */ jsx23("span", { children: activo.descripcion })
+              ] }) : null,
+              children
+            ]
+          }
+        )
       ]
     }
   );
 }
 
 // src/components/BuscadorCliente.jsx
-import { useEffect as useEffect6, useId as useId5, useMemo as useMemo4, useRef as useRef7, useState as useState7 } from "react";
+import { useEffect as useEffect8, useId as useId7, useMemo as useMemo7, useRef as useRef9, useState as useState9 } from "react";
 
 // src/utils/cliente.js
 var normalizar = (valor) => String(valor ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -2622,7 +3285,7 @@ function motivosDuplicadoCliente(cliente, referencia = {}) {
 }
 
 // src/components/BuscadorCliente.jsx
-import { Fragment as Fragment4, jsx as jsx23, jsxs as jsxs16 } from "react/jsx-runtime";
+import { Fragment as Fragment4, jsx as jsx24, jsxs as jsxs17 } from "react/jsx-runtime";
 var MAX_RESULTADOS2 = 8;
 function BuscadorCliente({
   clientes = [],
@@ -2643,14 +3306,14 @@ function BuscadorCliente({
   className,
   inputProps
 }) {
-  const [query, setQuery] = useState7("");
-  const [abierto, setAbierto] = useState7(false);
-  const [resaltado, setResaltado] = useState7(0);
-  const [creando, setCreando] = useState7(false);
-  const listaId = useId5();
-  const raiz = useRef7(null);
-  const lista = useRef7(null);
-  useEffect6(() => {
+  const [query, setQuery] = useState9("");
+  const [abierto, setAbierto] = useState9(false);
+  const [resaltado, setResaltado] = useState9(0);
+  const [creando, setCreando] = useState9(false);
+  const listaId = useId7();
+  const raiz = useRef9(null);
+  const lista = useRef9(null);
+  useEffect8(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -2658,21 +3321,21 @@ function BuscadorCliente({
     document.addEventListener("click", cerrarFuera);
     return () => document.removeEventListener("click", cerrarFuera);
   }, []);
-  useEffect6(() => {
+  useEffect8(() => {
     if (!selectedId) return;
     const elegido = (Array.isArray(clientes) ? clientes : []).find((cliente) => cliente.id === selectedId);
     if (elegido) setQuery(elegido.name || elegido.nombre || "");
   }, [selectedId, clientes]);
   const termino = query.trim();
-  const coincidencias = useMemo4(() => filtrarClientes(clientes, termino, { limite: MAX_RESULTADOS2 }), [clientes, termino]);
-  const exacto = useMemo4(
+  const coincidencias = useMemo7(() => filtrarClientes(clientes, termino, { limite: MAX_RESULTADOS2 }), [clientes, termino]);
+  const exacto = useMemo7(
     () => (Array.isArray(clientes) ? clientes : []).some((cliente) => String(cliente?.name || cliente?.nombre || "").trim().toLowerCase() === termino.toLowerCase()),
     [clientes, termino]
   );
   const puedeCrear = Boolean(termino.length >= 2 && onCreate && !exacto);
   const opciones = puedeCrear ? [...coincidencias, { crear: termino }] : coincidencias;
   const listaVisible = abierto && !disabled && (opciones.length > 0 || Boolean(termino));
-  useEffect6(() => {
+  useEffect8(() => {
     if (!listaVisible) return;
     lista.current?.querySelector(`#${CSS.escape(`${listaId}-${resaltado}`)}`)?.scrollIntoView({ block: "nearest" });
   }, [listaVisible, resaltado, listaId]);
@@ -2724,8 +3387,8 @@ function BuscadorCliente({
       elegir(opciones[resaltado]);
     }
   }
-  return /* @__PURE__ */ jsxs16("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx23(
+  return /* @__PURE__ */ jsxs17("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx24(
       Input,
       {
         id,
@@ -2751,7 +3414,7 @@ function BuscadorCliente({
         ...inputProps
       }
     ),
-    listaVisible && /* @__PURE__ */ jsxs16(
+    listaVisible && /* @__PURE__ */ jsxs17(
       "ul",
       {
         id: listaId,
@@ -2764,7 +3427,7 @@ function BuscadorCliente({
             const creandoOpcion = Boolean(opcion.crear);
             const motivos = creandoOpcion ? [] : typeof detectarDuplicado === "function" ? detectarDuplicado(opcion) : null;
             const listaMotivos = Array.isArray(motivos) ? motivos : motivos ? ["datos coincidentes"] : [];
-            return /* @__PURE__ */ jsx23(
+            return /* @__PURE__ */ jsx24(
               "li",
               {
                 id: `${listaId}-${indice}`,
@@ -2777,31 +3440,31 @@ function BuscadorCliente({
                   "flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm transition",
                   indice === resaltado ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
                 ),
-                children: creandoOpcion ? /* @__PURE__ */ jsxs16(Fragment4, { children: [
-                  /* @__PURE__ */ jsx23(Icon, { name: "plus", className: "h-4 w-4 shrink-0 text-fono-light" }),
-                  /* @__PURE__ */ jsx23("span", { className: "min-w-0 flex-1 truncate", children: creando ? textoCreando : `${textoCrear} \xAB${opcion.crear}\xBB` })
-                ] }) : /* @__PURE__ */ jsx23(Fragment4, { children: /* @__PURE__ */ jsxs16("span", { className: "min-w-0 flex-1", children: [
-                  /* @__PURE__ */ jsxs16("span", { className: "flex min-w-0 items-center gap-2", children: [
-                    /* @__PURE__ */ jsx23("span", { className: "block min-w-0 truncate font-medium text-fore", children: opcion.name || opcion.nombre || "Sin nombre" }),
-                    listaMotivos.length > 0 ? /* @__PURE__ */ jsxs16(
+                children: creandoOpcion ? /* @__PURE__ */ jsxs17(Fragment4, { children: [
+                  /* @__PURE__ */ jsx24(Icon, { name: "plus", className: "h-4 w-4 shrink-0 text-fono-light" }),
+                  /* @__PURE__ */ jsx24("span", { className: "min-w-0 flex-1 truncate", children: creando ? textoCreando : `${textoCrear} \xAB${opcion.crear}\xBB` })
+                ] }) : /* @__PURE__ */ jsx24(Fragment4, { children: /* @__PURE__ */ jsxs17("span", { className: "min-w-0 flex-1", children: [
+                  /* @__PURE__ */ jsxs17("span", { className: "flex min-w-0 items-center gap-2", children: [
+                    /* @__PURE__ */ jsx24("span", { className: "block min-w-0 truncate font-medium text-fore", children: opcion.name || opcion.nombre || "Sin nombre" }),
+                    listaMotivos.length > 0 ? /* @__PURE__ */ jsxs17(
                       "span",
                       {
                         className: "inline-flex shrink-0 items-center gap-1 rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] font-bold text-warn-text",
                         title: `Coincide en ${listaMotivos.join(", ")}`,
                         children: [
-                          /* @__PURE__ */ jsx23(Icon, { name: "alert", className: "h-3 w-3" }),
+                          /* @__PURE__ */ jsx24(Icon, { name: "alert", className: "h-3 w-3" }),
                           textoDuplicado
                         ]
                       }
                     ) : null
                   ] }),
-                  detalleCliente(opcion) ? /* @__PURE__ */ jsx23("span", { className: "block truncate text-xs text-mute", children: detalleCliente(opcion) }) : null
+                  detalleCliente(opcion) ? /* @__PURE__ */ jsx24("span", { className: "block truncate text-xs text-mute", children: detalleCliente(opcion) }) : null
                 ] }) })
               },
               creandoOpcion ? `crear-${opcion.crear}` : opcion.id
             );
           }),
-          !opciones.length && termino ? /* @__PURE__ */ jsx23("li", { className: "px-2.5 py-2 text-sm text-mute", children: vacio }) : null
+          !opciones.length && termino ? /* @__PURE__ */ jsx24("li", { className: "px-2.5 py-2 text-sm text-mute", children: vacio }) : null
         ]
       }
     )
@@ -2809,10 +3472,10 @@ function BuscadorCliente({
 }
 
 // src/components/BuscadorPersonas.jsx
-import { useEffect as useEffect8, useId as useId6, useMemo as useMemo5, useRef as useRef8, useState as useState9 } from "react";
+import { useEffect as useEffect10, useId as useId8, useMemo as useMemo8, useRef as useRef10, useState as useState11 } from "react";
 
 // src/components/Avatar.jsx
-import { useEffect as useEffect7, useState as useState8 } from "react";
+import { useEffect as useEffect9, useState as useState10 } from "react";
 
 // src/utils/avatar.js
 var COLORES_AVATAR = {
@@ -2852,7 +3515,7 @@ function colorDeNombre(nombre) {
 }
 
 // src/components/Avatar.jsx
-import { jsx as jsx24, jsxs as jsxs17 } from "react/jsx-runtime";
+import { jsx as jsx25, jsxs as jsxs18 } from "react/jsx-runtime";
 var TAMANOS_AVATAR = {
   xs: "h-5 w-5 text-[9px]",
   sm: "h-7 w-7 text-[10px]",
@@ -2872,10 +3535,10 @@ function Avatar({
   onError,
   className
 }) {
-  const [cargada, setCargada] = useState8("");
-  const [fallo, setFallo] = useState8("");
+  const [cargada, setCargada] = useState10("");
+  const [fallo, setFallo] = useState10("");
   const url = String(src || "");
-  useEffect7(() => {
+  useEffect9(() => {
     setCargada("");
     setFallo("");
   }, [url]);
@@ -2884,7 +3547,7 @@ function Avatar({
   const etiqueta = ariaLabel || title || String(nombre ?? "").trim() || "Identidad";
   const conImagen = Boolean(url) && fallo !== url;
   const visible = conImagen && cargada === url;
-  return /* @__PURE__ */ jsxs17(
+  return /* @__PURE__ */ jsxs18(
     "span",
     {
       role: decorativo ? void 0 : "img",
@@ -2899,8 +3562,8 @@ function Avatar({
         className
       ),
       children: [
-        visible ? null : /* @__PURE__ */ jsx24("span", { "aria-hidden": "true", children: inicialesDeNombre(nombre) }),
-        conImagen ? /* @__PURE__ */ jsx24(
+        visible ? null : /* @__PURE__ */ jsx25("span", { "aria-hidden": "true", children: inicialesDeNombre(nombre) }),
+        conImagen ? /* @__PURE__ */ jsx25(
           "img",
           {
             src: url,
@@ -2977,7 +3640,7 @@ function registrarUsoPersona(clave, id, almacen = globalThis?.localStorage, ahor
 }
 
 // src/components/BuscadorPersonas.jsx
-import { jsx as jsx25, jsxs as jsxs18 } from "react/jsx-runtime";
+import { jsx as jsx26, jsxs as jsxs19 } from "react/jsx-runtime";
 function BuscadorPersonas({
   personas = [],
   valor = "",
@@ -3001,15 +3664,15 @@ function BuscadorPersonas({
   id,
   className
 }) {
-  const [query, setQuery] = useState9("");
-  const [resaltado, setResaltado] = useState9(0);
-  const [uso, setUso] = useState9(() => leerUsoPersonas(claveUso));
-  const listaId = useId6();
-  const lista = useRef8(null);
-  const raiz = useRef8(null);
-  const [abierto, setAbierto] = useState9(false);
-  const [editando, setEditando] = useState9(false);
-  const opciones = useMemo5(() => {
+  const [query, setQuery] = useState11("");
+  const [resaltado, setResaltado] = useState11(0);
+  const [uso, setUso] = useState11(() => leerUsoPersonas(claveUso));
+  const listaId = useId8();
+  const lista = useRef10(null);
+  const raiz = useRef10(null);
+  const [abierto, setAbierto] = useState11(false);
+  const [editando, setEditando] = useState11(false);
+  const opciones = useMemo8(() => {
     const fijas = (Array.isArray(opcionesFijas) ? opcionesFijas : []).map((opcion) => ({ ...opcion, fija: true }));
     const vacia = opcionVacia ? [{ id: "__vacia__", vacia: true, nombre: opcionVacia, icono: "user" }] : [];
     const filtradas = ordenarPersonas(filtrarPersonas(personas, query), uso);
@@ -3017,7 +3680,7 @@ function BuscadorPersonas({
     return [...fijas, ...vacia, ...limite];
   }, [personas, opcionesFijas, opcionVacia, query, uso, maxResultados]);
   const listaVisible = (!desplegable || abierto) && (opciones.length > 0 || Boolean(query));
-  useEffect8(() => {
+  useEffect10(() => {
     if (!desplegable || !abierto) return;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
@@ -3034,7 +3697,7 @@ function BuscadorPersonas({
       document.removeEventListener("keydown", cerrarEscape);
     };
   }, [desplegable, abierto]);
-  const etiquetaSeleccion = useMemo5(() => {
+  const etiquetaSeleccion = useMemo8(() => {
     const fijas = Array.isArray(opcionesFijas) ? opcionesFijas : [];
     const fija = fijas.find(
       (opcion) => opcion.valor !== void 0 ? opcion.valor === valor : opcion.id === valor
@@ -3094,8 +3757,8 @@ function BuscadorPersonas({
     return opcion.id === valor;
   }
   const limpiarVisible = Boolean(opcionVacia) && valor !== "" && valor != null && !disabled;
-  return /* @__PURE__ */ jsxs18("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx25(
+  return /* @__PURE__ */ jsxs19("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx26(
       Input,
       {
         id,
@@ -3137,7 +3800,7 @@ function BuscadorPersonas({
         className: limpiarVisible ? "pr-9" : void 0
       }
     ),
-    limpiarVisible ? /* @__PURE__ */ jsx25(
+    limpiarVisible ? /* @__PURE__ */ jsx26(
       "button",
       {
         type: "button",
@@ -3151,10 +3814,10 @@ function BuscadorPersonas({
           setAbierto(false);
         },
         className: "absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-mute transition hover:bg-ink-700 hover:text-fore",
-        children: /* @__PURE__ */ jsx25(Icon, { name: "close", className: "h-3.5 w-3.5", "aria-hidden": true })
+        children: /* @__PURE__ */ jsx26(Icon, { name: "close", className: "h-3.5 w-3.5", "aria-hidden": true })
       }
     ) : null,
-    listaVisible ? /* @__PURE__ */ jsxs18(
+    listaVisible ? /* @__PURE__ */ jsxs19(
       "ul",
       {
         id: listaId,
@@ -3169,7 +3832,7 @@ function BuscadorPersonas({
           opciones.map((opcion, indice) => {
             const elegida = esElegida(opcion);
             const inactiva = !opcion.fija && !opcion.vacia && opcion.activo === false;
-            return /* @__PURE__ */ jsxs18(
+            return /* @__PURE__ */ jsxs19(
               "li",
               {
                 id: `${listaId}-${indice}`,
@@ -3183,19 +3846,19 @@ function BuscadorPersonas({
                   indice === resaltado ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
                 ),
                 children: [
-                  opcion.fija ? /* @__PURE__ */ jsx25(Icon, { name: opcion.icono ?? "user", className: "h-4 w-4 shrink-0 text-mute", "aria-hidden": true }) : /* @__PURE__ */ jsx25(Avatar, { nombre: opcion.nombre ?? "", src: opcion.fotoUrl, tamano: "sm", decorativo: true }),
-                  /* @__PURE__ */ jsxs18("span", { className: "min-w-0 flex-1", children: [
-                    /* @__PURE__ */ jsx25("span", { className: "block truncate font-medium text-fore", children: opcion.nombre }),
-                    opcion.rol || opcion.detalle ? /* @__PURE__ */ jsx25("span", { className: "block truncate text-xs text-mute", children: opcion.rol ?? opcion.detalle }) : null
+                  opcion.fija ? /* @__PURE__ */ jsx26(Icon, { name: opcion.icono ?? "user", className: "h-4 w-4 shrink-0 text-mute", "aria-hidden": true }) : /* @__PURE__ */ jsx26(Avatar, { nombre: opcion.nombre ?? "", src: opcion.fotoUrl, tamano: "sm", decorativo: true }),
+                  /* @__PURE__ */ jsxs19("span", { className: "min-w-0 flex-1", children: [
+                    /* @__PURE__ */ jsx26("span", { className: "block truncate font-medium text-fore", children: opcion.nombre }),
+                    opcion.rol || opcion.detalle ? /* @__PURE__ */ jsx26("span", { className: "block truncate text-xs text-mute", children: opcion.rol ?? opcion.detalle }) : null
                   ] }),
-                  inactiva ? /* @__PURE__ */ jsx25("span", { className: "shrink-0 rounded border border-ink-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mute", children: "Inactiva" }) : null,
-                  elegida ? /* @__PURE__ */ jsx25(Icon, { name: "check", className: "h-4 w-4 shrink-0 text-ok-text", "aria-hidden": true }) : null
+                  inactiva ? /* @__PURE__ */ jsx26("span", { className: "shrink-0 rounded border border-ink-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mute", children: "Inactiva" }) : null,
+                  elegida ? /* @__PURE__ */ jsx26(Icon, { name: "check", className: "h-4 w-4 shrink-0 text-ok-text", "aria-hidden": true }) : null
                 ]
               },
               opcion.fija || opcion.vacia ? `fija-${opcion.id ?? opcion.valor ?? opcion.nombre}` : opcion.id
             );
           }),
-          !opciones.length && query ? /* @__PURE__ */ jsx25("li", { className: "px-2.5 py-2 text-sm text-mute", children: vacio }) : null
+          !opciones.length && query ? /* @__PURE__ */ jsx26("li", { className: "px-2.5 py-2 text-sm text-mute", children: vacio }) : null
         ]
       }
     ) : null
@@ -3203,8 +3866,8 @@ function BuscadorPersonas({
 }
 
 // src/components/PreviewFusion.jsx
-import { useId as useId7 } from "react";
-import { jsx as jsx26, jsxs as jsxs19 } from "react/jsx-runtime";
+import { useId as useId9 } from "react";
+import { jsx as jsx27, jsxs as jsxs20 } from "react/jsx-runtime";
 function PreviewFusion({
   entidades = [],
   principalId,
@@ -3218,11 +3881,11 @@ function PreviewFusion({
   className
 }) {
   const lista = (Array.isArray(entidades) ? entidades : []).slice(0, 2);
-  const grupo = useId7();
-  return /* @__PURE__ */ jsxs19("div", { className: cn("space-y-3", className), "data-testid": testId, children: [
-    /* @__PURE__ */ jsx26("div", { className: "grid gap-2 sm:grid-cols-2", children: lista.map((entidad) => {
+  const grupo = useId9();
+  return /* @__PURE__ */ jsxs20("div", { className: cn("space-y-3", className), "data-testid": testId, children: [
+    /* @__PURE__ */ jsx27("div", { className: "grid gap-2 sm:grid-cols-2", children: lista.map((entidad) => {
       const principal = entidad.id === principalId;
-      return /* @__PURE__ */ jsxs19(
+      return /* @__PURE__ */ jsxs20(
         "label",
         {
           className: cn(
@@ -3230,12 +3893,12 @@ function PreviewFusion({
             principal ? "border-fono/50 bg-fono/5" : "border-ink-600 hover:border-fono/40"
           ),
           children: [
-            /* @__PURE__ */ jsxs19("span", { className: "flex items-start justify-between gap-2", children: [
-              /* @__PURE__ */ jsxs19("span", { className: "min-w-0", children: [
-                /* @__PURE__ */ jsx26("span", { className: "block truncate font-semibold", children: entidad.titulo || "Sin nombre" }),
-                entidad.subtitulo ? /* @__PURE__ */ jsx26("span", { className: "block truncate text-xs text-mute", children: entidad.subtitulo }) : null
+            /* @__PURE__ */ jsxs20("span", { className: "flex items-start justify-between gap-2", children: [
+              /* @__PURE__ */ jsxs20("span", { className: "min-w-0", children: [
+                /* @__PURE__ */ jsx27("span", { className: "block truncate font-semibold", children: entidad.titulo || "Sin nombre" }),
+                entidad.subtitulo ? /* @__PURE__ */ jsx27("span", { className: "block truncate text-xs text-mute", children: entidad.subtitulo }) : null
               ] }),
-              /* @__PURE__ */ jsx26(
+              /* @__PURE__ */ jsx27(
                 "input",
                 {
                   type: "radio",
@@ -3247,39 +3910,39 @@ function PreviewFusion({
                 }
               )
             ] }),
-            principal ? /* @__PURE__ */ jsxs19("span", { className: "inline-flex items-center gap-1 text-[11px] font-semibold text-fono-light", children: [
-              /* @__PURE__ */ jsx26(Icon, { name: "check", className: "h-3.5 w-3.5" }),
+            principal ? /* @__PURE__ */ jsxs20("span", { className: "inline-flex items-center gap-1 text-[11px] font-semibold text-fono-light", children: [
+              /* @__PURE__ */ jsx27(Icon, { name: "check", className: "h-3.5 w-3.5" }),
               textoPrincipal
             ] }) : null,
-            Array.isArray(entidad.datos) && entidad.datos.length > 0 ? /* @__PURE__ */ jsx26("dl", { className: "space-y-0.5", children: entidad.datos.map((dato, indice) => /* @__PURE__ */ jsxs19("div", { className: "flex items-baseline justify-between gap-2 text-xs", children: [
-              /* @__PURE__ */ jsx26("dt", { className: "shrink-0 text-mute", children: dato.etiqueta }),
-              /* @__PURE__ */ jsx26("dd", { className: "min-w-0 truncate text-right", children: dato.valor ?? "\u2014" })
+            Array.isArray(entidad.datos) && entidad.datos.length > 0 ? /* @__PURE__ */ jsx27("dl", { className: "space-y-0.5", children: entidad.datos.map((dato, indice) => /* @__PURE__ */ jsxs20("div", { className: "flex items-baseline justify-between gap-2 text-xs", children: [
+              /* @__PURE__ */ jsx27("dt", { className: "shrink-0 text-mute", children: dato.etiqueta }),
+              /* @__PURE__ */ jsx27("dd", { className: "min-w-0 truncate text-right", children: dato.valor ?? "\u2014" })
             ] }, `${dato.etiqueta}-${indice}`)) }) : null
           ]
         },
         entidad.id
       );
     }) }),
-    Array.isArray(categorias) && categorias.length > 0 ? /* @__PURE__ */ jsxs19("section", { className: "rounded-xl border border-ink-600 bg-ink-800/40 p-3", children: [
-      /* @__PURE__ */ jsx26("p", { className: "text-[10px] font-bold uppercase tracking-wider text-mute", children: tituloCategorias }),
-      /* @__PURE__ */ jsx26("ul", { className: "mt-2 grid gap-1.5 sm:grid-cols-2", children: categorias.map((categoria) => {
+    Array.isArray(categorias) && categorias.length > 0 ? /* @__PURE__ */ jsxs20("section", { className: "rounded-xl border border-ink-600 bg-ink-800/40 p-3", children: [
+      /* @__PURE__ */ jsx27("p", { className: "text-[10px] font-bold uppercase tracking-wider text-mute", children: tituloCategorias }),
+      /* @__PURE__ */ jsx27("ul", { className: "mt-2 grid gap-1.5 sm:grid-cols-2", children: categorias.map((categoria) => {
         const cantidad = Math.max(0, Number(categoria?.cantidad) || 0);
-        return /* @__PURE__ */ jsxs19("li", { className: "flex items-center gap-2 text-sm", children: [
-          /* @__PURE__ */ jsx26(
+        return /* @__PURE__ */ jsxs20("li", { className: "flex items-center gap-2 text-sm", children: [
+          /* @__PURE__ */ jsx27(
             Icon,
             {
               name: cantidad > 0 ? "check" : "close",
               className: cn("h-4 w-4 shrink-0", cantidad > 0 ? "text-ok-text" : "text-mute")
             }
           ),
-          /* @__PURE__ */ jsx26("span", { className: cn("min-w-0 flex-1 truncate", cantidad > 0 ? "text-fore" : "text-mute"), children: categoria.etiqueta }),
-          categoria.detalle ? /* @__PURE__ */ jsx26("span", { className: "min-w-0 truncate text-xs text-mute", children: categoria.detalle }) : null,
-          /* @__PURE__ */ jsx26("span", { className: cn("shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums", cantidad > 0 ? "bg-ink-700 text-fore" : "bg-ink-700/50 text-mute"), children: cantidad })
+          /* @__PURE__ */ jsx27("span", { className: cn("min-w-0 flex-1 truncate", cantidad > 0 ? "text-fore" : "text-mute"), children: categoria.etiqueta }),
+          categoria.detalle ? /* @__PURE__ */ jsx27("span", { className: "min-w-0 truncate text-xs text-mute", children: categoria.detalle }) : null,
+          /* @__PURE__ */ jsx27("span", { className: cn("shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums", cantidad > 0 ? "bg-ink-700 text-fore" : "bg-ink-700/50 text-mute"), children: cantidad })
         ] }, categoria.id);
       }) })
     ] }) : null,
-    nota ? /* @__PURE__ */ jsx26("p", { className: "text-xs text-mute", children: nota }) : null,
-    acciones ? /* @__PURE__ */ jsx26("div", { className: "flex flex-wrap items-center justify-end gap-2", children: acciones }) : null
+    nota ? /* @__PURE__ */ jsx27("p", { className: "text-xs text-mute", children: nota }) : null,
+    acciones ? /* @__PURE__ */ jsx27("div", { className: "flex flex-wrap items-center justify-end gap-2", children: acciones }) : null
   ] });
 }
 
@@ -3399,7 +4062,7 @@ function tonoVencimiento(fecha, { hoy, diasAviso = 7 } = {}) {
 }
 
 // src/components/ChipFusion.jsx
-import { jsx as jsx27, jsxs as jsxs20 } from "react/jsx-runtime";
+import { jsx as jsx28, jsxs as jsxs21 } from "react/jsx-runtime";
 function ChipFusion({
   principal,
   fusionadoEl,
@@ -3413,21 +4076,21 @@ function ChipFusion({
   if (!principal) return null;
   const nombre = typeof principal === "string" ? principal : principal.name || principal.nombre || "la ficha principal";
   const fecha = fusionadoEl ? fechaCorta(fusionadoEl, "") : "";
-  return /* @__PURE__ */ jsxs20(
+  return /* @__PURE__ */ jsxs21(
     "span",
     {
       "data-testid": testId,
       className: cn("inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xl border border-info/30 bg-info/10 px-3 py-1.5 text-xs text-info-text", className),
       children: [
-        /* @__PURE__ */ jsx27(Icon, { name: "refresh", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsxs20("span", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsx28(Icon, { name: "refresh", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsxs21("span", { className: "min-w-0", children: [
           texto,
           " ",
-          /* @__PURE__ */ jsx27("b", { className: "text-fore", children: nombre }),
+          /* @__PURE__ */ jsx28("b", { className: "text-fore", children: nombre }),
           fecha ? ` \xB7 ${fecha}` : "",
           por ? ` \xB7 ${por}` : ""
         ] }),
-        onAbrirPrincipal ? /* @__PURE__ */ jsx27("button", { type: "button", onClick: onAbrirPrincipal, className: "shrink-0 font-semibold underline-offset-2 hover:underline", children: textoAbrir }) : null
+        onAbrirPrincipal ? /* @__PURE__ */ jsx28("button", { type: "button", onClick: onAbrirPrincipal, className: "shrink-0 font-semibold underline-offset-2 hover:underline", children: textoAbrir }) : null
       ]
     }
   );
@@ -3465,8 +4128,8 @@ function hayFusion(categorias = []) {
 }
 
 // src/components/ConfirmarConPalabra.jsx
-import { useEffect as useEffect9, useId as useId8, useState as useState10 } from "react";
-import { jsx as jsx28, jsxs as jsxs21 } from "react/jsx-runtime";
+import { useEffect as useEffect11, useId as useId10, useState as useState12 } from "react";
+import { jsx as jsx29, jsxs as jsxs22 } from "react/jsx-runtime";
 function ConfirmarConPalabra({
   titulo: titulo2 = "Confirmar unificaci\xF3n",
   resumen,
@@ -3481,13 +4144,13 @@ function ConfirmarConPalabra({
   testId = "confirmar-palabra",
   className
 }) {
-  const [texto, setTexto] = useState10("");
-  const campoId = useId8();
-  useEffect9(() => {
+  const [texto, setTexto] = useState12("");
+  const campoId = useId10();
+  useEffect11(() => {
     setTexto("");
   }, [palabra]);
   const listo = texto.trim().toUpperCase() === String(palabra).toUpperCase();
-  return /* @__PURE__ */ jsxs21(
+  return /* @__PURE__ */ jsxs22(
     "form",
     {
       onSubmit: (event) => {
@@ -3497,18 +4160,18 @@ function ConfirmarConPalabra({
       className: cn("space-y-3", className),
       "data-testid": testId,
       children: [
-        /* @__PURE__ */ jsxs21("div", { className: "rounded-xl border border-bad/30 bg-bad/5 p-3", children: [
-          /* @__PURE__ */ jsx28("p", { className: "text-sm font-semibold text-bad-text", children: titulo2 }),
-          resumen ? /* @__PURE__ */ jsx28("div", { className: "mt-1 text-sm", children: resumen }) : null,
-          /* @__PURE__ */ jsx28("p", { className: "mt-1 text-xs text-mute", children: advertencia })
+        /* @__PURE__ */ jsxs22("div", { className: "rounded-xl border border-bad/30 bg-bad/5 p-3", children: [
+          /* @__PURE__ */ jsx29("p", { className: "text-sm font-semibold text-bad-text", children: titulo2 }),
+          resumen ? /* @__PURE__ */ jsx29("div", { className: "mt-1 text-sm", children: resumen }) : null,
+          /* @__PURE__ */ jsx29("p", { className: "mt-1 text-xs text-mute", children: advertencia })
         ] }),
-        /* @__PURE__ */ jsxs21("div", { children: [
-          /* @__PURE__ */ jsxs21(Label, { htmlFor: campoId, children: [
+        /* @__PURE__ */ jsxs22("div", { children: [
+          /* @__PURE__ */ jsxs22(Label, { htmlFor: campoId, children: [
             "Escrib\xED ",
-            /* @__PURE__ */ jsx28("b", { children: palabra }),
+            /* @__PURE__ */ jsx29("b", { children: palabra }),
             " para confirmar"
           ] }),
-          /* @__PURE__ */ jsx28(
+          /* @__PURE__ */ jsx29(
             Input,
             {
               id: campoId,
@@ -3520,10 +4183,10 @@ function ConfirmarConPalabra({
             }
           )
         ] }),
-        error ? /* @__PURE__ */ jsx28(Aviso, { tono: "error", compact: true, children: error }) : null,
-        /* @__PURE__ */ jsxs21("div", { className: "flex flex-wrap justify-end gap-2", children: [
-          onCancelar ? /* @__PURE__ */ jsx28(Button, { type: "button", variant: "ghost", onClick: onCancelar, disabled: busy, children: "Cancelar" }) : null,
-          /* @__PURE__ */ jsx28(Button, { type: "submit", variant: "danger", disabled: !listo || busy, "data-testid": `${testId}-confirmar`, children: busy ? textoOcupado : confirmLabel })
+        error ? /* @__PURE__ */ jsx29(Aviso, { tono: "error", compact: true, children: error }) : null,
+        /* @__PURE__ */ jsxs22("div", { className: "flex flex-wrap justify-end gap-2", children: [
+          onCancelar ? /* @__PURE__ */ jsx29(Button, { type: "button", variant: "ghost", onClick: onCancelar, disabled: busy, children: "Cancelar" }) : null,
+          /* @__PURE__ */ jsx29(Button, { type: "submit", variant: "danger", disabled: !listo || busy, "data-testid": `${testId}-confirmar`, children: busy ? textoOcupado : confirmLabel })
         ] })
       ]
     }
@@ -3531,7 +4194,7 @@ function ConfirmarConPalabra({
 }
 
 // src/components/SelectorCuentaCobro.jsx
-import { useEffect as useEffect10, useId as useId9, useMemo as useMemo6, useRef as useRef9, useState as useState11 } from "react";
+import { useEffect as useEffect12, useId as useId11, useMemo as useMemo9, useRef as useRef11, useState as useState13 } from "react";
 
 // src/utils/cuentaCobro.js
 var MEDIOS_CUENTA = {
@@ -3592,7 +4255,7 @@ function detalleCuentaCobro(cuenta) {
 }
 
 // src/components/TarjetaCuentaCobro.jsx
-import { jsx as jsx29, jsxs as jsxs22 } from "react/jsx-runtime";
+import { jsx as jsx30, jsxs as jsxs23 } from "react/jsx-runtime";
 var normalizar3 = (valor) => String(valor ?? "").trim().toLowerCase();
 function TarjetaCuentaCobro({
   cuenta,
@@ -3615,26 +4278,26 @@ function TarjetaCuentaCobro({
   const pendiente = Math.max(0, Number(saldoPendientePyg) || 0);
   const cotizacion = Number(cotizacionPyg) || 0;
   const equivalente = cuenta.currency !== "PYG" && cotizacion > 0 ? pendiente / cotizacion : null;
-  return /* @__PURE__ */ jsxs22(
+  return /* @__PURE__ */ jsxs23(
     "div",
     {
       "data-testid": testId,
       className: cn("flex items-start gap-3 rounded-xl border border-fono/25 bg-fono/5 p-3", className),
       children: [
-        /* @__PURE__ */ jsx29("span", { className: "mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-ink-600 bg-ink-800", children: logo || /* @__PURE__ */ jsx29(Icon, { name: iconoMedioCuenta(cuenta.kind), className: "h-4 w-4 text-fono-light" }) }),
-        /* @__PURE__ */ jsxs22("div", { className: "min-w-0 flex-1 space-y-1", children: [
-          /* @__PURE__ */ jsxs22("div", { className: "flex flex-wrap items-center gap-x-2 gap-y-1", children: [
-            /* @__PURE__ */ jsx29("b", { className: "min-w-0 truncate text-sm text-fore", "data-testid": `${testId}-nombre`, children: cuenta.name }),
-            /* @__PURE__ */ jsx29("span", { className: "rounded border border-ink-500 px-1.5 py-0.5 text-[10px] font-bold text-mute", children: moneda }),
-            /* @__PURE__ */ jsx29("span", { className: "text-[11px] font-semibold text-mute", children: medio })
+        /* @__PURE__ */ jsx30("span", { className: "mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-ink-600 bg-ink-800", children: logo || /* @__PURE__ */ jsx30(Icon, { name: iconoMedioCuenta(cuenta.kind), className: "h-4 w-4 text-fono-light" }) }),
+        /* @__PURE__ */ jsxs23("div", { className: "min-w-0 flex-1 space-y-1", children: [
+          /* @__PURE__ */ jsxs23("div", { className: "flex flex-wrap items-center gap-x-2 gap-y-1", children: [
+            /* @__PURE__ */ jsx30("b", { className: "min-w-0 truncate text-sm text-fore", "data-testid": `${testId}-nombre`, children: cuenta.name }),
+            /* @__PURE__ */ jsx30("span", { className: "rounded border border-ink-500 px-1.5 py-0.5 text-[10px] font-bold text-mute", children: moneda }),
+            /* @__PURE__ */ jsx30("span", { className: "text-[11px] font-semibold text-mute", children: medio })
           ] }),
-          mostrarBanco ? /* @__PURE__ */ jsx29("p", { className: "truncate text-xs text-mute", children: banco }) : null,
-          detalleTexto ? /* @__PURE__ */ jsx29("p", { className: "truncate text-xs text-mute", "data-testid": `${testId}-detalle`, children: detalleTexto }) : null,
-          pendiente > 0 ? /* @__PURE__ */ jsxs22("p", { className: "text-xs text-mute", "data-testid": `${testId}-saldo`, children: [
+          mostrarBanco ? /* @__PURE__ */ jsx30("p", { className: "truncate text-xs text-mute", children: banco }) : null,
+          detalleTexto ? /* @__PURE__ */ jsx30("p", { className: "truncate text-xs text-mute", "data-testid": `${testId}-detalle`, children: detalleTexto }) : null,
+          pendiente > 0 ? /* @__PURE__ */ jsxs23("p", { className: "text-xs text-mute", "data-testid": `${testId}-saldo`, children: [
             "Saldo pendiente de esta venta:",
             " ",
-            /* @__PURE__ */ jsx29("b", { className: "tabular-nums text-warn-text", children: formatGs(pendiente) }),
-            equivalente !== null ? /* @__PURE__ */ jsxs22("span", { children: [
+            /* @__PURE__ */ jsx30("b", { className: "tabular-nums text-warn-text", children: formatGs(pendiente) }),
+            equivalente !== null ? /* @__PURE__ */ jsxs23("span", { children: [
               " \xB7 ",
               moneda,
               " ",
@@ -3642,9 +4305,9 @@ function TarjetaCuentaCobro({
             ] }) : null
           ] }) : null
         ] }),
-        /* @__PURE__ */ jsxs22("span", { className: "flex shrink-0 flex-wrap items-center gap-2", children: [
+        /* @__PURE__ */ jsxs23("span", { className: "flex shrink-0 flex-wrap items-center gap-2", children: [
           acciones,
-          onCambiar ? /* @__PURE__ */ jsx29(Button, { type: "button", variant: "ghost", onClick: onCambiar, "data-testid": `${testId}-cambiar`, children: textoCambiar }) : null
+          onCambiar ? /* @__PURE__ */ jsx30(Button, { type: "button", variant: "ghost", onClick: onCambiar, "data-testid": `${testId}-cambiar`, children: textoCambiar }) : null
         ] })
       ]
     }
@@ -3669,7 +4332,7 @@ function ventanaDeLista({ total = 0, scrollTop = 0, altoVista = 0, altoFila = 0,
 }
 
 // src/components/SelectorCuentaCobro.jsx
-import { jsx as jsx30, jsxs as jsxs23 } from "react/jsx-runtime";
+import { jsx as jsx31, jsxs as jsxs24 } from "react/jsx-runtime";
 var ALTO_OPCION = 48;
 var ALTO_VISTA = 224;
 var MARGEN = 2;
@@ -3695,27 +4358,27 @@ function SelectorCuentaCobro({
   testId = "cuenta-cobro",
   className
 }) {
-  const [eligiendo, setEligiendo] = useState11(!cuentaId);
-  const [consulta, setConsulta] = useState11("");
-  const [resaltado, setResaltado] = useState11(0);
-  const [scrollTop, setScrollTop] = useState11(0);
-  const [altoVista, setAltoVista] = useState11(ALTO_VISTA);
-  const [altoOpcion, setAltoOpcion] = useState11(ALTO_OPCION);
-  const listaId = useId9();
-  const raiz = useRef9(null);
-  const lista = useRef9(null);
-  const seleccionada = useMemo6(
+  const [eligiendo, setEligiendo] = useState13(!cuentaId);
+  const [consulta, setConsulta] = useState13("");
+  const [resaltado, setResaltado] = useState13(0);
+  const [scrollTop, setScrollTop] = useState13(0);
+  const [altoVista, setAltoVista] = useState13(ALTO_VISTA);
+  const [altoOpcion, setAltoOpcion] = useState13(ALTO_OPCION);
+  const listaId = useId11();
+  const raiz = useRef11(null);
+  const lista = useRef11(null);
+  const seleccionada = useMemo9(
     () => (Array.isArray(cuentas) ? cuentas : []).find((cuenta) => cuenta.id === cuentaId) || null,
     [cuentas, cuentaId]
   );
   const idSeleccionado = seleccionada?.id || "";
-  useEffect10(() => {
+  useEffect12(() => {
     setEligiendo(!idSeleccionado);
     setConsulta("");
     setScrollTop(0);
   }, [idSeleccionado]);
-  const sugeridaRef = useRef9("");
-  useEffect10(() => {
+  const sugeridaRef = useRef11("");
+  useEffect12(() => {
     if (!preseleccionar) return;
     if (idSeleccionado) {
       sugeridaRef.current = "";
@@ -3726,7 +4389,7 @@ function SelectorCuentaCobro({
     sugeridaRef.current = sugerida.id;
     onSelect?.(sugerida);
   }, [preseleccionar, idSeleccionado, cuentas, ultimoUsadoId, predeterminadaId, incluirInactivas, onSelect]);
-  useEffect10(() => {
+  useEffect12(() => {
     if (!eligiendo) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
@@ -3737,24 +4400,24 @@ function SelectorCuentaCobro({
     document.addEventListener("click", cerrarFuera);
     return () => document.removeEventListener("click", cerrarFuera);
   }, [eligiendo, idSeleccionado]);
-  const resultados = useMemo6(
+  const resultados = useMemo9(
     () => filtrarCuentasCobro(cuentas, consulta, { limite, incluirInactivas }),
     [cuentas, consulta, limite, incluirInactivas]
   );
   const listaVisible = eligiendo && !disabled && resultados.length > 0;
-  const ventana = useMemo6(
+  const ventana = useMemo9(
     () => ventanaDeLista({ total: resultados.length, scrollTop, altoVista, altoFila: altoOpcion, margen: MARGEN }),
     [resultados.length, scrollTop, altoVista, altoOpcion]
   );
   const visibles = resultados.slice(ventana.inicio, ventana.fin);
-  useEffect10(() => {
+  useEffect12(() => {
     const nodo = lista.current;
     if (!nodo) return;
     const fila = nodo.querySelector('[role="option"]')?.getBoundingClientRect().height;
     if (fila && Math.round(fila) !== altoOpcion) setAltoOpcion(Math.round(fila));
     if (nodo.clientHeight > 0 && nodo.clientHeight !== altoVista) setAltoVista(nodo.clientHeight);
   }, [listaVisible, consulta, altoOpcion, altoVista]);
-  useEffect10(() => {
+  useEffect12(() => {
     if (!listaVisible) return;
     const nodo = lista.current;
     if (!nodo) return;
@@ -3800,7 +4463,7 @@ function SelectorCuentaCobro({
     }
   }
   if (seleccionada && !eligiendo) {
-    return /* @__PURE__ */ jsx30(
+    return /* @__PURE__ */ jsx31(
       TarjetaCuentaCobro,
       {
         cuenta: seleccionada,
@@ -3818,8 +4481,8 @@ function SelectorCuentaCobro({
       }
     );
   }
-  return /* @__PURE__ */ jsxs23("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx30(
+  return /* @__PURE__ */ jsxs24("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx31(
       Input,
       {
         role: "combobox",
@@ -3838,7 +4501,7 @@ function SelectorCuentaCobro({
         onKeyDown: alTeclear
       }
     ),
-    listaVisible && /* @__PURE__ */ jsx30(
+    listaVisible && /* @__PURE__ */ jsx31(
       "ul",
       {
         ref: lista,
@@ -3855,7 +4518,7 @@ function SelectorCuentaCobro({
           const indice = ventana.inicio + posicion;
           const logoCuenta = typeof logo === "function" ? logo(cuenta) : null;
           const dato = [cuenta.holder, cuenta.accountNumber ? numeroParcialCuenta(cuenta.accountNumber) : null].filter(Boolean).join(" \xB7 ");
-          return /* @__PURE__ */ jsxs23(
+          return /* @__PURE__ */ jsxs24(
             "li",
             {
               id: `${listaId}-${indice}`,
@@ -3871,10 +4534,10 @@ function SelectorCuentaCobro({
                 indice === resaltado ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
               ),
               children: [
-                /* @__PURE__ */ jsx30("span", { className: "grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-ink-600 bg-ink-800", children: logoCuenta || /* @__PURE__ */ jsx30(Icon, { name: iconoMedioCuenta(cuenta.kind), className: "h-3.5 w-3.5 text-fono-light" }) }),
-                /* @__PURE__ */ jsxs23("span", { className: "min-w-0 flex-1", children: [
-                  /* @__PURE__ */ jsx30("span", { className: "block truncate font-medium text-fore", children: cuenta.name }),
-                  /* @__PURE__ */ jsx30("span", { className: "block truncate text-xs text-mute", children: [etiquetaMedioCuenta(cuenta.kind), simboloCuenta(cuenta.currency, cuenta.currencyLabel), dato].filter(Boolean).join(" \xB7 ") })
+                /* @__PURE__ */ jsx31("span", { className: "grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-ink-600 bg-ink-800", children: logoCuenta || /* @__PURE__ */ jsx31(Icon, { name: iconoMedioCuenta(cuenta.kind), className: "h-3.5 w-3.5 text-fono-light" }) }),
+                /* @__PURE__ */ jsxs24("span", { className: "min-w-0 flex-1", children: [
+                  /* @__PURE__ */ jsx31("span", { className: "block truncate font-medium text-fore", children: cuenta.name }),
+                  /* @__PURE__ */ jsx31("span", { className: "block truncate text-xs text-mute", children: [etiquetaMedioCuenta(cuenta.kind), simboloCuenta(cuenta.currency, cuenta.currencyLabel), dato].filter(Boolean).join(" \xB7 ") })
                 ] })
               ]
             },
@@ -3883,7 +4546,7 @@ function SelectorCuentaCobro({
         })
       }
     ),
-    eligiendo && !disabled && !resultados.length && consulta ? /* @__PURE__ */ jsx30("p", { className: "mt-1 text-xs text-mute", children: vacio }) : null
+    eligiendo && !disabled && !resultados.length && consulta ? /* @__PURE__ */ jsx31("p", { className: "mt-1 text-xs text-mute", children: vacio }) : null
   ] });
 }
 
@@ -3932,8 +4595,51 @@ function hayVersionNueva(actual, publicada) {
   return compararVersiones(publicada, actual) > 0;
 }
 
+// src/utils/appIdentity.js
+var VERSION_APP_RE = /^\d+\.\d+\.\d+(?:-rc\.[1-9]\d*)?$/;
+function esVersionApp(version) {
+  return VERSION_APP_RE.test(String(version ?? "").trim());
+}
+function etiquetaVersionApp(version) {
+  const valor = String(version ?? "").trim();
+  if (!esVersionApp(valor)) {
+    throw new TypeError("La versi\xF3n debe usar X.Y.Z o X.Y.Z-rc.N");
+  }
+  return `v${valor}`;
+}
+function textoRequerido(valor, campo) {
+  const texto = String(valor ?? "").trim();
+  if (!texto) throw new TypeError(`${campo} es obligatorio`);
+  return texto;
+}
+function crearIdentidadApp({
+  nombre,
+  version,
+  url = "",
+  logoUrl = "",
+  soporteUrl = "",
+  color = "#047857",
+  credito = "Desarrollado por Owncoding",
+  creditoUrl = "https://owncoding.dev/"
+} = {}) {
+  const nombreSeguro = textoRequerido(nombre, "nombre");
+  const versionSegura = String(version ?? "").trim();
+  const etiquetaVersion = etiquetaVersionApp(versionSegura);
+  return Object.freeze({
+    nombre: nombreSeguro,
+    version: versionSegura,
+    etiquetaVersion,
+    url: String(url ?? "").trim(),
+    logoUrl: String(logoUrl ?? "").trim(),
+    soporteUrl: String(soporteUrl ?? "").trim(),
+    color: /^#[0-9a-f]{6}$/i.test(String(color ?? "").trim()) ? String(color).trim() : "#047857",
+    credito: credito == null ? null : String(credito).trim(),
+    creditoUrl: String(creditoUrl ?? "").trim()
+  });
+}
+
 // src/components/BuscadorDispositivo.jsx
-import { useEffect as useEffect11, useId as useId10, useMemo as useMemo7, useRef as useRef10, useState as useState12 } from "react";
+import { useEffect as useEffect13, useId as useId12, useMemo as useMemo10, useRef as useRef12, useState as useState14 } from "react";
 
 // src/catalog/productos.js
 var MODELOS_IPHONE = [
@@ -4099,7 +4805,7 @@ function etiquetaDispositivo(valor = {}, { separador = " \xB7 " } = {}) {
 }
 
 // src/components/BuscadorDispositivo.jsx
-import { jsx as jsx31, jsxs as jsxs24 } from "react/jsx-runtime";
+import { jsx as jsx32, jsxs as jsxs25 } from "react/jsx-runtime";
 function BuscadorDispositivo({
   valor = {},
   onCambio,
@@ -4114,7 +4820,7 @@ function BuscadorDispositivo({
   className
 }) {
   const base = perfil || PERFILES_DISPOSITIVO[tipo] || PERFILES_DISPOSITIVO.mobile;
-  const config = useMemo7(() => ({
+  const config = useMemo10(() => ({
     ...base,
     catalogo: { ...base.catalogo || {}, ...catalogo || {} },
     etiquetas: { ...base.etiquetas || {}, ...etiquetas || {} }
@@ -4122,15 +4828,14 @@ function BuscadorDispositivo({
   const modelos = config.catalogo.modelos || [];
   const campos = config.campos || [];
   const etiqueta = (campo) => config.etiquetas?.[campo] || campo.charAt(0).toUpperCase() + campo.slice(1);
-  const [texto, setTexto] = useState12(() => valor.modelo || "");
-  const [abierto, setAbierto] = useState12(false);
-  const [resaltado, setResaltado] = useState12(0);
-  const listaId = useId10();
-  const raiz = useRef10(null);
-  useEffect11(() => {
+  const [texto, setTexto] = useState14(() => valor.modelo || "");
+  const [abierto, setAbierto] = useState14(false);
+  const campoId = useId12();
+  const raiz = useRef12(null);
+  useEffect13(() => {
     setTexto(valor.modelo || "");
   }, [valor.modelo]);
-  useEffect11(() => {
+  useEffect13(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -4138,8 +4843,8 @@ function BuscadorDispositivo({
     document.addEventListener("click", cerrarFuera);
     return () => document.removeEventListener("click", cerrarFuera);
   }, []);
-  const sugerencias = useMemo7(() => buscarDispositivo(modelos, texto, { porCodigo: buscarPorCodigo, limite }), [modelos, texto, buscarPorCodigo, limite]);
-  const modeloElegido = useMemo7(() => {
+  const sugerencias = useMemo10(() => buscarDispositivo(modelos, texto, { porCodigo: buscarPorCodigo, limite }), [modelos, texto, buscarPorCodigo, limite]);
+  const modeloElegido = useMemo10(() => {
     const q = String(valor.modelo || "").trim().toLowerCase();
     return modelos.find((modelo) => nombreDeDispositivo(modelo).toLowerCase() === q) || null;
   }, [modelos, valor.modelo]);
@@ -4150,7 +4855,6 @@ function BuscadorDispositivo({
     emitir(limpiarDependientes(valor, modelo, config));
     setTexto(nombreDeDispositivo(modelo));
     setAbierto(false);
-    setResaltado(0);
   }
   function confirmarLibre() {
     if (!permitirLibre) return;
@@ -4161,41 +4865,36 @@ function BuscadorDispositivo({
   function cambiarDependiente(campo, valorCampo) {
     emitir({ ...valor, [campo]: valorCampo }, campo);
   }
+  const listaVisible = abierto && Boolean(texto.trim()) && sugerencias.length > 0;
+  const navegacion = useComboboxNavigation({
+    options: sugerencias,
+    open: listaVisible,
+    onOpenChange: setAbierto,
+    onSelect: elegir,
+    getOptionKey: (modelo) => `${nombreDeDispositivo(modelo)}-${codigoDeDispositivo(modelo)}`,
+    listboxId: `${campoId}-lista`
+  });
   function onKeyDown(event) {
-    if (event.key === "Escape") {
-      setAbierto(false);
-      return;
-    }
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    navegacion.inputProps.onKeyDown(event);
+    if (event.key === "Enter" && !event.defaultPrevented) {
       event.preventDefault();
-      if (!abierto) {
-        setAbierto(true);
-        return;
-      }
-      if (!sugerencias.length) return;
-      const delta = event.key === "ArrowDown" ? 1 : -1;
-      setResaltado((actual) => (actual + delta + sugerencias.length) % sugerencias.length);
-      return;
-    }
-    if (event.key === "Enter") {
-      event.preventDefault();
-      const modelo = sugerencias[resaltado];
-      if (abierto && modelo) elegir(modelo);
-      else confirmarLibre();
+      confirmarLibre();
     }
   }
-  return /* @__PURE__ */ jsxs24("div", { className: cn("space-y-3", className), children: [
-    /* @__PURE__ */ jsxs24("div", { ref: raiz, className: "relative", children: [
-      /* @__PURE__ */ jsx31(Label, { htmlFor: listaId, children: etiqueta("modelo") }),
-      /* @__PURE__ */ jsx31(
+  return /* @__PURE__ */ jsxs25("div", { className: cn("space-y-3", className), children: [
+    /* @__PURE__ */ jsxs25("div", { ref: raiz, className: "relative", children: [
+      /* @__PURE__ */ jsx32(Label, { htmlFor: campoId, children: etiqueta("modelo") }),
+      /* @__PURE__ */ jsx32(
         Input,
         {
-          id: listaId,
+          id: campoId,
+          ref: navegacion.inputRef,
           type: "text",
           role: "combobox",
-          "aria-expanded": abierto,
-          "aria-controls": `${listaId}-lista`,
+          "aria-expanded": listaVisible,
+          "aria-controls": navegacion.listboxId,
           "aria-autocomplete": "list",
+          "aria-activedescendant": navegacion.activeOptionId,
           autoComplete: "off",
           disabled,
           value: texto,
@@ -4203,7 +4902,7 @@ function BuscadorDispositivo({
           onChange: (event) => {
             setTexto(event.target.value);
             setAbierto(true);
-            setResaltado(0);
+            navegacion.setActiveIndex(0);
             if (!event.target.value) emitir(limpiarDependientes(valor, "", config));
           },
           onFocus: () => setAbierto(true),
@@ -4216,39 +4915,32 @@ function BuscadorDispositivo({
           onKeyDown
         }
       ),
-      abierto && texto.trim() && sugerencias.length > 0 && /* @__PURE__ */ jsx31("ul", { id: `${listaId}-lista`, role: "listbox", className: "absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float", children: sugerencias.map((modelo, indice) => /* @__PURE__ */ jsx31("li", { children: /* @__PURE__ */ jsxs24(
-        "button",
+      listaVisible && /* @__PURE__ */ jsx32("ul", { ...navegacion.listboxProps, className: "absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float", children: sugerencias.map((modelo, indice) => /* @__PURE__ */ jsxs25(
+        "li",
         {
-          type: "button",
-          role: "option",
-          "aria-selected": indice === resaltado,
-          tabIndex: -1,
-          className: cn("flex w-full items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition", indice === resaltado && "bg-ink-700"),
-          onMouseDown: (event) => {
-            event.preventDefault();
-            elegir(modelo);
-          },
-          onMouseEnter: () => setResaltado(indice),
+          ...navegacion.getOptionProps(indice),
+          className: cn("flex min-h-11 cursor-pointer items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition", indice === navegacion.activeIndex && "bg-ink-700"),
           children: [
-            /* @__PURE__ */ jsx31("span", { className: "min-w-0 truncate", children: nombreDeDispositivo(modelo) }),
-            codigoDeDispositivo(modelo) ? /* @__PURE__ */ jsx31("span", { className: "shrink-0 font-mono text-[11px] text-mute", children: codigoDeDispositivo(modelo) }) : null
+            /* @__PURE__ */ jsx32("span", { className: "min-w-0 truncate", children: nombreDeDispositivo(modelo) }),
+            codigoDeDispositivo(modelo) ? /* @__PURE__ */ jsx32("span", { className: "shrink-0 font-mono text-[11px] text-mute", children: codigoDeDispositivo(modelo) }) : null
           ]
-        }
-      ) }, nombreDeDispositivo(modelo))) }),
-      abierto && texto.trim() && permitirLibre && sugerencias.length === 0 && /* @__PURE__ */ jsxs24("p", { className: "mt-1 text-xs text-mute", children: [
+        },
+        nombreDeDispositivo(modelo)
+      )) }),
+      abierto && texto.trim() && permitirLibre && sugerencias.length === 0 && /* @__PURE__ */ jsxs25("p", { className: "mt-1 text-xs text-mute", children: [
         "No est\xE1 en el cat\xE1logo: se guarda \xAB",
         texto.trim(),
         "\xBB tal cual."
       ] })
     ] }),
-    valor.modelo && campos.length > 0 && /* @__PURE__ */ jsx31("div", { className: "grid gap-3 sm:grid-cols-2 lg:grid-cols-3", children: campos.map((campo) => {
+    valor.modelo && campos.length > 0 && /* @__PURE__ */ jsx32("div", { className: "grid gap-3 sm:grid-cols-2 lg:grid-cols-3", children: campos.map((campo) => {
       const opciones = opcionesDependiente(modeloElegido, campo, config);
-      const id = `${listaId}-${campo}`;
-      return /* @__PURE__ */ jsxs24("div", { className: "space-y-1", children: [
-        /* @__PURE__ */ jsx31(Label, { htmlFor: id, children: etiqueta(campo) }),
-        /* @__PURE__ */ jsxs24(Select, { id, value: valor[campo] || "", disabled, onChange: (event) => cambiarDependiente(campo, event.target.value), children: [
-          /* @__PURE__ */ jsx31("option", { value: "", children: "Elegir\u2026" }),
-          opciones.map((opcion) => /* @__PURE__ */ jsx31("option", { value: opcion, children: opcion }, opcion))
+      const id = `${campoId}-${campo}`;
+      return /* @__PURE__ */ jsxs25("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ jsx32(Label, { htmlFor: id, children: etiqueta(campo) }),
+        /* @__PURE__ */ jsxs25(Select, { id, value: valor[campo] || "", disabled, onChange: (event) => cambiarDependiente(campo, event.target.value), children: [
+          /* @__PURE__ */ jsx32("option", { value: "", children: "Elegir\u2026" }),
+          opciones.map((opcion) => /* @__PURE__ */ jsx32("option", { value: opcion, children: opcion }, opcion))
         ] })
       ] }, campo);
     }) })
@@ -4256,8 +4948,8 @@ function BuscadorDispositivo({
 }
 
 // src/components/RucField.jsx
-import { useState as useState13 } from "react";
-import { jsx as jsx32, jsxs as jsxs25 } from "react/jsx-runtime";
+import { useId as useId13, useState as useState15 } from "react";
+import { jsx as jsx33, jsxs as jsxs26 } from "react/jsx-runtime";
 function RucField({
   id,
   value,
@@ -4271,11 +4963,17 @@ function RucField({
   placeholder = "80012345-6",
   autoComplete = "off",
   ariaLabel,
-  textoAyuda = "La raz\xF3n social se aplica solo si la confirm\xE1s."
+  textoAyuda = "La raz\xF3n social se aplica solo si la confirm\xE1s.",
+  className,
+  ...inputProps
 }) {
-  const [resultado, setResultado] = useState13(null);
-  const [consultando, setConsultando] = useState13(false);
-  const [error, setError] = useState13("");
+  const generado = useId13();
+  const inputId = id || generado;
+  const ayudaId = `${inputId}-ayuda`;
+  const errorId = `${inputId}-error`;
+  const [resultado, setResultado] = useState15(null);
+  const [consultando, setConsultando] = useState15(false);
+  const [error, setError] = useState15("");
   const hayRuc = Boolean(String(value || "").trim());
   const puedeExtraer = mostrarExtractor && typeof consultar === "function";
   async function extraer() {
@@ -4294,13 +4992,16 @@ function RucField({
       setConsultando(false);
     }
   }
-  return /* @__PURE__ */ jsxs25("div", { className: "space-y-2", children: [
-    /* @__PURE__ */ jsxs25("div", { className: "relative", children: [
-      /* @__PURE__ */ jsx32(
+  return /* @__PURE__ */ jsxs26("div", { className: cn("space-y-2", className), children: [
+    /* @__PURE__ */ jsxs26("div", { className: "relative", children: [
+      /* @__PURE__ */ jsx33(
         Input,
         {
-          id,
+          ...inputProps,
+          id: inputId,
           "aria-label": ariaLabel,
+          "aria-describedby": [inputProps["aria-describedby"], puedeExtraer && textoAyuda ? ayudaId : null, error ? errorId : null].filter(Boolean).join(" ") || void 0,
+          "aria-invalid": inputProps["aria-invalid"] ?? (error ? true : void 0),
           className: puedeExtraer ? consultando ? "pr-32" : "pr-11" : void 0,
           maxLength,
           autoComplete,
@@ -4314,7 +5015,7 @@ function RucField({
           placeholder
         }
       ),
-      puedeExtraer && /* @__PURE__ */ jsx32(
+      puedeExtraer && /* @__PURE__ */ jsx33(
         BotonDentroCampo,
         {
           etiqueta: "Extraer los datos del RUC",
@@ -4326,25 +5027,25 @@ function RucField({
         }
       )
     ] }),
-    puedeExtraer && textoAyuda && /* @__PURE__ */ jsx32("span", { className: "block text-xs text-mute", children: textoAyuda }),
-    resultado && /* @__PURE__ */ jsxs25("div", { className: "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-fono/25 bg-fono/5 p-3 text-sm", children: [
-      /* @__PURE__ */ jsxs25("span", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsxs25("span", { className: "flex flex-wrap items-center gap-2", children: [
-          /* @__PURE__ */ jsx32("b", { className: "truncate", children: resultado.name }),
-          resultado.simulado && /* @__PURE__ */ jsx32(Badge, { color: "blue", children: "Simulada en demo" })
+    puedeExtraer && textoAyuda && /* @__PURE__ */ jsx33("span", { id: ayudaId, className: "block text-xs text-mute", children: textoAyuda }),
+    resultado && /* @__PURE__ */ jsxs26("div", { role: "status", className: "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-fono/25 bg-fono/5 p-3 text-sm", children: [
+      /* @__PURE__ */ jsxs26("span", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxs26("span", { className: "flex flex-wrap items-center gap-2", children: [
+          /* @__PURE__ */ jsx33("b", { className: "truncate", children: resultado.name }),
+          resultado.simulado && /* @__PURE__ */ jsx33(Badge, { color: "blue", children: "Simulada en demo" })
         ] }),
-        /* @__PURE__ */ jsxs25("span", { className: "block text-mute", children: [
+        /* @__PURE__ */ jsxs26("span", { className: "block text-mute", children: [
           "RUC ",
           resultado.fullRuc
         ] }),
-        resultado.simulado && /* @__PURE__ */ jsx32("span", { className: "block text-xs text-mute", children: "Resultado ficticio: la demo no consulta registros reales." })
+        resultado.simulado && /* @__PURE__ */ jsx33("span", { className: "block text-xs text-mute", children: "Resultado ficticio: la demo no consulta registros reales." })
       ] }),
-      /* @__PURE__ */ jsx32("button", { type: "button", className: "font-semibold text-fono-light", onClick: () => {
+      /* @__PURE__ */ jsx33("button", { type: "button", className: "min-h-11 rounded-lg px-2 font-semibold text-fono-light", onClick: () => {
         onAplicar?.(resultado);
         setResultado(null);
       }, children: "Usar estos datos" })
     ] }),
-    error && /* @__PURE__ */ jsx32("p", { role: "alert", className: "text-sm text-bad-text", children: error })
+    error && /* @__PURE__ */ jsx33("p", { id: errorId, role: "alert", className: "text-sm text-bad-text", children: error })
   ] });
 }
 
@@ -4359,24 +5060,24 @@ function esRuc(valor) {
 }
 
 // src/components/SerialTexto.jsx
-import { jsx as jsx33, jsxs as jsxs26 } from "react/jsx-runtime";
+import { jsx as jsx34, jsxs as jsxs27 } from "react/jsx-runtime";
 function SerialTexto({ serial, className, tonoCola = "text-fore", vacio = "\u2014", enmascarar = false }) {
   if (enmascarar) {
     const mascara = serialEnmascarado(serial);
-    if (!mascara) return /* @__PURE__ */ jsx33("span", { className: cn("font-mono", className), children: vacio });
-    return /* @__PURE__ */ jsx33("span", { className: cn("font-mono", className), title: String(serial), children: mascara });
+    if (!mascara) return /* @__PURE__ */ jsx34("span", { className: cn("font-mono", className), children: vacio });
+    return /* @__PURE__ */ jsx34("span", { className: cn("font-mono", className), title: String(serial), children: mascara });
   }
   const { cabeza, cola } = partirSerial(serial);
-  if (!cola) return /* @__PURE__ */ jsx33("span", { className: cn("font-mono", className), children: vacio });
-  return /* @__PURE__ */ jsxs26("span", { className: cn("flex min-w-0 font-mono", className), title: String(serial), children: [
-    /* @__PURE__ */ jsx33("span", { className: "min-w-0 truncate", children: cabeza }),
-    /* @__PURE__ */ jsx33("b", { className: cn("shrink-0", tonoCola), children: cola })
+  if (!cola) return /* @__PURE__ */ jsx34("span", { className: cn("font-mono", className), children: vacio });
+  return /* @__PURE__ */ jsxs27("span", { className: cn("flex min-w-0 font-mono", className), title: String(serial), children: [
+    /* @__PURE__ */ jsx34("span", { className: "min-w-0 truncate", children: cabeza }),
+    /* @__PURE__ */ jsx34("b", { className: cn("shrink-0", tonoCola), children: cola })
   ] });
 }
 
 // src/components/CampoSeriales.jsx
-import { useMemo as useMemo8, useState as useState14 } from "react";
-import { jsx as jsx34, jsxs as jsxs27 } from "react/jsx-runtime";
+import { useMemo as useMemo11, useState as useState16 } from "react";
+import { jsx as jsx35, jsxs as jsxs28 } from "react/jsx-runtime";
 function CampoSeriales({
   valor,
   onCambio,
@@ -4389,17 +5090,17 @@ function CampoSeriales({
   disabled = false,
   className
 }) {
-  const [texto, setTexto] = useState14(() => Array.isArray(valor) ? valor.join("\n") : valor || "");
-  const resultado = useMemo8(() => normalizarSeriales(texto, { validar, limite, maxLargo }), [texto, validar, limite, maxLargo]);
+  const [texto, setTexto] = useState16(() => Array.isArray(valor) ? valor.join("\n") : valor || "");
+  const resultado = useMemo11(() => normalizarSeriales(texto, { validar, limite, maxLargo }), [texto, validar, limite, maxLargo]);
   function cambiar(siguiente) {
     setTexto(siguiente);
     const limpio = normalizarSeriales(siguiente, { validar, limite, maxLargo });
     onCambio?.(limpio.seriales, limpio);
   }
   const hay = resultado.seriales.length > 0;
-  return /* @__PURE__ */ jsxs27("div", { className: cn("space-y-2", className), children: [
-    etiqueta ? /* @__PURE__ */ jsx34("span", { className: "block text-xs font-semibold text-mute", children: etiqueta }) : null,
-    /* @__PURE__ */ jsx34(
+  return /* @__PURE__ */ jsxs28("div", { className: cn("space-y-2", className), children: [
+    etiqueta ? /* @__PURE__ */ jsx35("span", { className: "block text-xs font-semibold text-mute", children: etiqueta }) : null,
+    /* @__PURE__ */ jsx35(
       Textarea,
       {
         rows: 4,
@@ -4411,39 +5112,39 @@ function CampoSeriales({
         autoCapitalize: "characters"
       }
     ),
-    /* @__PURE__ */ jsxs27("p", { className: "flex flex-wrap items-center gap-x-3 gap-y-1 text-xs", role: "status", children: [
-      /* @__PURE__ */ jsxs27("span", { className: hay ? "font-semibold text-ok-text" : "text-mute", children: [
+    /* @__PURE__ */ jsxs28("p", { className: "flex flex-wrap items-center gap-x-3 gap-y-1 text-xs", role: "status", children: [
+      /* @__PURE__ */ jsxs28("span", { className: hay ? "font-semibold text-ok-text" : "text-mute", children: [
         resultado.seriales.length,
         " listo(s) para cargar"
       ] }),
-      resultado.repetidos.length > 0 && /* @__PURE__ */ jsxs27("span", { className: "text-warn-text", children: [
+      resultado.repetidos.length > 0 && /* @__PURE__ */ jsxs28("span", { className: "text-warn-text", children: [
         resultado.repetidos.length,
         " repetido(s)"
       ] }),
-      resultado.invalidos.length > 0 && /* @__PURE__ */ jsxs27("span", { className: "text-bad-text", children: [
+      resultado.invalidos.length > 0 && /* @__PURE__ */ jsxs28("span", { className: "text-bad-text", children: [
         resultado.invalidos.length,
         " inv\xE1lido(s)"
       ] })
     ] }),
-    resultado.invalidos.length > 0 && /* @__PURE__ */ jsxs27("p", { className: "break-words text-[11px] text-mute", title: resultado.invalidos.join(" \xB7 "), children: [
+    resultado.invalidos.length > 0 && /* @__PURE__ */ jsxs28("p", { className: "break-words text-[11px] text-mute", title: resultado.invalidos.join(" \xB7 "), children: [
       "Revis\xE1: ",
       resultado.invalidos.slice(0, 5).join(" \xB7 "),
       resultado.invalidos.length > 5 ? " \u2026" : ""
     ] }),
-    ayuda ? /* @__PURE__ */ jsx34("p", { className: "text-[11px] text-mute", children: ayuda }) : null
+    ayuda ? /* @__PURE__ */ jsx35("p", { className: "text-[11px] text-mute", children: ayuda }) : null
   ] });
 }
 
 // src/components/EstadoBadge.jsx
-import { jsx as jsx35 } from "react/jsx-runtime";
+import { jsx as jsx36 } from "react/jsx-runtime";
 function EstadoBadge({ mapa, valor, vacio = "Sin estado" }) {
   const item = mapa?.[valor];
-  if (item) return /* @__PURE__ */ jsx35(Badge, { color: item.color, children: item.label });
-  return /* @__PURE__ */ jsx35(Badge, { children: valor || vacio });
+  if (item) return /* @__PURE__ */ jsx36(Badge, { color: item.color, children: item.label });
+  return /* @__PURE__ */ jsx36(Badge, { children: valor || vacio });
 }
 
 // src/components/SeccionColapsable.jsx
-import { useId as useId11, useState as useState15 } from "react";
+import { useId as useId14, useState as useState17 } from "react";
 
 // src/utils/tabla.js
 var ROTULO_DATO = "text-[10px] font-bold uppercase tracking-wider text-mute";
@@ -4455,11 +5156,11 @@ var CELDA_IDENTIDAD = "truncate text-[13px] font-semibold";
 var CELDA_IDENTIDAD_GRANDE = "truncate text-sm font-semibold";
 
 // src/components/SeccionColapsable.jsx
-import { jsx as jsx36, jsxs as jsxs28 } from "react/jsx-runtime";
+import { jsx as jsx37, jsxs as jsxs29 } from "react/jsx-runtime";
 function SeccionColapsable({ id, titulo: titulo2, resumen, icono, abierta = false, clave = id, className = "", children }) {
-  const autoId = useId11();
+  const autoId = useId14();
   const panelId = `seccion-panel-${autoId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
-  const [expandida, setExpandida] = useState15(() => {
+  const [expandida, setExpandida] = useState17(() => {
     if (!clave) return abierta;
     try {
       const guardado = window.sessionStorage.getItem(clave);
@@ -4480,8 +5181,8 @@ function SeccionColapsable({ id, titulo: titulo2, resumen, icono, abierta = fals
       return siguiente;
     });
   }
-  return /* @__PURE__ */ jsxs28("section", { className: cn("rounded-2xl border border-ink-600 bg-ink-900", className), children: [
-    /* @__PURE__ */ jsxs28(
+  return /* @__PURE__ */ jsxs29("section", { className: cn("rounded-2xl border border-ink-600 bg-ink-900", className), children: [
+    /* @__PURE__ */ jsxs29(
       "button",
       {
         type: "button",
@@ -4490,21 +5191,21 @@ function SeccionColapsable({ id, titulo: titulo2, resumen, icono, abierta = fals
         onClick: alternar,
         className: "flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition hover:bg-ink-800/60",
         children: [
-          icono ? /* @__PURE__ */ jsx36(Icon, { name: icono, className: "h-4 w-4 shrink-0 text-mute" }) : null,
-          /* @__PURE__ */ jsxs28("span", { className: "min-w-0 flex-1", children: [
-            /* @__PURE__ */ jsx36("span", { className: cn("block", ROTULO_SECCION), children: titulo2 }),
-            resumen ? /* @__PURE__ */ jsx36("span", { className: "mt-0.5 block truncate text-sm", children: resumen }) : null
+          icono ? /* @__PURE__ */ jsx37(Icon, { name: icono, className: "h-4 w-4 shrink-0 text-mute" }) : null,
+          /* @__PURE__ */ jsxs29("span", { className: "min-w-0 flex-1", children: [
+            /* @__PURE__ */ jsx37("span", { className: cn("block", ROTULO_SECCION), children: titulo2 }),
+            resumen ? /* @__PURE__ */ jsx37("span", { className: "mt-0.5 block truncate text-sm", children: resumen }) : null
           ] }),
-          /* @__PURE__ */ jsx36(Icon, { name: "chevron", className: cn("h-4 w-4 shrink-0 text-mute transition-transform", expandida && "rotate-180") })
+          /* @__PURE__ */ jsx37(Icon, { name: "chevron", className: cn("h-4 w-4 shrink-0 text-mute transition-transform", expandida && "rotate-180") })
         ]
       }
     ),
-    /* @__PURE__ */ jsx36("div", { id: panelId, hidden: !expandida, className: "border-t border-ink-600/70 px-4 pb-4 pt-3", children })
+    /* @__PURE__ */ jsx37("div", { id: panelId, hidden: !expandida, className: "border-t border-ink-600/70 px-4 pb-4 pt-3", children })
   ] });
 }
 
 // src/components/TaxIdField.jsx
-import { useId as useId12, useState as useState16 } from "react";
+import { useId as useId15, useState as useState18 } from "react";
 
 // src/utils/taxId.js
 var PATRON_RUC = /^\d{5,8}(-\d)?$/;
@@ -4531,7 +5232,7 @@ function limpiarTaxId(value, max = 32) {
 }
 
 // src/components/TaxIdField.jsx
-import { jsx as jsx37, jsxs as jsxs29 } from "react/jsx-runtime";
+import { jsx as jsx38, jsxs as jsxs30 } from "react/jsx-runtime";
 function TaxIdField({
   label = "RUC / identificaci\xF3n fiscal",
   value = "",
@@ -4553,11 +5254,11 @@ function TaxIdField({
   className,
   ...props
 }) {
-  const generado = useId12();
+  const generado = useId15();
   const inputId = id || generado;
   const descripcionId = `${inputId}-descripcion`;
-  const [tocado, setTocado] = useState16(false);
-  const [consulta, setConsulta] = useState16({ estado: "inicial" });
+  const [tocado, setTocado] = useState18(false);
+  const [consulta, setConsulta] = useState18({ estado: "inicial" });
   const esRucPy = String(pais).trim().toUpperCase() === "PY";
   const normalizado = normalizeTaxId(value);
   const invalido = normalizado !== null && !taxIdValidoParaPais(normalizado, pais);
@@ -4587,9 +5288,9 @@ function TaxIdField({
     onAplicarRazonSocial?.(consulta.razonSocial);
     setConsulta({ estado: "inicial" });
   }
-  return /* @__PURE__ */ jsxs29(FormField, { label, hint, error: errorVisible, htmlFor: inputId, descripcionId, children: [
-    /* @__PURE__ */ jsxs29("div", { className: "relative", children: [
-      /* @__PURE__ */ jsx37(
+  return /* @__PURE__ */ jsxs30(FormField, { label, hint, error: errorVisible, htmlFor: inputId, descripcionId, children: [
+    /* @__PURE__ */ jsxs30("div", { className: "relative", children: [
+      /* @__PURE__ */ jsx38(
         Input,
         {
           id: inputId,
@@ -4612,7 +5313,7 @@ function TaxIdField({
           ...props
         }
       ),
-      onBuscarRazonSocial ? /* @__PURE__ */ jsx37(
+      onBuscarRazonSocial ? /* @__PURE__ */ jsx38(
         BotonDentroCampo,
         {
           etiqueta: etiquetaConsulta,
@@ -4623,12 +5324,12 @@ function TaxIdField({
         }
       ) : null
     ] }),
-    consulta.estado === "encontrada" ? /* @__PURE__ */ jsxs29("div", { role: "status", className: "mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-ink-600 bg-ink-800/60 px-3 py-2 text-xs", children: [
-      /* @__PURE__ */ jsxs29("span", { className: "text-mute", children: [
+    consulta.estado === "encontrada" ? /* @__PURE__ */ jsxs30("div", { role: "status", className: "mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-ink-600 bg-ink-800/60 px-3 py-2 text-xs", children: [
+      /* @__PURE__ */ jsxs30("span", { className: "text-mute", children: [
         "Raz\xF3n social: ",
-        /* @__PURE__ */ jsx37("b", { className: "font-semibold text-fore", children: consulta.razonSocial })
+        /* @__PURE__ */ jsx38("b", { className: "font-semibold text-fore", children: consulta.razonSocial })
       ] }),
-      onAplicarRazonSocial ? /* @__PURE__ */ jsx37(
+      onAplicarRazonSocial ? /* @__PURE__ */ jsx38(
         "button",
         {
           type: "button",
@@ -4638,25 +5339,25 @@ function TaxIdField({
         }
       ) : null
     ] }) : null,
-    consulta.estado === "error" ? /* @__PURE__ */ jsx37("p", { role: "alert", className: "mt-1.5 text-xs text-bad-text", children: consulta.mensaje }) : null
+    consulta.estado === "error" ? /* @__PURE__ */ jsx38("p", { role: "alert", className: "mt-1.5 text-xs text-bad-text", children: consulta.mensaje }) : null
   ] });
 }
 
 // src/components/GoogleButton.jsx
-import { jsx as jsx38, jsxs as jsxs30 } from "react/jsx-runtime";
+import { jsx as jsx39, jsxs as jsxs31 } from "react/jsx-runtime";
 function GoogleMark({ className }) {
-  return /* @__PURE__ */ jsxs30("svg", { "aria-hidden": "true", viewBox: "0 0 18 18", className: cn("h-[18px] w-[18px] shrink-0", className), children: [
-    /* @__PURE__ */ jsx38("path", { fill: "#EA4335", d: "M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.909c1.703-1.568 2.683-3.878 2.683-6.615Z" }),
-    /* @__PURE__ */ jsx38("path", { fill: "#4285F4", d: "M9 18c2.43 0 4.467-.806 5.957-2.18l-2.91-2.258c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.037-3.71H.956v2.331A9 9 0 0 0 9 18Z" }),
-    /* @__PURE__ */ jsx38("path", { fill: "#FBBC05", d: "M3.963 10.712A5.412 5.412 0 0 1 3.681 9c0-.594.102-1.171.282-1.712V4.957H.956A9 9 0 0 0 0 9c0 1.452.348 2.827.956 4.043l3.007-2.331Z" }),
-    /* @__PURE__ */ jsx38("path", { fill: "#34A853", d: "M9 3.578c1.322 0 2.508.454 3.441 1.345l2.581-2.582C13.463.891 11.426 0 9 0A9 9 0 0 0 .956 4.957l3.007 2.331C4.672 5.162 6.656 3.578 9 3.578Z" })
+  return /* @__PURE__ */ jsxs31("svg", { "aria-hidden": "true", viewBox: "0 0 18 18", className: cn("h-[18px] w-[18px] shrink-0", className), children: [
+    /* @__PURE__ */ jsx39("path", { fill: "#EA4335", d: "M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.909c1.703-1.568 2.683-3.878 2.683-6.615Z" }),
+    /* @__PURE__ */ jsx39("path", { fill: "#4285F4", d: "M9 18c2.43 0 4.467-.806 5.957-2.18l-2.91-2.258c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.037-3.71H.956v2.331A9 9 0 0 0 9 18Z" }),
+    /* @__PURE__ */ jsx39("path", { fill: "#FBBC05", d: "M3.963 10.712A5.412 5.412 0 0 1 3.681 9c0-.594.102-1.171.282-1.712V4.957H.956A9 9 0 0 0 0 9c0 1.452.348 2.827.956 4.043l3.007-2.331Z" }),
+    /* @__PURE__ */ jsx39("path", { fill: "#34A853", d: "M9 3.578c1.322 0 2.508.454 3.441 1.345l2.581-2.582C13.463.891 11.426 0 9 0A9 9 0 0 0 .956 4.957l3.007 2.331C4.672 5.162 6.656 3.578 9 3.578Z" })
   ] });
 }
 function OAuthDivider({ texto = "o", className }) {
-  return /* @__PURE__ */ jsxs30("div", { className: cn("flex items-center gap-4 py-1 text-sm font-medium text-mute", className), children: [
-    /* @__PURE__ */ jsx38("span", { className: "h-px flex-1 bg-fore/10" }),
+  return /* @__PURE__ */ jsxs31("div", { className: cn("flex items-center gap-4 py-1 text-sm font-medium text-mute", className), children: [
+    /* @__PURE__ */ jsx39("span", { className: "h-px flex-1 bg-fore/10" }),
     texto,
-    /* @__PURE__ */ jsx38("span", { className: "h-px flex-1 bg-fore/10" })
+    /* @__PURE__ */ jsx39("span", { className: "h-px flex-1 bg-fore/10" })
   ] });
 }
 function GoogleButton({
@@ -4668,7 +5369,7 @@ function GoogleButton({
   etiquetaBusy = "Conectando con Google\u2026",
   className
 }) {
-  return /* @__PURE__ */ jsxs30(
+  return /* @__PURE__ */ jsxs31(
     "button",
     {
       type: "button",
@@ -4683,104 +5384,198 @@ function GoogleButton({
         className
       ),
       children: [
-        busy ? /* @__PURE__ */ jsx38("span", { className: "h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-[#4285F4]" }) : /* @__PURE__ */ jsx38(GoogleMark, {}),
-        /* @__PURE__ */ jsx38("span", { className: "ml-3", children: busy ? etiquetaBusy : crear ? etiquetaCrear : etiquetaContinuar })
+        busy ? /* @__PURE__ */ jsx39("span", { className: "h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-[#4285F4]" }) : /* @__PURE__ */ jsx39(GoogleMark, {}),
+        /* @__PURE__ */ jsx39("span", { className: "ml-3", children: busy ? etiquetaBusy : crear ? etiquetaCrear : etiquetaContinuar })
       ]
     }
   );
 }
 
 // src/components/AuthLayout.jsx
-import { jsx as jsx39, jsxs as jsxs31 } from "react/jsx-runtime";
+import { jsx as jsx40, jsxs as jsxs32 } from "react/jsx-runtime";
 function AuthLayout({ logo, aside, acciones, pie, children, className }) {
-  return /* @__PURE__ */ jsxs31("main", { className: cn("relative flex min-h-dvh flex-col overflow-x-hidden bg-paper text-fore", className), children: [
-    acciones && /* @__PURE__ */ jsx39("div", { className: "absolute right-4 top-4 z-20", children: acciones }),
-    /* @__PURE__ */ jsx39("div", { "aria-hidden": true, className: "pointer-events-none absolute -left-40 -top-40 h-96 w-96 rounded-full bg-fono/15 blur-3xl" }),
-    /* @__PURE__ */ jsxs31("div", { className: "mx-auto grid w-full max-w-[1380px] flex-1 items-center gap-12 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_520px] lg:px-12", children: [
-      /* @__PURE__ */ jsxs31("section", { className: "hidden lg:block", children: [
+  return /* @__PURE__ */ jsxs32("main", { className: cn("relative flex min-h-dvh flex-col overflow-x-hidden bg-paper text-fore", className), children: [
+    acciones && /* @__PURE__ */ jsx40("div", { className: "absolute right-4 top-4 z-20", children: acciones }),
+    /* @__PURE__ */ jsx40("div", { "aria-hidden": true, className: "pointer-events-none absolute -left-40 -top-40 h-96 w-96 rounded-full bg-fono/15 blur-3xl" }),
+    /* @__PURE__ */ jsxs32("div", { className: "mx-auto grid w-full max-w-[1380px] flex-1 items-center gap-12 px-5 py-6 lg:grid-cols-[minmax(0,1fr)_520px] lg:px-12", children: [
+      /* @__PURE__ */ jsxs32("section", { className: "hidden lg:block", children: [
         logo,
         aside
       ] }),
       children
     ] }),
-    pie && /* @__PURE__ */ jsx39("div", { className: "shrink-0", children: pie })
+    pie && /* @__PURE__ */ jsx40("div", { className: "shrink-0", children: pie })
   ] });
 }
 
 // src/components/ProductFooter.jsx
-import { Fragment as Fragment5, jsx as jsx40, jsxs as jsxs32 } from "react/jsx-runtime";
+import { jsx as jsx41, jsxs as jsxs33 } from "react/jsx-runtime";
 var CREDITO_PIE = "Desarrollado por Owncoding";
 var CREDITO_PIE_URL = "https://owncoding.dev/";
 function ProductFooter({
-  nombre = "",
-  version = "",
-  credito = CREDITO_PIE,
-  creditoUrl = CREDITO_PIE_URL,
+  identidad,
+  nombre,
+  version,
+  modelo = "compacto",
+  enlaces = [],
+  credito,
+  creditoUrl,
   anio = (/* @__PURE__ */ new Date()).getFullYear(),
   leading,
   children,
   className
 }) {
-  return /* @__PURE__ */ jsxs32(
+  const nombreVisible = nombre ?? identidad?.nombre ?? "";
+  const versionVisible = version ?? identidad?.etiquetaVersion ?? (identidad?.version ? `v${identidad.version}` : "");
+  const creditoVisible = credito === void 0 ? identidad?.credito ?? CREDITO_PIE : credito;
+  const creditoHref = creditoUrl ?? identidad?.creditoUrl ?? CREDITO_PIE_URL;
+  const distribuido = modelo === "distribuido";
+  const apilado = modelo === "apilado";
+  return /* @__PURE__ */ jsxs33(
     "footer",
     {
       "data-testid": "product-footer",
-      className: cn("border-t border-fore/10 bg-transparent px-4 py-3 text-center text-[11px] text-mute", className),
+      "data-modelo": modelo,
+      className: cn(
+        "border-t border-fore/10 bg-transparent px-4 py-4 text-xs leading-5 text-mute",
+        distribuido ? "flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-left" : "text-center",
+        apilado && "flex flex-col items-center gap-1",
+        className
+      ),
       children: [
-        leading,
-        /* @__PURE__ */ jsxs32("span", { children: [
-          "\xA9 ",
-          anio,
-          nombre ? ` ${nombre}` : "",
-          ". Todos los derechos reservados.",
-          version ? ` \xB7 ${version}` : ""
+        /* @__PURE__ */ jsxs33("div", { className: cn("flex min-w-0 flex-wrap items-center justify-center gap-x-2", distribuido && "justify-start"), children: [
+          leading,
+          /* @__PURE__ */ jsxs33("span", { children: [
+            "\xA9 ",
+            anio,
+            nombreVisible ? ` ${nombreVisible}` : "",
+            ". Todos los derechos reservados.",
+            versionVisible ? ` \xB7 ${versionVisible}` : ""
+          ] }),
+          children ? /* @__PURE__ */ jsx41("span", { children }) : null
         ] }),
-        children && /* @__PURE__ */ jsxs32(Fragment5, { children: [
-          " \xB7 ",
-          children
-        ] }),
-        credito && /* @__PURE__ */ jsxs32(Fragment5, { children: [
-          " \xB7 ",
-          /* @__PURE__ */ jsx40(
+        enlaces.length > 0 || creditoVisible ? /* @__PURE__ */ jsxs33("nav", { "aria-label": "Informaci\xF3n institucional", className: "flex flex-wrap items-center justify-center gap-x-3 gap-y-1", children: [
+          enlaces.map((enlace, indice) => {
+            const externo = enlace.externo ?? /^https?:\/\//i.test(enlace.href ?? "");
+            return enlace?.href && enlace?.etiqueta ? /* @__PURE__ */ jsxs33(
+              "a",
+              {
+                href: enlace.href,
+                target: externo ? "_blank" : void 0,
+                rel: externo ? "noreferrer" : void 0,
+                className: "toque-44 inline-flex min-h-11 items-center rounded-lg px-1 font-medium text-fono-dark underline-offset-4 hover:underline dark:text-fono-light",
+                children: [
+                  enlace.etiqueta,
+                  externo ? /* @__PURE__ */ jsx41("span", { className: "sr-only", children: " (se abre en otra pesta\xF1a)" }) : null
+                ]
+              },
+              enlace.id ?? enlace.href ?? indice
+            ) : null;
+          }),
+          creditoVisible ? /* @__PURE__ */ jsxs33(
             "a",
             {
-              href: creditoUrl,
+              href: creditoHref,
               target: "_blank",
               rel: "noreferrer",
-              className: "toque-44 font-medium text-fono-dark hover:underline",
-              children: credito
+              className: "toque-44 inline-flex min-h-11 items-center rounded-lg px-1 font-medium text-fono-dark underline-offset-4 hover:underline dark:text-fono-light",
+              children: [
+                creditoVisible,
+                /* @__PURE__ */ jsx41("span", { className: "sr-only", children: " (se abre en otra pesta\xF1a)" })
+              ]
             }
-          )
-        ] })
+          ) : null
+        ] }) : null
       ]
     }
   );
 }
 
+// src/components/ProductPrefooter.jsx
+import { jsx as jsx42, jsxs as jsxs34 } from "react/jsx-runtime";
+var CLASE_ENLACE = "toque-44 inline-flex min-h-11 items-center rounded-lg px-1 text-sm font-medium text-fono-dark underline-offset-4 hover:underline dark:text-fono-light";
+function Enlace({ enlace }) {
+  if (!enlace?.href || !enlace?.etiqueta) return null;
+  const externo = enlace.externo ?? /^https?:\/\//i.test(enlace.href);
+  return /* @__PURE__ */ jsxs34(
+    "a",
+    {
+      href: enlace.href,
+      target: externo ? "_blank" : void 0,
+      rel: externo ? "noreferrer" : void 0,
+      className: cn(CLASE_ENLACE, enlace.className),
+      children: [
+        enlace.etiqueta,
+        externo ? /* @__PURE__ */ jsx42("span", { className: "sr-only", children: " (se abre en otra pesta\xF1a)" }) : null
+      ]
+    }
+  );
+}
+function ProductPrefooter({
+  modelo = "enlaces",
+  titulo: titulo2 = "M\xE1s informaci\xF3n",
+  descripcion,
+  columnas = [],
+  accion,
+  redes = [],
+  children,
+  className
+}) {
+  const mostrarEnlaces = modelo === "enlaces" || modelo === "completo";
+  const mostrarAccion = modelo === "accion" || modelo === "completo";
+  return /* @__PURE__ */ jsx42(
+    "aside",
+    {
+      "aria-label": titulo2,
+      "data-testid": "product-prefooter",
+      "data-modelo": modelo,
+      className: cn("border-t border-fore/10 bg-ink-800 px-4 py-8 text-fore sm:px-6", className),
+      children: /* @__PURE__ */ jsxs34("div", { className: "mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)]", children: [
+        /* @__PURE__ */ jsxs34("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsx42("h2", { className: "text-xl font-bold text-fore", children: titulo2 }),
+          descripcion ? /* @__PURE__ */ jsx42("p", { className: "mt-2 max-w-2xl text-sm leading-6 text-mute", children: descripcion }) : null,
+          mostrarEnlaces && columnas.length > 0 ? /* @__PURE__ */ jsx42("div", { className: "mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3", children: columnas.map((columna, indice) => /* @__PURE__ */ jsxs34("section", { "aria-label": columna.titulo, children: [
+            columna.titulo ? /* @__PURE__ */ jsx42("h3", { className: "text-sm font-bold text-fore", children: columna.titulo }) : null,
+            /* @__PURE__ */ jsx42("ul", { className: "mt-2 space-y-1", children: (columna.enlaces ?? []).map((enlace, enlaceIndice) => /* @__PURE__ */ jsx42("li", { children: /* @__PURE__ */ jsx42(Enlace, { enlace }) }, enlace.id ?? enlace.href ?? enlaceIndice)) })
+          ] }, columna.id ?? columna.titulo ?? indice)) }) : null,
+          redes.length > 0 ? /* @__PURE__ */ jsx42("nav", { "aria-label": "Redes sociales", className: "mt-6 flex flex-wrap gap-x-4 gap-y-1", children: redes.map((enlace, indice) => /* @__PURE__ */ jsx42(Enlace, { enlace: { ...enlace, externo: true } }, enlace.id ?? enlace.href ?? indice)) }) : null,
+          children ? /* @__PURE__ */ jsx42("div", { className: "mt-6 text-sm text-mute", children }) : null
+        ] }),
+        mostrarAccion && accion ? /* @__PURE__ */ jsxs34("section", { className: "self-start rounded-2xl border border-interactivo bg-ink p-5 shadow-card", "aria-label": accion.titulo, children: [
+          /* @__PURE__ */ jsx42("h3", { className: "text-lg font-bold text-fore", children: accion.titulo }),
+          accion.descripcion ? /* @__PURE__ */ jsx42("p", { className: "mt-2 text-sm leading-6 text-mute", children: accion.descripcion }) : null,
+          accion.enlace ? /* @__PURE__ */ jsx42("div", { className: "mt-4", children: /* @__PURE__ */ jsx42(Enlace, { enlace: accion.enlace }) }) : null
+        ] }) : null
+      ] })
+    }
+  );
+}
+
 // src/components/LoadingScreen.jsx
-import { jsx as jsx41, jsxs as jsxs33 } from "react/jsx-runtime";
-function LoadingScreen({ mensaje = "Cargando\u2026", logo, tienda = null, etiqueta = "", className }) {
+import { jsx as jsx43, jsxs as jsxs35 } from "react/jsx-runtime";
+function LoadingScreen({ mensaje, label, logo, tienda = null, etiqueta = "", className }) {
+  const texto = mensaje ?? label ?? "Cargando\u2026";
   const nombreTienda = tienda?.nombre || "";
   const imagenTienda = tienda?.logo || "";
-  return /* @__PURE__ */ jsxs33(
+  return /* @__PURE__ */ jsxs35(
     "div",
     {
       className: cn("relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-paper px-6 text-fore", className),
       role: "status",
       "aria-busy": "true",
-      "aria-label": mensaje,
+      "aria-label": texto,
       children: [
-        /* @__PURE__ */ jsx41("div", { "aria-hidden": true, className: "pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-[62%] rounded-full bg-fono/20 blur-3xl" }),
-        /* @__PURE__ */ jsx41("div", { "aria-hidden": true, className: "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fono/50 to-transparent" }),
-        /* @__PURE__ */ jsxs33("div", { className: "relative flex w-full max-w-xs flex-col items-center", children: [
-          /* @__PURE__ */ jsx41("div", { className: "drop-shadow-[0_10px_30px_rgba(12,136,118,0.25)] motion-safe:animate-[oc-respira_2.6s_ease-in-out_infinite]", children: logo }),
-          /* @__PURE__ */ jsx41("p", { className: "mt-7 text-[11px] font-semibold uppercase tracking-[.22em] text-mute", children: mensaje }),
-          /* @__PURE__ */ jsx41("div", { className: "mt-4 h-[3px] w-44 overflow-hidden rounded-full bg-ink-600/70", "aria-hidden": true, children: /* @__PURE__ */ jsx41("span", { className: "block h-full w-1/3 rounded-full bg-gradient-to-r from-fono/40 via-fono to-fono-light motion-safe:animate-[oc-carga_1.25s_ease-in-out_infinite]" }) })
+        /* @__PURE__ */ jsx43("div", { "aria-hidden": true, className: "pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-[62%] rounded-full bg-fono/20 blur-3xl" }),
+        /* @__PURE__ */ jsx43("div", { "aria-hidden": true, className: "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fono/50 to-transparent" }),
+        /* @__PURE__ */ jsxs35("div", { className: "relative flex w-full max-w-xs flex-col items-center", children: [
+          /* @__PURE__ */ jsx43("div", { className: "drop-shadow-[0_10px_30px_rgba(12,136,118,0.25)] motion-safe:animate-[oc-respira_2.6s_ease-in-out_infinite]", children: logo }),
+          /* @__PURE__ */ jsx43("p", { className: "mt-7 text-[11px] font-semibold uppercase tracking-[.22em] text-mute", children: texto }),
+          /* @__PURE__ */ jsx43("div", { className: "mt-4 h-[3px] w-44 overflow-hidden rounded-full bg-ink-600/70", "aria-hidden": true, children: /* @__PURE__ */ jsx43("span", { className: "block h-full w-1/3 rounded-full bg-gradient-to-r from-fono/40 via-fono to-fono-light motion-safe:animate-[oc-carga_1.25s_ease-in-out_infinite]" }) })
         ] }),
-        nombreTienda && /* @__PURE__ */ jsx41("div", { className: "absolute inset-x-0 bottom-8 flex justify-center px-6", children: /* @__PURE__ */ jsxs33("span", { className: "flex max-w-[22rem] items-center gap-2.5 rounded-full border border-fore/10 bg-ink-800/70 px-3 py-1.5 shadow-card backdrop-blur", children: [
-          imagenTienda ? /* @__PURE__ */ jsx41("img", { src: imagenTienda, alt: "", className: "h-6 w-6 shrink-0 rounded-full object-cover", referrerPolicy: "no-referrer" }) : /* @__PURE__ */ jsx41("span", { className: "grid h-6 w-6 shrink-0 place-items-center rounded-full bg-fono/15 text-[10px] font-bold text-fono-text", children: nombreTienda.charAt(0).toUpperCase() }),
-          /* @__PURE__ */ jsx41("span", { className: "min-w-0 truncate text-xs font-semibold", children: nombreTienda }),
-          etiqueta && /* @__PURE__ */ jsx41("span", { className: "shrink-0 rounded-full border border-ink-500 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mute", children: etiqueta })
+        nombreTienda && /* @__PURE__ */ jsx43("div", { className: "absolute inset-x-0 bottom-8 flex justify-center px-6", children: /* @__PURE__ */ jsxs35("span", { className: "flex max-w-[22rem] items-center gap-2.5 rounded-full border border-fore/10 bg-ink-800/70 px-3 py-1.5 shadow-card backdrop-blur", children: [
+          imagenTienda ? /* @__PURE__ */ jsx43("img", { src: imagenTienda, alt: "", className: "h-6 w-6 shrink-0 rounded-full object-cover", referrerPolicy: "no-referrer" }) : /* @__PURE__ */ jsx43("span", { className: "grid h-6 w-6 shrink-0 place-items-center rounded-full bg-fono/15 text-[10px] font-bold text-fono-text", children: nombreTienda.charAt(0).toUpperCase() }),
+          /* @__PURE__ */ jsx43("span", { className: "min-w-0 truncate text-xs font-semibold", children: nombreTienda }),
+          etiqueta && /* @__PURE__ */ jsx43("span", { className: "shrink-0 rounded-full border border-ink-500 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mute", children: etiqueta })
         ] }) })
       ]
     }
@@ -4788,7 +5583,7 @@ function LoadingScreen({ mensaje = "Cargando\u2026", logo, tienda = null, etique
 }
 
 // src/components/PegarEnlaceToken.jsx
-import { useState as useState17 } from "react";
+import { useState as useState19 } from "react";
 
 // src/utils/token.js
 var RUTA_CON_TOKEN = /(?:^|\/)([^/?#]+)\/([a-f0-9]{64})(?:[/?#]|$)/i;
@@ -4810,7 +5605,7 @@ function esToken(value) {
 }
 
 // src/components/PegarEnlaceToken.jsx
-import { jsx as jsx42, jsxs as jsxs34 } from "react/jsx-runtime";
+import { jsx as jsx44, jsxs as jsxs36 } from "react/jsx-runtime";
 function PegarEnlaceToken({
   onToken,
   etiqueta = "Peg\xE1 tu enlace completo",
@@ -4819,8 +5614,8 @@ function PegarEnlaceToken({
   id = "pegar-enlace",
   className
 }) {
-  const [enlace, setEnlace] = useState17("");
-  const [error, setError] = useState17("");
+  const [enlace, setEnlace] = useState19("");
+  const [error, setError] = useState19("");
   function aplicar(event) {
     event.preventDefault();
     setError("");
@@ -4828,10 +5623,10 @@ function PegarEnlaceToken({
     if (!token) return setError(errorMensaje);
     onToken?.(token);
   }
-  return /* @__PURE__ */ jsxs34("form", { onSubmit: aplicar, className: className ?? "space-y-3 rounded-xl border border-fono/25 bg-fono/5 p-4", children: [
-    /* @__PURE__ */ jsxs34("div", { children: [
-      /* @__PURE__ */ jsx42(Label, { htmlFor: id, children: etiqueta }),
-      /* @__PURE__ */ jsx42(
+  return /* @__PURE__ */ jsxs36("form", { onSubmit: aplicar, className: className ?? "space-y-3 rounded-xl border border-fono/25 bg-fono/5 p-4", children: [
+    /* @__PURE__ */ jsxs36("div", { children: [
+      /* @__PURE__ */ jsx44(Label, { htmlFor: id, children: etiqueta }),
+      /* @__PURE__ */ jsx44(
         Input,
         {
           id,
@@ -4846,16 +5641,16 @@ function PegarEnlaceToken({
         }
       )
     ] }),
-    error && /* @__PURE__ */ jsx42(Aviso, { tono: "error", children: error }),
-    /* @__PURE__ */ jsx42(Button, { type: "submit", disabled: !enlace.trim(), children: textoBoton })
+    error && /* @__PURE__ */ jsx44(Aviso, { tono: "error", children: error }),
+    /* @__PURE__ */ jsx44(Button, { type: "submit", disabled: !enlace.trim(), children: textoBoton })
   ] });
 }
 
 // src/components/NavLateral.jsx
-import { Fragment as Fragment6, useState as useState18 } from "react";
-import { jsx as jsx43, jsxs as jsxs35 } from "react/jsx-runtime";
+import { Fragment as Fragment5, useState as useState20 } from "react";
+import { jsx as jsx45, jsxs as jsxs37 } from "react/jsx-runtime";
 function ItemNav({ item, activo, colapsado, onSelect, hijo = false }) {
-  return /* @__PURE__ */ jsx43("li", { children: /* @__PURE__ */ jsxs35(
+  return /* @__PURE__ */ jsx45("li", { children: /* @__PURE__ */ jsxs37(
     "button",
     {
       type: "button",
@@ -4869,38 +5664,51 @@ function ItemNav({ item, activo, colapsado, onSelect, hijo = false }) {
         colapsado && "justify-center px-2"
       ),
       children: [
-        item.icono && /* @__PURE__ */ jsx43(Icon, { name: item.icono, className: cn("shrink-0", hijo ? "h-3.5 w-3.5" : "h-4 w-4") }),
-        !colapsado && /* @__PURE__ */ jsx43("span", { className: "min-w-0 flex-1 truncate text-left", children: item.label }),
-        !colapsado && item.contador != null && /* @__PURE__ */ jsx43("span", { className: "shrink-0 rounded-full bg-ink-700 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-mute", children: item.contador }),
-        colapsado && item.contador != null && /* @__PURE__ */ jsx43("span", { className: "sr-only", children: item.contador })
+        item.icono && /* @__PURE__ */ jsx45(Icon, { name: item.icono, className: cn("shrink-0", hijo ? "h-3.5 w-3.5" : "h-4 w-4") }),
+        !colapsado && /* @__PURE__ */ jsx45("span", { className: "min-w-0 flex-1 truncate text-left", children: item.label }),
+        !colapsado && item.contador != null && /* @__PURE__ */ jsx45("span", { className: "shrink-0 rounded-full bg-ink-700 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-mute", children: item.contador }),
+        colapsado && item.contador != null && /* @__PURE__ */ jsx45("span", { className: "sr-only", children: item.contador })
       ]
     }
   ) });
 }
-function NavLateral({
-  items = [],
-  grupos,
-  gruposPlegados,
-  onToggleGrupo,
-  activeId,
-  onSelect,
-  colapsado = false,
-  onToggle,
-  cabecera,
-  pie,
-  ancho = "w-64",
-  ariaLabel = "Navegaci\xF3n principal",
-  className
-}) {
-  const [plegadosInterno, setPlegadosInterno] = useState18({});
-  const plegados = gruposPlegados ?? plegadosInterno;
+function NavLateral(props) {
+  const {
+    items = [],
+    grupos,
+    gruposPlegados,
+    defaultGruposPlegados = {},
+    onToggleGrupo,
+    activeId,
+    onSelect,
+    colapsado: colapsadoProp,
+    defaultColapsado = false,
+    onToggle,
+    cabecera,
+    pie,
+    ancho = "w-64",
+    ariaLabel = "Navegaci\xF3n principal",
+    className
+  } = props;
+  const gruposControlados = Object.prototype.hasOwnProperty.call(props, "gruposPlegados");
+  const colapsoControlado = Object.prototype.hasOwnProperty.call(props, "colapsado");
+  const [plegadosInterno, setPlegadosInterno] = useState20(defaultGruposPlegados);
+  const [colapsadoInterno, setColapsadoInterno] = useState20(defaultColapsado);
+  const plegados = gruposControlados ? gruposPlegados || {} : plegadosInterno;
+  const colapsado = colapsoControlado ? Boolean(colapsadoProp) : colapsadoInterno;
   const alternarGrupo = (titulo2) => {
-    if (onToggleGrupo) onToggleGrupo(titulo2);
-    else setPlegadosInterno((previos) => ({ ...previos, [titulo2]: !previos[titulo2] }));
+    const siguiente = !Boolean(plegados[titulo2]);
+    if (!gruposControlados) setPlegadosInterno((previos) => ({ ...previos, [titulo2]: siguiente }));
+    onToggleGrupo?.(titulo2, siguiente);
   };
-  const lista = (listaItems) => /* @__PURE__ */ jsx43("ul", { className: "space-y-1", children: listaItems.map((item) => /* @__PURE__ */ jsxs35(Fragment6, { children: [
-    /* @__PURE__ */ jsx43(ItemNav, { item, activo: item.id === activeId, colapsado, onSelect }),
-    !colapsado && item.hijos?.length ? /* @__PURE__ */ jsx43("li", { children: /* @__PURE__ */ jsx43("ul", { className: "mt-0.5 space-y-0.5 pl-7", children: item.hijos.map((hijo) => /* @__PURE__ */ jsx43(
+  const alternarColapso = () => {
+    const siguiente = !colapsado;
+    if (!colapsoControlado) setColapsadoInterno(siguiente);
+    onToggle?.(siguiente);
+  };
+  const lista = (listaItems) => /* @__PURE__ */ jsx45("ul", { className: "space-y-1", children: listaItems.map((item) => /* @__PURE__ */ jsxs37(Fragment5, { children: [
+    /* @__PURE__ */ jsx45(ItemNav, { item, activo: item.id === activeId, colapsado, onSelect }),
+    !colapsado && item.hijos?.length ? /* @__PURE__ */ jsx45("li", { children: /* @__PURE__ */ jsx45("ul", { className: "mt-0.5 space-y-0.5 pl-7", children: item.hijos.map((hijo) => /* @__PURE__ */ jsx45(
       ItemNav,
       {
         item: hijo,
@@ -4912,31 +5720,31 @@ function NavLateral({
       hijo.id
     )) }) }) : null
   ] }, item.id)) });
-  return /* @__PURE__ */ jsxs35(
+  return /* @__PURE__ */ jsxs37(
     "nav",
     {
       "aria-label": ariaLabel,
       className: cn("flex h-dvh flex-col border-r border-ink-600 bg-ink-900 transition-[width] duration-200", colapsado ? "w-[4.5rem]" : ancho, className),
       children: [
-        /* @__PURE__ */ jsxs35("div", { className: cn("flex items-center gap-2 px-3 py-3", colapsado && "justify-center"), children: [
-          cabecera && /* @__PURE__ */ jsx43("div", { className: "min-w-0 flex-1", children: cabecera }),
-          onToggle && /* @__PURE__ */ jsx43(
+        /* @__PURE__ */ jsxs37("div", { className: cn("flex items-center gap-2 px-3 py-3", colapsado && "justify-center"), children: [
+          cabecera && /* @__PURE__ */ jsx45("div", { className: "min-w-0 flex-1", children: cabecera }),
+          onToggle && /* @__PURE__ */ jsx45(
             "button",
             {
               type: "button",
-              onClick: onToggle,
+              onClick: alternarColapso,
               "aria-label": colapsado ? "Expandir men\xFA" : "Contraer men\xFA",
               "aria-expanded": !colapsado,
               className: cn("grid h-9 w-9 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-700 hover:text-fore", colapsado && "w-full"),
-              children: /* @__PURE__ */ jsx43(Icon, { name: "back", className: cn("h-4 w-4 transition-transform", colapsado && "rotate-180") })
+              children: /* @__PURE__ */ jsx45(Icon, { name: "back", className: cn("h-4 w-4 transition-transform", colapsado && "rotate-180") })
             }
           )
         ] }),
-        /* @__PURE__ */ jsx43("div", { className: "min-h-0 flex-1 space-y-2 overflow-y-auto px-2 py-2", children: grupos ? grupos.map(({ titulo: titulo2, items: itemsGrupo = [] }) => {
+        /* @__PURE__ */ jsx45("div", { className: "min-h-0 flex-1 space-y-2 overflow-y-auto px-2 py-2", children: grupos ? grupos.map(({ titulo: titulo2, items: itemsGrupo = [] }) => {
           const plegado = Boolean(plegados[titulo2]);
           const tieneActivo = itemsGrupo.some((item) => item.id === activeId);
-          return /* @__PURE__ */ jsxs35("div", { className: "flex flex-col", children: [
-            !colapsado && /* @__PURE__ */ jsxs35(
+          return /* @__PURE__ */ jsxs37("div", { className: "flex flex-col", children: [
+            !colapsado && /* @__PURE__ */ jsxs37(
               "button",
               {
                 type: "button",
@@ -4945,11 +5753,11 @@ function NavLateral({
                 title: plegado ? `Mostrar ${titulo2}` : `Ocultar ${titulo2}`,
                 className: "mb-0.5 flex w-full items-center justify-between gap-1 rounded-md px-2.5 py-0.5 text-left transition hover:bg-fore/5",
                 children: [
-                  /* @__PURE__ */ jsxs35("span", { className: "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[.16em] text-mute", children: [
+                  /* @__PURE__ */ jsxs37("span", { className: "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[.16em] text-mute", children: [
                     titulo2,
-                    plegado && tieneActivo && /* @__PURE__ */ jsx43("span", { className: "h-1.5 w-1.5 rounded-full bg-fono", "aria-hidden": true })
+                    plegado && tieneActivo && /* @__PURE__ */ jsx45("span", { className: "h-1.5 w-1.5 rounded-full bg-fono", "aria-hidden": true })
                   ] }),
-                  /* @__PURE__ */ jsx43(
+                  /* @__PURE__ */ jsx45(
                     Icon,
                     {
                       name: "chevron",
@@ -4962,72 +5770,122 @@ function NavLateral({
             (!plegado || colapsado) && lista(itemsGrupo)
           ] }, titulo2);
         }) : lista(items) }),
-        pie && /* @__PURE__ */ jsx43("div", { className: "border-t border-ink-600 p-2 text-fore", children: pie })
+        pie && /* @__PURE__ */ jsx45("div", { className: "border-t border-ink-600 p-2 text-fore", children: pie })
       ]
     }
   );
 }
 
 // src/components/MenuDesplegable.jsx
-import { useEffect as useEffect12, useRef as useRef11, useState as useState19 } from "react";
-import { jsx as jsx44, jsxs as jsxs36 } from "react/jsx-runtime";
+import { useEffect as useEffect14, useRef as useRef13, useState as useState21 } from "react";
+import { jsx as jsx46, jsxs as jsxs38 } from "react/jsx-runtime";
 function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel = "Men\xFA", className }) {
-  const [abierto, setAbierto] = useState19(false);
-  const raiz = useRef11(null);
-  useEffect12(() => {
+  const [abierto, setAbierto] = useState21(false);
+  const [activo, setActivo] = useState21(0);
+  const raiz = useRef13(null);
+  const disparador = useRef13(null);
+  const menu = useRef13(null);
+  const acciones = items.filter((item) => !item.separador && !item.disabled);
+  function enfocar(indice) {
+    const elementos = menu.current?.querySelectorAll('[role="menuitem"]:not(:disabled)') || [];
+    if (!elementos.length) return;
+    const siguiente = (indice + elementos.length) % elementos.length;
+    setActivo(siguiente);
+    elementos[siguiente]?.focus();
+  }
+  function cerrar({ devolverFoco = false } = {}) {
+    setAbierto(false);
+    if (devolverFoco) requestAnimationFrame(() => disparador.current?.focus());
+  }
+  function abrir(indice = 0) {
+    if (!acciones.length) return;
+    setAbierto(true);
+    requestAnimationFrame(() => enfocar(indice));
+  }
+  useEffect14(() => {
     if (!abierto) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
-      setAbierto(false);
-    };
-    const cerrarEsc = (event) => {
-      if (event.key === "Escape") setAbierto(false);
+      cerrar();
     };
     document.addEventListener("click", cerrarFuera);
-    document.addEventListener("keydown", cerrarEsc);
     return () => {
       document.removeEventListener("click", cerrarFuera);
-      document.removeEventListener("keydown", cerrarEsc);
     };
   }, [abierto]);
-  return /* @__PURE__ */ jsxs36("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx44(
+  function manejarMenu(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cerrar({ devolverFoco: true });
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      enfocar(activo + 1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      enfocar(activo - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      enfocar(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      enfocar(-1);
+    }
+  }
+  return /* @__PURE__ */ jsxs38("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx46(
       "button",
       {
+        ref: disparador,
         type: "button",
         "aria-haspopup": "menu",
         "aria-expanded": abierto,
-        onClick: () => setAbierto((actual) => !actual),
-        className: "inline-flex items-center gap-2 rounded-lg transition",
+        onClick: () => {
+          if (abierto) cerrar();
+          else abrir(0);
+        },
+        onKeyDown: (event) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            abrir(event.key === "ArrowDown" ? 0 : -1);
+          }
+        },
+        className: "toque-44 inline-flex min-h-11 items-center gap-2 rounded-lg transition",
         children: trigger
       }
     ),
-    abierto && /* @__PURE__ */ jsx44(
+    abierto && /* @__PURE__ */ jsx46(
       "div",
       {
+        ref: menu,
         role: "menu",
         "aria-label": ariaLabel,
+        onKeyDown: manejarMenu,
         className: cn("absolute z-30 mt-1 min-w-48 rounded-xl border border-ink-500 bg-ink p-1 shadow-float", alineacion === "right" ? "right-0" : "left-0"),
         children: items.map((item, indice) => {
-          if (item.separador) return /* @__PURE__ */ jsx44("div", { className: "my-1 h-px bg-ink-600" }, `sep-${indice}`);
-          return /* @__PURE__ */ jsxs36(
+          if (item.separador) return /* @__PURE__ */ jsx46("div", { role: "separator", className: "my-1 h-px bg-ink-600" }, `sep-${indice}`);
+          const indiceActivo = items.slice(0, indice).filter((candidato) => !candidato.separador && !candidato.disabled).length;
+          return /* @__PURE__ */ jsxs38(
             "button",
             {
               type: "button",
               role: "menuitem",
+              tabIndex: !item.disabled && indiceActivo === activo ? 0 : -1,
               disabled: item.disabled,
+              onFocus: () => {
+                if (!item.disabled) setActivo(indiceActivo);
+              },
               onClick: () => {
-                setAbierto(false);
+                cerrar({ devolverFoco: true });
                 item.onClick?.();
               },
               className: cn(
-                "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition",
+                "flex min-h-11 w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition",
                 item.peligro ? "text-bad-text hover:bg-bad/10" : "text-fore hover:bg-ink-700",
                 item.disabled && "cursor-not-allowed opacity-40"
               ),
               children: [
-                item.icono && /* @__PURE__ */ jsx44(Icon, { name: item.icono, className: "h-4 w-4 shrink-0" }),
-                /* @__PURE__ */ jsx44("span", { className: "min-w-0 flex-1 truncate", children: item.label }),
+                item.icono && /* @__PURE__ */ jsx46(Icon, { name: item.icono, className: "h-4 w-4 shrink-0" }),
+                /* @__PURE__ */ jsx46("span", { className: "min-w-0 flex-1 truncate", children: item.label }),
                 item.extra
               ]
             },
@@ -5040,10 +5898,10 @@ function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel 
 }
 
 // src/components/EnlaceLinea.jsx
-import { jsx as jsx45 } from "react/jsx-runtime";
+import { jsx as jsx47 } from "react/jsx-runtime";
 function EnlaceLinea({ href, onClick, children, className }) {
-  if (!href) return /* @__PURE__ */ jsx45("span", { className: cn("font-medium", className), children });
-  return /* @__PURE__ */ jsx45(
+  if (!href) return /* @__PURE__ */ jsx47("span", { className: cn("font-medium", className), children });
+  return /* @__PURE__ */ jsx47(
     "a",
     {
       href,
@@ -5058,7 +5916,7 @@ function EnlaceLinea({ href, onClick, children, className }) {
 }
 
 // src/components/AvisoPrivacidad.jsx
-import { jsx as jsx46, jsxs as jsxs37 } from "react/jsx-runtime";
+import { jsx as jsx48, jsxs as jsxs39 } from "react/jsx-runtime";
 function AvisoPrivacidad({
   finalidad,
   detalle,
@@ -5078,20 +5936,20 @@ function AvisoPrivacidad({
     { clave: "politica", href: politicaUrl, onClick: onPolitica, texto: politicaTexto },
     { clave: "derechos", href: derechosUrl, onClick: onDerechos, texto: derechosTexto }
   ].filter((enlace) => enlace.href);
-  return /* @__PURE__ */ jsxs37(Nota, { tono, como: "div", compact, className, "data-testid": "aviso-privacidad", children: [
-    finalidad && /* @__PURE__ */ jsx46("span", { className: "block", children: finalidad }),
-    detalle && /* @__PURE__ */ jsx46("span", { className: "mt-0.5 block text-xs text-mute", children: detalle }),
+  return /* @__PURE__ */ jsxs39(Nota, { tono, como: "div", compact, className, "data-testid": "aviso-privacidad", children: [
+    finalidad && /* @__PURE__ */ jsx48("span", { className: "block", children: finalidad }),
+    detalle && /* @__PURE__ */ jsx48("span", { className: "mt-0.5 block text-xs text-mute", children: detalle }),
     children,
-    enlaces.length > 0 && /* @__PURE__ */ jsx46("span", { className: "mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs", children: enlaces.map((enlace, indice) => /* @__PURE__ */ jsxs37("span", { className: "inline-flex items-center gap-2", children: [
-      indice > 0 && /* @__PURE__ */ jsx46("span", { "aria-hidden": "true", children: "\xB7" }),
-      /* @__PURE__ */ jsx46(EnlaceLinea, { href: enlace.href, onClick: enlace.onClick, children: enlace.texto })
+    enlaces.length > 0 && /* @__PURE__ */ jsx48("span", { className: "mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs", children: enlaces.map((enlace, indice) => /* @__PURE__ */ jsxs39("span", { className: "inline-flex items-center gap-2", children: [
+      indice > 0 && /* @__PURE__ */ jsx48("span", { "aria-hidden": "true", children: "\xB7" }),
+      /* @__PURE__ */ jsx48(EnlaceLinea, { href: enlace.href, onClick: enlace.onClick, children: enlace.texto })
     ] }, enlace.clave)) })
   ] });
 }
 
 // src/components/ConsentimientoDatos.jsx
-import { useId as useId13 } from "react";
-import { jsx as jsx47, jsxs as jsxs38 } from "react/jsx-runtime";
+import { useId as useId16 } from "react";
+import { jsx as jsx49, jsxs as jsxs40 } from "react/jsx-runtime";
 function ConsentimientoDatos({
   checked = false,
   onChange,
@@ -5108,12 +5966,12 @@ function ConsentimientoDatos({
   className,
   ...props
 }) {
-  const generado = useId13();
+  const generado = useId16();
   const campoId = id || generado;
   const politicaId = `${campoId}-politica`;
   const errorId = `${campoId}-error`;
-  return /* @__PURE__ */ jsxs38("div", { className: cn("space-y-1.5", className), "data-testid": "consentimiento-datos", children: [
-    /* @__PURE__ */ jsx47(
+  return /* @__PURE__ */ jsxs40("div", { className: cn("space-y-1.5", className), "data-testid": "consentimiento-datos", children: [
+    /* @__PURE__ */ jsx49(
       Checkbox,
       {
         id: campoId,
@@ -5129,20 +5987,20 @@ function ConsentimientoDatos({
         ...props
       }
     ),
-    /* @__PURE__ */ jsxs38("p", { id: politicaId, className: "text-xs leading-relaxed text-mute", children: [
-      politicaUrl ? /* @__PURE__ */ jsxs38("span", { children: [
+    /* @__PURE__ */ jsxs40("p", { id: politicaId, className: "text-xs leading-relaxed text-mute", children: [
+      politicaUrl ? /* @__PURE__ */ jsxs40("span", { children: [
         "Le\xE9 la ",
-        /* @__PURE__ */ jsx47(EnlaceLinea, { href: politicaUrl, onClick: onPolitica, children: politicaTexto }),
+        /* @__PURE__ */ jsx49(EnlaceLinea, { href: politicaUrl, onClick: onPolitica, children: politicaTexto }),
         version ? " \xB7 " : null
       ] }) : null,
-      version ? /* @__PURE__ */ jsxs38("span", { children: [
+      version ? /* @__PURE__ */ jsxs40("span", { children: [
         "versi\xF3n ",
         version,
         " \xB7 "
       ] }) : null,
       "pod\xE9s revocarlo cuando quieras."
     ] }),
-    error && /* @__PURE__ */ jsx47("p", { id: errorId, role: "alert", className: "text-xs text-bad-text", children: error })
+    error && /* @__PURE__ */ jsx49("p", { id: errorId, role: "alert", className: "text-xs text-bad-text", children: error })
   ] });
 }
 
@@ -5168,7 +6026,7 @@ function registroConsentimiento({
 
 // src/components/ThemeToggle.jsx
 import { useSyncExternalStore } from "react";
-import { jsx as jsx48 } from "react/jsx-runtime";
+import { jsx as jsx50 } from "react/jsx-runtime";
 var TEMA_CLARO = "claro";
 var TEMA_OSCURO = "oscuro";
 var CLAVE_PREDETERMINADA = "owncoding-theme";
@@ -5203,7 +6061,7 @@ function ThemeToggle({
   const tema = useSyncExternalStore(suscribir, leerTema, () => TEMA_CLARO);
   const oscuro = tema === TEMA_OSCURO;
   const etiqueta = oscuro ? etiquetaClaro : etiquetaOscuro;
-  return /* @__PURE__ */ jsx48(
+  return /* @__PURE__ */ jsx50(
     "button",
     {
       type: "button",
@@ -5220,47 +6078,47 @@ function ThemeToggle({
         "hover:border-fono hover:bg-fono/10 hover:text-fore",
         className
       ),
-      children: /* @__PURE__ */ jsx48(Icon, { name: oscuro ? "sun" : "moon", className: "h-4 w-4" })
+      children: /* @__PURE__ */ jsx50(Icon, { name: oscuro ? "sun" : "moon", className: "h-4 w-4" })
     }
   );
 }
 
 // src/components/PanelDerecho.jsx
-import { jsx as jsx49, jsxs as jsxs39 } from "react/jsx-runtime";
+import { jsx as jsx51, jsxs as jsxs41 } from "react/jsx-runtime";
 function PanelDerecho({ children, panel, id, className, classNamePanel }) {
-  return /* @__PURE__ */ jsxs39("div", { className: cn("grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]", className), children: [
-    /* @__PURE__ */ jsx49("div", { className: "min-w-0 space-y-4", children }),
-    /* @__PURE__ */ jsx49("aside", { id, className: cn("min-w-0 lg:sticky lg:top-24", classNamePanel), children: panel })
+  return /* @__PURE__ */ jsxs41("div", { className: cn("grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]", className), children: [
+    /* @__PURE__ */ jsx51("div", { className: "min-w-0 space-y-4", children }),
+    /* @__PURE__ */ jsx51("aside", { id, className: cn("min-w-0 lg:sticky lg:top-24", classNamePanel), children: panel })
   ] });
 }
 
 // src/components/TarjetaAjuste.jsx
-import { jsx as jsx50, jsxs as jsxs40 } from "react/jsx-runtime";
+import { jsx as jsx52, jsxs as jsxs42 } from "react/jsx-runtime";
 function TarjetaAjuste({ titulo: titulo2, descripcion, accion, icono, tono = "normal", children, className, id }) {
   const peligro = tono === "peligro";
-  return /* @__PURE__ */ jsxs40(Card, { id, className: cn("space-y-3", peligro && "border-bad/30", className), children: [
-    /* @__PURE__ */ jsxs40("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
-      /* @__PURE__ */ jsxs40("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsxs40("h2", { className: cn("flex items-center gap-2 font-semibold", peligro && "text-bad-text"), children: [
-          icono && /* @__PURE__ */ jsx50(Icon, { name: icono, className: "h-4 w-4 text-mute" }),
+  return /* @__PURE__ */ jsxs42(Card, { id, className: cn("space-y-3", peligro && "border-bad/30", className), children: [
+    /* @__PURE__ */ jsxs42("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
+      /* @__PURE__ */ jsxs42("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxs42("h2", { className: cn("flex items-center gap-2 font-semibold", peligro && "text-bad-text"), children: [
+          icono && /* @__PURE__ */ jsx52(Icon, { name: icono, className: "h-4 w-4 text-mute" }),
           titulo2
         ] }),
-        descripcion && /* @__PURE__ */ jsx50("p", { className: "mt-1 text-sm text-mute", children: descripcion })
+        descripcion && /* @__PURE__ */ jsx52("p", { className: "mt-1 text-sm text-mute", children: descripcion })
       ] }),
-      accion && /* @__PURE__ */ jsx50("div", { className: "shrink-0", children: accion })
+      accion && /* @__PURE__ */ jsx52("div", { className: "shrink-0", children: accion })
     ] }),
     children
   ] });
 }
 
 // src/components/EstadoGuardado.jsx
-import { jsx as jsx51 } from "react/jsx-runtime";
+import { jsx as jsx53 } from "react/jsx-runtime";
 function EstadoGuardado({ testId, estado, className }) {
-  return /* @__PURE__ */ jsx51("div", { "data-testid": testId, "aria-live": "polite", className: cn("min-w-0", className), children: estado && (estado.ok ? /* @__PURE__ */ jsx51(Badge, { color: "green", children: estado.texto }) : /* @__PURE__ */ jsx51(Aviso, { tono: "error", compact: true, className: "max-w-xl", children: estado.texto })) });
+  return /* @__PURE__ */ jsx53("div", { "data-testid": testId, "aria-live": "polite", className: cn("min-w-0", className), children: estado && (estado.ok ? /* @__PURE__ */ jsx53(Badge, { color: "green", children: estado.texto }) : /* @__PURE__ */ jsx53(Aviso, { tono: "error", compact: true, className: "max-w-xl", children: estado.texto })) });
 }
 
 // src/components/AjustesImpresion.jsx
-import { useState as useState20 } from "react";
+import { useState as useState22 } from "react";
 
 // src/printing/estadoImpresoras.js
 var ESTADO_IMPRESORA = Object.freeze({
@@ -5357,7 +6215,7 @@ function agregarEstado(impresoras = [], estados = {}) {
 }
 
 // src/components/AjustesImpresion.jsx
-import { jsx as jsx52, jsxs as jsxs41 } from "react/jsx-runtime";
+import { jsx as jsx54, jsxs as jsxs43 } from "react/jsx-runtime";
 var VACIO = () => ({
   id: null,
   nombre: "",
@@ -5405,7 +6263,7 @@ function AjustesImpresion({
   descripcion = "Eleg\xED c\xF3mo sale el papel: por red (LAN) o por una cola local (USB). La app verifica cada impresora antes de usarla.",
   className
 }) {
-  const [form, setForm] = useState20(null);
+  const [form, setForm] = useState22(null);
   const resumen = agregarEstado(impresoras, estado);
   function cambiar(campo, valor) {
     setForm((actual) => ({ ...actual, [campo]: valor }));
@@ -5418,40 +6276,40 @@ function AjustesImpresion({
     onGuardar?.({ ...form, destino, copias: Number(form.copias) || 1 });
     setForm(null);
   }
-  return /* @__PURE__ */ jsxs41(Card, { className: cn("space-y-4", className), children: [
-    /* @__PURE__ */ jsxs41("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
-      /* @__PURE__ */ jsxs41("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsxs41("h2", { className: "flex items-center gap-2 font-semibold", children: [
-          /* @__PURE__ */ jsx52(Icon, { name: "printer", className: "h-4 w-4" }),
+  return /* @__PURE__ */ jsxs43(Card, { className: cn("space-y-4", className), children: [
+    /* @__PURE__ */ jsxs43("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
+      /* @__PURE__ */ jsxs43("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxs43("h2", { className: "flex items-center gap-2 font-semibold", children: [
+          /* @__PURE__ */ jsx54(Icon, { name: "printer", className: "h-4 w-4" }),
           titulo2
         ] }),
-        /* @__PURE__ */ jsx52("p", { className: "mt-1 text-sm text-mute", children: descripcion })
+        /* @__PURE__ */ jsx54("p", { className: "mt-1 text-sm text-mute", children: descripcion })
       ] }),
-      /* @__PURE__ */ jsxs41("div", { className: "flex flex-wrap items-center gap-2", children: [
-        /* @__PURE__ */ jsx52(Badge, { color: resumen.tono, className: "w-fit whitespace-nowrap", title: resumen.detalle, children: resumen.label }),
-        onVerificar && /* @__PURE__ */ jsxs41(Button, { type: "button", variant: "outline", onClick: onVerificar, children: [
-          /* @__PURE__ */ jsx52(Icon, { name: "refresh", className: "h-3.5 w-3.5" }),
+      /* @__PURE__ */ jsxs43("div", { className: "flex flex-wrap items-center gap-2", children: [
+        /* @__PURE__ */ jsx54(Badge, { color: resumen.tono, className: "w-fit whitespace-nowrap", title: resumen.detalle, children: resumen.label }),
+        onVerificar && /* @__PURE__ */ jsxs43(Button, { type: "button", variant: "outline", onClick: onVerificar, children: [
+          /* @__PURE__ */ jsx54(Icon, { name: "refresh", className: "h-3.5 w-3.5" }),
           "Verificar"
         ] }),
-        /* @__PURE__ */ jsxs41(Button, { type: "button", onClick: () => setForm(VACIO()), children: [
-          /* @__PURE__ */ jsx52(Icon, { name: "plus", className: "h-4 w-4" }),
+        /* @__PURE__ */ jsxs43(Button, { type: "button", onClick: () => setForm(VACIO()), children: [
+          /* @__PURE__ */ jsx54(Icon, { name: "plus", className: "h-4 w-4" }),
           "Agregar impresora"
         ] })
       ] })
     ] }),
-    impresoras.length === 0 && /* @__PURE__ */ jsx52("p", { className: "rounded-xl border border-ink-600 p-4 text-sm text-mute", children: "Todav\xEDa no hay impresoras configuradas." }),
-    /* @__PURE__ */ jsx52("ul", { className: "space-y-2", children: impresoras.map((impresora) => {
+    impresoras.length === 0 && /* @__PURE__ */ jsx54("p", { className: "rounded-xl border border-ink-600 p-4 text-sm text-mute", children: "Todav\xEDa no hay impresoras configuradas." }),
+    /* @__PURE__ */ jsx54("ul", { className: "space-y-2", children: impresoras.map((impresora) => {
       const registro = estado?.[impresora.id];
       const tono = TONO_ESTADO[registro?.estado] || "slate";
-      return /* @__PURE__ */ jsxs41("li", { className: "flex flex-wrap items-center justify-between gap-2 rounded-xl border border-ink-600 p-3", children: [
-        /* @__PURE__ */ jsxs41("div", { className: "min-w-0", children: [
-          /* @__PURE__ */ jsxs41("p", { className: "flex items-center gap-2 font-medium", children: [
-            /* @__PURE__ */ jsx52(Dot, { color: tono }),
+      return /* @__PURE__ */ jsxs43("li", { className: "flex flex-wrap items-center justify-between gap-2 rounded-xl border border-ink-600 p-3", children: [
+        /* @__PURE__ */ jsxs43("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsxs43("p", { className: "flex items-center gap-2 font-medium", children: [
+            /* @__PURE__ */ jsx54(Dot, { color: tono }),
             impresora.nombre || "Impresora",
-            impresora.predeterminada && /* @__PURE__ */ jsx52(Badge, { color: "fono", children: "Predeterminada" }),
-            impresora.activa === false && /* @__PURE__ */ jsx52(Badge, { color: "slate", children: "Inactiva" })
+            impresora.predeterminada && /* @__PURE__ */ jsx54(Badge, { color: "fono", children: "Predeterminada" }),
+            impresora.activa === false && /* @__PURE__ */ jsx54(Badge, { color: "slate", children: "Inactiva" })
           ] }),
-          /* @__PURE__ */ jsxs41("p", { className: "mt-0.5 truncate text-xs text-mute", title: impresora.destino, children: [
+          /* @__PURE__ */ jsxs43("p", { className: "mt-0.5 truncate text-xs text-mute", title: impresora.destino, children: [
             conexionDeDestino(impresora.destino) === "cups" ? "USB / cola local" : "LAN",
             " \xB7 ",
             impresora.destino || "sin destino",
@@ -5461,79 +6319,79 @@ function AjustesImpresion({
             registro ? ` \xB7 ${textoVerificacion(registro)}` : ""
           ] })
         ] }),
-        /* @__PURE__ */ jsxs41("div", { className: "flex flex-wrap items-center gap-1", children: [
-          onProbar && /* @__PURE__ */ jsx52(Button, { type: "button", variant: "outline", disabled: probando === impresora.id, onClick: () => onProbar(impresora), children: probando === impresora.id ? "Probando\u2026" : "Imprimir prueba" }),
-          /* @__PURE__ */ jsx52(Button, { type: "button", variant: "ghost", onClick: () => setForm(aFormulario(impresora)), children: "Editar" }),
-          onEliminar && /* @__PURE__ */ jsx52(Button, { type: "button", variant: "ghost", className: "text-bad-text", onClick: () => onEliminar(impresora.id), children: "Eliminar" })
+        /* @__PURE__ */ jsxs43("div", { className: "flex flex-wrap items-center gap-1", children: [
+          onProbar && /* @__PURE__ */ jsx54(Button, { type: "button", variant: "outline", disabled: probando === impresora.id, onClick: () => onProbar(impresora), children: probando === impresora.id ? "Probando\u2026" : "Imprimir prueba" }),
+          /* @__PURE__ */ jsx54(Button, { type: "button", variant: "ghost", onClick: () => setForm(aFormulario(impresora)), children: "Editar" }),
+          onEliminar && /* @__PURE__ */ jsx54(Button, { type: "button", variant: "ghost", className: "text-bad-text", onClick: () => onEliminar(impresora.id), children: "Eliminar" })
         ] })
       ] }, impresora.id);
     }) }),
-    form && /* @__PURE__ */ jsxs41("form", { onSubmit: enviar, className: "space-y-3 rounded-xl border border-fono/25 bg-fono/5 p-3", children: [
-      /* @__PURE__ */ jsxs41("div", { className: "grid gap-3 sm:grid-cols-2", children: [
-        /* @__PURE__ */ jsxs41("div", { children: [
-          /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-nombre", children: "Nombre" }),
-          /* @__PURE__ */ jsx52(Input, { id: "imp-nombre", required: true, value: form.nombre, onChange: (event) => cambiar("nombre", event.target.value), placeholder: "Mostrador" })
+    form && /* @__PURE__ */ jsxs43("form", { onSubmit: enviar, className: "space-y-3 rounded-xl border border-fono/25 bg-fono/5 p-3", children: [
+      /* @__PURE__ */ jsxs43("div", { className: "grid gap-3 sm:grid-cols-2", children: [
+        /* @__PURE__ */ jsxs43("div", { children: [
+          /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-nombre", children: "Nombre" }),
+          /* @__PURE__ */ jsx54(Input, { id: "imp-nombre", required: true, value: form.nombre, onChange: (event) => cambiar("nombre", event.target.value), placeholder: "Mostrador" })
         ] }),
-        /* @__PURE__ */ jsxs41("div", { children: [
-          /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-ubicacion", children: "Ubicaci\xF3n (opcional)" }),
-          /* @__PURE__ */ jsx52(Input, { id: "imp-ubicacion", value: form.ubicacion, onChange: (event) => cambiar("ubicacion", event.target.value), placeholder: "Caja 1" })
+        /* @__PURE__ */ jsxs43("div", { children: [
+          /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-ubicacion", children: "Ubicaci\xF3n (opcional)" }),
+          /* @__PURE__ */ jsx54(Input, { id: "imp-ubicacion", value: form.ubicacion, onChange: (event) => cambiar("ubicacion", event.target.value), placeholder: "Caja 1" })
         ] })
       ] }),
-      /* @__PURE__ */ jsxs41("div", { className: "grid gap-3 sm:grid-cols-2", children: [
-        /* @__PURE__ */ jsxs41("div", { children: [
-          /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-conexion", children: "Conexi\xF3n" }),
-          /* @__PURE__ */ jsxs41(Select, { id: "imp-conexion", value: form.conexion, onChange: (event) => cambiar("conexion", event.target.value), children: [
-            /* @__PURE__ */ jsx52("option", { value: "lan", children: "LAN (impresora de red)" }),
-            /* @__PURE__ */ jsx52("option", { value: "cups", children: "USB / cola local (CUPS)" })
+      /* @__PURE__ */ jsxs43("div", { className: "grid gap-3 sm:grid-cols-2", children: [
+        /* @__PURE__ */ jsxs43("div", { children: [
+          /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-conexion", children: "Conexi\xF3n" }),
+          /* @__PURE__ */ jsxs43(Select, { id: "imp-conexion", value: form.conexion, onChange: (event) => cambiar("conexion", event.target.value), children: [
+            /* @__PURE__ */ jsx54("option", { value: "lan", children: "LAN (impresora de red)" }),
+            /* @__PURE__ */ jsx54("option", { value: "cups", children: "USB / cola local (CUPS)" })
           ] })
         ] }),
-        form.conexion === "lan" ? /* @__PURE__ */ jsxs41("div", { className: "grid grid-cols-[minmax(0,1fr)_6rem] gap-2", children: [
-          /* @__PURE__ */ jsxs41("div", { children: [
-            /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-ip", children: "IP" }),
-            /* @__PURE__ */ jsx52(Input, { id: "imp-ip", required: true, value: form.ip, onChange: (event) => cambiar("ip", event.target.value), placeholder: "192.168.1.50", inputMode: "decimal" })
+        form.conexion === "lan" ? /* @__PURE__ */ jsxs43("div", { className: "grid grid-cols-[minmax(0,1fr)_6rem] gap-2", children: [
+          /* @__PURE__ */ jsxs43("div", { children: [
+            /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-ip", children: "IP" }),
+            /* @__PURE__ */ jsx54(Input, { id: "imp-ip", required: true, value: form.ip, onChange: (event) => cambiar("ip", event.target.value), placeholder: "192.168.1.50", inputMode: "decimal" })
           ] }),
-          /* @__PURE__ */ jsxs41("div", { children: [
-            /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-puerto", children: "Puerto" }),
-            /* @__PURE__ */ jsx52(Input, { id: "imp-puerto", value: form.puerto, onChange: (event) => cambiar("puerto", event.target.value.replace(/\D/g, "")), placeholder: "9100", inputMode: "numeric" })
+          /* @__PURE__ */ jsxs43("div", { children: [
+            /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-puerto", children: "Puerto" }),
+            /* @__PURE__ */ jsx54(Input, { id: "imp-puerto", value: form.puerto, onChange: (event) => cambiar("puerto", event.target.value.replace(/\D/g, "")), placeholder: "9100", inputMode: "numeric" })
           ] })
-        ] }) : /* @__PURE__ */ jsxs41("div", { children: [
-          /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-cola", children: "Cola local" }),
-          /* @__PURE__ */ jsx52(Input, { id: "imp-cola", required: true, value: form.cola, onChange: (event) => cambiar("cola", event.target.value), placeholder: "Nombre exacto en el sistema" }),
-          /* @__PURE__ */ jsx52("p", { className: "mt-1 text-xs text-mute", children: "En Windows/macOS el nombre de la cola es el que ves en Impresoras del sistema." })
+        ] }) : /* @__PURE__ */ jsxs43("div", { children: [
+          /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-cola", children: "Cola local" }),
+          /* @__PURE__ */ jsx54(Input, { id: "imp-cola", required: true, value: form.cola, onChange: (event) => cambiar("cola", event.target.value), placeholder: "Nombre exacto en el sistema" }),
+          /* @__PURE__ */ jsx54("p", { className: "mt-1 text-xs text-mute", children: "En Windows/macOS el nombre de la cola es el que ves en Impresoras del sistema." })
         ] })
       ] }),
-      /* @__PURE__ */ jsxs41("div", { className: "grid gap-3 sm:grid-cols-3", children: [
-        /* @__PURE__ */ jsxs41("div", { children: [
-          /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-ancho", children: "Ancho de papel" }),
-          /* @__PURE__ */ jsx52(Select, { id: "imp-ancho", value: form.ancho, onChange: (event) => cambiar("ancho", event.target.value), children: anchoOpciones.map((opcion) => /* @__PURE__ */ jsx52("option", { value: opcion.id, children: opcion.label }, opcion.id)) })
+      /* @__PURE__ */ jsxs43("div", { className: "grid gap-3 sm:grid-cols-3", children: [
+        /* @__PURE__ */ jsxs43("div", { children: [
+          /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-ancho", children: "Ancho de papel" }),
+          /* @__PURE__ */ jsx54(Select, { id: "imp-ancho", value: form.ancho, onChange: (event) => cambiar("ancho", event.target.value), children: anchoOpciones.map((opcion) => /* @__PURE__ */ jsx54("option", { value: opcion.id, children: opcion.label }, opcion.id)) })
         ] }),
-        /* @__PURE__ */ jsxs41("div", { children: [
-          /* @__PURE__ */ jsx52(Label, { htmlFor: "imp-copias", children: "Copias" }),
-          /* @__PURE__ */ jsx52(Input, { id: "imp-copias", value: form.copias, onChange: (event) => cambiar("copias", event.target.value.replace(/\D/g, "")), inputMode: "numeric", maxLength: 2 })
+        /* @__PURE__ */ jsxs43("div", { children: [
+          /* @__PURE__ */ jsx54(Label, { htmlFor: "imp-copias", children: "Copias" }),
+          /* @__PURE__ */ jsx54(Input, { id: "imp-copias", value: form.copias, onChange: (event) => cambiar("copias", event.target.value.replace(/\D/g, "")), inputMode: "numeric", maxLength: 2 })
         ] }),
-        /* @__PURE__ */ jsxs41("label", { className: "flex items-end gap-2 pb-2 text-sm", children: [
-          /* @__PURE__ */ jsx52("input", { type: "checkbox", className: "h-4 w-4 accent-fono", checked: form.predeterminada, onChange: (event) => cambiar("predeterminada", event.target.checked) }),
+        /* @__PURE__ */ jsxs43("label", { className: "flex items-end gap-2 pb-2 text-sm", children: [
+          /* @__PURE__ */ jsx54("input", { type: "checkbox", className: "h-4 w-4 accent-fono", checked: form.predeterminada, onChange: (event) => cambiar("predeterminada", event.target.checked) }),
           "Predeterminada"
         ] })
       ] }),
-      /* @__PURE__ */ jsx52("p", { className: "text-xs text-mute", children: form.conexion === "lan" ? `Se guardar\xE1 como lan:${form.ip || "<ip>"}:${form.puerto || "9100"}` : `Se guardar\xE1 como cups:${form.cola || "<cola>"}` }),
-      /* @__PURE__ */ jsxs41("div", { className: "flex flex-wrap justify-end gap-2", children: [
-        /* @__PURE__ */ jsx52(Button, { type: "button", variant: "ghost", onClick: () => setForm(null), children: "Cancelar" }),
-        /* @__PURE__ */ jsx52(Button, { type: "submit", disabled: guardando, children: guardando ? "Guardando\u2026" : "Guardar impresora" })
+      /* @__PURE__ */ jsx54("p", { className: "text-xs text-mute", children: form.conexion === "lan" ? `Se guardar\xE1 como lan:${form.ip || "<ip>"}:${form.puerto || "9100"}` : `Se guardar\xE1 como cups:${form.cola || "<cola>"}` }),
+      /* @__PURE__ */ jsxs43("div", { className: "flex flex-wrap justify-end gap-2", children: [
+        /* @__PURE__ */ jsx54(Button, { type: "button", variant: "ghost", onClick: () => setForm(null), children: "Cancelar" }),
+        /* @__PURE__ */ jsx54(Button, { type: "submit", disabled: guardando, children: guardando ? "Guardando\u2026" : "Guardar impresora" })
       ] })
     ] }),
-    /* @__PURE__ */ jsxs41("p", { className: "text-xs text-mute", children: [
+    /* @__PURE__ */ jsxs43("p", { className: "text-xs text-mute", children: [
       "La impresi\xF3n sale por el ",
-      /* @__PURE__ */ jsx52("b", { className: "text-fore", children: "agente local" }),
+      /* @__PURE__ */ jsx54("b", { className: "text-fore", children: "agente local" }),
       ": instalalo en la computadora que tiene la impresora (LAN o USB conectada) y vinculala con el c\xF3digo. Con el agente ca\xEDdo, los trabajos quedan en cola; nunca se pierden. Ver ",
-      /* @__PURE__ */ jsx52("b", { className: "text-fore", children: "docs/IMPRESION.md" }),
+      /* @__PURE__ */ jsx54("b", { className: "text-fore", children: "docs/IMPRESION.md" }),
       "."
     ] })
   ] });
 }
 
 // src/components/BotonImprimir.jsx
-import { jsx as jsx53, jsxs as jsxs42 } from "react/jsx-runtime";
+import { jsx as jsx55, jsxs as jsxs44 } from "react/jsx-runtime";
 function BotonImprimir({
   onImprimir,
   estado = null,
@@ -5545,20 +6403,21 @@ function BotonImprimir({
 }) {
   const enCurso = estado === "pendiente" || estado === "reclamado";
   const texto = enCurso ? etiquetaTrabajo(estado) : etiqueta;
-  return /* @__PURE__ */ jsxs42("span", { className: cn("inline-flex items-center gap-2", className), children: [
-    /* @__PURE__ */ jsxs42(Button, { type: "button", variant, disabled: disabled || enCurso, onClick: onImprimir, "aria-busy": enCurso, children: [
-      /* @__PURE__ */ jsx53(Icon, { name: icono, className: "h-4 w-4" }),
+  return /* @__PURE__ */ jsxs44("span", { className: cn("inline-flex items-center gap-2", className), children: [
+    /* @__PURE__ */ jsxs44(Button, { type: "button", variant, disabled: disabled || enCurso, onClick: onImprimir, "aria-busy": enCurso, children: [
+      /* @__PURE__ */ jsx55(Icon, { name: icono, className: "h-4 w-4" }),
       texto
     ] }),
-    estado && !enCurso && /* @__PURE__ */ jsx53(Badge, { color: colorTrabajo(estado), className: "whitespace-nowrap", children: etiquetaTrabajo(estado) })
+    estado && !enCurso && /* @__PURE__ */ jsx55(Badge, { color: colorTrabajo(estado), className: "whitespace-nowrap", children: etiquetaTrabajo(estado) })
   ] });
 }
 
 // src/components/BancoCombobox.jsx
-import { useEffect as useEffect13, useId as useId14, useMemo as useMemo9, useRef as useRef12, useState as useState22 } from "react";
+import { useEffect as useEffect15, useMemo as useMemo12, useRef as useRef14, useState as useState24 } from "react";
 
 // src/utils/bancos.js
-var BANCOS_PARAGUAY = [
+var FECHA_VERIFICACION_MARCAS_FINANCIERAS = "2026-10-01";
+var BANCOS_Y_FINANCIERAS_PARAGUAY = [
   "Banco Atlas",
   "Banco Basa",
   "Banco Continental",
@@ -5566,69 +6425,331 @@ var BANCOS_PARAGUAY = [
   "Banco do Brasil",
   "Banco Familiar",
   "Banco GNB Paraguay",
-  "Banco Interfisa",
-  "Banco Ita\xFA Paraguay",
+  "Interfisa Banco",
+  "Ita\xFA",
   "Banco Nacional de Fomento",
-  "Banco Sudameris",
+  "Sudameris",
   "Bancop",
-  "Citibank Paraguay",
-  "Coomecipar",
-  "Cooperativa Medalla Milagrosa",
-  "Cooperativa San Crist\xF3bal",
-  "Cooperativa Universitaria",
-  "Financiera El Comercio",
+  "Citi",
   "Financiera FIC",
-  "Financiera Finexpar",
   "Financiera Paraguayo Japonesa",
+  "Finlatina",
   "Solar Banco",
-  "Ueno Bank",
-  "Visi\xF3n Banco"
+  "Tu Financiera",
+  "ueno bank",
+  "Zeta Banco"
 ];
+var COOPERATIVAS_PARAGUAY = [
+  "Coomecipar",
+  "Medalla Milagrosa",
+  "San Crist\xF3bal",
+  "Universitaria"
+];
+var BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY];
+var EMPAQUETADO = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion });
+var CONTENIDO = (archivo) => ({ ...EMPAQUETADO(archivo, "fallback"), tipo: "horizontal-contained" });
+var MONOGRAMA = (estado = "fallback") => ({ tipo: "monograma", estado });
+var TEXTO = (estado = "fallback") => ({ tipo: "texto", estado });
+function variantesFallback(estado = "fallback") {
+  return { compacto: MONOGRAMA(estado), horizontal: TEXTO(estado) };
+}
+function tieneAssetEmpaquetado(variantes) {
+  return Boolean(variantes && Object.values(variantes).some((visual) => visual?.empaquetado));
+}
+function entrada({ categoria, alias = [], monograma, color, fuenteOficial, estado = "parcial", variantes, redistribucion, ...legacy }) {
+  const permiso = redistribucion?.permitida === true && Boolean(redistribucion.evidencia);
+  const requierePermiso = tieneAssetEmpaquetado(variantes);
+  return {
+    categoria,
+    alias,
+    monograma,
+    color,
+    fuenteOficial,
+    verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS,
+    estado: requierePermiso && !permiso ? "permiso-pendiente" : estado,
+    redistribucion: permiso ? { permitida: true, evidencia: redistribucion.evidencia } : { permitida: false, evidencia: null },
+    variantes: requierePermiso && !permiso ? variantesFallback("permiso-pendiente") : variantes || variantesFallback(estado === "permiso-pendiente" ? "permiso-pendiente" : "fallback"),
+    ...legacy
+  };
+}
 var LOGOS_BANCOS = {
-  "Banco Atlas": { archivo: "banco-atlas.png", alias: ["atlas"] },
-  "Banco Basa": { archivo: "banco-basa.svg" },
-  "Banco Continental": { marca: "continental", alias: ["continental"] },
-  "Banco de la Naci\xF3n Argentina": { archivo: "banco-nacion-argentina.png", chip: true, alias: ["banco nacion", "bna"] },
-  "Banco do Brasil": { archivo: "banco-do-brasil.svg", alias: ["bb", "brasil"] },
-  "Banco Familiar": { marca: "familiar", alias: ["familiar"] },
-  "Banco GNB Paraguay": { archivo: "banco-gnb.svg" },
-  "Banco Interfisa": { archivo: "interfisa.png", alias: ["interfisa"] },
-  "Banco Ita\xFA Paraguay": { archivo: "itau.png", alias: ["itau", "banco itau", "itau paraguay"] },
-  "Banco Nacional de Fomento": { archivo: "bnf.png", alias: ["bnf", "nacional de fomento"] },
-  "Banco Sudameris": { archivo: "sudameris.png", alias: ["sudameris"] },
-  "Bancop": { archivo: "bancop.png" },
-  "Citibank Paraguay": { archivo: "citibank.svg", alias: ["citibank", "citi"] },
-  "Coomecipar": { monograma: "CO", color: "#0B6E4F" },
-  "Cooperativa Medalla Milagrosa": { monograma: "MMM", color: "#6C3FA0" },
-  "Cooperativa San Crist\xF3bal": { monograma: "CSC", color: "#167A54" },
-  "Cooperativa Universitaria": { monograma: "CU", color: "#1D4E9E" },
-  "Financiera El Comercio": { monograma: "FEC", color: "#0E7C7B" },
-  "Financiera FIC": { monograma: "FIC", color: "#C8102E", alias: ["fic", "financiera fic"] },
-  "Financiera Finexpar": { monograma: "FX", color: "#C24E1B" },
-  "Financiera Paraguayo Japonesa": { archivo: "paraguayo-japonesa.png" },
-  "Solar Banco": { archivo: "solar.svg", alias: ["solar", "solar ahorro y finanzas"] },
-  "Ueno Bank": { marca: "ueno", alias: ["ueno"] },
-  "Visi\xF3n Banco": { monograma: "VB", color: "#E4572E", alias: ["vision", "banco vision"] },
-  // Absorbido por Banco Continental (2025): se resuelve para los datos
-  // históricos de las apps, pero no entra en las sugerencias del catálogo.
-  "Banco R\xEDo": { monograma: "BR", color: "#1B5FA8", alias: ["rio", "banco rio"] }
+  "Banco Atlas": entrada({
+    categoria: "banco",
+    alias: ["atlas"],
+    monograma: "BA",
+    color: "#174A7E",
+    fuenteOficial: "https://www.bancoatlas.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Banco Basa": entrada({
+    categoria: "banco",
+    monograma: "B",
+    color: "#E94B35",
+    archivo: "banco-basa.svg",
+    fuenteOficial: "https://www.bancobasa.com.py/",
+    estado: "verificado",
+    variantes: {
+      compacto: EMPAQUETADO("banco-basa-compacto.svg"),
+      horizontal: EMPAQUETADO("banco-basa.svg")
+    }
+  }),
+  "Banco Continental": entrada({
+    categoria: "banco",
+    alias: ["continental"],
+    monograma: "BC",
+    color: "#1C4480",
+    marca: "continental",
+    fuenteOficial: "https://www.bancontinental.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Banco de la Naci\xF3n Argentina": entrada({
+    categoria: "banco",
+    alias: ["banco nacion", "banco naci\xF3n", "bna"],
+    monograma: "BNA",
+    color: "#005F5B",
+    archivo: "banco-nacion-argentina.svg",
+    chip: true,
+    fuenteOficial: "https://www.bna.com.ar/Downloads/Libro_Banco_Nacion.pdf",
+    estado: "verificado",
+    variantes: {
+      compacto: EMPAQUETADO("banco-nacion-argentina-compacto.png"),
+      horizontal: EMPAQUETADO("banco-nacion-argentina.svg")
+    }
+  }),
+  "Banco do Brasil": entrada({
+    categoria: "banco",
+    alias: ["bb", "brasil"],
+    monograma: "BB",
+    color: "#173E91",
+    fuenteOficial: "https://www.bb.com.br/docs/portal/dimac/CCBB-Manual-de-identidade-da-Marca.pdf",
+    estado: "parcial",
+    variantes: variantesFallback()
+  }),
+  "Banco Familiar": entrada({
+    categoria: "banco",
+    alias: ["familiar"],
+    monograma: "BF",
+    color: "#004B8D",
+    marca: "familiar",
+    fuenteOficial: "https://www.familiar.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Banco GNB Paraguay": entrada({
+    categoria: "banco",
+    alias: ["gnb", "banco gnb"],
+    monograma: "GNB",
+    color: "#00563F",
+    archivo: "banco-gnb.svg",
+    fuenteOficial: "https://www.bancognb.com.py/",
+    estado: "parcial",
+    variantes: {
+      compacto: CONTENIDO("banco-gnb.svg"),
+      horizontal: EMPAQUETADO("banco-gnb.svg")
+    }
+  }),
+  "Interfisa Banco": entrada({
+    categoria: "banco",
+    alias: ["interfisa", "banco interfisa"],
+    monograma: "IB",
+    color: "#00594C",
+    fuenteOficial: "https://www.interfisa.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Ita\xFA": entrada({
+    categoria: "banco",
+    alias: ["itau", "banco itau", "itau paraguay", "banco ita\xFA paraguay"],
+    monograma: "I",
+    color: "#EC7000",
+    fuenteOficial: "https://www.itau.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Banco Nacional de Fomento": entrada({
+    categoria: "banco",
+    alias: ["bnf", "nacional de fomento"],
+    monograma: "BNF",
+    color: "#006A44",
+    fuenteOficial: "https://www.bnf.gov.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Sudameris": entrada({
+    categoria: "banco",
+    alias: ["banco sudameris"],
+    monograma: "S",
+    color: "#009A49",
+    archivo: "sudameris.svg",
+    fuenteOficial: "https://www.sudameris.com.py/",
+    estado: "parcial",
+    variantes: {
+      compacto: { ...CONTENIDO("sudameris.svg"), fondo: "#00583F", padding: true },
+      horizontal: EMPAQUETADO("sudameris.svg", "oficial", { fondo: "#00583F", padding: true })
+    }
+  }),
+  "Bancop": entrada({
+    categoria: "banco",
+    monograma: "B",
+    color: "#006B3C",
+    fuenteOficial: "https://www.bancop.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Citi": entrada({
+    categoria: "banco",
+    alias: ["citibank", "citibank paraguay"],
+    monograma: "C",
+    color: "#59636E",
+    fuenteOficial: "https://www.citigroup.com/citi/about/countries-and-jurisdictions/paraguay.html",
+    estado: "permiso-pendiente",
+    variantes: variantesFallback("permiso-pendiente")
+  }),
+  "Financiera FIC": entrada({
+    categoria: "financiera",
+    alias: ["fic"],
+    monograma: "FIC",
+    color: "#C8102E",
+    archivo: "financiera-fic.png",
+    fuenteOficial: "https://fic.com.py/",
+    estado: "parcial",
+    variantes: {
+      compacto: CONTENIDO("financiera-fic.png"),
+      horizontal: EMPAQUETADO("financiera-fic.png")
+    }
+  }),
+  "Financiera Paraguayo Japonesa": entrada({
+    categoria: "financiera",
+    alias: ["fpj", "paraguayo japonesa"],
+    monograma: "FPJ",
+    color: "#0066A4",
+    archivo: "financiera-paraguayo-japonesa.png",
+    fuenteOficial: "https://www.fpj.com.py/",
+    estado: "verificado",
+    variantes: {
+      compacto: EMPAQUETADO("financiera-paraguayo-japonesa-compacto.png", "oficial", { fondo: "#0066A4", padding: true }),
+      horizontal: EMPAQUETADO("financiera-paraguayo-japonesa.png", "oficial", { fondo: "#0066A4", padding: true })
+    }
+  }),
+  "Finlatina": entrada({
+    categoria: "financiera",
+    alias: ["financiera finlatina"],
+    monograma: "FL",
+    color: "#24537A",
+    fuenteOficial: "https://www.finlatina.com.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Solar Banco": entrada({
+    categoria: "banco",
+    alias: ["solar", "solar ahorro y finanzas"],
+    monograma: "S",
+    color: "#F36F21",
+    archivo: "solar-banco.svg",
+    fuenteOficial: "https://solar.com.py/",
+    estado: "parcial",
+    variantes: {
+      compacto: CONTENIDO("solar-banco.svg"),
+      horizontal: EMPAQUETADO("solar-banco.svg")
+    }
+  }),
+  "Tu Financiera": entrada({
+    categoria: "financiera",
+    alias: ["tu financiera"],
+    monograma: "TF",
+    color: "#314255",
+    fuenteOficial: "https://www.bcp.gov.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "ueno bank": entrada({
+    categoria: "banco",
+    alias: ["ueno", "ueno bank", "Ueno Bank"],
+    monograma: "U",
+    color: "#7B2CF5",
+    marca: "ueno",
+    archivo: "ueno-bank.svg",
+    fuenteOficial: "https://www.ueno.com.py/",
+    estado: "verificado",
+    variantes: {
+      compacto: EMPAQUETADO("ueno-bank-compacto.svg"),
+      horizontal: EMPAQUETADO("ueno-bank.svg")
+    }
+  }),
+  "Zeta Banco": entrada({
+    categoria: "banco",
+    alias: ["zeta", "finexpar", "financiera finexpar"],
+    monograma: "Z",
+    color: "#2D3340",
+    fuenteOficial: "https://www.bcp.gov.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Coomecipar": entrada({
+    categoria: "cooperativa",
+    monograma: "CO",
+    color: "#0B6E4F",
+    fuenteOficial: "https://www.coomecipar.coop.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Medalla Milagrosa": entrada({
+    categoria: "cooperativa",
+    alias: ["cooperativa medalla milagrosa"],
+    monograma: "MM",
+    color: "#6C3FA0",
+    fuenteOficial: "https://www.medallamilagrosa.coop.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "San Crist\xF3bal": entrada({
+    categoria: "cooperativa",
+    alias: ["cooperativa san cristobal", "cooperativa san crist\xF3bal"],
+    monograma: "SC",
+    color: "#167A54",
+    fuenteOficial: "https://www.sancristobal.coop.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  "Universitaria": entrada({
+    categoria: "cooperativa",
+    alias: ["cooperativa universitaria"],
+    monograma: "U",
+    color: "#1D4E9E",
+    fuenteOficial: "https://www.cu.coop.py/",
+    estado: "fallback",
+    variantes: variantesFallback()
+  }),
+  // Compatibilidad histórica: no aparecen en sugerencias y resuelven a la
+  // entidad sucesora en vez de fingir una marca que ya no está activa.
+  "Financiera El Comercio": { redirigeA: "ueno bank", alias: ["el comercio"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
+  "Visi\xF3n Banco": { redirigeA: "ueno bank", alias: ["vision", "banco vision", "visi\xF3n"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
+  "Banco R\xEDo": { redirigeA: "Banco Continental", alias: ["rio", "banco rio", "banco r\xEDo"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS }
 };
 var COLORES_BANCO_RESPALDO = ["#33414F", "#1D4E9E", "#0B6E4F", "#8A3A1B", "#6C3FA0", "#12659E"];
 function normalizarBanco(texto) {
   return String(texto || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
-var INDICE = new Map(
-  Object.entries(LOGOS_BANCOS).flatMap(
-    ([nombre, entrada]) => [nombre, ...entrada.alias || []].map((clave) => [normalizarBanco(clave), { nombre, ...entrada }])
-  )
-);
+var INDICE = /* @__PURE__ */ new Map();
+for (const [nombre, entradaLogo] of Object.entries(LOGOS_BANCOS)) {
+  for (const clave of [nombre, ...entradaLogo.alias || []]) {
+    INDICE.set(normalizarBanco(clave), { nombre, entrada: entradaLogo });
+  }
+}
+var BUSQUEDAS_POR_BANCO = new Map(BANCOS_PARAGUAY.map((nombre) => [nombre, /* @__PURE__ */ new Set([normalizarBanco(nombre)])]));
+for (const [clave, encontrada] of INDICE) {
+  const destino = encontrada.entrada.redirigeA || encontrada.nombre;
+  BUSQUEDAS_POR_BANCO.get(destino)?.add(clave);
+}
 var VACIAS = /* @__PURE__ */ new Set(["banco", "financiera", "cooperativa", "banca", "de", "del", "la", "el", "y"]);
 function inicialesDeBanco(nombre) {
   const palabras = String(nombre || "").split(/[\s/]+/).filter(Boolean);
   const utiles = palabras.filter((palabra) => !VACIAS.has(normalizarBanco(palabra)));
   const base = (utiles.length ? utiles : palabras).slice(0, 3);
-  const iniciales = base.map((palabra) => palabra[0].toUpperCase()).join("");
-  return iniciales || "?";
+  const iniciales2 = base.map((palabra) => palabra[0].toUpperCase()).join("");
+  return iniciales2 || "?";
 }
 function colorDeBanco(nombre) {
   const texto = normalizarBanco(nombre);
@@ -5636,66 +6757,475 @@ function colorDeBanco(nombre) {
   for (const letra of texto) hash = (hash * 31 + letra.charCodeAt(0)) % 9973;
   return COLORES_BANCO_RESPALDO[hash % COLORES_BANCO_RESPALDO.length];
 }
-function logoDeBanco(nombre) {
+function varianteNormalizada(variante) {
+  return variante === "compacto" || variante === "compact" ? "compacto" : "horizontal";
+}
+function resolverEntrada(nombre) {
+  const encontrada = INDICE.get(normalizarBanco(nombre));
+  if (!encontrada) return null;
+  const destino = encontrada.entrada.redirigeA;
+  if (!destino) return { nombre: encontrada.nombre, entrada: encontrada.entrada, aliasHistorico: null };
+  return { nombre: destino, entrada: LOGOS_BANCOS[destino], aliasHistorico: encontrada.nombre };
+}
+function logoDeBanco(nombre, variante = "horizontal") {
   const texto = String(nombre || "").trim();
   if (!texto) return null;
-  const entrada = INDICE.get(normalizarBanco(texto));
-  if (entrada?.archivo) return { banco: entrada.nombre, tipo: "archivo", archivo: entrada.archivo, chip: Boolean(entrada.chip) };
-  if (entrada?.marca) return { banco: entrada.nombre, tipo: "marca", marca: entrada.marca };
-  if (entrada) return { banco: entrada.nombre, tipo: "monograma", iniciales: entrada.monograma, color: entrada.color };
-  return { banco: texto, tipo: "monograma", iniciales: inicialesDeBanco(texto), color: colorDeBanco(texto), generico: true };
+  const resuelta = resolverEntrada(texto);
+  if (!resuelta) {
+    const iniciales2 = inicialesDeBanco(texto);
+    const color = colorDeBanco(texto);
+    const claveVariante2 = varianteNormalizada(variante);
+    return {
+      banco: texto,
+      tipo: "monograma",
+      iniciales: iniciales2,
+      color,
+      generico: true,
+      categoria: "desconocida",
+      estado: "fallback",
+      variante: claveVariante2,
+      visual: claveVariante2 === "compacto" ? MONOGRAMA() : TEXTO()
+    };
+  }
+  const { nombre: canonico, entrada: registro, aliasHistorico } = resuelta;
+  const claveVariante = varianteNormalizada(variante);
+  const base = registro.archivo ? { tipo: "archivo", archivo: registro.archivo, chip: Boolean(registro.chip) } : registro.marca ? { tipo: "marca", marca: registro.marca } : { tipo: "monograma", iniciales: registro.monograma || inicialesDeBanco(canonico), color: registro.color || colorDeBanco(canonico) };
+  return {
+    banco: canonico,
+    ...base,
+    ...registro.marca ? { marca: registro.marca } : {},
+    categoria: registro.categoria,
+    estado: registro.estado,
+    redistribucion: registro.redistribucion,
+    fuenteOficial: registro.fuenteOficial || null,
+    verificadoEn: registro.verificadoEn || null,
+    variante: claveVariante,
+    visual: registro.variantes[claveVariante],
+    ...aliasHistorico ? { aliasHistorico } : {}
+  };
+}
+function coberturaBancos(catalogo = BANCOS_PARAGUAY) {
+  return catalogo.map((nombre) => {
+    const entradaLogo = LOGOS_BANCOS[nombre];
+    return {
+      nombre,
+      categoria: entradaLogo.categoria,
+      estado: entradaLogo.estado,
+      redistribucion: entradaLogo.redistribucion,
+      fuenteOficial: entradaLogo.fuenteOficial || null,
+      verificadoEn: entradaLogo.verificadoEn,
+      variantes: {
+        compacto: { ...entradaLogo.variantes.compacto },
+        horizontal: { ...entradaLogo.variantes.horizontal }
+      },
+      // Campos históricos del diagnóstico.
+      tipo: entradaLogo.archivo ? "archivo" : entradaLogo.marca ? "marca" : "monograma",
+      archivo: entradaLogo.archivo || null,
+      marca: entradaLogo.marca || null
+    };
+  });
 }
 function sugerenciasDeBanco(texto, catalogo = BANCOS_PARAGUAY) {
   const termino = normalizarBanco(texto);
   if (!termino) return catalogo;
-  return catalogo.filter((banco) => normalizarBanco(banco).includes(termino));
+  return catalogo.filter((banco) => {
+    const busquedas = BUSQUEDAS_POR_BANCO.get(banco) || /* @__PURE__ */ new Set([normalizarBanco(banco)]);
+    return [...busquedas].some((clave) => clave.includes(termino));
+  });
 }
 
-// src/components/BancoLogo.jsx
-import { useState as useState21 } from "react";
-import { jsx as jsx54 } from "react/jsx-runtime";
-function BancoLogo({ banco, alto = "h-5", className, soloCatalogo = false, baseAssets = "/bancos", marcas = {} }) {
-  const [fallo, setFallo] = useState21(false);
-  const texto = String(banco || "").trim();
-  const registro = logoDeBanco(texto);
-  if (!registro) return null;
-  const marca = registro.tipo === "marca" ? registro.marca : null;
-  if (marca && marcas[marca]) {
-    const Logo = marcas[marca];
-    return /* @__PURE__ */ jsx54("span", { className: cn("inline-flex items-center", alto, className), title: texto, children: /* @__PURE__ */ jsx54(Logo, {}) });
+// src/utils/mediosPago.js
+var EMPAQUETADO2 = (archivo, estado = "oficial") => ({ tipo: "archivo", archivo, estado, empaquetado: `pagos/${archivo}` });
+var MONOGRAMA2 = (estado = "fallback") => ({ tipo: "monograma", estado });
+var TEXTO2 = (estado = "fallback") => ({ tipo: "texto", estado });
+var FALLBACK = (estado = "fallback") => ({ compacto: MONOGRAMA2(estado), horizontal: TEXTO2(estado) });
+function entrada2({ categoria, alias = [], monograma, color, fuenteOficial, estado = "parcial", variantes, ...extra }) {
+  const permiso = extra.redistribucion?.permitida === true && Boolean(extra.redistribucion.evidencia);
+  const requierePermiso = Boolean(variantes && Object.values(variantes).some((visual) => visual?.empaquetado));
+  const { redistribucion: _redistribucion, ...resto } = extra;
+  return {
+    categoria,
+    alias,
+    monograma,
+    color,
+    fuenteOficial,
+    verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS,
+    estado: requierePermiso && !permiso ? "permiso-pendiente" : estado,
+    redistribucion: permiso ? { permitida: true, evidencia: extra.redistribucion.evidencia } : { permitida: false, evidencia: null },
+    variantes: requierePermiso && !permiso ? FALLBACK("permiso-pendiente") : variantes || FALLBACK(estado === "permiso-pendiente" ? "permiso-pendiente" : "fallback"),
+    ...resto
+  };
+}
+var MARCAS_MEDIOS_PAGO = {
+  Visa: entrada2({
+    categoria: "red-tarjeta",
+    monograma: "V",
+    color: "#1434CB",
+    fuenteOficial: "https://corporate.visa.com/en/about-visa/brand.html",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  Mastercard: entrada2({
+    categoria: "red-tarjeta",
+    alias: ["master card"],
+    monograma: "MC",
+    color: "#EB001B",
+    fuenteOficial: "https://www.mastercard.com/brandcenter/us/en/download-artwork.html",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  "American Express": entrada2({
+    categoria: "red-tarjeta",
+    alias: ["amex", "american express"],
+    monograma: "AX",
+    color: "#2E77BC",
+    fuenteOficial: "https://www.americanexpress.com/it/merchant/materiale-puntovendita/materialidigitali.html",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  Bancard: entrada2({
+    categoria: "procesador",
+    monograma: "B",
+    color: "#0068B3",
+    fuenteOficial: "https://www.bancard.com.py/",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  "Red Infonet": entrada2({
+    categoria: "red-procesamiento",
+    alias: ["infonet"],
+    monograma: "RI",
+    color: "#263C8F",
+    fuenteOficial: "https://www.bancard.com.py/productos",
+    estado: "fallback",
+    variantes: FALLBACK()
+  }),
+  Dinelco: entrada2({
+    categoria: "red-procesamiento",
+    monograma: "D",
+    color: "#D71920",
+    fuenteOficial: "https://www.dinelco.com.py/",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  upay: entrada2({
+    categoria: "procesador",
+    alias: ["u pay"],
+    monograma: "U",
+    color: "#5A31F4",
+    fuenteOficial: "https://upay.com.py/",
+    estado: "verificado",
+    variantes: {
+      compacto: EMPAQUETADO2("upay-compacto.svg"),
+      horizontal: EMPAQUETADO2("upay.svg")
+    }
+  }),
+  uPOS: entrada2({
+    categoria: "terminal",
+    alias: ["u pos"],
+    monograma: "UP",
+    color: "#5A31F4",
+    fuenteOficial: "https://upay.com.py/",
+    estado: "producto-padre",
+    marcaPadre: "upay",
+    variantes: {
+      compacto: { ...EMPAQUETADO2("upay-compacto.svg", "producto-padre"), marcaPadre: "upay" },
+      horizontal: { ...TEXTO2("producto-padre"), marcaPadre: "upay" }
+    }
+  }),
+  Procard: entrada2({
+    categoria: "procesador",
+    alias: ["pro card"],
+    monograma: "P",
+    color: "#1968A9",
+    fuenteOficial: "https://www.procard.com.py/procard_institucional/",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  PayPro: entrada2({
+    categoria: "producto",
+    alias: ["pay pro"],
+    monograma: "PP",
+    color: "#1968A9",
+    marcaPadre: "Procard",
+    fuenteOficial: "https://www.procard.com.py/procard_institucional/paypro/",
+    estado: "fallback",
+    variantes: FALLBACK()
+  }),
+  Cabal: entrada2({
+    categoria: "red-tarjeta",
+    monograma: "C",
+    color: "#006A53",
+    fuenteOficial: "https://www.cabal.coop/comercios/servicios/senalizacion-de-tu-negocio?id=587",
+    estado: "permiso-pendiente",
+    variantes: FALLBACK("permiso-pendiente")
+  }),
+  Panal: entrada2({
+    categoria: "red-tarjeta",
+    monograma: "P",
+    color: "#A56A1C",
+    fuenteOficial: "https://www.bcp.gov.py/comisiones-por-intermediacion-cobradas-a-los-comercios-por-las-operaciones-con-tarjetas",
+    estado: "fallback",
+    variantes: FALLBACK()
+  }),
+  // Pagopar fue absorbida por la propuesta vigente de upay. Solo resuelve
+  // datos históricos; no se publica como procesador independiente.
+  Pagopar: { redirigeA: "upay", alias: ["pago par"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS }
+};
+var MEDIOS_PAGO_CON_MARCA = Object.keys(MARCAS_MEDIOS_PAGO).filter((nombre) => !MARCAS_MEDIOS_PAGO[nombre].redirigeA);
+function normalizarMarcaPago(texto) {
+  return String(texto || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+var INDICE_MARCAS_PAGO = /* @__PURE__ */ new Map();
+for (const [nombre, registro] of Object.entries(MARCAS_MEDIOS_PAGO)) {
+  for (const clave of [nombre, ...registro.alias || []]) {
+    INDICE_MARCAS_PAGO.set(normalizarMarcaPago(clave), { nombre, registro });
   }
-  if (soloCatalogo && registro.generico) return null;
-  if (registro.tipo === "archivo" && !fallo) {
-    return /* @__PURE__ */ jsx54("span", { className: cn("inline-flex items-center", alto, className), title: texto, children: /* @__PURE__ */ jsx54(
-      "img",
-      {
-        src: baseAssets ? `${baseAssets.replace(/\/$/, "")}/${registro.archivo}` : registro.archivo,
-        alt: "",
-        loading: "lazy",
-        onError: () => setFallo(true),
-        className: cn("h-full w-auto max-w-[6rem] object-contain", registro.chip && "rounded-[4px] bg-white px-1 py-[1px]")
+}
+function varianteNormalizada2(variante) {
+  return variante === "compacto" || variante === "compact" ? "compacto" : "horizontal";
+}
+function iniciales(nombre) {
+  const partes = String(nombre || "").trim().split(/\s+/).filter(Boolean).slice(0, 2);
+  return partes.map((parte) => parte[0]?.toUpperCase()).join("") || "?";
+}
+function logoDeMedioPago(nombre, variante = "horizontal") {
+  const texto = String(nombre || "").trim();
+  if (!texto) return null;
+  const encontrada = INDICE_MARCAS_PAGO.get(normalizarMarcaPago(texto));
+  const claveVariante = varianteNormalizada2(variante);
+  if (!encontrada) {
+    return {
+      marca: texto,
+      tipo: "monograma",
+      iniciales: iniciales(texto),
+      color: "#33414F",
+      generico: true,
+      categoria: "desconocida",
+      estado: "fallback",
+      variante: claveVariante,
+      visual: claveVariante === "compacto" ? MONOGRAMA2() : TEXTO2()
+    };
+  }
+  const aliasHistorico = encontrada.registro.redirigeA ? encontrada.nombre : null;
+  const canonico = encontrada.registro.redirigeA || encontrada.nombre;
+  const registro = MARCAS_MEDIOS_PAGO[canonico];
+  return {
+    marca: canonico,
+    tipo: registro.variantes[claveVariante].tipo === "archivo" ? "archivo" : "monograma",
+    iniciales: registro.monograma || iniciales(canonico),
+    color: registro.color || "#33414F",
+    categoria: registro.categoria,
+    estado: registro.estado,
+    redistribucion: registro.redistribucion,
+    fuenteOficial: registro.fuenteOficial || null,
+    verificadoEn: registro.verificadoEn || null,
+    variante: claveVariante,
+    visual: registro.variantes[claveVariante],
+    ...registro.marcaPadre ? { marcaPadre: registro.marcaPadre } : {},
+    ...aliasHistorico ? { aliasHistorico } : {}
+  };
+}
+function coberturaMediosPago(catalogo = MEDIOS_PAGO_CON_MARCA) {
+  return catalogo.map((nombre) => {
+    const registro = MARCAS_MEDIOS_PAGO[nombre];
+    return {
+      nombre,
+      categoria: registro.categoria,
+      estado: registro.estado,
+      redistribucion: registro.redistribucion,
+      fuenteOficial: registro.fuenteOficial || null,
+      verificadoEn: registro.verificadoEn,
+      marcaPadre: registro.marcaPadre || null,
+      variantes: {
+        compacto: { ...registro.variantes.compacto },
+        horizontal: { ...registro.variantes.horizontal }
       }
-    ) });
+    };
+  });
+}
+
+// src/financial/assets.js
+var ASSETS_FINANCIEROS = Object.freeze({});
+function adjuntarAssetFinanciero(visual) {
+  if (!visual || !visual.empaquetado) return visual;
+  const asset = ASSETS_FINANCIEROS[visual.empaquetado];
+  return asset ? { ...visual, asset } : visual;
+}
+function adjuntarAssetsAlRegistro(registro) {
+  if (!registro?.visual) return registro;
+  return { ...registro, visual: adjuntarAssetFinanciero(registro.visual) };
+}
+
+// src/financial/resolvers.js
+function logoDeBanco2(nombre, variante) {
+  return adjuntarAssetsAlRegistro(logoDeBanco(nombre, variante));
+}
+function logoDeMedioPago2(nombre, variante) {
+  return adjuntarAssetsAlRegistro(logoDeMedioPago(nombre, variante));
+}
+
+// src/components/LogoFinanciero.jsx
+import { useState as useState23 } from "react";
+import { jsx as jsx56, jsxs as jsxs45 } from "react/jsx-runtime";
+function fuenteDe(visual, baseAssets) {
+  if (!visual?.archivo) return null;
+  if (typeof baseAssets === "string" && baseAssets) {
+    return `${baseAssets.replace(/\/$/, "")}/${visual.archivo}`;
   }
-  const iniciales = registro.iniciales || inicialesDeBanco(texto);
-  const color = registro.color || colorDeBanco(texto);
-  return /* @__PURE__ */ jsx54("span", { className: cn("inline-flex items-center", alto, className), title: texto, children: /* @__PURE__ */ jsx54(
+  return visual.asset || visual.archivo;
+}
+function Monograma({ iniciales: iniciales2, color, compacto }) {
+  return /* @__PURE__ */ jsx56(
     "span",
     {
       "aria-hidden": "true",
-      className: "grid h-full min-w-[1.15rem] place-items-center rounded-[5px] px-1 text-[9px] font-bold leading-none tracking-tight text-white",
+      className: cn(
+        "grid place-items-center rounded-[5px] px-1 text-[9px] font-bold leading-none tracking-tight text-white",
+        compacto ? "h-full w-full" : "h-full min-w-[1.15rem]"
+      ),
       style: { backgroundColor: color },
-      children: iniciales
+      children: iniciales2
     }
-  ) });
+  );
+}
+function LogoFinanciero({
+  nombre,
+  registro,
+  alto = "h-5",
+  className,
+  baseAssets,
+  marcas = {},
+  soloCatalogo = false,
+  decorativo = false
+}) {
+  const [assetFallido, setAssetFallido] = useState23(null);
+  if (!registro || soloCatalogo && registro.generico) return null;
+  const compacto = registro.variante === "compacto";
+  const visual = registro.visual || { tipo: "monograma", estado: "fallback" };
+  const fuente = fuenteDe(visual, baseAssets);
+  const fallo = fuente && assetFallido === fuente;
+  const iniciales2 = registro.iniciales || "?";
+  const color = registro.color || "#33414F";
+  const etiqueta = registro.banco || registro.marca || nombre;
+  const semantica = decorativo ? { "aria-hidden": true } : { role: "img", "aria-label": etiqueta };
+  const marcaPersonalizada = registro.marca && marcas[registro.marca];
+  if (marcaPersonalizada) {
+    const Logo = marcaPersonalizada;
+    return /* @__PURE__ */ jsx56(
+      "span",
+      {
+        ...semantica,
+        className: cn("inline-flex items-center", compacto && "aspect-square justify-center", alto, className),
+        "data-logo-estado": visual.estado || registro.estado,
+        "data-logo-variante": registro.variante,
+        children: /* @__PURE__ */ jsx56(Logo, {})
+      }
+    );
+  }
+  if (fuente && !fallo && (visual.tipo === "archivo" || visual.tipo === "horizontal-contained")) {
+    return /* @__PURE__ */ jsx56(
+      "span",
+      {
+        ...semantica,
+        className: cn(
+          "inline-flex items-center",
+          compacto && "aspect-square shrink-0 justify-center overflow-hidden rounded-[5px]",
+          visual.fondo && visual.padding && "rounded-md p-1",
+          alto,
+          className
+        ),
+        style: visual.fondo ? { backgroundColor: visual.fondo } : void 0,
+        "data-logo-estado": visual.estado || registro.estado,
+        "data-logo-variante": registro.variante,
+        "data-logo-tipo": visual.tipo,
+        children: /* @__PURE__ */ jsx56(
+          "img",
+          {
+            src: fuente,
+            alt: "",
+            loading: "lazy",
+            onError: () => setAssetFallido(fuente),
+            className: cn(
+              "object-contain",
+              compacto ? "h-full w-full" : "h-full w-auto max-w-[8rem]",
+              registro.chip && "rounded-[4px] bg-white px-1 py-[1px]"
+            )
+          }
+        )
+      }
+    );
+  }
+  if (!compacto && visual.tipo === "texto") {
+    return /* @__PURE__ */ jsxs45(
+      "span",
+      {
+        ...semantica,
+        className: cn("inline-flex items-center gap-1.5 whitespace-nowrap", alto, className),
+        "data-logo-estado": visual.estado || registro.estado,
+        "data-logo-variante": registro.variante,
+        "data-logo-tipo": "texto",
+        children: [
+          /* @__PURE__ */ jsx56(Monograma, { iniciales: iniciales2, color, compacto: false }),
+          /* @__PURE__ */ jsx56("span", { "aria-hidden": "true", className: "text-xs font-semibold leading-none text-current", children: etiqueta })
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ jsx56(
+    "span",
+    {
+      ...semantica,
+      className: cn("inline-flex items-center", compacto && "aspect-square shrink-0", alto, className),
+      "data-logo-estado": visual.estado || registro.estado,
+      "data-logo-variante": registro.variante,
+      "data-logo-tipo": "monograma",
+      children: /* @__PURE__ */ jsx56(Monograma, { iniciales: iniciales2, color, compacto })
+    }
+  );
+}
+
+// src/components/BancoLogo.jsx
+import { jsx as jsx57 } from "react/jsx-runtime";
+function BancoLogo({
+  banco,
+  variante = "horizontal",
+  alto = "h-5",
+  className,
+  soloCatalogo = false,
+  baseAssets,
+  marcas = {},
+  decorativo = false
+}) {
+  const texto = String(banco || "").trim();
+  const registro = logoDeBanco2(texto, variante);
+  if (!registro) return null;
+  return /* @__PURE__ */ jsx57(
+    LogoFinanciero,
+    {
+      nombre: texto,
+      registro: {
+        ...registro,
+        iniciales: registro.iniciales || inicialesDeBanco(registro.banco || texto),
+        color: registro.color || colorDeBanco(registro.banco || texto)
+      },
+      alto,
+      className,
+      soloCatalogo,
+      baseAssets,
+      marcas,
+      decorativo
+    }
+  );
 }
 
 // src/components/BancoCombobox.jsx
-import { jsx as jsx55, jsxs as jsxs43 } from "react/jsx-runtime";
+import { jsx as jsx58, jsxs as jsxs46 } from "react/jsx-runtime";
 function BancoCombobox({
   id,
   value = "",
   onChange,
+  onSelect,
   required = false,
   disabled = false,
   placeholder,
@@ -5703,12 +7233,9 @@ function BancoCombobox({
   catalogo = BANCOS_PARAGUAY,
   logoProps
 }) {
-  const [abierto, setAbierto] = useState22(false);
-  const [resaltado, setResaltado] = useState22(0);
-  const listaId = useId14();
-  const raiz = useRef12(null);
-  const lista = useRef12(null);
-  useEffect13(() => {
+  const [abierto, setAbierto] = useState24(false);
+  const raiz = useRef14(null);
+  useEffect15(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -5716,48 +7243,31 @@ function BancoCombobox({
     document.addEventListener("click", cerrarFuera);
     return () => document.removeEventListener("click", cerrarFuera);
   }, []);
-  const sugerencias = useMemo9(() => sugerenciasDeBanco(value, catalogo), [value, catalogo]);
-  useEffect13(() => {
-    if (!abierto) return;
-    lista.current?.querySelector(`#${CSS.escape(`${listaId}-${resaltado}`)}`)?.scrollIntoView({ block: "nearest" });
-  }, [abierto, resaltado, listaId]);
+  const sugerencias = useMemo12(() => sugerenciasDeBanco(value, catalogo), [value, catalogo]);
   function elegir(banco) {
     onChange?.(banco);
+    onSelect?.(banco);
     setAbierto(false);
-    setResaltado(0);
-  }
-  function alTeclear(event) {
-    if (event.key === "Escape") {
-      setAbierto(false);
-      return;
-    }
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      if (!abierto) {
-        setAbierto(true);
-        return;
-      }
-      if (!sugerencias.length) return;
-      const paso = event.key === "ArrowDown" ? 1 : -1;
-      setResaltado((actual) => (actual + paso + sugerencias.length) % sugerencias.length);
-      return;
-    }
-    if (event.key === "Enter" && abierto && sugerencias[resaltado]) {
-      event.preventDefault();
-      elegir(sugerencias[resaltado]);
-    }
   }
   const listaVisible = abierto && sugerencias.length > 0;
-  return /* @__PURE__ */ jsxs43("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx55(
+  const navegacion = useComboboxNavigation({
+    options: sugerencias,
+    open: listaVisible,
+    onOpenChange: setAbierto,
+    onSelect: elegir,
+    getOptionKey: (banco) => banco
+  });
+  return /* @__PURE__ */ jsxs46("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx58(
       Input,
       {
         id,
+        ref: navegacion.inputRef,
         role: "combobox",
         "aria-expanded": listaVisible,
-        "aria-controls": listaId,
+        "aria-controls": navegacion.listboxId,
         "aria-autocomplete": "list",
-        "aria-activedescendant": listaVisible ? `${listaId}-${resaltado}` : void 0,
+        "aria-activedescendant": navegacion.activeOptionId,
         autoComplete: "off",
         required,
         disabled,
@@ -5766,41 +7276,68 @@ function BancoCombobox({
         onChange: (event) => {
           onChange?.(event.target.value);
           setAbierto(true);
-          setResaltado(0);
+          navegacion.setActiveIndex(0);
         },
         onFocus: () => setAbierto(true),
-        onKeyDown: alTeclear
+        onKeyDown: navegacion.inputProps.onKeyDown
       }
     ),
-    listaVisible && /* @__PURE__ */ jsx55(
+    listaVisible && /* @__PURE__ */ jsx58(
       "ul",
       {
-        id: listaId,
-        ref: lista,
-        role: "listbox",
+        ...navegacion.listboxProps,
         "aria-label": "Bancos",
         className: "absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border border-ink-500 bg-ink p-1 shadow-float",
-        children: sugerencias.map((banco, indice) => /* @__PURE__ */ jsx55("li", { id: `${listaId}-${indice}`, role: "option", "aria-selected": indice === resaltado, children: /* @__PURE__ */ jsxs43(
-          "button",
+        children: sugerencias.map((banco, indice) => /* @__PURE__ */ jsxs46(
+          "li",
           {
-            type: "button",
-            className: cn("flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm transition", indice === resaltado ? "bg-ink-700 text-fore" : "text-mute hover:bg-ink-700 hover:text-fore"),
-            onMouseEnter: () => setResaltado(indice),
-            onMouseDown: (event) => event.preventDefault(),
-            onClick: () => elegir(banco),
+            ...navegacion.getOptionProps(indice),
+            className: cn(
+              "flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm transition",
+              indice === navegacion.activeIndex ? "bg-ink-700 text-fore" : "text-mute hover:bg-ink-700 hover:text-fore"
+            ),
             children: [
-              /* @__PURE__ */ jsx55(BancoLogo, { banco, alto: "h-4", ...logoProps }),
-              /* @__PURE__ */ jsx55("span", { className: "min-w-0 flex-1 truncate", children: banco })
+              /* @__PURE__ */ jsx58(BancoLogo, { banco, variante: "compacto", alto: "h-4", decorativo: true, ...logoProps }),
+              /* @__PURE__ */ jsx58("span", { className: "min-w-0 flex-1 truncate", children: banco })
             ]
-          }
-        ) }, banco))
+          },
+          banco
+        ))
       }
     )
   ] });
 }
 
+// src/components/MedioPagoLogo.jsx
+import { jsx as jsx59 } from "react/jsx-runtime";
+function MedioPagoLogo({
+  marca,
+  variante = "horizontal",
+  alto = "h-5",
+  className,
+  soloCatalogo = false,
+  baseAssets,
+  decorativo = false
+}) {
+  const texto = String(marca || "").trim();
+  const registro = logoDeMedioPago2(texto, variante);
+  if (!registro) return null;
+  return /* @__PURE__ */ jsx59(
+    LogoFinanciero,
+    {
+      nombre: texto,
+      registro,
+      alto,
+      className,
+      soloCatalogo,
+      baseAssets,
+      decorativo
+    }
+  );
+}
+
 // src/components/CityAutocomplete.jsx
-import { useEffect as useEffect14, useRef as useRef13, useState as useState23 } from "react";
+import { useEffect as useEffect16, useId as useId17, useRef as useRef15, useState as useState25 } from "react";
 
 // src/catalog/ciudades.js
 var MUNICIPIOS = [
@@ -6112,7 +7649,7 @@ function buscarCiudad(texto, limite = 8) {
 }
 
 // src/components/CityAutocomplete.jsx
-import { jsx as jsx56, jsxs as jsxs44 } from "react/jsx-runtime";
+import { jsx as jsx60, jsxs as jsxs47 } from "react/jsx-runtime";
 function ciudadDe(fila) {
   return fila?.city ?? fila?.ciudad ?? "";
 }
@@ -6122,6 +7659,7 @@ function departamentoDeFila(fila) {
 function CityAutocomplete({
   value = "",
   onSelect,
+  onChange,
   placeholder = "Ej: Asunci\xF3n, Ciudad del Este\u2026",
   disabled = false,
   className,
@@ -6131,12 +7669,13 @@ function CityAutocomplete({
   inputProps,
   mensajeError = "No se pudieron cargar las sugerencias."
 }) {
-  const [sugerencias, setSugerencias] = useState23([]);
-  const [abierto, setAbierto] = useState23(false);
-  const [error, setError] = useState23("");
-  const timer = useRef13(null);
-  const raiz = useRef13(null);
-  useEffect14(() => {
+  const [sugerencias, setSugerencias] = useState25([]);
+  const [abierto, setAbierto] = useState25(false);
+  const [error, setError] = useState25("");
+  const timer = useRef15(null);
+  const raiz = useRef15(null);
+  const errorId = useId17();
+  useEffect16(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
@@ -6144,7 +7683,7 @@ function CityAutocomplete({
     document.addEventListener("mousedown", cerrarFuera);
     return () => document.removeEventListener("mousedown", cerrarFuera);
   }, []);
-  useEffect14(() => () => {
+  useEffect16(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
   function resolver(texto) {
@@ -6176,6 +7715,7 @@ function CityAutocomplete({
     }, 250);
   }
   function change(texto) {
+    onChange?.(texto);
     onSelect?.(texto, departamentoDe(texto));
     resolver(texto);
   }
@@ -6183,48 +7723,77 @@ function CityAutocomplete({
     if (timer.current) clearTimeout(timer.current);
     const ciudad = ciudadDe(fila);
     const departamento = departamentoDeFila(fila) || departamentoDe(ciudad);
+    onChange?.(ciudad);
     onSelect?.(ciudad, departamento);
     setSugerencias([]);
     setAbierto(false);
   }
+  const listaVisible = abierto && sugerencias.length > 0;
+  const navegacion = useComboboxNavigation({
+    options: sugerencias,
+    open: listaVisible,
+    onOpenChange: setAbierto,
+    onSelect: elegir,
+    getOptionKey: (fila) => `${ciudadDe(fila)}-${departamentoDeFila(fila)}`
+  });
   function alPerderFoco() {
     const departamento = departamentoDe(value);
     if (departamento) onSelect?.(value, departamento);
   }
-  return /* @__PURE__ */ jsxs44("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsx56(
+  return /* @__PURE__ */ jsxs47("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsx60(
       Input,
       {
+        ...inputProps,
+        ref: navegacion.inputRef,
         maxLength,
         disabled,
         value,
-        onChange: (event) => change(event.target.value),
-        onFocus: () => {
+        onChange: (event) => {
+          inputProps?.onChange?.(event);
+          change(event.target.value);
+          navegacion.setActiveIndex(0);
+        },
+        onFocus: (event) => {
+          inputProps?.onFocus?.(event);
           if (value.trim().length >= 2 && sugerencias.length) setAbierto(true);
         },
-        onBlur: alPerderFoco,
+        onBlur: (event) => {
+          inputProps?.onBlur?.(event);
+          alPerderFoco();
+        },
+        onKeyDown: (event) => {
+          inputProps?.onKeyDown?.(event);
+          if (!event.defaultPrevented) navegacion.inputProps.onKeyDown(event);
+        },
         placeholder,
         autoComplete: "off",
         "aria-label": "Ciudad",
         role: "combobox",
-        "aria-expanded": abierto && sugerencias.length > 0,
-        ...inputProps
+        "aria-expanded": listaVisible,
+        "aria-controls": navegacion.listboxId,
+        "aria-autocomplete": "list",
+        "aria-activedescendant": navegacion.activeOptionId,
+        "aria-describedby": [inputProps?.["aria-describedby"], error ? errorId : null].filter(Boolean).join(" ") || void 0,
+        "aria-invalid": inputProps?.["aria-invalid"] ?? (error ? true : void 0)
       }
     ),
-    abierto && sugerencias.length > 0 && /* @__PURE__ */ jsx56("ul", { role: "listbox", "aria-label": "Ciudades", className: "absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-ink-500 bg-ink shadow-float", children: sugerencias.map((fila) => /* @__PURE__ */ jsx56("li", { role: "option", "aria-selected": false, children: /* @__PURE__ */ jsxs44(
-      "button",
+    listaVisible && /* @__PURE__ */ jsx60("ul", { ...navegacion.listboxProps, "aria-label": "Ciudades", className: "absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-ink-500 bg-ink shadow-float", children: sugerencias.map((fila, indice) => /* @__PURE__ */ jsxs47(
+      "li",
       {
-        type: "button",
-        className: "flex w-full items-baseline justify-between gap-3 px-3 py-2 text-left text-sm transition hover:bg-ink-700",
-        onMouseDown: (event) => event.preventDefault(),
-        onClick: () => elegir(fila),
+        ...navegacion.getOptionProps(indice),
+        className: cn(
+          "flex min-h-11 cursor-pointer items-baseline justify-between gap-3 px-3 py-2 text-left text-sm transition",
+          indice === navegacion.activeIndex ? "bg-ink-700" : "hover:bg-ink-700"
+        ),
         children: [
-          /* @__PURE__ */ jsx56("span", { className: "truncate font-medium text-fore", children: ciudadDe(fila) }),
-          /* @__PURE__ */ jsx56("span", { className: "shrink-0 text-xs text-mute", children: departamentoDeFila(fila) })
+          /* @__PURE__ */ jsx60("span", { className: "truncate font-medium text-fore", children: ciudadDe(fila) }),
+          /* @__PURE__ */ jsx60("span", { className: "shrink-0 text-xs text-mute", children: departamentoDeFila(fila) })
         ]
-      }
-    ) }, `${ciudadDe(fila)}-${departamentoDeFila(fila)}`)) }),
-    error ? /* @__PURE__ */ jsx56("p", { role: "alert", className: "mt-1 text-xs text-bad-text", children: error }) : null
+      },
+      `${ciudadDe(fila)}-${departamentoDeFila(fila)}`
+    )) }),
+    error ? /* @__PURE__ */ jsx60("p", { id: errorId, role: "alert", className: "mt-1 text-xs text-bad-text", children: error }) : null
   ] });
 }
 
@@ -6310,21 +7879,21 @@ var etiquetaCondicion = (clave) => {
 };
 
 // src/components/SemaforoItem.jsx
-import { jsx as jsx57, jsxs as jsxs45 } from "react/jsx-runtime";
+import { jsx as jsx61, jsxs as jsxs48 } from "react/jsx-runtime";
 function SemaforoItem({ estado = "sinVerificar", etiqueta, detalle, como = "li", className, ...props }) {
   const config = estadoItem(estado);
   const Etiqueta = como === "div" ? "div" : "li";
-  return /* @__PURE__ */ jsxs45(
+  return /* @__PURE__ */ jsxs48(
     Etiqueta,
     {
       className: cn("flex items-center gap-2.5", className),
       "aria-label": etiqueta ? `${etiqueta}: ${config.etiqueta}` : config.etiqueta,
       ...props,
       children: [
-        /* @__PURE__ */ jsx57("span", { className: cn("grid h-6 w-6 shrink-0 place-items-center rounded-full", TONOS.punto[config.tono]), title: config.etiqueta, "aria-hidden": "true", children: /* @__PURE__ */ jsx57(Icon, { name: config.icono, className: "h-3.5 w-3.5" }) }),
-        /* @__PURE__ */ jsxs45("span", { className: "min-w-0 flex-1", children: [
-          /* @__PURE__ */ jsx57("span", { className: "block truncate text-sm", children: etiqueta }),
-          detalle && /* @__PURE__ */ jsx57("span", { className: "block truncate text-xs text-mute", children: detalle })
+        /* @__PURE__ */ jsx61("span", { className: cn("grid h-6 w-6 shrink-0 place-items-center rounded-full", TONOS.punto[config.tono]), title: config.etiqueta, "aria-hidden": "true", children: /* @__PURE__ */ jsx61(Icon, { name: config.icono, className: "h-3.5 w-3.5" }) }),
+        /* @__PURE__ */ jsxs48("span", { className: "min-w-0 flex-1", children: [
+          /* @__PURE__ */ jsx61("span", { className: "block truncate text-sm", children: etiqueta }),
+          detalle && /* @__PURE__ */ jsx61("span", { className: "block truncate text-xs text-mute", children: detalle })
         ] })
       ]
     }
@@ -6332,30 +7901,30 @@ function SemaforoItem({ estado = "sinVerificar", etiqueta, detalle, como = "li",
 }
 
 // src/components/FilaChecklist.jsx
-import { jsx as jsx58, jsxs as jsxs46 } from "react/jsx-runtime";
+import { jsx as jsx62, jsxs as jsxs49 } from "react/jsx-runtime";
 function FilaChecklist({ etiqueta, estado = "sinVerificar", nota, accion, className }) {
   const config = estadoItem(estado);
-  return /* @__PURE__ */ jsxs46("div", { className: cn("flex items-start gap-2.5 rounded-xl border border-ink-600 p-2.5", className), children: [
-    /* @__PURE__ */ jsx58("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", TONOS.punto[config.tono]), title: config.etiqueta, "aria-hidden": "true", children: /* @__PURE__ */ jsx58(Icon, { name: config.icono, className: "h-3.5 w-3.5" }) }),
-    /* @__PURE__ */ jsxs46("div", { className: "min-w-0 flex-1", children: [
-      /* @__PURE__ */ jsx58("p", { className: "truncate text-sm", children: etiqueta }),
-      nota && /* @__PURE__ */ jsx58("p", { className: "mt-0.5 text-xs text-mute", children: nota })
+  return /* @__PURE__ */ jsxs49("div", { className: cn("flex items-start gap-2.5 rounded-xl border border-ink-600 p-2.5", className), children: [
+    /* @__PURE__ */ jsx62("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", TONOS.punto[config.tono]), title: config.etiqueta, "aria-hidden": "true", children: /* @__PURE__ */ jsx62(Icon, { name: config.icono, className: "h-3.5 w-3.5" }) }),
+    /* @__PURE__ */ jsxs49("div", { className: "min-w-0 flex-1", children: [
+      /* @__PURE__ */ jsx62("p", { className: "truncate text-sm", children: etiqueta }),
+      nota && /* @__PURE__ */ jsx62("p", { className: "mt-0.5 text-xs text-mute", children: nota })
     ] }),
-    /* @__PURE__ */ jsx58("span", { className: "shrink-0 text-[11px] font-semibold text-mute", title: config.etiqueta, children: config.etiqueta }),
+    /* @__PURE__ */ jsx62("span", { className: "shrink-0 text-[11px] font-semibold text-mute", title: config.etiqueta, children: config.etiqueta }),
     accion
   ] });
 }
 function ConteoChecklist({ pasan = 0, total = 0, fallas = 0, sustantivo = "pass", className }) {
   const completo = total > 0 && pasan === total;
-  return /* @__PURE__ */ jsxs46("span", { className: cn("inline-flex flex-wrap items-center gap-2 text-xs font-semibold", className), children: [
-    /* @__PURE__ */ jsxs46("span", { className: completo ? "text-pass-text" : "text-mute", children: [
+  return /* @__PURE__ */ jsxs49("span", { className: cn("inline-flex flex-wrap items-center gap-2 text-xs font-semibold", className), children: [
+    /* @__PURE__ */ jsxs49("span", { className: completo ? "text-pass-text" : "text-mute", children: [
       pasan,
       " de ",
       total,
       " ",
       sustantivo
     ] }),
-    fallas > 0 && /* @__PURE__ */ jsxs46("span", { className: "text-bad-text", children: [
+    fallas > 0 && /* @__PURE__ */ jsxs49("span", { className: "text-bad-text", children: [
       fallas,
       " ",
       fallas === 1 ? "falla" : "fallas"
@@ -6364,18 +7933,18 @@ function ConteoChecklist({ pasan = 0, total = 0, fallas = 0, sustantivo = "pass"
 }
 
 // src/components/ChipEstado.jsx
-import { jsx as jsx59, jsxs as jsxs47 } from "react/jsx-runtime";
+import { jsx as jsx63, jsxs as jsxs50 } from "react/jsx-runtime";
 function ChipEstado({ estado = "pendiente", etiqueta, icono, tono, title, className }) {
   const config = estadoChip(estado);
   const texto = etiqueta || config.etiqueta;
-  return /* @__PURE__ */ jsxs47(
+  return /* @__PURE__ */ jsxs50(
     "span",
     {
       "data-estado": estado,
       title: title ?? texto,
       className: cn("inline-flex items-center gap-1.5 rounded-lg border px-2 py-0.5 text-[11px] font-semibold", TONOS.chip[tonoCanonico(tono || config.tono)], className),
       children: [
-        /* @__PURE__ */ jsx59(Icon, { name: icono || config.icono, className: "h-3 w-3", "aria-hidden": "true" }),
+        /* @__PURE__ */ jsx63(Icon, { name: icono || config.icono, className: "h-3 w-3", "aria-hidden": "true" }),
         texto
       ]
     }
@@ -6383,19 +7952,19 @@ function ChipEstado({ estado = "pendiente", etiqueta, icono, tono, title, classN
 }
 
 // src/components/ChipsLocks.jsx
-import { jsx as jsx60, jsxs as jsxs48 } from "react/jsx-runtime";
+import { jsx as jsx64, jsxs as jsxs51 } from "react/jsx-runtime";
 function ChipsLocks({ locks = [], conEstado = false, className }) {
   if (!locks.length) return null;
-  return /* @__PURE__ */ jsx60("ul", { className: cn("flex flex-wrap items-center gap-1.5", className), children: locks.map((lock) => {
+  return /* @__PURE__ */ jsx64("ul", { className: cn("flex flex-wrap items-center gap-1.5", className), children: locks.map((lock) => {
     const config = estadoLock(lock.estado);
     const etiqueta = lock.etiqueta || LOCKS_DISPOSITIVO[lock.clave] || lock.clave;
-    return /* @__PURE__ */ jsxs48(
+    return /* @__PURE__ */ jsxs51(
       "li",
       {
         className: cn("inline-flex items-center gap-1.5 rounded-lg border px-2 py-0.5 text-[11px] font-semibold", TONOS.chip[config.tono]),
         title: lock.detalle || `${etiqueta}: ${config.etiqueta}`,
         children: [
-          /* @__PURE__ */ jsx60(Icon, { name: config.icono, className: "h-3 w-3", "aria-hidden": "true" }),
+          /* @__PURE__ */ jsx64(Icon, { name: config.icono, className: "h-3 w-3", "aria-hidden": "true" }),
           etiqueta,
           conEstado ? ` \xB7 ${config.etiqueta}` : ""
         ]
@@ -6406,7 +7975,7 @@ function ChipsLocks({ locks = [], conEstado = false, className }) {
 }
 
 // src/components/MedidorBateria.jsx
-import { jsx as jsx61, jsxs as jsxs49 } from "react/jsx-runtime";
+import { jsx as jsx65, jsxs as jsxs52 } from "react/jsx-runtime";
 function MedidorBateria({ porcentaje, ciclos, etiqueta = "Bater\xEDa", variante = "barra", compact = false, mostrarEtiqueta = false, className }) {
   const hay = porcentaje !== null && porcentaje !== void 0 && porcentaje !== "" && Number.isFinite(Number(porcentaje));
   const valor = hay ? Number(porcentaje) : null;
@@ -6414,22 +7983,22 @@ function MedidorBateria({ porcentaje, ciclos, etiqueta = "Bater\xEDa", variante 
   const texto = hay ? `${valor}%` : "\u2014";
   const title = hay ? `${etiqueta}: ${valor}%${ciclos ? ` \xB7 ${ciclos} ciclos` : ""}` : `${etiqueta}: sin dato`;
   if (variante === "chip") {
-    return /* @__PURE__ */ jsxs49("span", { className: cn("inline-flex shrink-0 items-center rounded border border-ink-600 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums", TONOS.texto[tono], className), title, children: [
+    return /* @__PURE__ */ jsxs52("span", { className: cn("inline-flex shrink-0 items-center rounded border border-ink-600 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums", TONOS.texto[tono], className), title, children: [
       texto,
       mostrarEtiqueta ? ` ${etiqueta.toLowerCase()}` : ""
     ] });
   }
-  return /* @__PURE__ */ jsxs49("div", { className: cn("space-y-1", className), title, children: [
-    /* @__PURE__ */ jsxs49("div", { className: "flex items-baseline justify-between gap-2", children: [
-      /* @__PURE__ */ jsx61("span", { className: cn("text-xs text-mute", compact && "text-[11px]"), children: etiqueta }),
-      /* @__PURE__ */ jsx61("span", { className: cn("font-semibold tabular-nums", TONOS.texto[tono], compact && "text-xs"), children: texto })
+  return /* @__PURE__ */ jsxs52("div", { className: cn("space-y-1", className), title, children: [
+    /* @__PURE__ */ jsxs52("div", { className: "flex items-baseline justify-between gap-2", children: [
+      /* @__PURE__ */ jsx65("span", { className: cn("text-xs text-mute", compact && "text-[11px]"), children: etiqueta }),
+      /* @__PURE__ */ jsx65("span", { className: cn("font-semibold tabular-nums", TONOS.texto[tono], compact && "text-xs"), children: texto })
     ] }),
-    hay ? /* @__PURE__ */ jsx61(BarraProgreso, { valor, tono, alto: compact ? "sm" : "md", pista: "bg-ink-700", etiqueta: `${etiqueta} ${valor}%` }) : /* @__PURE__ */ jsx61(Badge, { color: "slate", children: "Sin dato" })
+    hay ? /* @__PURE__ */ jsx65(BarraProgreso, { valor, tono, alto: compact ? "sm" : "md", pista: "bg-ink-700", etiqueta: `${etiqueta} ${valor}%` }) : /* @__PURE__ */ jsx65(Badge, { color: "slate", children: "Sin dato" })
   ] });
 }
 
 // src/components/MedidorStock.jsx
-import { jsx as jsx62, jsxs as jsxs50 } from "react/jsx-runtime";
+import { jsx as jsx66, jsxs as jsxs53 } from "react/jsx-runtime";
 function MedidorStock({
   stock,
   umbral,
@@ -6443,7 +8012,7 @@ function MedidorStock({
   const n = Number(stock);
   const u = Number(umbral);
   if (sinDato || !Number.isFinite(n)) {
-    return /* @__PURE__ */ jsx62("span", { className: cn("text-xs text-mute", className), children: vacio });
+    return /* @__PURE__ */ jsx66("span", { className: cn("text-xs text-mute", className), children: vacio });
   }
   const tieneUmbral = Number.isFinite(u);
   const agotado = n <= 0;
@@ -6454,15 +8023,15 @@ function MedidorStock({
   if (variante === "barra") {
     const techo = tieneUmbral ? Math.max(u, n) : n;
     const porcentaje = techo > 0 ? Math.min(100, Math.round(n / techo * 100)) : 0;
-    return /* @__PURE__ */ jsxs50("span", { className: cn("block min-w-0 space-y-1", className), children: [
-      /* @__PURE__ */ jsxs50("span", { className: "flex items-baseline justify-between gap-2 text-xs", children: [
-        /* @__PURE__ */ jsx62("span", { className: cn("font-semibold", tono === "bad" ? "text-bad-text" : tono === "warn" ? "text-warn-text" : "text-ok-text"), children: texto }),
-        /* @__PURE__ */ jsx62("span", { className: "tabular-nums text-mute", children: detalle })
+    return /* @__PURE__ */ jsxs53("span", { className: cn("block min-w-0 space-y-1", className), children: [
+      /* @__PURE__ */ jsxs53("span", { className: "flex items-baseline justify-between gap-2 text-xs", children: [
+        /* @__PURE__ */ jsx66("span", { className: cn("font-semibold", tono === "bad" ? "text-bad-text" : tono === "warn" ? "text-warn-text" : "text-ok-text"), children: texto }),
+        /* @__PURE__ */ jsx66("span", { className: "tabular-nums text-mute", children: detalle })
       ] }),
-      /* @__PURE__ */ jsx62("span", { role: "progressbar", "aria-label": etiqueta ?? `Stock ${detalle}`, "aria-valuenow": porcentaje, "aria-valuemin": 0, "aria-valuemax": 100, className: "block h-1.5 overflow-hidden rounded-full bg-ink-700", children: /* @__PURE__ */ jsx62("span", { className: cn("block h-full rounded-full transition-[width]", tono === "bad" ? "bg-bad" : tono === "warn" ? "bg-warn" : "bg-ok"), style: { width: `${porcentaje}%` } }) })
+      /* @__PURE__ */ jsx66("span", { role: "progressbar", "aria-label": etiqueta ?? `Stock ${detalle}`, "aria-valuenow": porcentaje, "aria-valuemin": 0, "aria-valuemax": 100, className: "block h-1.5 overflow-hidden rounded-full bg-ink-700", children: /* @__PURE__ */ jsx66("span", { className: cn("block h-full rounded-full transition-[width]", tono === "bad" ? "bg-bad" : tono === "warn" ? "bg-warn" : "bg-ok"), style: { width: `${porcentaje}%` } }) })
     ] });
   }
-  return /* @__PURE__ */ jsxs50(
+  return /* @__PURE__ */ jsxs53(
     "span",
     {
       className: cn(
@@ -6474,21 +8043,21 @@ function MedidorStock({
       ),
       title: etiqueta ?? `${texto} \xB7 ${detalle}`,
       children: [
-        variante !== "chip" && /* @__PURE__ */ jsx62("span", { className: cn("h-1.5 w-1.5 rounded-full", tono === "bad" ? "bg-bad" : tono === "warn" ? "bg-warn" : "bg-ok"), "aria-hidden": "true" }),
-        /* @__PURE__ */ jsx62("span", { className: "tabular-nums", children: detalle }),
-        mostrarUmbral && /* @__PURE__ */ jsx62("span", { className: "font-normal text-mute", children: texto })
+        variante !== "chip" && /* @__PURE__ */ jsx66("span", { className: cn("h-1.5 w-1.5 rounded-full", tono === "bad" ? "bg-bad" : tono === "warn" ? "bg-warn" : "bg-ok"), "aria-hidden": "true" }),
+        /* @__PURE__ */ jsx66("span", { className: "tabular-nums", children: detalle }),
+        mostrarUmbral && /* @__PURE__ */ jsx66("span", { className: "font-normal text-mute", children: texto })
       ]
     }
   );
 }
 
 // src/components/ContadorLote.jsx
-import { jsx as jsx63, jsxs as jsxs51 } from "react/jsx-runtime";
+import { jsx as jsx67, jsxs as jsxs54 } from "react/jsx-runtime";
 function ContadorLote({ recibidos, total, variante = "texto", sufijo, mostrarFaltan = false, vacio = "Sin dato", className }) {
   const r = Number(recibidos);
   const t = Number(total);
   if (recibidos === null || recibidos === void 0 || !Number.isFinite(t) || t <= 0 || !Number.isFinite(r)) {
-    return /* @__PURE__ */ jsx63("span", { className: cn("text-xs text-mute", className), children: vacio });
+    return /* @__PURE__ */ jsx67("span", { className: cn("text-xs text-mute", className), children: vacio });
   }
   const hechas = Math.max(0, Math.min(t, Math.trunc(r)));
   const completo = hechas >= t;
@@ -6497,15 +8066,15 @@ function ContadorLote({ recibidos, total, variante = "texto", sufijo, mostrarFal
   const texto = sufijo ? `${hechas} de ${t} ${sufijo}` : `${hechas} de ${t}`;
   if (variante === "barra") {
     const porcentaje = Math.round(hechas / t * 100);
-    return /* @__PURE__ */ jsxs51("span", { className: cn("block min-w-0 space-y-1", className), children: [
-      /* @__PURE__ */ jsxs51("span", { className: "flex items-baseline justify-between gap-2 text-xs", children: [
-        /* @__PURE__ */ jsx63("span", { className: cn("font-semibold", tono === "ok" ? "text-ok-text" : tono === "warn" ? "text-warn-text" : "text-mute"), children: texto }),
-        mostrarFaltan && !completo && /* @__PURE__ */ jsxs51("span", { className: "text-mute", children: [
+    return /* @__PURE__ */ jsxs54("span", { className: cn("block min-w-0 space-y-1", className), children: [
+      /* @__PURE__ */ jsxs54("span", { className: "flex items-baseline justify-between gap-2 text-xs", children: [
+        /* @__PURE__ */ jsx67("span", { className: cn("font-semibold", tono === "ok" ? "text-ok-text" : tono === "warn" ? "text-warn-text" : "text-mute"), children: texto }),
+        mostrarFaltan && !completo && /* @__PURE__ */ jsxs54("span", { className: "text-mute", children: [
           "faltan ",
           faltan
         ] })
       ] }),
-      /* @__PURE__ */ jsx63(
+      /* @__PURE__ */ jsx67(
         "span",
         {
           role: "progressbar",
@@ -6514,13 +8083,13 @@ function ContadorLote({ recibidos, total, variante = "texto", sufijo, mostrarFal
           "aria-valuemin": 0,
           "aria-valuemax": t,
           className: "block h-1.5 overflow-hidden rounded-full bg-ink-700",
-          children: /* @__PURE__ */ jsx63("span", { className: cn("block h-full rounded-full transition-[width]", tono === "ok" ? "bg-ok" : tono === "warn" ? "bg-warn" : "bg-mute"), style: { width: `${porcentaje}%` } })
+          children: /* @__PURE__ */ jsx67("span", { className: cn("block h-full rounded-full transition-[width]", tono === "ok" ? "bg-ok" : tono === "warn" ? "bg-warn" : "bg-mute"), style: { width: `${porcentaje}%` } })
         }
       )
     ] });
   }
   if (variante === "chip") {
-    return /* @__PURE__ */ jsxs51(
+    return /* @__PURE__ */ jsxs54(
       "span",
       {
         className: cn(
@@ -6530,8 +8099,8 @@ function ContadorLote({ recibidos, total, variante = "texto", sufijo, mostrarFal
         ),
         title: texto,
         children: [
-          /* @__PURE__ */ jsx63("span", { className: "tabular-nums", children: texto }),
-          mostrarFaltan && !completo && /* @__PURE__ */ jsxs51("span", { className: "font-normal", children: [
+          /* @__PURE__ */ jsx67("span", { className: "tabular-nums", children: texto }),
+          mostrarFaltan && !completo && /* @__PURE__ */ jsxs54("span", { className: "font-normal", children: [
             "\xB7 faltan ",
             faltan
           ] })
@@ -6539,9 +8108,9 @@ function ContadorLote({ recibidos, total, variante = "texto", sufijo, mostrarFal
       }
     );
   }
-  return /* @__PURE__ */ jsxs51("span", { className: cn("inline-flex items-baseline gap-1.5 whitespace-nowrap text-xs", className), title: texto, children: [
-    /* @__PURE__ */ jsx63("span", { className: cn("font-semibold tabular-nums", tono === "ok" ? "text-ok-text" : tono === "warn" ? "text-warn-text" : "text-mute"), children: texto }),
-    mostrarFaltan && !completo && /* @__PURE__ */ jsxs51("span", { className: "text-mute", children: [
+  return /* @__PURE__ */ jsxs54("span", { className: cn("inline-flex items-baseline gap-1.5 whitespace-nowrap text-xs", className), title: texto, children: [
+    /* @__PURE__ */ jsx67("span", { className: cn("font-semibold tabular-nums", tono === "ok" ? "text-ok-text" : tono === "warn" ? "text-warn-text" : "text-mute"), children: texto }),
+    mostrarFaltan && !completo && /* @__PURE__ */ jsxs54("span", { className: "text-mute", children: [
       "faltan ",
       faltan
     ] })
@@ -6671,7 +8240,7 @@ var COLOR_DE_TONO = { ok: "green", bad: "red", warn: "orange", info: "blue", mut
 var colorDeTono = (tono) => COLOR_DE_TONO[tono] || "slate";
 
 // src/components/ChipPrioridad.jsx
-import { jsx as jsx64 } from "react/jsx-runtime";
+import { jsx as jsx68 } from "react/jsx-runtime";
 function ChipPrioridad({ prioridad = "media", etiqueta, title, className }) {
   const tono = tonoPrioridad(prioridad);
   const texto = etiqueta || etiquetaPrioridad(prioridad);
@@ -6682,7 +8251,7 @@ function ChipPrioridad({ prioridad = "media", etiqueta, title, className }) {
     info: "border-info/30 bg-info/10 text-info-text",
     mute: "border-ink-500 bg-ink-700 text-mute"
   };
-  return /* @__PURE__ */ jsx64(
+  return /* @__PURE__ */ jsx68(
     "span",
     {
       className: cn("inline-flex items-center whitespace-nowrap rounded-lg border px-2 py-0.5 text-xs font-semibold", CLASES3[tono] || CLASES3.mute, className),
@@ -6693,7 +8262,7 @@ function ChipPrioridad({ prioridad = "media", etiqueta, title, className }) {
 }
 
 // src/components/ChipOrigen.jsx
-import { jsx as jsx65, jsxs as jsxs52 } from "react/jsx-runtime";
+import { jsx as jsx69, jsxs as jsxs55 } from "react/jsx-runtime";
 function ChipOrigen({ origen, etiqueta, title, className }) {
   const tono = tonoOrigen(origen);
   const texto = etiqueta || etiquetaOrigen(origen);
@@ -6704,21 +8273,21 @@ function ChipOrigen({ origen, etiqueta, title, className }) {
     info: "border-info/30 bg-info/10 text-info-text",
     mute: "border-ink-500 bg-ink-700 text-mute"
   };
-  return /* @__PURE__ */ jsxs52(
+  return /* @__PURE__ */ jsxs55(
     "span",
     {
       className: cn("inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-lg border px-2 py-0.5 text-xs font-semibold", CLASES3[tono] || CLASES3.mute, className),
       title: title || texto,
       children: [
-        /* @__PURE__ */ jsx65(Icon, { name: iconoOrigen(origen), className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx65("span", { className: "truncate", children: texto })
+        /* @__PURE__ */ jsx69(Icon, { name: iconoOrigen(origen), className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx69("span", { className: "truncate", children: texto })
       ]
     }
   );
 }
 
 // src/components/ContadoresCompra.jsx
-import { jsx as jsx66, jsxs as jsxs53 } from "react/jsx-runtime";
+import { jsx as jsx70, jsxs as jsxs56 } from "react/jsx-runtime";
 function ContadoresCompra({ pendiente = 0, comprado = 0, faltan = 0, variante = "texto", className }) {
   const conteo = (valor) => Math.max(0, Math.trunc(Number(valor) || 0));
   const datos = [
@@ -6727,26 +8296,26 @@ function ContadoresCompra({ pendiente = 0, comprado = 0, faltan = 0, variante = 
     { clave: "faltan", etiqueta: "faltan", valor: conteo(faltan), tono: conteo(faltan) > 0 ? "text-bad-text" : "text-mute" }
   ];
   if (variante === "chips") {
-    return /* @__PURE__ */ jsx66("span", { className: cn("flex min-w-0 flex-wrap items-center gap-1.5", className), children: datos.map((dato) => /* @__PURE__ */ jsxs53("span", { className: "inline-flex items-center gap-1 rounded-lg border border-ink-600 bg-ink-800 px-2 py-0.5 text-[11px] text-mute", children: [
-      /* @__PURE__ */ jsx66("b", { className: cn("tabular-nums", dato.tono), children: dato.valor }),
+    return /* @__PURE__ */ jsx70("span", { className: cn("flex min-w-0 flex-wrap items-center gap-1.5", className), children: datos.map((dato) => /* @__PURE__ */ jsxs56("span", { className: "inline-flex items-center gap-1 rounded-lg border border-ink-600 bg-ink-800 px-2 py-0.5 text-[11px] text-mute", children: [
+      /* @__PURE__ */ jsx70("b", { className: cn("tabular-nums", dato.tono), children: dato.valor }),
       dato.etiqueta
     ] }, dato.clave)) });
   }
-  return /* @__PURE__ */ jsx66("span", { className: cn("flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", className), "aria-label": "Conteo de la necesidad", children: datos.map((dato) => /* @__PURE__ */ jsxs53("span", { children: [
-    /* @__PURE__ */ jsx66("b", { className: cn("tabular-nums", dato.tono), children: dato.valor }),
+  return /* @__PURE__ */ jsx70("span", { className: cn("flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", className), "aria-label": "Conteo de la necesidad", children: datos.map((dato) => /* @__PURE__ */ jsxs56("span", { children: [
+    /* @__PURE__ */ jsx70("b", { className: cn("tabular-nums", dato.tono), children: dato.valor }),
     " ",
     dato.etiqueta
   ] }, dato.clave)) });
 }
 
 // src/components/ResumenDestinos.jsx
-import { jsx as jsx67, jsxs as jsxs54 } from "react/jsx-runtime";
+import { jsx as jsx71, jsxs as jsxs57 } from "react/jsx-runtime";
 function ResumenDestinos({ destinos = [], ariaLabel = "Destinos", onElegir, className }) {
   const lista = (Array.isArray(destinos) ? destinos : []).filter((destino) => destino && Number(destino.cantidad) > 0);
   if (!lista.length) return null;
-  return /* @__PURE__ */ jsx67("span", { className: cn("flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-mute", className), "aria-label": ariaLabel, children: lista.map((destino, indice) => /* @__PURE__ */ jsxs54("span", { className: "flex min-w-0 items-center gap-1.5", children: [
-    indice > 0 && /* @__PURE__ */ jsx67("span", { "aria-hidden": "true", children: "\xB7" }),
-    onElegir ? /* @__PURE__ */ jsxs54(
+  return /* @__PURE__ */ jsx71("span", { className: cn("flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-mute", className), "aria-label": ariaLabel, children: lista.map((destino, indice) => /* @__PURE__ */ jsxs57("span", { className: "flex min-w-0 items-center gap-1.5", children: [
+    indice > 0 && /* @__PURE__ */ jsx71("span", { "aria-hidden": "true", children: "\xB7" }),
+    onElegir ? /* @__PURE__ */ jsxs57(
       "button",
       {
         type: "button",
@@ -6754,13 +8323,13 @@ function ResumenDestinos({ destinos = [], ariaLabel = "Destinos", onElegir, clas
         title: destino.detalle || void 0,
         className: "min-w-0 truncate transition hover:text-fore",
         children: [
-          /* @__PURE__ */ jsx67("b", { className: "tabular-nums text-fore", children: Number(destino.cantidad) }),
+          /* @__PURE__ */ jsx71("b", { className: "tabular-nums text-fore", children: Number(destino.cantidad) }),
           " ",
           destino.etiqueta
         ]
       }
-    ) : /* @__PURE__ */ jsxs54("span", { className: "min-w-0 truncate", title: destino.detalle || void 0, children: [
-      /* @__PURE__ */ jsx67("b", { className: "tabular-nums text-fore", children: Number(destino.cantidad) }),
+    ) : /* @__PURE__ */ jsxs57("span", { className: "min-w-0 truncate", title: destino.detalle || void 0, children: [
+      /* @__PURE__ */ jsx71("b", { className: "tabular-nums text-fore", children: Number(destino.cantidad) }),
       " ",
       destino.etiqueta
     ] })
@@ -6768,7 +8337,7 @@ function ResumenDestinos({ destinos = [], ariaLabel = "Destinos", onElegir, clas
 }
 
 // src/components/Vencimiento.jsx
-import { jsx as jsx68 } from "react/jsx-runtime";
+import { jsx as jsx72 } from "react/jsx-runtime";
 var SOLO_DIA2 = /^\d{4}-\d{2}-\d{2}$/;
 function estadoVencimiento(fecha, { hoy = /* @__PURE__ */ new Date(), diasAviso = 7 } = {}) {
   const vence = fechaValida(fecha);
@@ -6794,17 +8363,17 @@ var CHIP = {
   mute: "border-ink-500 bg-ink-700 text-mute"
 };
 function Vencimiento({ fecha, variante = "texto", diasAviso = 7, hoy, texto, vacio = "\u2014", className }) {
-  if (!fecha) return /* @__PURE__ */ jsx68("span", { className: cn("text-xs text-mute", className), children: vacio });
+  if (!fecha) return /* @__PURE__ */ jsx72("span", { className: cn("text-xs text-mute", className), children: vacio });
   const estado = estadoVencimiento(fecha, { hoy, diasAviso });
   const contenido = texto || estado.texto;
   if (variante === "chip") {
-    return /* @__PURE__ */ jsx68("span", { className: cn("inline-flex items-center whitespace-nowrap rounded-lg border px-2 py-0.5 text-xs font-semibold tabular-nums", CHIP[estado.tono] || CHIP.mute, className), title: estado.titulo, children: contenido });
+    return /* @__PURE__ */ jsx72("span", { className: cn("inline-flex items-center whitespace-nowrap rounded-lg border px-2 py-0.5 text-xs font-semibold tabular-nums", CHIP[estado.tono] || CHIP.mute, className), title: estado.titulo, children: contenido });
   }
-  return /* @__PURE__ */ jsx68("span", { className: cn("whitespace-nowrap text-xs font-medium tabular-nums", CLASES[estado.tono] || CLASES.mute, className), title: estado.titulo, children: contenido });
+  return /* @__PURE__ */ jsx72("span", { className: cn("whitespace-nowrap text-xs font-medium tabular-nums", CLASES[estado.tono] || CLASES.mute, className), title: estado.titulo, children: contenido });
 }
 
 // src/components/TarjetaNecesidad.jsx
-import { Fragment as Fragment7, jsx as jsx69, jsxs as jsxs55 } from "react/jsx-runtime";
+import { Fragment as Fragment6, jsx as jsx73, jsxs as jsxs58 } from "react/jsx-runtime";
 function TarjetaNecesidad({
   producto,
   variante,
@@ -6826,43 +8395,43 @@ function TarjetaNecesidad({
   className
 }) {
   const est = estadoNecesidad(estado);
-  const titulo2 = /* @__PURE__ */ jsxs55(Fragment7, { children: [
-    /* @__PURE__ */ jsx69("span", { className: "block truncate font-semibold", children: producto || "Sin producto" }),
-    variante ? /* @__PURE__ */ jsx69("span", { className: "block truncate text-xs text-mute", children: variante }) : null
+  const titulo2 = /* @__PURE__ */ jsxs58(Fragment6, { children: [
+    /* @__PURE__ */ jsx73("span", { className: "block truncate font-semibold", children: producto || "Sin producto" }),
+    variante ? /* @__PURE__ */ jsx73("span", { className: "block truncate text-xs text-mute", children: variante }) : null
   ] });
-  return /* @__PURE__ */ jsxs55("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
-    /* @__PURE__ */ jsxs55("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ jsx69("div", { className: "min-w-0", children: onAbrir ? /* @__PURE__ */ jsx69("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2 }),
-      /* @__PURE__ */ jsx69(ChipPrioridad, { prioridad, className: "shrink-0" })
+  return /* @__PURE__ */ jsxs58("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
+    /* @__PURE__ */ jsxs58("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ jsx73("div", { className: "min-w-0", children: onAbrir ? /* @__PURE__ */ jsx73("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2 }),
+      /* @__PURE__ */ jsx73(ChipPrioridad, { prioridad, className: "shrink-0" })
     ] }),
-    /* @__PURE__ */ jsxs55("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
-      /* @__PURE__ */ jsx69(Badge, { color: colorDeTono(est.tono), children: est.etiqueta }),
-      origen ? /* @__PURE__ */ jsx69(ChipOrigen, { origen }) : null,
-      centro ? /* @__PURE__ */ jsxs55("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
-        /* @__PURE__ */ jsx69(Icon, { name: "building", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx69("span", { className: "truncate", children: centro })
+    /* @__PURE__ */ jsxs58("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
+      /* @__PURE__ */ jsx73(Badge, { color: colorDeTono(est.tono), children: est.etiqueta }),
+      origen ? /* @__PURE__ */ jsx73(ChipOrigen, { origen }) : null,
+      centro ? /* @__PURE__ */ jsxs58("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
+        /* @__PURE__ */ jsx73(Icon, { name: "building", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx73("span", { className: "truncate", children: centro })
       ] }) : null,
-      fechaPrometida ? /* @__PURE__ */ jsxs55("span", { className: "inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ jsx69(Icon, { name: "calendar", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx69(Vencimiento, { fecha: fechaPrometida, diasAviso })
+      fechaPrometida ? /* @__PURE__ */ jsxs58("span", { className: "inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ jsx73(Icon, { name: "calendar", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx73(Vencimiento, { fecha: fechaPrometida, diasAviso })
       ] }) : null,
-      vinculo?.etiqueta ? vinculo.onClick ? /* @__PURE__ */ jsxs55("button", { type: "button", onClick: vinculo.onClick, className: "inline-flex min-w-0 items-center gap-1 transition hover:text-fore", children: [
-        /* @__PURE__ */ jsx69(Icon, { name: "receipt", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx69("span", { className: "truncate", children: vinculo.etiqueta })
-      ] }) : /* @__PURE__ */ jsxs55("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
-        /* @__PURE__ */ jsx69(Icon, { name: "receipt", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx69("span", { className: "truncate", children: vinculo.etiqueta })
+      vinculo?.etiqueta ? vinculo.onClick ? /* @__PURE__ */ jsxs58("button", { type: "button", onClick: vinculo.onClick, className: "inline-flex min-w-0 items-center gap-1 transition hover:text-fore", children: [
+        /* @__PURE__ */ jsx73(Icon, { name: "receipt", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx73("span", { className: "truncate", children: vinculo.etiqueta })
+      ] }) : /* @__PURE__ */ jsxs58("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
+        /* @__PURE__ */ jsx73(Icon, { name: "receipt", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx73("span", { className: "truncate", children: vinculo.etiqueta })
       ] }) : null
     ] }),
-    /* @__PURE__ */ jsx69(ContadoresCompra, { className: "mt-2", pendiente, comprado, faltan }),
-    Array.isArray(destinos) && destinos.length > 0 ? /* @__PURE__ */ jsx69("div", { className: "mt-1.5", children: /* @__PURE__ */ jsx69(ResumenDestinos, { destinos, onElegir: onElegirDestino }) }) : null,
-    observaciones ? /* @__PURE__ */ jsx69("p", { className: "mt-1.5 text-xs text-mute", children: observaciones }) : null,
-    acciones ? /* @__PURE__ */ jsx69("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
+    /* @__PURE__ */ jsx73(ContadoresCompra, { className: "mt-2", pendiente, comprado, faltan }),
+    Array.isArray(destinos) && destinos.length > 0 ? /* @__PURE__ */ jsx73("div", { className: "mt-1.5", children: /* @__PURE__ */ jsx73(ResumenDestinos, { destinos, onElegir: onElegirDestino }) }) : null,
+    observaciones ? /* @__PURE__ */ jsx73("p", { className: "mt-1.5 text-xs text-mute", children: observaciones }) : null,
+    acciones ? /* @__PURE__ */ jsx73("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
   ] });
 }
 
 // src/components/TarjetaCompra.jsx
-import { Fragment as Fragment8, jsx as jsx70, jsxs as jsxs56 } from "react/jsx-runtime";
+import { Fragment as Fragment7, jsx as jsx74, jsxs as jsxs59 } from "react/jsx-runtime";
 function TarjetaCompra({
   codigo,
   proveedor,
@@ -6881,43 +8450,43 @@ function TarjetaCompra({
   className
 }) {
   const est = estadoCompra(estado);
-  const titulo2 = /* @__PURE__ */ jsxs56(Fragment8, { children: [
-    /* @__PURE__ */ jsx70("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
-    /* @__PURE__ */ jsx70("span", { className: "block truncate font-semibold", children: proveedor || "Sin proveedor" })
+  const titulo2 = /* @__PURE__ */ jsxs59(Fragment7, { children: [
+    /* @__PURE__ */ jsx74("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
+    /* @__PURE__ */ jsx74("span", { className: "block truncate font-semibold", children: proveedor || "Sin proveedor" })
   ] });
-  return /* @__PURE__ */ jsxs56("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
-    /* @__PURE__ */ jsxs56("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ jsxs56("div", { className: "min-w-0", children: [
-        onAbrir ? /* @__PURE__ */ jsx70("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2,
-        referencia ? /* @__PURE__ */ jsxs56("span", { className: "mt-0.5 block truncate text-xs text-mute", children: [
+  return /* @__PURE__ */ jsxs59("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
+    /* @__PURE__ */ jsxs59("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ jsxs59("div", { className: "min-w-0", children: [
+        onAbrir ? /* @__PURE__ */ jsx74("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2,
+        referencia ? /* @__PURE__ */ jsxs59("span", { className: "mt-0.5 block truncate text-xs text-mute", children: [
           "Ref. ",
           referencia
         ] }) : null
       ] }),
-      /* @__PURE__ */ jsx70(Badge, { color: colorDeTono(est.tono), className: "shrink-0", children: est.etiqueta })
+      /* @__PURE__ */ jsx74(Badge, { color: colorDeTono(est.tono), className: "shrink-0", children: est.etiqueta })
     ] }),
-    /* @__PURE__ */ jsxs56("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
-      Number.isFinite(Number(unidades)) ? /* @__PURE__ */ jsx70(ContadorLote, { recibidos: conImei, total: unidades, variante: "chip", sufijo: "con IMEI", mostrarFaltan: true }) : null,
-      costo !== null && costo !== void 0 && costo !== "" ? /* @__PURE__ */ jsxs56("span", { className: "inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ jsx70(Icon, { name: "money", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx70(Money, { value: costo, currency: moneda, simbolo })
+    /* @__PURE__ */ jsxs59("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
+      Number.isFinite(Number(unidades)) ? /* @__PURE__ */ jsx74(ContadorLote, { recibidos: conImei, total: unidades, variante: "chip", sufijo: "con IMEI", mostrarFaltan: true }) : null,
+      costo !== null && costo !== void 0 && costo !== "" ? /* @__PURE__ */ jsxs59("span", { className: "inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ jsx74(Icon, { name: "money", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx74(Money, { value: costo, currency: moneda, simbolo })
       ] }) : null,
-      origen ? /* @__PURE__ */ jsxs56("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
-        /* @__PURE__ */ jsx70(Icon, { name: "building", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx70("span", { className: "truncate", children: origen })
+      origen ? /* @__PURE__ */ jsxs59("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
+        /* @__PURE__ */ jsx74(Icon, { name: "building", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx74("span", { className: "truncate", children: origen })
       ] }) : null,
-      destino ? /* @__PURE__ */ jsxs56("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
-        /* @__PURE__ */ jsx70(Icon, { name: "arrowRight", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx70("span", { className: "truncate", children: destino })
+      destino ? /* @__PURE__ */ jsxs59("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
+        /* @__PURE__ */ jsx74(Icon, { name: "arrowRight", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx74("span", { className: "truncate", children: destino })
       ] }) : null
     ] }),
-    notas ? /* @__PURE__ */ jsx70("p", { className: "mt-1.5 text-xs text-mute", children: notas }) : null,
-    acciones ? /* @__PURE__ */ jsx70("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
+    notas ? /* @__PURE__ */ jsx74("p", { className: "mt-1.5 text-xs text-mute", children: notas }) : null,
+    acciones ? /* @__PURE__ */ jsx74("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
   ] });
 }
 
 // src/components/TarjetaLote.jsx
-import { Fragment as Fragment9, jsx as jsx71, jsxs as jsxs57 } from "react/jsx-runtime";
+import { Fragment as Fragment8, jsx as jsx75, jsxs as jsxs60 } from "react/jsx-runtime";
 function TarjetaLote({
   codigo,
   estado,
@@ -6937,40 +8506,40 @@ function TarjetaLote({
 }) {
   const est = estadoEnvio(estado);
   const ruta = [origen, destino].filter(Boolean).join(" \u2192 ");
-  const titulo2 = /* @__PURE__ */ jsxs57(Fragment9, { children: [
-    /* @__PURE__ */ jsx71("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
-    /* @__PURE__ */ jsx71("span", { className: "block truncate font-semibold", children: ruta || "Sin origen ni destino" })
+  const titulo2 = /* @__PURE__ */ jsxs60(Fragment8, { children: [
+    /* @__PURE__ */ jsx75("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
+    /* @__PURE__ */ jsx75("span", { className: "block truncate font-semibold", children: ruta || "Sin origen ni destino" })
   ] });
-  return /* @__PURE__ */ jsxs57("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
-    /* @__PURE__ */ jsxs57("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ jsxs57("div", { className: "min-w-0", children: [
-        onAbrir ? /* @__PURE__ */ jsx71("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2,
-        empresa || guia ? /* @__PURE__ */ jsx71("span", { className: "mt-0.5 block truncate text-xs text-mute", children: [empresa, guia ? `Gu\xEDa ${guia}` : null].filter(Boolean).join(" \xB7 ") }) : null
+  return /* @__PURE__ */ jsxs60("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
+    /* @__PURE__ */ jsxs60("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ jsxs60("div", { className: "min-w-0", children: [
+        onAbrir ? /* @__PURE__ */ jsx75("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2,
+        empresa || guia ? /* @__PURE__ */ jsx75("span", { className: "mt-0.5 block truncate text-xs text-mute", children: [empresa, guia ? `Gu\xEDa ${guia}` : null].filter(Boolean).join(" \xB7 ") }) : null
       ] }),
-      /* @__PURE__ */ jsx71(Badge, { color: colorDeTono(est.tono), className: "shrink-0", children: est.etiqueta })
+      /* @__PURE__ */ jsx75(Badge, { color: colorDeTono(est.tono), className: "shrink-0", children: est.etiqueta })
     ] }),
-    /* @__PURE__ */ jsxs57("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
-      metodo ? /* @__PURE__ */ jsxs57("span", { className: "inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ jsx71(Icon, { name: iconoMetodoEnvio(metodo), className: "h-3.5 w-3.5 shrink-0" }),
+    /* @__PURE__ */ jsxs60("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
+      metodo ? /* @__PURE__ */ jsxs60("span", { className: "inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ jsx75(Icon, { name: iconoMetodoEnvio(metodo), className: "h-3.5 w-3.5 shrink-0" }),
         etiquetaMetodoEnvio(metodo)
       ] }) : null,
-      responsable ? /* @__PURE__ */ jsxs57("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
-        /* @__PURE__ */ jsx71(Icon, { name: "user", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx71("span", { className: "truncate", children: responsable })
+      responsable ? /* @__PURE__ */ jsxs60("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
+        /* @__PURE__ */ jsx75(Icon, { name: "user", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx75("span", { className: "truncate", children: responsable })
       ] }) : null,
-      eta ? /* @__PURE__ */ jsxs57("span", { className: "inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ jsx71(Icon, { name: "calendar", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx71(Vencimiento, { fecha: eta })
+      eta ? /* @__PURE__ */ jsxs60("span", { className: "inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ jsx75(Icon, { name: "calendar", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx75(Vencimiento, { fecha: eta })
       ] }) : null,
-      Number.isFinite(Number(unidades)) ? /* @__PURE__ */ jsx71(ContadorLote, { recibidos: conImei, total: unidades, variante: "chip", sufijo: "con IMEI", mostrarFaltan: true }) : null
+      Number.isFinite(Number(unidades)) ? /* @__PURE__ */ jsx75(ContadorLote, { recibidos: conImei, total: unidades, variante: "chip", sufijo: "con IMEI", mostrarFaltan: true }) : null
     ] }),
-    notas ? /* @__PURE__ */ jsx71("p", { className: "mt-1.5 text-xs text-mute", children: notas }) : null,
-    acciones ? /* @__PURE__ */ jsx71("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
+    notas ? /* @__PURE__ */ jsx75("p", { className: "mt-1.5 text-xs text-mute", children: notas }) : null,
+    acciones ? /* @__PURE__ */ jsx75("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
   ] });
 }
 
 // src/components/TarjetaRecepcion.jsx
-import { Fragment as Fragment10, jsx as jsx72, jsxs as jsxs58 } from "react/jsx-runtime";
+import { Fragment as Fragment9, jsx as jsx76, jsxs as jsxs61 } from "react/jsx-runtime";
 function TarjetaRecepcion({
   codigo,
   estado,
@@ -6991,43 +8560,43 @@ function TarjetaRecepcion({
   const est = estadoEnvio(estado);
   const ruta = [origen, destino].filter(Boolean).join(" \u2192 ");
   const depositoTexto = deposito ?? depositoSugerido;
-  const titulo2 = /* @__PURE__ */ jsxs58(Fragment10, { children: [
-    /* @__PURE__ */ jsx72("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
-    /* @__PURE__ */ jsx72("span", { className: "block truncate font-semibold", children: ruta || "Sin origen ni destino" })
+  const titulo2 = /* @__PURE__ */ jsxs61(Fragment9, { children: [
+    /* @__PURE__ */ jsx76("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
+    /* @__PURE__ */ jsx76("span", { className: "block truncate font-semibold", children: ruta || "Sin origen ni destino" })
   ] });
-  return /* @__PURE__ */ jsxs58("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
-    /* @__PURE__ */ jsxs58("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ jsxs58("div", { className: "min-w-0", children: [
-        onAbrir ? /* @__PURE__ */ jsx72("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2,
-        llegada ? /* @__PURE__ */ jsxs58("span", { className: "mt-0.5 block truncate text-xs text-mute", children: [
+  return /* @__PURE__ */ jsxs61("article", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3 text-sm", className), "data-estado": estado, children: [
+    /* @__PURE__ */ jsxs61("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ jsxs61("div", { className: "min-w-0", children: [
+        onAbrir ? /* @__PURE__ */ jsx76("button", { type: "button", onClick: () => onAbrir(), className: "block max-w-full text-left", children: titulo2 }) : titulo2,
+        llegada ? /* @__PURE__ */ jsxs61("span", { className: "mt-0.5 block truncate text-xs text-mute", children: [
           "Lleg\xF3 ",
           llegada
         ] }) : null
       ] }),
-      /* @__PURE__ */ jsx72(Badge, { color: colorDeTono(est.tono), className: "shrink-0", children: est.etiqueta })
+      /* @__PURE__ */ jsx76(Badge, { color: colorDeTono(est.tono), className: "shrink-0", children: est.etiqueta })
     ] }),
-    /* @__PURE__ */ jsxs58("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
-      metodo ? /* @__PURE__ */ jsxs58("span", { className: "inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ jsx72(Icon, { name: iconoMetodoEnvio(metodo), className: "h-3.5 w-3.5 shrink-0" }),
+    /* @__PURE__ */ jsxs61("div", { className: "mt-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-mute", children: [
+      metodo ? /* @__PURE__ */ jsxs61("span", { className: "inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ jsx76(Icon, { name: iconoMetodoEnvio(metodo), className: "h-3.5 w-3.5 shrink-0" }),
         etiquetaMetodoEnvio(metodo)
       ] }) : null,
-      eta ? /* @__PURE__ */ jsxs58("span", { className: "inline-flex items-center gap-1", children: [
-        /* @__PURE__ */ jsx72(Icon, { name: "calendar", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx72(Vencimiento, { fecha: eta })
+      eta ? /* @__PURE__ */ jsxs61("span", { className: "inline-flex items-center gap-1", children: [
+        /* @__PURE__ */ jsx76(Icon, { name: "calendar", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx76(Vencimiento, { fecha: eta })
       ] }) : null,
-      depositoTexto ? /* @__PURE__ */ jsxs58("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
-        /* @__PURE__ */ jsx72(Icon, { name: "box", className: "h-3.5 w-3.5 shrink-0" }),
-        /* @__PURE__ */ jsx72("span", { className: "truncate", children: depositoTexto })
+      depositoTexto ? /* @__PURE__ */ jsxs61("span", { className: "inline-flex min-w-0 items-center gap-1", children: [
+        /* @__PURE__ */ jsx76(Icon, { name: "box", className: "h-3.5 w-3.5 shrink-0" }),
+        /* @__PURE__ */ jsx76("span", { className: "truncate", children: depositoTexto })
       ] }) : null,
-      Number.isFinite(Number(unidades)) ? /* @__PURE__ */ jsx72(ContadorLote, { recibidos: conImei, total: unidades, variante: "chip", sufijo: "con IMEI", mostrarFaltan: true }) : null
+      Number.isFinite(Number(unidades)) ? /* @__PURE__ */ jsx76(ContadorLote, { recibidos: conImei, total: unidades, variante: "chip", sufijo: "con IMEI", mostrarFaltan: true }) : null
     ] }),
-    notas ? /* @__PURE__ */ jsx72("p", { className: "mt-1.5 text-xs text-mute", children: notas }) : null,
-    acciones ? /* @__PURE__ */ jsx72("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
+    notas ? /* @__PURE__ */ jsx76("p", { className: "mt-1.5 text-xs text-mute", children: notas }) : null,
+    acciones ? /* @__PURE__ */ jsx76("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: acciones }) : null
   ] });
 }
 
 // src/components/CodigoQr.jsx
-import { useEffect as useEffect15, useState as useState24 } from "react";
+import { useEffect as useEffect17, useState as useState26 } from "react";
 
 // src/utils/qr.js
 var QR_OPCIONES = { nivel: "M", margen: 1, ancho: 220 };
@@ -7043,10 +8612,10 @@ async function qrDataUrl(valor, { ancho = QR_OPCIONES.ancho, nivel = QR_OPCIONES
 }
 
 // src/components/CodigoQr.jsx
-import { jsx as jsx73 } from "react/jsx-runtime";
+import { jsx as jsx77 } from "react/jsx-runtime";
 function CodigoQr({ valor, ancho = 220, nivel = "M", margen = 1, alt = "C\xF3digo QR", className, ...props }) {
-  const [imagen, setImagen] = useState24("");
-  useEffect15(() => {
+  const [imagen, setImagen] = useState26("");
+  useEffect17(() => {
     let activo = true;
     qrDataUrl(valor, { ancho, nivel, margen }).then((data) => {
       if (activo) setImagen(data);
@@ -7056,11 +8625,11 @@ function CodigoQr({ valor, ancho = 220, nivel = "M", margen = 1, alt = "C\xF3dig
     };
   }, [valor, ancho, nivel, margen]);
   if (!imagen) return null;
-  return /* @__PURE__ */ jsx73("img", { src: imagen, alt, title: alt, className: cn("rounded-xl bg-white p-2", className), ...props });
+  return /* @__PURE__ */ jsx77("img", { src: imagen, alt, title: alt, className: cn("rounded-xl bg-white p-2", className), ...props });
 }
 
 // src/components/EtiquetaLote.jsx
-import { jsx as jsx74, jsxs as jsxs59 } from "react/jsx-runtime";
+import { jsx as jsx78, jsxs as jsxs62 } from "react/jsx-runtime";
 function EtiquetaLote({
   codigo,
   numero,
@@ -7076,36 +8645,36 @@ function EtiquetaLote({
   nota,
   className
 }) {
-  return /* @__PURE__ */ jsxs59("div", { className: cn("w-full max-w-[320px] rounded-xl border-2 border-[#10161a] bg-white p-3 text-[#10161a]", className), children: [
-    /* @__PURE__ */ jsxs59("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ jsx74("b", { className: "font-mono text-sm", children: codigo || "ENV-\u2026" }),
-      qr ? /* @__PURE__ */ jsx74("img", { src: qr, alt: "QR del lote", className: "h-16 w-16" }) : null,
-      !qr && qrValor ? /* @__PURE__ */ jsx74(CodigoQr, { valor: qrValor, ancho: 96, alt: "QR del lote", className: "h-16 w-16 rounded-md bg-white p-0" }) : null
+  return /* @__PURE__ */ jsxs62("div", { className: cn("w-full max-w-[320px] rounded-xl border-2 border-[#10161a] bg-white p-3 text-[#10161a]", className), children: [
+    /* @__PURE__ */ jsxs62("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ jsx78("b", { className: "font-mono text-sm", children: codigo || "ENV-\u2026" }),
+      qr ? /* @__PURE__ */ jsx78("img", { src: qr, alt: "QR del lote", className: "h-16 w-16" }) : null,
+      !qr && qrValor ? /* @__PURE__ */ jsx78(CodigoQr, { valor: qrValor, ancho: 96, alt: "QR del lote", className: "h-16 w-16 rounded-md bg-white p-0" }) : null
     ] }),
-    total ? /* @__PURE__ */ jsxs59("p", { className: "mt-1 text-center text-xs font-bold uppercase tracking-wider", children: [
+    total ? /* @__PURE__ */ jsxs62("p", { className: "mt-1 text-center text-xs font-bold uppercase tracking-wider", children: [
       "Producto ",
       numero,
       " de ",
       total
     ] }) : null,
-    /* @__PURE__ */ jsx74("p", { className: "mt-1 text-center text-base font-bold leading-tight", children: producto || "Producto" }),
-    variante ? /* @__PURE__ */ jsx74("p", { className: "text-center text-[11px]", children: variante }) : null,
-    /* @__PURE__ */ jsx74("p", { className: "mt-1 text-center font-mono text-sm", children: serial || (pendienteImei ? "IMEI pendiente" : "\u2014") }),
-    pedido || destino ? /* @__PURE__ */ jsxs59("div", { className: "mt-1 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-wide", children: [
-      /* @__PURE__ */ jsx74("span", { className: "min-w-0 truncate", children: pedido || "" }),
-      /* @__PURE__ */ jsx74("span", { className: "min-w-0 truncate text-right", children: destino || "" })
+    /* @__PURE__ */ jsx78("p", { className: "mt-1 text-center text-base font-bold leading-tight", children: producto || "Producto" }),
+    variante ? /* @__PURE__ */ jsx78("p", { className: "text-center text-[11px]", children: variante }) : null,
+    /* @__PURE__ */ jsx78("p", { className: "mt-1 text-center font-mono text-sm", children: serial || (pendienteImei ? "IMEI pendiente" : "\u2014") }),
+    pedido || destino ? /* @__PURE__ */ jsxs62("div", { className: "mt-1 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-wide", children: [
+      /* @__PURE__ */ jsx78("span", { className: "min-w-0 truncate", children: pedido || "" }),
+      /* @__PURE__ */ jsx78("span", { className: "min-w-0 truncate text-right", children: destino || "" })
     ] }) : null,
-    nota ? /* @__PURE__ */ jsx74("p", { className: "mt-1 text-[10px]", children: nota }) : null
+    nota ? /* @__PURE__ */ jsx78("p", { className: "mt-1 text-[10px]", children: nota }) : null
   ] });
 }
 
 // src/components/ManifiestoEnvio.jsx
-import { jsx as jsx75, jsxs as jsxs60 } from "react/jsx-runtime";
+import { jsx as jsx79, jsxs as jsxs63 } from "react/jsx-runtime";
 function Dato({ etiqueta, valor }) {
   if (!valor) return null;
-  return /* @__PURE__ */ jsxs60("p", { className: "min-w-0", children: [
-    /* @__PURE__ */ jsx75("span", { className: "oc-print-suave block text-[9.5px] font-bold uppercase tracking-wider", children: etiqueta }),
-    /* @__PURE__ */ jsx75("span", { className: "block whitespace-pre-wrap text-[12.5px]", children: valor })
+  return /* @__PURE__ */ jsxs63("p", { className: "min-w-0", children: [
+    /* @__PURE__ */ jsx79("span", { className: "oc-print-suave block text-[9.5px] font-bold uppercase tracking-wider", children: etiqueta }),
+    /* @__PURE__ */ jsx79("span", { className: "block whitespace-pre-wrap text-[12.5px]", children: valor })
   ] });
 }
 function ManifiestoEnvio({
@@ -7136,68 +8705,69 @@ function ManifiestoEnvio({
   const totalUnidades = Number.isFinite(Number(unidades)) ? Number(unidades) : lista.reduce((suma, linea) => suma + cantidadDe(linea), 0);
   const totalConImei = Number.isFinite(Number(conImei)) ? Number(conImei) : lista.reduce((suma, linea) => suma + (linea?.imeis?.length || 0), 0);
   const totalPendientes = Number.isFinite(Number(pendientes)) ? Number(pendientes) : lista.reduce((suma, linea) => suma + (Number(linea?.pendientes) || 0), 0);
-  return /* @__PURE__ */ jsxs60("section", { className: cn("oc-print-bloque w-full bg-white p-4 text-[#10161a]", className), "aria-label": `Manifiesto del lote ${codigo || ""}`, children: [
-    /* @__PURE__ */ jsxs60("div", { className: "flex items-start justify-between gap-3 border-b-2 border-[#10161a] pb-2", children: [
-      /* @__PURE__ */ jsxs60("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsx75("p", { className: "oc-print-suave text-[10px] font-bold uppercase tracking-wider", children: "Manifiesto de env\xEDo" }),
-        /* @__PURE__ */ jsx75("b", { className: "block font-mono text-lg", children: codigo || "ENV-\u2026" }),
-        ruta ? /* @__PURE__ */ jsx75("span", { className: "block text-sm font-semibold", children: ruta }) : null
+  return /* @__PURE__ */ jsxs63("section", { className: cn("oc-print-bloque w-full bg-white p-4 text-[#10161a]", className), "aria-label": `Manifiesto del lote ${codigo || ""}`, children: [
+    /* @__PURE__ */ jsxs63("div", { className: "flex items-start justify-between gap-3 border-b-2 border-[#10161a] pb-2", children: [
+      /* @__PURE__ */ jsxs63("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsx79("p", { className: "oc-print-suave text-[10px] font-bold uppercase tracking-wider", children: "Manifiesto de env\xEDo" }),
+        /* @__PURE__ */ jsx79("b", { className: "block font-mono text-lg", children: codigo || "ENV-\u2026" }),
+        ruta ? /* @__PURE__ */ jsx79("span", { className: "block text-sm font-semibold", children: ruta }) : null
       ] }),
-      qr ? /* @__PURE__ */ jsx75("img", { src: qr, alt: "QR del manifiesto", className: "h-20 w-20" }) : null,
-      !qr && enlace ? /* @__PURE__ */ jsx75(CodigoQr, { valor: enlace, ancho: 120, alt: "QR del manifiesto", className: "h-20 w-20 rounded-md bg-white p-0" }) : null
+      qr ? /* @__PURE__ */ jsx79("img", { src: qr, alt: "QR del manifiesto", className: "h-20 w-20" }) : null,
+      !qr && enlace ? /* @__PURE__ */ jsx79(CodigoQr, { valor: enlace, ancho: 120, alt: "QR del manifiesto", className: "h-20 w-20 rounded-md bg-white p-0" }) : null
     ] }),
-    /* @__PURE__ */ jsxs60("div", { className: "mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3", children: [
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "M\xE9todo", valor: metodo ? etiquetaMetodoEnvio(metodo) : null }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Empresa", valor: empresa }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Conductor", valor: conductor }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Gu\xEDa", valor: guia }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Responsable", valor: responsable }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Compra", valor: compra }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Salida", valor: salida }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "ETA", valor: eta }),
-      /* @__PURE__ */ jsx75(Dato, { etiqueta: "Llegada", valor: llegada })
+    /* @__PURE__ */ jsxs63("div", { className: "mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3", children: [
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "M\xE9todo", valor: metodo ? etiquetaMetodoEnvio(metodo) : null }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Empresa", valor: empresa }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Conductor", valor: conductor }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Gu\xEDa", valor: guia }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Responsable", valor: responsable }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Compra", valor: compra }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Salida", valor: salida }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "ETA", valor: eta }),
+      /* @__PURE__ */ jsx79(Dato, { etiqueta: "Llegada", valor: llegada })
     ] }),
-    /* @__PURE__ */ jsxs60("table", { className: "oc-print-tabla mt-3 w-full", children: [
-      /* @__PURE__ */ jsx75("thead", { children: /* @__PURE__ */ jsxs60("tr", { children: [
-        /* @__PURE__ */ jsx75("th", { children: "Producto" }),
-        /* @__PURE__ */ jsx75("th", { children: "Variante" }),
-        /* @__PURE__ */ jsx75("th", { className: "oc-print-num", children: "Cantidad" }),
-        /* @__PURE__ */ jsx75("th", { children: "IMEI / serial" })
+    /* @__PURE__ */ jsxs63("table", { className: "oc-print-tabla mt-3 w-full", children: [
+      /* @__PURE__ */ jsx79("caption", { className: "sr-only", children: "Detalle de productos, variantes, cantidades e identificadores del env\xEDo" }),
+      /* @__PURE__ */ jsx79("thead", { children: /* @__PURE__ */ jsxs63("tr", { children: [
+        /* @__PURE__ */ jsx79("th", { scope: "col", children: "Producto" }),
+        /* @__PURE__ */ jsx79("th", { scope: "col", children: "Variante" }),
+        /* @__PURE__ */ jsx79("th", { scope: "col", className: "oc-print-num", children: "Cantidad" }),
+        /* @__PURE__ */ jsx79("th", { scope: "col", children: "IMEI / serial" })
       ] }) }),
-      /* @__PURE__ */ jsx75("tbody", { children: lista.map((linea, indice) => {
+      /* @__PURE__ */ jsx79("tbody", { children: lista.map((linea, indice) => {
         const imeis = Array.isArray(linea?.imeis) ? linea.imeis : [];
         const pendientesLinea = Number(linea?.pendientes) || 0;
-        return /* @__PURE__ */ jsxs60("tr", { children: [
-          /* @__PURE__ */ jsx75("td", { children: linea?.producto || "\u2014" }),
-          /* @__PURE__ */ jsx75("td", { children: [linea?.capacidad, linea?.condicion ? etiquetaCondicion(linea.condicion) : null].filter(Boolean).join(" \xB7 ") || "\u2014" }),
-          /* @__PURE__ */ jsx75("td", { className: "oc-print-num", children: cantidadDe(linea) }),
-          /* @__PURE__ */ jsxs60("td", { children: [
-            imeis.map((serial) => /* @__PURE__ */ jsx75("span", { className: "block font-mono text-[11px]", children: serial }, serial)),
-            pendientesLinea > 0 ? /* @__PURE__ */ jsxs60("span", { className: "oc-print-suave block text-[11px]", children: [
+        return /* @__PURE__ */ jsxs63("tr", { children: [
+          /* @__PURE__ */ jsx79("td", { children: linea?.producto || "\u2014" }),
+          /* @__PURE__ */ jsx79("td", { children: [linea?.capacidad, linea?.condicion ? etiquetaCondicion(linea.condicion) : null].filter(Boolean).join(" \xB7 ") || "\u2014" }),
+          /* @__PURE__ */ jsx79("td", { className: "oc-print-num", children: cantidadDe(linea) }),
+          /* @__PURE__ */ jsxs63("td", { children: [
+            imeis.map((serial) => /* @__PURE__ */ jsx79("span", { className: "block font-mono text-[11px]", children: serial }, serial)),
+            pendientesLinea > 0 ? /* @__PURE__ */ jsxs63("span", { className: "oc-print-suave block text-[11px]", children: [
               pendientesLinea,
               " IMEI pendiente",
               pendientesLinea === 1 ? "" : "s"
             ] }) : null,
-            !imeis.length && !pendientesLinea ? /* @__PURE__ */ jsx75("span", { className: "oc-print-suave block text-[11px]", children: "Sin IMEI registrados" }) : null
+            !imeis.length && !pendientesLinea ? /* @__PURE__ */ jsx79("span", { className: "oc-print-suave block text-[11px]", children: "Sin IMEI registrados" }) : null
           ] })
         ] }, linea?.id ?? `${linea?.producto || "linea"}-${indice}`);
       }) })
     ] }),
-    /* @__PURE__ */ jsxs60("div", { className: "mt-2 border-t border-[#dbe3e7] pt-2", children: [
-      /* @__PURE__ */ jsxs60("p", { className: "text-[11.5px]", children: [
-        /* @__PURE__ */ jsx75("b", { className: "oc-print-num", children: totalUnidades }),
+    /* @__PURE__ */ jsxs63("div", { className: "mt-2 border-t border-[#dbe3e7] pt-2", children: [
+      /* @__PURE__ */ jsxs63("p", { className: "text-[11.5px]", children: [
+        /* @__PURE__ */ jsx79("b", { className: "oc-print-num", children: totalUnidades }),
         " unidad",
         totalUnidades === 1 ? "" : "es",
         " \xB7",
         " ",
-        /* @__PURE__ */ jsx75("b", { className: "oc-print-num", children: totalConImei }),
+        /* @__PURE__ */ jsx79("b", { className: "oc-print-num", children: totalConImei }),
         " con IMEI \xB7",
         " ",
-        /* @__PURE__ */ jsx75("b", { className: "oc-print-num", children: totalPendientes }),
+        /* @__PURE__ */ jsx79("b", { className: "oc-print-num", children: totalPendientes }),
         " pendiente",
         totalPendientes === 1 ? "" : "s"
       ] }),
-      notas ? /* @__PURE__ */ jsx75("p", { className: "mt-1 whitespace-pre-wrap text-[11px]", children: notas }) : null
+      notas ? /* @__PURE__ */ jsx79("p", { className: "mt-1 whitespace-pre-wrap text-[11px]", children: notas }) : null
     ] })
   ] });
 }
@@ -7225,7 +8795,7 @@ var etiquetaPluralRevision = (estado) => ESTADOS_REVISION[claveRevision(estado)]
 var tonoRevision = (estado) => ESTADOS_REVISION[claveRevision(estado)]?.tono || "mute";
 
 // src/components/ResumenIncidencias.jsx
-import { jsx as jsx76, jsxs as jsxs61 } from "react/jsx-runtime";
+import { jsx as jsx80, jsxs as jsxs64 } from "react/jsx-runtime";
 var CLASES2 = {
   bad: "border-bad/30 bg-bad/10 text-bad-text",
   warn: "border-warn/30 bg-warn/10 text-warn-text",
@@ -7235,11 +8805,11 @@ var CLASES2 = {
 function ResumenIncidencias({ incidencias = [], sinIncidencias = "Sin incidencias", className }) {
   const lista = (Array.isArray(incidencias) ? incidencias : []).map((incidencia) => ({ ...incidencia, cantidad: Math.trunc(Number(incidencia?.cantidad) || 0) })).filter((incidencia) => incidencia.cantidad > 0);
   if (!lista.length) {
-    return /* @__PURE__ */ jsx76("span", { className: cn("inline-flex items-center rounded-lg border px-2 py-0.5 text-xs font-semibold", CLASES2.ok, className), children: sinIncidencias });
+    return /* @__PURE__ */ jsx80("span", { className: cn("inline-flex items-center rounded-lg border px-2 py-0.5 text-xs font-semibold", CLASES2.ok, className), children: sinIncidencias });
   }
-  return /* @__PURE__ */ jsx76("span", { className: cn("flex min-w-0 flex-wrap items-center gap-1.5", className), role: "list", "aria-label": "Incidencias de la recepci\xF3n", children: lista.map((incidencia, indice) => {
+  return /* @__PURE__ */ jsx80("span", { className: cn("flex min-w-0 flex-wrap items-center gap-1.5", className), role: "list", "aria-label": "Incidencias de la recepci\xF3n", children: lista.map((incidencia, indice) => {
     const tono = incidencia.tono || tonoRevision(incidencia.tipo);
-    return /* @__PURE__ */ jsxs61(
+    return /* @__PURE__ */ jsxs64(
       "span",
       {
         role: "listitem",
@@ -7247,7 +8817,7 @@ function ResumenIncidencias({ incidencias = [], sinIncidencias = "Sin incidencia
         className: cn("inline-flex items-center gap-1 whitespace-nowrap rounded-lg border px-2 py-0.5 text-xs font-semibold", CLASES2[tono] || CLASES2.mute),
         children: [
           incidencia.etiqueta || etiquetaPluralRevision(incidencia.tipo),
-          /* @__PURE__ */ jsx76("span", { className: "tabular-nums", children: incidencia.cantidad })
+          /* @__PURE__ */ jsx80("span", { className: "tabular-nums", children: incidencia.cantidad })
         ]
       },
       `${incidencia.tipo}-${indice}`
@@ -7256,7 +8826,7 @@ function ResumenIncidencias({ incidencias = [], sinIncidencias = "Sin incidencia
 }
 
 // src/components/ResumenRecepcion.jsx
-import { jsx as jsx77, jsxs as jsxs62 } from "react/jsx-runtime";
+import { jsx as jsx81, jsxs as jsxs65 } from "react/jsx-runtime";
 var ORDEN = ["recibido", "faltante", "sobrante", "danado", "incorrecto"];
 var CHIP2 = {
   ok: "border-ok/30 bg-ok/10 text-ok-text",
@@ -7272,14 +8842,14 @@ function ResumenRecepcion({ resumen, items, className }) {
   }, {}) : {};
   const filas = ORDEN.filter((clave) => (conteos[clave] || 0) > 0);
   if (!filas.length) return null;
-  return /* @__PURE__ */ jsx77("span", { className: cn("flex min-w-0 flex-wrap items-center gap-1.5", className), "aria-label": "Resumen de la recepci\xF3n", children: filas.map((clave) => /* @__PURE__ */ jsxs62("span", { className: cn("inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-xs font-semibold", CHIP2[tonoRevision(clave)] || CHIP2.mute), children: [
-    /* @__PURE__ */ jsx77("b", { className: "tabular-nums", children: conteos[clave] }),
+  return /* @__PURE__ */ jsx81("span", { className: cn("flex min-w-0 flex-wrap items-center gap-1.5", className), "aria-label": "Resumen de la recepci\xF3n", children: filas.map((clave) => /* @__PURE__ */ jsxs65("span", { className: cn("inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-xs font-semibold", CHIP2[tonoRevision(clave)] || CHIP2.mute), children: [
+    /* @__PURE__ */ jsx81("b", { className: "tabular-nums", children: conteos[clave] }),
     etiquetaPluralRevision(clave).toLowerCase()
   ] }, clave)) });
 }
 
 // src/components/FilaRevision.jsx
-import { jsx as jsx78, jsxs as jsxs63 } from "react/jsx-runtime";
+import { jsx as jsx82, jsxs as jsxs66 } from "react/jsx-runtime";
 var TONOS2 = {
   ok: "border-ok/30 bg-ok/5",
   warn: "border-warn/25 bg-warn/5",
@@ -7294,21 +8864,21 @@ var CHIP3 = {
 };
 function FilaRevision({ etiqueta, serial, estado = "ok", detalle, acciones, compact = false, className }) {
   const tono = tonoRevision(estado);
-  return /* @__PURE__ */ jsxs63("div", { className: cn("flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border px-3", compact ? "py-1.5" : "py-2.5", TONOS2[tono] || TONOS2.mute, className), children: [
-    /* @__PURE__ */ jsxs63("span", { className: "min-w-0 flex-1", children: [
-      /* @__PURE__ */ jsx78("span", { className: "block truncate text-sm font-semibold", children: etiqueta }),
-      /* @__PURE__ */ jsxs63("span", { className: "mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-mute", children: [
-        serial ? /* @__PURE__ */ jsx78(SerialTexto, { serial, className: "text-[11px]" }) : /* @__PURE__ */ jsx78("span", { children: "IMEI pendiente" }),
-        detalle ? /* @__PURE__ */ jsx78("span", { className: CELDA_DATO, title: String(detalle), children: detalle }) : null
+  return /* @__PURE__ */ jsxs66("div", { className: cn("flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border px-3", compact ? "py-1.5" : "py-2.5", TONOS2[tono] || TONOS2.mute, className), children: [
+    /* @__PURE__ */ jsxs66("span", { className: "min-w-0 flex-1", children: [
+      /* @__PURE__ */ jsx82("span", { className: "block truncate text-sm font-semibold", children: etiqueta }),
+      /* @__PURE__ */ jsxs66("span", { className: "mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-mute", children: [
+        serial ? /* @__PURE__ */ jsx82(SerialTexto, { serial, className: "text-[11px]" }) : /* @__PURE__ */ jsx82("span", { children: "IMEI pendiente" }),
+        detalle ? /* @__PURE__ */ jsx82("span", { className: CELDA_DATO, title: String(detalle), children: detalle }) : null
       ] })
     ] }),
-    /* @__PURE__ */ jsx78("span", { className: cn("shrink-0 rounded-lg border px-2 py-0.5 text-xs font-semibold", CHIP3[tono] || CHIP3.mute), "data-estado": estado, children: etiquetaRevision(estado) }),
-    acciones ? /* @__PURE__ */ jsx78("span", { className: "flex shrink-0 flex-wrap items-center gap-2", children: acciones }) : null
+    /* @__PURE__ */ jsx82("span", { className: cn("shrink-0 rounded-lg border px-2 py-0.5 text-xs font-semibold", CHIP3[tono] || CHIP3.mute), "data-estado": estado, children: etiquetaRevision(estado) }),
+    acciones ? /* @__PURE__ */ jsx82("span", { className: "flex shrink-0 flex-wrap items-center gap-2", children: acciones }) : null
   ] });
 }
 
 // src/components/SelectorIncidencia.jsx
-import { jsx as jsx79 } from "react/jsx-runtime";
+import { jsx as jsx83 } from "react/jsx-runtime";
 var CHIP4 = {
   ok: "border-ok/40 bg-ok/10 text-ok-text",
   warn: "border-warn/40 bg-warn/10 text-warn-text",
@@ -7317,10 +8887,10 @@ var CHIP4 = {
 };
 var CHIP_APAGADO = "border-ink-500 text-mute hover:border-fono hover:text-fore";
 function SelectorIncidencia({ valor, onChange, tipos = INCIDENCIAS, permitirQuitar = true, disabled = false, ariaLabel = "Incidencia de la unidad", className }) {
-  return /* @__PURE__ */ jsx79("span", { role: "group", "aria-label": ariaLabel, className: cn("flex flex-wrap items-center gap-1.5", className), children: tipos.map((tipo) => {
+  return /* @__PURE__ */ jsx83("span", { role: "group", "aria-label": ariaLabel, className: cn("flex flex-wrap items-center gap-1.5", className), children: tipos.map((tipo) => {
     const activo = valor === tipo;
     const tono = tonoRevision(tipo);
-    return /* @__PURE__ */ jsx79(
+    return /* @__PURE__ */ jsx83(
       "button",
       {
         type: "button",
@@ -7340,38 +8910,54 @@ function SelectorIncidencia({ valor, onChange, tipos = INCIDENCIAS, permitirQuit
 }
 
 // src/components/DestinoRecepcion.jsx
-import { useId as useId15, useState as useState25 } from "react";
-import { jsx as jsx80, jsxs as jsxs64 } from "react/jsx-runtime";
-function DestinoRecepcion({
-  destino,
-  depositos = [],
-  pendientes = 0,
-  recibiendo = false,
-  onRecibir,
-  etiqueta = "Recibir en",
-  textoRecibir = "Recibir todo",
-  className
-}) {
-  const [elegido, setElegido] = useState25(destino?.id ?? depositos[0]?.id ?? "");
-  const id = useId15();
+import { useEffect as useEffect18, useId as useId18, useRef as useRef16, useState as useState27 } from "react";
+import { jsx as jsx84, jsxs as jsxs67 } from "react/jsx-runtime";
+function DestinoRecepcion(props) {
+  const {
+    destino,
+    destinoId,
+    defaultDestinoId,
+    onDestinoChange,
+    depositos = [],
+    pendientes = 0,
+    recibiendo = false,
+    onRecibir,
+    etiqueta = "Recibir en",
+    textoRecibir = "Recibir todo",
+    className
+  } = props;
+  const controlado = Object.prototype.hasOwnProperty.call(props, "destinoId");
+  const [elegidoInterno, setElegidoInterno] = useState27(defaultDestinoId ?? destino?.id ?? depositos[0]?.id ?? "");
+  const destinoAnterior = useRef16(destino?.id);
+  useEffect18(() => {
+    if (controlado || destinoAnterior.current === destino?.id) return;
+    destinoAnterior.current = destino?.id;
+    setElegidoInterno(destino?.id ?? defaultDestinoId ?? depositos[0]?.id ?? "");
+  }, [controlado, defaultDestinoId, depositos, destino?.id]);
+  const elegido = controlado ? destinoId ?? "" : elegidoInterno;
+  const id = useId18();
   const actual = depositos.find((deposito) => deposito.id === elegido) || destino || null;
   const alternativas = depositos.filter((deposito) => deposito.id !== actual?.id);
-  return /* @__PURE__ */ jsxs64("section", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3", className), "aria-label": "Cierre de la recepci\xF3n", children: [
-    /* @__PURE__ */ jsxs64("div", { className: "flex flex-wrap items-end gap-3", children: [
-      /* @__PURE__ */ jsxs64("label", { htmlFor: id, className: "min-w-0 flex-1 space-y-1 text-xs text-mute", children: [
-        /* @__PURE__ */ jsx80("span", { className: "block font-semibold", children: etiqueta }),
-        alternativas.length > 0 ? /* @__PURE__ */ jsxs64(Select, { id, value: elegido, onChange: (event) => setElegido(event.target.value), className: "w-full", children: [
-          actual ? /* @__PURE__ */ jsx80("option", { value: actual.id, children: actual.nombre }) : null,
-          alternativas.map((deposito) => /* @__PURE__ */ jsx80("option", { value: deposito.id, children: deposito.nombre }, deposito.id))
-        ] }) : /* @__PURE__ */ jsxs64("span", { className: "flex h-9 items-center gap-2 rounded-lg border border-ink-600 px-3 text-sm font-semibold text-fore", children: [
-          /* @__PURE__ */ jsx80(Icon, { name: "box", className: "h-4 w-4 text-mute" }),
+  const elegir = (siguiente) => {
+    if (!controlado) setElegidoInterno(siguiente);
+    onDestinoChange?.(siguiente);
+  };
+  return /* @__PURE__ */ jsxs67("section", { className: cn("rounded-xl border border-ink-600 bg-ink-800 p-3", className), "aria-label": "Cierre de la recepci\xF3n", children: [
+    /* @__PURE__ */ jsxs67("div", { className: "flex flex-wrap items-end gap-3", children: [
+      /* @__PURE__ */ jsxs67("label", { htmlFor: id, className: "min-w-0 flex-1 space-y-1 text-xs text-mute", children: [
+        /* @__PURE__ */ jsx84("span", { className: "block font-semibold", children: etiqueta }),
+        alternativas.length > 0 ? /* @__PURE__ */ jsxs67(Select, { id, value: elegido, onChange: (event) => elegir(event.target.value), className: "w-full", children: [
+          actual ? /* @__PURE__ */ jsx84("option", { value: actual.id, children: actual.nombre }) : null,
+          alternativas.map((deposito) => /* @__PURE__ */ jsx84("option", { value: deposito.id, children: deposito.nombre }, deposito.id))
+        ] }) : /* @__PURE__ */ jsxs67("span", { className: "flex h-9 items-center gap-2 rounded-lg border border-ink-600 px-3 text-sm font-semibold text-fore", children: [
+          /* @__PURE__ */ jsx84(Icon, { name: "box", className: "h-4 w-4 text-mute" }),
           actual?.nombre || "Sin dep\xF3sito"
         ] })
       ] }),
-      /* @__PURE__ */ jsx80(Button, { type: "button", disabled: recibiendo || !actual?.id || !onRecibir, onClick: () => onRecibir?.(actual.id), children: recibiendo ? "Recibiendo\u2026" : textoRecibir })
+      /* @__PURE__ */ jsx84(Button, { type: "button", disabled: recibiendo || !actual?.id || !onRecibir, onClick: () => onRecibir?.(actual.id), children: recibiendo ? "Recibiendo\u2026" : textoRecibir })
     ] }),
-    Number(pendientes) > 0 && /* @__PURE__ */ jsxs64("p", { className: "mt-2 flex items-center gap-1.5 text-xs text-warn-text", children: [
-      /* @__PURE__ */ jsx80(Icon, { name: "alert", className: "h-3.5 w-3.5 shrink-0", "aria-hidden": "true" }),
+    Number(pendientes) > 0 && /* @__PURE__ */ jsxs67("p", { className: "mt-2 flex items-center gap-1.5 text-xs text-warn-text", children: [
+      /* @__PURE__ */ jsx84(Icon, { name: "alert", className: "h-3.5 w-3.5 shrink-0", "aria-hidden": "true" }),
       Number(pendientes),
       " unidad(es) sin IMEI: se reciben igual y el IMEI se completa despu\xE9s."
     ] })
@@ -7379,18 +8965,18 @@ function DestinoRecepcion({
 }
 
 // src/components/GradoBadge.jsx
-import { jsx as jsx81, jsxs as jsxs65 } from "react/jsx-runtime";
+import { jsx as jsx85, jsxs as jsxs68 } from "react/jsx-runtime";
 function GradoBadge({ grado, conDescripcion = false, className }) {
   const config = gradoCondicion(grado);
-  if (!config) return /* @__PURE__ */ jsx81(Badge, { className, children: grado || "Sin grado" });
-  return /* @__PURE__ */ jsxs65("span", { className: cn("inline-flex items-center gap-2", className), children: [
-    /* @__PURE__ */ jsx81(Badge, { color: colorBadge(config.tono), className: "whitespace-nowrap", title: config.descripcion, children: config.etiqueta }),
-    conDescripcion && /* @__PURE__ */ jsx81("span", { className: "text-xs text-mute", children: config.descripcion })
+  if (!config) return /* @__PURE__ */ jsx85(Badge, { className, children: grado || "Sin grado" });
+  return /* @__PURE__ */ jsxs68("span", { className: cn("inline-flex items-center gap-2", className), children: [
+    /* @__PURE__ */ jsx85(Badge, { color: colorBadge(config.tono), className: "whitespace-nowrap", title: config.descripcion, children: config.etiqueta }),
+    conDescripcion && /* @__PURE__ */ jsx85("span", { className: "text-xs text-mute", children: config.descripcion })
   ] });
 }
 
 // src/components/TileEquipo.jsx
-import { Fragment as Fragment11, jsx as jsx82, jsxs as jsxs66 } from "react/jsx-runtime";
+import { Fragment as Fragment10, jsx as jsx86, jsxs as jsxs69 } from "react/jsx-runtime";
 function TileEquipo({
   modelo,
   imei,
@@ -7406,31 +8992,31 @@ function TileEquipo({
   className
 }) {
   const raiz = cn("w-full space-y-2.5 rounded-2xl border border-ink-600 bg-ink-800 p-3 text-left", onOpen && "transition hover:border-fono active:scale-[.995]", className);
-  const contenido = /* @__PURE__ */ jsxs66(Fragment11, { children: [
-    /* @__PURE__ */ jsxs66("div", { className: "flex items-start gap-3", children: [
-      foto ? /* @__PURE__ */ jsx82("img", { src: foto, alt: modelo || "Equipo", className: "h-12 w-12 shrink-0 rounded-xl border border-ink-600 object-cover" }) : /* @__PURE__ */ jsx82("span", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-ink-600 bg-ink-700 text-mute", children: /* @__PURE__ */ jsx82(IconoCategoria, { categoria: modelo, className: "h-6 w-6" }) }),
-      /* @__PURE__ */ jsxs66("div", { className: "min-w-0 flex-1", children: [
-        /* @__PURE__ */ jsx82("p", { className: "truncate text-sm font-semibold", children: modelo || "Equipo" }),
-        imei && /* @__PURE__ */ jsx82("p", { className: "mt-0.5 truncate font-mono text-[11px] text-mute", "data-serial": true, children: imei }),
-        detalle && /* @__PURE__ */ jsx82("p", { className: "mt-0.5 truncate text-[11px] text-mute", children: detalle })
+  const contenido = /* @__PURE__ */ jsxs69(Fragment10, { children: [
+    /* @__PURE__ */ jsxs69("div", { className: "flex items-start gap-3", children: [
+      foto ? /* @__PURE__ */ jsx86("img", { src: foto, alt: modelo || "Equipo", className: "h-12 w-12 shrink-0 rounded-xl border border-ink-600 object-cover" }) : /* @__PURE__ */ jsx86("span", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-ink-600 bg-ink-700 text-mute", children: /* @__PURE__ */ jsx86(IconoCategoria, { categoria: modelo, className: "h-6 w-6" }) }),
+      /* @__PURE__ */ jsxs69("div", { className: "min-w-0 flex-1", children: [
+        /* @__PURE__ */ jsx86("p", { className: "truncate text-sm font-semibold", children: modelo || "Equipo" }),
+        imei && /* @__PURE__ */ jsx86("p", { className: "mt-0.5 truncate font-mono text-[11px] text-mute", "data-serial": true, children: imei }),
+        detalle && /* @__PURE__ */ jsx86("p", { className: "mt-0.5 truncate text-[11px] text-mute", children: detalle })
       ] }),
-      estado && /* @__PURE__ */ jsx82(ChipEstado, { estado })
+      estado && /* @__PURE__ */ jsx86(ChipEstado, { estado })
     ] }),
-    /* @__PURE__ */ jsxs66("div", { className: "flex flex-wrap items-center gap-2", children: [
-      grado && /* @__PURE__ */ jsx82(GradoBadge, { grado }),
-      bateria !== void 0 && bateria !== null && /* @__PURE__ */ jsx82(MedidorBateria, { porcentaje: bateria, ciclos, variante: "chip" }),
-      locks?.length ? /* @__PURE__ */ jsx82(ChipsLocks, { locks }) : null
+    /* @__PURE__ */ jsxs69("div", { className: "flex flex-wrap items-center gap-2", children: [
+      grado && /* @__PURE__ */ jsx86(GradoBadge, { grado }),
+      bateria !== void 0 && bateria !== null && /* @__PURE__ */ jsx86(MedidorBateria, { porcentaje: bateria, ciclos, variante: "chip" }),
+      locks?.length ? /* @__PURE__ */ jsx86(ChipsLocks, { locks }) : null
     ] }),
-    acciones && /* @__PURE__ */ jsx82("div", { className: "flex flex-wrap gap-2", children: acciones })
+    acciones && /* @__PURE__ */ jsx86("div", { className: "flex flex-wrap gap-2", children: acciones })
   ] });
   if (onOpen) {
-    return /* @__PURE__ */ jsx82("button", { type: "button", onClick: onOpen, className: raiz, children: contenido });
+    return /* @__PURE__ */ jsx86("button", { type: "button", onClick: onOpen, className: raiz, children: contenido });
   }
-  return /* @__PURE__ */ jsx82("article", { className: raiz, children: contenido });
+  return /* @__PURE__ */ jsx86("article", { className: raiz, children: contenido });
 }
 
 // src/components/PasosEquipo.jsx
-import { jsx as jsx83, jsxs as jsxs67 } from "react/jsx-runtime";
+import { jsx as jsx87, jsxs as jsxs70 } from "react/jsx-runtime";
 function PasosEquipo({ pasos = [], actual = 0, etiqueta, testId, className }) {
   if (!pasos.length) return null;
   const etiquetaDe = (paso) => typeof paso === "string" ? paso : paso.etiqueta ?? paso.label ?? "";
@@ -7442,7 +9028,7 @@ function PasosEquipo({ pasos = [], actual = 0, etiqueta, testId, className }) {
     return Number.isInteger(numero) ? Math.min(Math.max(0, numero), pasos.length - 1) : 0;
   })();
   const texto = etiqueta || etiquetaDe(pasos[indiceActual]) || String(actual);
-  return /* @__PURE__ */ jsxs67(
+  return /* @__PURE__ */ jsxs70(
     "span",
     {
       className: cn("flex items-center gap-1", className),
@@ -7450,7 +9036,7 @@ function PasosEquipo({ pasos = [], actual = 0, etiqueta, testId, className }) {
       "data-paso": indiceActual + 1,
       "aria-label": `Paso ${indiceActual + 1} de ${pasos.length}: ${texto}`,
       children: [
-        pasos.map((paso, orden) => /* @__PURE__ */ jsx83(
+        pasos.map((paso, orden) => /* @__PURE__ */ jsx87(
           "span",
           {
             "aria-hidden": "true",
@@ -7461,55 +9047,55 @@ function PasosEquipo({ pasos = [], actual = 0, etiqueta, testId, className }) {
           },
           claveDe(paso, orden)
         )),
-        /* @__PURE__ */ jsx83("span", { className: "text-[10px] font-semibold text-mute", children: texto })
+        /* @__PURE__ */ jsx87("span", { className: "text-[10px] font-semibold text-mute", children: texto })
       ]
     }
   );
 }
 
 // src/components/ColumnaLote.jsx
-import { jsx as jsx84, jsxs as jsxs68 } from "react/jsx-runtime";
+import { jsx as jsx88, jsxs as jsxs71 } from "react/jsx-runtime";
 function ColumnaLote({ etiqueta, tono = "slate", contador, acciones, children, vacio = "Sin equipos", testId, className }) {
   const lista = Array.isArray(children) ? children.filter(Boolean) : children;
   const vacia = !lista || Array.isArray(lista) && lista.length === 0;
-  return /* @__PURE__ */ jsxs68("section", { "data-testid": testId, className: cn("rounded-2xl border border-ink-600 bg-ink-800/40 p-3", className), children: [
-    /* @__PURE__ */ jsxs68("header", { className: "flex items-center justify-between gap-2", children: [
-      /* @__PURE__ */ jsxs68("span", { className: "flex min-w-0 items-center gap-2", children: [
-        /* @__PURE__ */ jsx84(Badge, { color: tono, children: etiqueta }),
-        contador !== void 0 && contador !== null && /* @__PURE__ */ jsx84("span", { className: "text-xs tabular-nums text-mute", children: contador })
+  return /* @__PURE__ */ jsxs71("section", { "data-testid": testId, className: cn("rounded-2xl border border-ink-600 bg-ink-800/40 p-3", className), children: [
+    /* @__PURE__ */ jsxs71("header", { className: "flex items-center justify-between gap-2", children: [
+      /* @__PURE__ */ jsxs71("span", { className: "flex min-w-0 items-center gap-2", children: [
+        /* @__PURE__ */ jsx88(Badge, { color: tono, children: etiqueta }),
+        contador !== void 0 && contador !== null && /* @__PURE__ */ jsx88("span", { className: "text-xs tabular-nums text-mute", children: contador })
       ] }),
-      acciones ? /* @__PURE__ */ jsx84("span", { className: "flex flex-wrap items-center gap-2", children: acciones }) : null
+      acciones ? /* @__PURE__ */ jsx88("span", { className: "flex flex-wrap items-center gap-2", children: acciones }) : null
     ] }),
-    /* @__PURE__ */ jsx84("div", { className: "mt-3 space-y-2", children: vacia ? /* @__PURE__ */ jsx84(EmptyState, { compact: true, title: vacio }) : lista })
+    /* @__PURE__ */ jsx88("div", { className: "mt-3 space-y-2", children: vacia ? /* @__PURE__ */ jsx88(EmptyState, { compact: true, title: vacio }) : lista })
   ] });
 }
 
 // src/components/TileRol.jsx
-import { Fragment as Fragment12, jsx as jsx85, jsxs as jsxs69 } from "react/jsx-runtime";
+import { Fragment as Fragment11, jsx as jsx89, jsxs as jsxs72 } from "react/jsx-runtime";
 function TileRol({ titulo: titulo2, descripcion, cantidad, total, dominios = [], onAbrir, className }) {
-  const contenido = /* @__PURE__ */ jsxs69(Fragment12, { children: [
-    /* @__PURE__ */ jsxs69("div", { className: "flex items-start justify-between gap-2", children: [
-      /* @__PURE__ */ jsxs69("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsx85("b", { className: "block truncate text-sm", children: titulo2 }),
-        descripcion ? /* @__PURE__ */ jsx85("p", { className: "mt-0.5 text-[11px] leading-4 text-mute", children: descripcion }) : null
+  const contenido = /* @__PURE__ */ jsxs72(Fragment11, { children: [
+    /* @__PURE__ */ jsxs72("div", { className: "flex items-start justify-between gap-2", children: [
+      /* @__PURE__ */ jsxs72("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsx89("b", { className: "block truncate text-sm", children: titulo2 }),
+        descripcion ? /* @__PURE__ */ jsx89("p", { className: "mt-0.5 text-[11px] leading-4 text-mute", children: descripcion }) : null
       ] }),
-      Number.isFinite(Number(total)) && Number(total) > 0 ? /* @__PURE__ */ jsxs69("span", { className: "v2-numero shrink-0 text-2xl font-bold tabular-nums", children: [
+      Number.isFinite(Number(total)) && Number(total) > 0 ? /* @__PURE__ */ jsxs72("span", { className: "v2-numero shrink-0 text-2xl font-bold tabular-nums", children: [
         Number(cantidad) || 0,
-        /* @__PURE__ */ jsxs69("span", { className: "text-sm font-semibold text-mute", children: [
+        /* @__PURE__ */ jsxs72("span", { className: "text-sm font-semibold text-mute", children: [
           "/",
           Number(total)
         ] })
       ] }) : null
     ] }),
-    dominios.length > 0 && /* @__PURE__ */ jsx85("div", { className: "mt-2 flex flex-wrap gap-1", children: dominios.map((dominio, indice) => /* @__PURE__ */ jsx85(Badge, { color: dominio.activo ? "green" : "slate", children: dominio.etiqueta }, dominio.id ?? `${dominio.etiqueta}-${indice}`)) })
+    dominios.length > 0 && /* @__PURE__ */ jsx89("div", { className: "mt-2 flex flex-wrap gap-1", children: dominios.map((dominio, indice) => /* @__PURE__ */ jsx89(Badge, { color: dominio.activo ? "green" : "slate", children: dominio.etiqueta }, dominio.id ?? `${dominio.etiqueta}-${indice}`)) })
   ] });
   const clases = "block w-full rounded-2xl border border-ink-600 bg-ink-800 p-3 text-left";
-  if (!onAbrir) return /* @__PURE__ */ jsx85("div", { className: cn(clases, className), children: contenido });
-  return /* @__PURE__ */ jsx85("button", { type: "button", onClick: onAbrir, className: cn(clases, "transition hover:border-fono/60", className), children: contenido });
+  if (!onAbrir) return /* @__PURE__ */ jsx89("div", { className: cn(clases, className), children: contenido });
+  return /* @__PURE__ */ jsx89("button", { type: "button", onClick: onAbrir, className: cn(clases, "transition hover:border-fono/60", className), children: contenido });
 }
 
 // src/components/Stepper.jsx
-import { jsx as jsx86, jsxs as jsxs70 } from "react/jsx-runtime";
+import { jsx as jsx90, jsxs as jsxs73 } from "react/jsx-runtime";
 function Stepper({ pasos = [], actual = 0, hechos = [], variante = "linea", ariaLabel = "Flujo", className }) {
   if (!pasos.length) return null;
   const etiquetaDe = (paso) => typeof paso === "string" ? paso : paso.etiqueta ?? paso.label ?? "";
@@ -7517,11 +9103,11 @@ function Stepper({ pasos = [], actual = 0, hechos = [], variante = "linea", aria
   const esHecho = (paso, indice) => hechos.includes(claveDe(paso, indice)) || typeof actual === "number" && indice < actual;
   const esActual = (paso, indice) => typeof paso === "string" || paso.id === void 0 ? indice === actual : paso.id === actual;
   if (variante === "tarjetas") {
-    return /* @__PURE__ */ jsx86("ol", { className: cn("grid grid-cols-2 gap-2 sm:grid-flow-col sm:auto-cols-fr", className), "aria-label": ariaLabel, children: pasos.map((paso, indice) => {
+    return /* @__PURE__ */ jsx90("ol", { className: cn("grid grid-cols-2 gap-2 sm:grid-flow-col sm:auto-cols-fr", className), "aria-label": ariaLabel, children: pasos.map((paso, indice) => {
       const hecho = esHecho(paso, indice);
       const activo = !hecho && esActual(paso, indice);
-      return /* @__PURE__ */ jsxs70("li", { className: cn("flex items-center gap-2.5 rounded-xl border p-2.5", activo ? "border-info/40 bg-info/5" : "border-ink-600"), children: [
-        /* @__PURE__ */ jsx86(
+      return /* @__PURE__ */ jsxs73("li", { "aria-current": activo ? "step" : void 0, className: cn("flex items-center gap-2.5 rounded-xl border p-2.5", activo ? "border-info/40 bg-info/5" : "border-ink-600"), children: [
+        /* @__PURE__ */ jsx90(
           "span",
           {
             className: cn(
@@ -7529,21 +9115,21 @@ function Stepper({ pasos = [], actual = 0, hechos = [], variante = "linea", aria
               activo ? "oc-paso-activo bg-info/15 text-info-text" : hecho ? "bg-ok/15 text-ok-text" : "bg-ink-700 text-mute"
             ),
             "aria-hidden": "true",
-            children: hecho ? /* @__PURE__ */ jsx86(Icon, { name: "check", className: "h-3.5 w-3.5" }) : indice + 1
+            children: hecho ? /* @__PURE__ */ jsx90(Icon, { name: "check", className: "h-3.5 w-3.5" }) : indice + 1
           }
         ),
-        /* @__PURE__ */ jsxs70("span", { className: "min-w-0", children: [
-          /* @__PURE__ */ jsx86("span", { className: "block truncate text-xs font-semibold", children: etiquetaDe(paso) }),
-          typeof paso === "object" && paso.detalle ? /* @__PURE__ */ jsx86("span", { className: cn("block truncate text-[11px]", activo ? "text-info-text" : "text-mute"), children: paso.detalle }) : null
+        /* @__PURE__ */ jsxs73("span", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsx90("span", { className: "block truncate text-xs font-semibold", children: etiquetaDe(paso) }),
+          typeof paso === "object" && paso.detalle ? /* @__PURE__ */ jsx90("span", { className: cn("block truncate text-[11px]", activo ? "text-info-text" : "text-mute"), children: paso.detalle }) : null
         ] })
       ] }, claveDe(paso, indice));
     }) });
   }
-  return /* @__PURE__ */ jsx86("ol", { className: cn("flex flex-wrap items-center gap-x-2 gap-y-2", className), "aria-label": ariaLabel, children: pasos.map((paso, indice) => {
+  return /* @__PURE__ */ jsx90("ol", { className: cn("flex flex-wrap items-center gap-x-2 gap-y-2", className), "aria-label": ariaLabel, children: pasos.map((paso, indice) => {
     const hecho = esHecho(paso, indice);
     const enCurso = esActual(paso, indice);
-    return /* @__PURE__ */ jsxs70("li", { className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ jsx86(
+    return /* @__PURE__ */ jsxs73("li", { "aria-current": enCurso ? "step" : void 0, className: "flex items-center gap-2", children: [
+      /* @__PURE__ */ jsx90(
         "span",
         {
           className: cn(
@@ -7553,23 +9139,23 @@ function Stepper({ pasos = [], actual = 0, hechos = [], variante = "linea", aria
             !hecho && !enCurso && "border-ink-600 bg-ink-800 text-mute"
           ),
           "aria-hidden": "true",
-          children: hecho ? /* @__PURE__ */ jsx86(Icon, { name: "check", className: "h-3.5 w-3.5" }) : indice + 1
+          children: hecho ? /* @__PURE__ */ jsx90(Icon, { name: "check", className: "h-3.5 w-3.5" }) : indice + 1
         }
       ),
-      /* @__PURE__ */ jsxs70("span", { className: cn("text-xs font-semibold", enCurso ? "text-fore" : hecho ? "text-pass-text" : "text-mute"), children: [
+      /* @__PURE__ */ jsxs73("span", { className: cn("text-xs font-semibold", enCurso ? "text-fore" : hecho ? "text-pass-text" : "text-mute"), children: [
         etiquetaDe(paso),
-        typeof paso === "object" && paso.detalle && /* @__PURE__ */ jsxs70("span", { className: "ml-1 font-normal text-mute", children: [
+        typeof paso === "object" && paso.detalle && /* @__PURE__ */ jsxs73("span", { className: "ml-1 font-normal text-mute", children: [
           "\xB7 ",
           paso.detalle
         ] })
       ] }),
-      indice < pasos.length - 1 && /* @__PURE__ */ jsx86("span", { className: "mx-1 h-px w-6 bg-ink-600", "aria-hidden": "true" })
+      indice < pasos.length - 1 && /* @__PURE__ */ jsx90("span", { className: "mx-1 h-px w-6 bg-ink-600", "aria-hidden": "true" })
     ] }, claveDe(paso, indice));
   }) });
 }
 
 // src/components/FichaCertificado.jsx
-import { jsx as jsx87, jsxs as jsxs71 } from "react/jsx-runtime";
+import { jsx as jsx91, jsxs as jsxs74 } from "react/jsx-runtime";
 function FichaCertificado({
   empresa,
   modelo,
@@ -7594,25 +9180,25 @@ function FichaCertificado({
 }) {
   const hayChecklist = Number(total) > 0;
   const completo = hayChecklist && Number(aprobados) === Number(total);
-  return /* @__PURE__ */ jsxs71("article", { className: cn("overflow-hidden rounded-2xl border border-ink-600 bg-ink-800", className), children: [
-    /* @__PURE__ */ jsxs71("header", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-ink-600 p-4", children: [
-      /* @__PURE__ */ jsxs71("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsx87("p", { className: "text-[11px] font-bold uppercase tracking-wider text-mute", children: empresa || "Informe de dispositivo" }),
-        /* @__PURE__ */ jsx87("h2", { className: "truncate text-lg font-bold", children: modelo || "Equipo" })
+  return /* @__PURE__ */ jsxs74("article", { className: cn("overflow-hidden rounded-2xl border border-ink-600 bg-ink-800", className), children: [
+    /* @__PURE__ */ jsxs74("header", { className: "flex flex-wrap items-center justify-between gap-3 border-b border-ink-600 p-4", children: [
+      /* @__PURE__ */ jsxs74("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsx91("p", { className: "text-[11px] font-bold uppercase tracking-wider text-mute", children: empresa || "Informe de dispositivo" }),
+        /* @__PURE__ */ jsx91("h2", { className: "truncate text-lg font-bold", children: modelo || "Equipo" })
       ] }),
-      /* @__PURE__ */ jsx87(ChipEstado, { estado })
+      /* @__PURE__ */ jsx91(ChipEstado, { estado })
     ] }),
-    /* @__PURE__ */ jsxs71("div", { className: "grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_auto]", children: [
-      /* @__PURE__ */ jsxs71("div", { className: "min-w-0 space-y-3", children: [
-        /* @__PURE__ */ jsxs71("dl", { className: "grid gap-x-4 gap-y-2 sm:grid-cols-2", children: [
-          /* @__PURE__ */ jsx87(FilaDato, { etiqueta: "IMEI / serial", valor: imei || "\u2014", valorClassName: "font-mono text-xs" }),
-          /* @__PURE__ */ jsx87(FilaDato, { etiqueta: "Grado", valor: grado ? /* @__PURE__ */ jsx87(GradoBadge, { grado }) : "Sin grado asignado" }),
-          /* @__PURE__ */ jsx87(FilaDato, { etiqueta: "Bater\xEDa", valor: /* @__PURE__ */ jsx87(MedidorBateria, { porcentaje: bateria, ciclos, variante: "barra", compact: true }), className: "items-end" }),
-          /* @__PURE__ */ jsx87(
+    /* @__PURE__ */ jsxs74("div", { className: "grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_auto]", children: [
+      /* @__PURE__ */ jsxs74("div", { className: "min-w-0 space-y-3", children: [
+        /* @__PURE__ */ jsxs74("dl", { className: "grid gap-x-4 gap-y-2 sm:grid-cols-2", children: [
+          /* @__PURE__ */ jsx91(FilaDato, { etiqueta: "IMEI / serial", valor: imei || "\u2014", valorClassName: "font-mono text-xs" }),
+          /* @__PURE__ */ jsx91(FilaDato, { etiqueta: "Grado", valor: grado ? /* @__PURE__ */ jsx91(GradoBadge, { grado }) : "Sin grado asignado" }),
+          /* @__PURE__ */ jsx91(FilaDato, { etiqueta: "Bater\xEDa", valor: /* @__PURE__ */ jsx91(MedidorBateria, { porcentaje: bateria, ciclos, variante: "barra", compact: true }), className: "items-end" }),
+          /* @__PURE__ */ jsx91(
             FilaDato,
             {
               etiqueta: "Checklist",
-              valor: hayChecklist ? /* @__PURE__ */ jsxs71("span", { className: completo ? "text-pass-text" : "text-mute", children: [
+              valor: hayChecklist ? /* @__PURE__ */ jsxs74("span", { className: completo ? "text-pass-text" : "text-mute", children: [
                 aprobados,
                 " de ",
                 total,
@@ -7620,31 +9206,31 @@ function FichaCertificado({
               ] }) : "Sin verificaci\xF3n f\xEDsica"
             }
           ),
-          puntaje !== null && puntaje !== void 0 && puntaje !== "" && /* @__PURE__ */ jsx87(FilaDato, { etiqueta: "Puntaje", valor: /* @__PURE__ */ jsx87("span", { className: "tabular-nums", children: Number.isFinite(Number(puntaje)) ? `${Number(puntaje)}%` : puntaje }) }),
-          condicion ? /* @__PURE__ */ jsx87(FilaDato, { etiqueta: "Condici\xF3n", valor: condicion }) : null
+          puntaje !== null && puntaje !== void 0 && puntaje !== "" && /* @__PURE__ */ jsx91(FilaDato, { etiqueta: "Puntaje", valor: /* @__PURE__ */ jsx91("span", { className: "tabular-nums", children: Number.isFinite(Number(puntaje)) ? `${Number(puntaje)}%` : puntaje }) }),
+          condicion ? /* @__PURE__ */ jsx91(FilaDato, { etiqueta: "Condici\xF3n", valor: condicion }) : null
         ] }),
-        locks.length ? /* @__PURE__ */ jsx87(ChipsLocks, { locks, conEstado: true }) : null,
-        repuestosNoOem ? /* @__PURE__ */ jsxs71("div", { className: "rounded-xl border border-warn/25 bg-warn/5 p-3 text-sm", children: [
-          /* @__PURE__ */ jsx87("p", { className: "text-[11px] font-bold uppercase tracking-wider text-mute", children: "Repuestos no OEM" }),
-          /* @__PURE__ */ jsx87("p", { className: "mt-0.5 break-words", children: repuestosNoOem }),
-          repuestosNoOemNota ? /* @__PURE__ */ jsx87("p", { className: "mt-0.5 text-xs text-mute", children: repuestosNoOemNota }) : null
+        locks.length ? /* @__PURE__ */ jsx91(ChipsLocks, { locks, conEstado: true }) : null,
+        repuestosNoOem ? /* @__PURE__ */ jsxs74("div", { className: "rounded-xl border border-warn/25 bg-warn/5 p-3 text-sm", children: [
+          /* @__PURE__ */ jsx91("p", { className: "text-[11px] font-bold uppercase tracking-wider text-mute", children: "Repuestos no OEM" }),
+          /* @__PURE__ */ jsx91("p", { className: "mt-0.5 break-words", children: repuestosNoOem }),
+          repuestosNoOemNota ? /* @__PURE__ */ jsx91("p", { className: "mt-0.5 text-xs text-mute", children: repuestosNoOemNota }) : null
         ] }) : null,
-        /* @__PURE__ */ jsxs71("p", { className: "text-xs text-mute", children: [
+        /* @__PURE__ */ jsxs74("p", { className: "text-xs text-mute", children: [
           verificadoPor ? `Verificado por ${verificadoPor}` : "Verificaci\xF3n pendiente",
           verificadoAt ? ` \xB7 ${verificadoAt}` : ""
         ] })
       ] }),
-      enlace ? /* @__PURE__ */ jsxs71("div", { className: "flex flex-col items-center gap-2", children: [
-        /* @__PURE__ */ jsx87(CodigoQr, { valor: enlace, ancho: 180, alt: "QR del informe del dispositivo" }),
-        /* @__PURE__ */ jsx87("p", { className: "max-w-[12rem] break-all text-center text-[11px] text-mute", children: etiquetaQr })
+      enlace ? /* @__PURE__ */ jsxs74("div", { className: "flex flex-col items-center gap-2", children: [
+        /* @__PURE__ */ jsx91(CodigoQr, { valor: enlace, ancho: 180, alt: "QR del informe del dispositivo" }),
+        /* @__PURE__ */ jsx91("p", { className: "max-w-[12rem] break-all text-center text-[11px] text-mute", children: etiquetaQr })
       ] }) : null
     ] }),
-    acciones ? /* @__PURE__ */ jsx87("footer", { className: "flex flex-wrap gap-2 border-t border-ink-600 p-4", children: acciones }) : null
+    acciones ? /* @__PURE__ */ jsx91("footer", { className: "flex flex-wrap gap-2 border-t border-ink-600 p-4", children: acciones }) : null
   ] });
 }
 
 // src/components/VistaPreviaPapel.jsx
-import { jsx as jsx88 } from "react/jsx-runtime";
+import { jsx as jsx92 } from "react/jsx-runtime";
 var ANCHOS_PAPEL = {
   "thermal-80": "max-w-[302px]",
   "thermal-58": "max-w-[219px]",
@@ -7654,7 +9240,7 @@ var ANCHOS_PAPEL = {
 };
 function VistaPreviaPapel({ formato = "thermal-80", contenido, titulo: titulo2 = "Vista previa del documento", alto = "h-[60vh]", className, ...props }) {
   const ancho = ANCHOS_PAPEL[formato];
-  return /* @__PURE__ */ jsx88(
+  return /* @__PURE__ */ jsx92(
     "iframe",
     {
       title: titulo2,
@@ -7666,7 +9252,7 @@ function VistaPreviaPapel({ formato = "thermal-80", contenido, titulo: titulo2 =
 }
 
 // src/components/Calendario.jsx
-import { useMemo as useMemo10, useState as useState26 } from "react";
+import { useMemo as useMemo13, useState as useState28 } from "react";
 
 // src/utils/calendario.js
 var ES_PY2 = "es-PY";
@@ -7773,7 +9359,7 @@ function claveUTC(fecha) {
 }
 
 // src/components/Calendario.jsx
-import { Fragment as Fragment13, jsx as jsx89, jsxs as jsxs72 } from "react/jsx-runtime";
+import { Fragment as Fragment12, jsx as jsx93, jsxs as jsxs75 } from "react/jsx-runtime";
 var TONO_ITEM = { info: TONOS.chip.info, ok: TONOS.chip.ok, warn: TONOS.chip.warn, bad: TONOS.chip.bad };
 function ItemCalendario({ item, contexto, onElegir }) {
   const tono = TONO_ITEM[item.tono] || TONOS.chip.mute;
@@ -7783,28 +9369,28 @@ function ItemCalendario({ item, contexto, onElegir }) {
     contexto.vista === "lista" ? "px-2.5 py-1.5 text-xs" : "px-1.5 py-0.5 text-[11px]",
     tono
   );
-  const contenido = /* @__PURE__ */ jsxs72(Fragment13, { children: [
-    item.hora && /* @__PURE__ */ jsx89("span", { className: "shrink-0 tabular-nums opacity-80", children: item.hora }),
-    /* @__PURE__ */ jsxs72("span", { className: "min-w-0 flex-1", children: [
-      /* @__PURE__ */ jsx89("span", { className: "block truncate font-medium", children: item.titulo }),
-      contexto.vista === "lista" && item.detalle && /* @__PURE__ */ jsx89("span", { className: "block truncate opacity-80", children: item.detalle })
+  const contenido = /* @__PURE__ */ jsxs75(Fragment12, { children: [
+    item.hora && /* @__PURE__ */ jsx93("span", { className: "shrink-0 tabular-nums opacity-80", children: item.hora }),
+    /* @__PURE__ */ jsxs75("span", { className: "min-w-0 flex-1", children: [
+      /* @__PURE__ */ jsx93("span", { className: "block truncate font-medium", children: item.titulo }),
+      contexto.vista === "lista" && item.detalle && /* @__PURE__ */ jsx93("span", { className: "block truncate opacity-80", children: item.detalle })
     ] })
   ] });
   const etiqueta = [titulo2, item.detalle].filter(Boolean).join(" \u2014 ");
-  return item.href ? /* @__PURE__ */ jsx89("a", { href: item.href, title: etiqueta, className: clases, onClick: () => onElegir?.(item), children: contenido }) : /* @__PURE__ */ jsx89("button", { type: "button", title: etiqueta, className: clases, onClick: () => onElegir?.(item), children: contenido });
+  return item.href ? /* @__PURE__ */ jsx93("a", { href: item.href, title: etiqueta, className: clases, onClick: () => onElegir?.(item), children: contenido }) : /* @__PURE__ */ jsx93("button", { type: "button", title: etiqueta, className: clases, onClick: () => onElegir?.(item), children: contenido });
 }
 function ListaDias({ dias, porDia, hoy, onElegir, renderItem, soloConItems }) {
   const visibles = soloConItems ? dias.filter((dia) => (porDia.get(dia)?.length ?? 0) > 0 || dia === hoy) : dias;
-  if (!visibles.length) return /* @__PURE__ */ jsx89(EmptyState, { compact: true, icon: "calendar", title: "Sin movimientos en el per\xEDodo" });
-  return /* @__PURE__ */ jsx89("div", { className: "divide-y divide-ink-600/60", children: visibles.map((dia) => {
+  if (!visibles.length) return /* @__PURE__ */ jsx93(EmptyState, { compact: true, icon: "calendar", title: "Sin movimientos en el per\xEDodo" });
+  return /* @__PURE__ */ jsx93("div", { className: "divide-y divide-ink-600/60", children: visibles.map((dia) => {
     const delDia = porDia.get(dia) || [];
-    return /* @__PURE__ */ jsxs72("section", { className: "py-2", children: [
-      /* @__PURE__ */ jsxs72("header", { className: "flex items-center justify-between gap-2 px-1", children: [
-        /* @__PURE__ */ jsx89("span", { className: "text-xs font-semibold text-fore", children: etiquetaDia(dia) }),
-        dia === hoy && /* @__PURE__ */ jsx89("span", { className: "rounded-full bg-fono/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-text", children: "Hoy" })
+    return /* @__PURE__ */ jsxs75("section", { className: "py-2", children: [
+      /* @__PURE__ */ jsxs75("header", { className: "flex items-center justify-between gap-2 px-1", children: [
+        /* @__PURE__ */ jsx93("span", { className: "text-xs font-semibold text-fore", children: etiquetaDia(dia) }),
+        dia === hoy && /* @__PURE__ */ jsx93("span", { className: "rounded-full bg-fono/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-text", children: "Hoy" })
       ] }),
-      /* @__PURE__ */ jsx89("div", { className: "mt-1 space-y-1", children: delDia.length === 0 ? /* @__PURE__ */ jsx89("p", { className: "px-1 text-xs text-mute", children: "Sin movimientos" }) : delDia.map(
-        (item, indice) => renderItem ? /* @__PURE__ */ jsx89("div", { children: renderItem(item, { vista: "lista", dia }) }, item.id ?? indice) : /* @__PURE__ */ jsx89(ItemCalendario, { item, contexto: { vista: "lista", dia }, onElegir }, item.id ?? indice)
+      /* @__PURE__ */ jsx93("div", { className: "mt-1 space-y-1", children: delDia.length === 0 ? /* @__PURE__ */ jsx93("p", { className: "px-1 text-xs text-mute", children: "Sin movimientos" }) : delDia.map(
+        (item, indice) => renderItem ? /* @__PURE__ */ jsx93("div", { children: renderItem(item, { vista: "lista", dia }) }, item.id ?? indice) : /* @__PURE__ */ jsx93(ItemCalendario, { item, contexto: { vista: "lista", dia }, onElegir }, item.id ?? indice)
       ) })
     ] }, dia);
   }) });
@@ -7830,19 +9416,19 @@ function Calendario({
   ariaLabel = "Calendario",
   className
 }) {
-  const claveHoy = useMemo10(() => hoyClave(hoy), [hoy]);
-  const [vistaInterna, setVistaInterna] = useState26(vistaPorDefecto);
-  const [anclaInterna, setAnclaInterna] = useState26(() => anclaPorDefecto || ancla || claveHoy);
-  const [seleccionInterna, setSeleccionInterna] = useState26(null);
+  const claveHoy = useMemo13(() => hoyClave(hoy), [hoy]);
+  const [vistaInterna, setVistaInterna] = useState28(vistaPorDefecto);
+  const [anclaInterna, setAnclaInterna] = useState28(() => anclaPorDefecto || ancla || claveHoy);
+  const [seleccionInterna, setSeleccionInterna] = useState28(null);
   const vistaActual = vistas.includes(vista) ? vista : vistas.includes(vistaInterna) ? vistaInterna : vistas[0] || "mes";
   const anclaActual = String(ancla || anclaInterna || claveHoy).slice(0, 10);
   const seleccion = diaSeleccionado !== void 0 ? diaSeleccionado : seleccionInterna;
-  const rango = useMemo10(
+  const rango = useMemo13(
     () => vistaActual === "semana" ? rangoSemana(anclaActual) : rangoMes(anclaActual),
     [vistaActual, anclaActual]
   );
-  const porDia = useMemo10(() => agruparPorDia(items), [items]);
-  const totalEnRango = useMemo10(
+  const porDia = useMemo13(() => agruparPorDia(items), [items]);
+  const totalEnRango = useMemo13(
     () => rango.dias.reduce((suma, dia) => suma + (porDia.get(dia)?.length ?? 0), 0),
     [rango, porDia]
   );
@@ -7868,35 +9454,35 @@ function Calendario({
     if (diaSeleccionado === void 0) setSeleccionInterna(dia);
     onSeleccionarDia?.(dia);
   }
-  return /* @__PURE__ */ jsxs72("section", { className: cn("space-y-3", className), "aria-label": ariaLabel, children: [
-    /* @__PURE__ */ jsxs72("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
-      /* @__PURE__ */ jsxs72("div", { className: "flex items-center gap-1.5", children: [
-        /* @__PURE__ */ jsx89(
+  return /* @__PURE__ */ jsxs75("section", { className: cn("space-y-3", className), "aria-label": ariaLabel, children: [
+    /* @__PURE__ */ jsxs75("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
+      /* @__PURE__ */ jsxs75("div", { className: "flex items-center gap-1.5", children: [
+        /* @__PURE__ */ jsx93(
           "button",
           {
             type: "button",
             onClick: () => mover(-1),
             "aria-label": vistaActual === "semana" ? "Semana anterior" : "Mes anterior",
             title: vistaActual === "semana" ? "Semana anterior" : "Mes anterior",
-            className: "grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
-            children: /* @__PURE__ */ jsx89(Icon, { name: "back", className: "h-4 w-4" })
+            className: "toque-44 grid h-11 w-11 place-items-center rounded-lg border border-interactivo text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
+            children: /* @__PURE__ */ jsx93(Icon, { name: "back", className: "h-4 w-4" })
           }
         ),
-        /* @__PURE__ */ jsx89(Button, { type: "button", variant: "outline", onClick: irHoy, title: "Ir al d\xEDa de hoy", children: "Hoy" }),
-        /* @__PURE__ */ jsx89(
+        /* @__PURE__ */ jsx93(Button, { type: "button", variant: "outline", onClick: irHoy, title: "Ir al d\xEDa de hoy", children: "Hoy" }),
+        /* @__PURE__ */ jsx93(
           "button",
           {
             type: "button",
             onClick: () => mover(1),
             "aria-label": vistaActual === "semana" ? "Semana siguiente" : "Mes siguiente",
             title: vistaActual === "semana" ? "Semana siguiente" : "Mes siguiente",
-            className: "grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
-            children: /* @__PURE__ */ jsx89(Icon, { name: "back", className: "h-4 w-4 rotate-180" })
+            className: "toque-44 grid h-11 w-11 place-items-center rounded-lg border border-interactivo text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
+            children: /* @__PURE__ */ jsx93(Icon, { name: "back", className: "h-4 w-4 rotate-180" })
           }
         )
       ] }),
-      /* @__PURE__ */ jsx89("p", { className: "order-last w-full text-sm font-semibold text-fore sm:order-none sm:w-auto", "aria-live": "polite", children: periodo }),
-      vistas.length > 1 && /* @__PURE__ */ jsx89(
+      /* @__PURE__ */ jsx93("p", { className: "order-last w-full text-sm font-semibold text-fore sm:order-none sm:w-auto", "aria-live": "polite", children: periodo }),
+      vistas.length > 1 && /* @__PURE__ */ jsx93(
         SegmentedField,
         {
           value: vistaActual,
@@ -7909,15 +9495,18 @@ function Calendario({
         }
       )
     ] }),
-    cargando ? /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7 gap-1 p-1", "aria-busy": "true", children: Array.from({ length: 35 }, (_, indice) => /* @__PURE__ */ jsx89(Skeleton, { className: "h-20" }, indice)) }) : /* @__PURE__ */ jsxs72(Fragment13, { children: [
-      /* @__PURE__ */ jsxs72("div", { className: "hidden overflow-hidden rounded-xl border border-ink-600 md:block", children: [
-        /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7 border-b border-ink-600 bg-ink-900/60", children: DIAS_SEMANA.map((dia) => /* @__PURE__ */ jsx89("span", { className: "px-2 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-mute", children: dia }, dia)) }),
-        /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7", children: rango.dias.map((dia) => {
+    cargando ? /* @__PURE__ */ jsxs75("div", { className: "grid grid-cols-7 gap-1 p-1", role: "status", "aria-live": "polite", "aria-busy": "true", children: [
+      /* @__PURE__ */ jsx93("span", { className: "sr-only", children: "Cargando calendario\u2026" }),
+      Array.from({ length: 35 }, (_, indice) => /* @__PURE__ */ jsx93(Skeleton, { className: "h-20" }, indice))
+    ] }) : /* @__PURE__ */ jsxs75(Fragment12, { children: [
+      /* @__PURE__ */ jsxs75("div", { className: "hidden overflow-hidden rounded-xl border border-ink-600 md:block", children: [
+        /* @__PURE__ */ jsx93("div", { className: "grid grid-cols-7 border-b border-ink-600 bg-ink-900/60", children: DIAS_SEMANA.map((dia) => /* @__PURE__ */ jsx93("span", { className: "px-2 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-mute", children: dia }, dia)) }),
+        /* @__PURE__ */ jsx93("div", { className: "grid grid-cols-7", children: rango.dias.map((dia) => {
           const delDia = porDia.get(dia) || [];
           const ocultos = delDia.length - maxPorDia;
           const esHoy = dia === claveHoy;
           const esSeleccionado = dia === seleccion;
-          return /* @__PURE__ */ jsxs72(
+          return /* @__PURE__ */ jsxs75(
             "div",
             {
               "data-fuera": mismoMes(dia, anclaActual) ? void 0 : "true",
@@ -7929,7 +9518,7 @@ function Calendario({
                 esSeleccionado && "bg-fono/5"
               ),
               children: [
-                /* @__PURE__ */ jsxs72(
+                /* @__PURE__ */ jsxs75(
                   "button",
                   {
                     type: "button",
@@ -7942,15 +9531,15 @@ function Calendario({
                       esHoy ? "bg-fono/15 font-bold text-fono-text" : "text-mute hover:bg-ink-700 hover:text-fore"
                     ),
                     children: [
-                      /* @__PURE__ */ jsx89("span", { className: "tabular-nums", children: Number(dia.slice(8, 10)) }),
-                      delDia.length > 0 && /* @__PURE__ */ jsx89("span", { className: "rounded-full bg-ink-600 px-1 text-[10px] font-semibold tabular-nums text-mute", title: `${delDia.length} movimientos`, children: delDia.length })
+                      /* @__PURE__ */ jsx93("span", { className: "tabular-nums", children: Number(dia.slice(8, 10)) }),
+                      delDia.length > 0 && /* @__PURE__ */ jsx93("span", { className: "rounded-full bg-ink-600 px-1 text-[10px] font-semibold tabular-nums text-mute", title: `${delDia.length} movimientos`, children: delDia.length })
                     ]
                   }
                 ),
-                /* @__PURE__ */ jsx89("div", { className: "space-y-0.5", children: delDia.slice(0, maxPorDia).map(
-                  (item, indice) => renderItem ? /* @__PURE__ */ jsx89("div", { children: renderItem(item, { vista: "grilla", dia }) }, item.id ?? indice) : /* @__PURE__ */ jsx89(ItemCalendario, { item, contexto: { vista: "grilla", dia }, onElegir: onElegirItem }, item.id ?? indice)
+                /* @__PURE__ */ jsx93("div", { className: "space-y-0.5", children: delDia.slice(0, maxPorDia).map(
+                  (item, indice) => renderItem ? /* @__PURE__ */ jsx93("div", { children: renderItem(item, { vista: "grilla", dia }) }, item.id ?? indice) : /* @__PURE__ */ jsx93(ItemCalendario, { item, contexto: { vista: "grilla", dia }, onElegir: onElegirItem }, item.id ?? indice)
                 ) }),
-                ocultos > 0 && /* @__PURE__ */ jsxs72(
+                ocultos > 0 && /* @__PURE__ */ jsxs75(
                   "button",
                   {
                     type: "button",
@@ -7970,7 +9559,7 @@ function Calendario({
           );
         }) })
       ] }),
-      /* @__PURE__ */ jsx89("div", { className: "md:hidden", children: /* @__PURE__ */ jsx89(
+      /* @__PURE__ */ jsx93("div", { className: "md:hidden", children: /* @__PURE__ */ jsx93(
         ListaDias,
         {
           dias: rango.dias,
@@ -7982,28 +9571,28 @@ function Calendario({
         }
       ) })
     ] }),
-    !cargando && totalEnRango === 0 && /* @__PURE__ */ jsx89(EmptyState, { compact: true, icon: "calendar", title: "Sin movimientos en el per\xEDodo" }),
-    mostrarDetalle && seleccion && /* @__PURE__ */ jsxs72("section", { className: "rounded-xl border border-ink-600 bg-ink-800 p-3", "aria-label": `Detalle de ${etiquetaDia(seleccion)}`, children: [
-      /* @__PURE__ */ jsxs72("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
-        /* @__PURE__ */ jsx89("p", { className: "text-sm font-semibold text-fore", children: etiquetaDia(seleccion) }),
-        /* @__PURE__ */ jsxs72("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxs72("span", { className: "text-xs tabular-nums text-mute", children: [
+    !cargando && totalEnRango === 0 && /* @__PURE__ */ jsx93("div", { role: "status", children: /* @__PURE__ */ jsx93(EmptyState, { compact: true, icon: "calendar", title: "Sin movimientos en el per\xEDodo" }) }),
+    mostrarDetalle && seleccion && /* @__PURE__ */ jsxs75("section", { className: "rounded-xl border border-ink-600 bg-ink-800 p-3", "aria-label": `Detalle de ${etiquetaDia(seleccion)}`, children: [
+      /* @__PURE__ */ jsxs75("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
+        /* @__PURE__ */ jsx93("p", { className: "text-sm font-semibold text-fore", children: etiquetaDia(seleccion) }),
+        /* @__PURE__ */ jsxs75("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxs75("span", { className: "text-xs tabular-nums text-mute", children: [
             delSeleccionado.length,
             " ",
             delSeleccionado.length === 1 ? "movimiento" : "movimientos"
           ] }),
-          /* @__PURE__ */ jsx89(Button, { type: "button", variant: "ghost", onClick: () => cambiarSeleccion(null), title: "Cerrar el detalle del d\xEDa", children: "Cerrar" })
+          /* @__PURE__ */ jsx93(Button, { type: "button", variant: "ghost", onClick: () => cambiarSeleccion(null), title: "Cerrar el detalle del d\xEDa", children: "Cerrar" })
         ] })
       ] }),
-      delSeleccionado.length === 0 ? /* @__PURE__ */ jsx89(EmptyState, { compact: true, icon: "calendar", title: "Sin movimientos", description: "Eleg\xED otro d\xEDa o naveg\xE1 a otro per\xEDodo." }) : /* @__PURE__ */ jsx89("div", { className: "mt-2 space-y-1", children: delSeleccionado.map(
-        (item, indice) => renderItem ? /* @__PURE__ */ jsx89("div", { children: renderItem(item, { vista: "lista", dia: seleccion }) }, item.id ?? indice) : /* @__PURE__ */ jsx89(ItemCalendario, { item, contexto: { vista: "lista", dia: seleccion }, onElegir: onElegirItem }, item.id ?? indice)
+      delSeleccionado.length === 0 ? /* @__PURE__ */ jsx93(EmptyState, { compact: true, icon: "calendar", title: "Sin movimientos", description: "Eleg\xED otro d\xEDa o naveg\xE1 a otro per\xEDodo." }) : /* @__PURE__ */ jsx93("div", { className: "mt-2 space-y-1", children: delSeleccionado.map(
+        (item, indice) => renderItem ? /* @__PURE__ */ jsx93("div", { children: renderItem(item, { vista: "lista", dia: seleccion }) }, item.id ?? indice) : /* @__PURE__ */ jsx93(ItemCalendario, { item, contexto: { vista: "lista", dia: seleccion }, onElegir: onElegirItem }, item.id ?? indice)
       ) })
     ] })
   ] });
 }
 
 // src/components/RangoFecha.jsx
-import { useId as useId16, useRef as useRef14, useState as useState27 } from "react";
+import { useEffect as useEffect19, useId as useId19, useRef as useRef17, useState as useState29 } from "react";
 
 // src/utils/rangoFecha.js
 var PERIODOS_FECHA = ["hoy", "esta-semana", "este-mes", "mes-pasado", "ultimos-30", "personalizado"];
@@ -8054,42 +9643,59 @@ function rangoInvertido(desde, hasta) {
 }
 
 // src/components/RangoFecha.jsx
-import { jsx as jsx90, jsxs as jsxs73 } from "react/jsx-runtime";
-function RangoFecha({
-  desde,
-  hasta,
-  onCambio,
-  desdePorDefecto,
-  hastaPorDefecto,
-  periodoPorDefecto = "este-mes",
-  atajos = PERIODOS_FECHA,
-  hoy,
-  ariaLabel = "Filtro por rango de fechas",
-  mostrarCampos = true,
-  className
-}) {
-  const controlado = desde !== void 0 || hasta !== void 0;
-  const [interno, setInterno] = useState27(() => {
+import { jsx as jsx94, jsxs as jsxs76 } from "react/jsx-runtime";
+function RangoFecha(props) {
+  const {
+    desde,
+    hasta,
+    onCambio,
+    desdePorDefecto,
+    hastaPorDefecto,
+    periodoPorDefecto = "este-mes",
+    atajos = PERIODOS_FECHA,
+    hoy,
+    ariaLabel = "Filtro por rango de fechas",
+    mostrarCampos = true,
+    className
+  } = props;
+  const desdeControlado = Object.prototype.hasOwnProperty.call(props, "desde");
+  const hastaControlado = Object.prototype.hasOwnProperty.call(props, "hasta");
+  const [interno, setInterno] = useState29(() => {
     if (desdePorDefecto !== void 0 || hastaPorDefecto !== void 0) {
       return { desde: desdePorDefecto || "", hasta: hastaPorDefecto || "" };
     }
     return rangoDePeriodo(periodoPorDefecto, { hoy }) || { desde: "", hasta: "" };
   });
-  const idDesde = useId16();
-  const idHasta = useId16();
-  const refDesde = useRef14(null);
-  const actual = controlado ? { desde: desde ?? "", hasta: hasta ?? "" } : interno;
+  const idDesde = useId19();
+  const idHasta = useId19();
+  const errorId = useId19();
+  const refDesde = useRef17(null);
+  useEffect19(() => {
+    if (desdeControlado === hastaControlado) return;
+    if (typeof process === "undefined" || process.env.NODE_ENV !== "production") {
+      console.warn("RangoFecha: control\xE1 `desde` y `hasta` juntos cuando sea posible. El campo omitido permanece no controlado por compatibilidad.");
+    }
+  }, [desdeControlado, hastaControlado]);
+  const actual = {
+    desde: desdeControlado ? desde ?? "" : interno.desde,
+    hasta: hastaControlado ? hasta ?? "" : interno.hasta
+  };
   const activo = periodoDeRango(actual.desde, actual.hasta, { hoy });
   const invertido = rangoInvertido(actual.desde, actual.hasta);
   function aplicar(siguienteDesde, siguienteHasta) {
     const par = { desde: siguienteDesde ?? "", hasta: siguienteHasta ?? "" };
-    if (!controlado) setInterno(par);
+    if (!desdeControlado || !hastaControlado) {
+      setInterno((anterior) => ({
+        desde: desdeControlado ? anterior.desde : par.desde,
+        hasta: hastaControlado ? anterior.hasta : par.hasta
+      }));
+    }
     onCambio?.(par.desde, par.hasta);
   }
-  return /* @__PURE__ */ jsxs73("div", { className: cn("space-y-2", className), children: [
-    /* @__PURE__ */ jsx90("div", { className: "flex flex-wrap items-center gap-1.5", role: "group", "aria-label": ariaLabel, children: atajos.map((periodo) => {
+  return /* @__PURE__ */ jsxs76("div", { className: cn("space-y-2", className), children: [
+    /* @__PURE__ */ jsx94("div", { className: "flex flex-wrap items-center gap-1.5", role: "group", "aria-label": ariaLabel, children: atajos.map((periodo) => {
       const esActivo = activo === periodo;
-      return /* @__PURE__ */ jsx90(
+      return /* @__PURE__ */ jsx94(
         "button",
         {
           type: "button",
@@ -8100,7 +9706,7 @@ function RangoFecha({
             else refDesde.current?.focus();
           },
           className: cn(
-            "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition",
+            "min-h-11 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition",
             esActivo ? "border-fono/30 bg-fono/15 text-fono-text" : "border-ink-600 text-mute hover:border-fono/40 hover:text-fore"
           ),
           children: ETIQUETA_PERIODO[periodo] || periodo
@@ -8108,10 +9714,10 @@ function RangoFecha({
         periodo
       );
     }) }),
-    mostrarCampos && /* @__PURE__ */ jsxs73("div", { className: "flex flex-wrap items-end gap-2", children: [
-      /* @__PURE__ */ jsxs73("div", { children: [
-        /* @__PURE__ */ jsx90(Label, { htmlFor: idDesde, children: "Desde" }),
-        /* @__PURE__ */ jsx90(
+    mostrarCampos && /* @__PURE__ */ jsxs76("div", { className: "flex flex-wrap items-end gap-2", children: [
+      /* @__PURE__ */ jsxs76("div", { children: [
+        /* @__PURE__ */ jsx94(Label, { htmlFor: idDesde, children: "Desde" }),
+        /* @__PURE__ */ jsx94(
           Input,
           {
             id: idDesde,
@@ -8119,33 +9725,37 @@ function RangoFecha({
             type: "date",
             value: actual.desde,
             max: actual.hasta || void 0,
+            "aria-invalid": invertido || void 0,
+            "aria-describedby": invertido ? errorId : void 0,
             onChange: (event) => aplicar(event.target.value, actual.hasta),
             className: "w-40 max-w-full tabular-nums"
           }
         )
       ] }),
-      /* @__PURE__ */ jsxs73("div", { children: [
-        /* @__PURE__ */ jsx90(Label, { htmlFor: idHasta, children: "Hasta" }),
-        /* @__PURE__ */ jsx90(
+      /* @__PURE__ */ jsxs76("div", { children: [
+        /* @__PURE__ */ jsx94(Label, { htmlFor: idHasta, children: "Hasta" }),
+        /* @__PURE__ */ jsx94(
           Input,
           {
             id: idHasta,
             type: "date",
             value: actual.hasta,
             min: actual.desde || void 0,
+            "aria-invalid": invertido || void 0,
+            "aria-describedby": invertido ? errorId : void 0,
             onChange: (event) => aplicar(actual.desde, event.target.value),
             className: "w-40 max-w-full tabular-nums"
           }
         )
       ] })
     ] }),
-    invertido && /* @__PURE__ */ jsx90(Aviso, { tono: "warn", compact: true, children: "El rango est\xE1 invertido: \xABdesde\xBB es posterior a \xABhasta\xBB." })
+    invertido && /* @__PURE__ */ jsx94(Aviso, { id: errorId, tono: "warn", compact: true, children: "El rango est\xE1 invertido: \xABdesde\xBB es posterior a \xABhasta\xBB." })
   ] });
 }
 
 // src/components/PaletaComandos.jsx
-import { useEffect as useEffect16, useId as useId17, useMemo as useMemo11, useRef as useRef15, useState as useState28 } from "react";
-import { Fragment as Fragment14, jsx as jsx91, jsxs as jsxs74 } from "react/jsx-runtime";
+import { useEffect as useEffect20, useId as useId20, useMemo as useMemo14, useRef as useRef18, useState as useState30 } from "react";
+import { Fragment as Fragment13, jsx as jsx95, jsxs as jsxs77 } from "react/jsx-runtime";
 var CAPITALIZAR = (texto) => texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : texto;
 function agruparResultados(resultados = [], { etiquetasTipo = {}, iconosTipo = {} } = {}) {
   const grupos = [];
@@ -8199,20 +9809,20 @@ function PaletaComandos({
   mostrarAtajoEnBoton = true,
   className
 }) {
-  const [interna, setInterna] = useState28(false);
-  const [consulta, setConsulta] = useState28("");
-  const [resultados, setResultados] = useState28(null);
-  const [cargando, setCargando] = useState28(false);
-  const [error, setError] = useState28("");
-  const [activo, setActivo] = useState28(0);
-  const [intento, setIntento] = useState28(0);
-  const raiz = useRef15(null);
-  const entrada = useRef15(null);
-  const buscarRef = useRef15(buscar);
+  const [interna, setInterna] = useState30(false);
+  const [consulta, setConsulta] = useState30("");
+  const [resultados, setResultados] = useState30(null);
+  const [cargando, setCargando] = useState30(false);
+  const [error, setError] = useState30("");
+  const [activo, setActivo] = useState30(0);
+  const [intento, setIntento] = useState30(0);
+  const raiz = useRef18(null);
+  const entrada3 = useRef18(null);
+  const buscarRef = useRef18(buscar);
   buscarRef.current = buscar;
-  const onAbrirRef = useRef15(onAbrir);
+  const onAbrirRef = useRef18(onAbrir);
   onAbrirRef.current = onAbrir;
-  const idLista = useId17();
+  const idLista = useId20();
   const controlada = abierta !== void 0;
   const visible = controlada ? Boolean(abierta) : interna;
   function abrir() {
@@ -8223,7 +9833,10 @@ function PaletaComandos({
     if (!controlada) setInterna(false);
     onCerrar?.();
   }
-  useEffect16(() => {
+  const { esSuperior, requestClose } = useDialogFocusTrap(visible, cerrar, raiz, {
+    initialFocus: () => entrada3.current
+  });
+  useEffect20(() => {
     if (!conAtajo) return void 0;
     const onKeyDown2 = (event) => {
       if (event.defaultPrevented || event.altKey || event.shiftKey) return;
@@ -8236,7 +9849,7 @@ function PaletaComandos({
     document.addEventListener("keydown", onKeyDown2);
     return () => document.removeEventListener("keydown", onKeyDown2);
   }, [conAtajo, atajo, controlada]);
-  useEffect16(() => {
+  useEffect20(() => {
     if (!visible) return void 0;
     setConsulta("");
     setResultados(null);
@@ -8244,10 +9857,9 @@ function PaletaComandos({
     setCargando(false);
     setActivo(0);
     setIntento(0);
-    const frame = requestAnimationFrame(() => entrada.current?.focus());
-    return () => cancelAnimationFrame(frame);
+    return void 0;
   }, [visible]);
-  useEffect16(() => {
+  useEffect20(() => {
     if (!visible) return void 0;
     const termino2 = consulta.trim();
     if (termino2.length < minimo) {
@@ -8278,17 +9890,17 @@ function PaletaComandos({
   }, [visible, consulta, intento, minimo, espera, mensajeError]);
   const termino = consulta.trim();
   const listo = termino.length >= minimo;
-  const grupos = useMemo11(
+  const grupos = useMemo14(
     () => agruparResultados(resultados || [], { etiquetasTipo, iconosTipo }),
     [resultados, etiquetasTipo, iconosTipo]
   );
-  const planos = useMemo11(() => grupos.flatMap((grupo) => grupo.items), [grupos]);
+  const planos = useMemo14(() => grupos.flatMap((grupo) => grupo.items), [grupos]);
   const estado = estadoPaleta({ listo, cargando, error, total: planos.length });
-  const indice = useMemo11(() => new Map(planos.map((item, posicion) => [item, posicion])), [planos]);
-  useEffect16(() => {
+  const indice = useMemo14(() => new Map(planos.map((item, posicion) => [item, posicion])), [planos]);
+  useEffect20(() => {
     setActivo(0);
   }, [resultados]);
-  useEffect16(() => {
+  useEffect20(() => {
     if (!visible) return;
     raiz.current?.querySelector(`[data-paleta-index="${activo}"]`)?.scrollIntoView?.({ block: "nearest" });
   }, [activo, visible, planos.length]);
@@ -8307,11 +9919,6 @@ function PaletaComandos({
     onElegir?.(resultado);
   }
   function onKeyDown(event) {
-    if (event.key === "Escape") {
-      event.stopPropagation();
-      cerrar();
-      return;
-    }
     if (event.key === "ArrowDown") {
       event.preventDefault();
       mover(1);
@@ -8328,8 +9935,8 @@ function PaletaComandos({
   }
   const textoContinuar = textoSeguir || `Segu\xED escribiendo: buscamos desde ${minimo} caracteres.`;
   const idOpcion = (posicion) => `${idLista}-opcion-${posicion}`;
-  return /* @__PURE__ */ jsxs74(Fragment14, { children: [
-    boton && /* @__PURE__ */ jsxs74(
+  return /* @__PURE__ */ jsxs77(Fragment13, { children: [
+    boton && /* @__PURE__ */ jsxs77(
       "button",
       {
         type: "button",
@@ -8337,33 +9944,34 @@ function PaletaComandos({
         "aria-label": `${titulo2} \xB7 ${atajoTexto}`,
         "aria-haspopup": "dialog",
         title: `${titulo2} \xB7 ${atajoTexto}`,
-        className: "inline-flex h-9 items-center gap-2 rounded-lg border border-ink-500 px-3 text-sm text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
+        className: "toque-44 inline-flex min-h-11 items-center gap-2 rounded-lg border border-interactivo px-3 text-sm text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
         children: [
-          /* @__PURE__ */ jsx91(Icon, { name: "search", className: "h-4 w-4" }),
-          /* @__PURE__ */ jsx91("span", { className: "hidden sm:inline", children: textoBoton }),
-          mostrarAtajoEnBoton && /* @__PURE__ */ jsx91("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1.5 py-0.5 text-[10px] font-semibold text-mute", "aria-hidden": "true", children: atajoTexto })
+          /* @__PURE__ */ jsx95(Icon, { name: "search", className: "h-4 w-4" }),
+          /* @__PURE__ */ jsx95("span", { className: "hidden sm:inline", children: textoBoton }),
+          mostrarAtajoEnBoton && /* @__PURE__ */ jsx95("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1.5 py-0.5 text-[10px] font-semibold text-mute", "aria-hidden": "true", children: atajoTexto })
         ]
       }
     ),
-    visible && /* @__PURE__ */ jsx91(
+    visible && /* @__PURE__ */ jsx95(
       "div",
       {
         className: "fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-3 sm:p-6",
-        onMouseDown: (event) => event.target === event.currentTarget && cerrar(),
+        onMouseDown: (event) => event.target === event.currentTarget && requestClose(),
         onKeyDown,
-        children: /* @__PURE__ */ jsxs74(
+        children: /* @__PURE__ */ jsxs77(
           "div",
           {
             ref: raiz,
             role: "dialog",
-            "aria-modal": "true",
+            "aria-modal": esSuperior ? "true" : void 0,
             "aria-label": titulo2,
+            tabIndex: -1,
             className: cn("mt-[8vh] w-full max-w-xl overflow-hidden rounded-2xl border border-ink-600 bg-ink shadow-float", className),
             children: [
-              /* @__PURE__ */ jsx91("div", { className: "border-b border-ink-600 p-3", children: /* @__PURE__ */ jsx91(
+              /* @__PURE__ */ jsx95("div", { className: "border-b border-ink-600 p-3", children: /* @__PURE__ */ jsx95(
                 SearchField_default,
                 {
-                  ref: entrada,
+                  ref: entrada3,
                   value: consulta,
                   onChange: (event) => setConsulta(event.target.value),
                   placeholder,
@@ -8376,18 +9984,19 @@ function PaletaComandos({
                   autoComplete: "off"
                 }
               ) }),
-              /* @__PURE__ */ jsxs74("div", { id: idLista, className: "max-h-[50vh] min-h-[9rem] overflow-y-auto p-2", children: [
-                estado === "seguir" && /* @__PURE__ */ jsx91("p", { className: "px-2 py-6 text-center text-sm text-mute", children: textoContinuar }),
-                estado === "error" && /* @__PURE__ */ jsxs74("div", { className: "space-y-2 p-2", children: [
-                  /* @__PURE__ */ jsx91(Aviso, { tono: "error", compact: true, children: error }),
-                  /* @__PURE__ */ jsx91(Button, { type: "button", variant: "outline", onClick: () => setIntento((actual) => actual + 1), children: "Reintentar" })
+              /* @__PURE__ */ jsxs77("div", { id: idLista, className: "max-h-[50vh] min-h-[9rem] overflow-y-auto p-2", children: [
+                estado === "seguir" && /* @__PURE__ */ jsx95("p", { role: "status", className: "px-2 py-6 text-center text-sm text-mute", children: textoContinuar }),
+                estado === "error" && /* @__PURE__ */ jsxs77("div", { className: "space-y-2 p-2", children: [
+                  /* @__PURE__ */ jsx95(Aviso, { tono: "error", compact: true, children: error }),
+                  /* @__PURE__ */ jsx95(Button, { type: "button", variant: "outline", onClick: () => setIntento((actual) => actual + 1), children: "Reintentar" })
                 ] }),
-                estado === "cargando" && /* @__PURE__ */ jsxs74("div", { className: "space-y-2 p-2", "aria-busy": "true", children: [
-                  /* @__PURE__ */ jsx91(Skeleton, { className: "h-4 w-1/3" }),
-                  /* @__PURE__ */ jsx91(Skeleton, { className: "h-9 w-full" }),
-                  /* @__PURE__ */ jsx91(Skeleton, { className: "h-9 w-full" })
+                estado === "cargando" && /* @__PURE__ */ jsxs77("div", { className: "space-y-2 p-2", role: "status", "aria-live": "polite", "aria-busy": "true", children: [
+                  /* @__PURE__ */ jsx95("span", { className: "sr-only", children: "Buscando\u2026" }),
+                  /* @__PURE__ */ jsx95(Skeleton, { className: "h-4 w-1/3" }),
+                  /* @__PURE__ */ jsx95(Skeleton, { className: "h-9 w-full" }),
+                  /* @__PURE__ */ jsx95(Skeleton, { className: "h-9 w-full" })
                 ] }),
-                estado === "vacio" && /* @__PURE__ */ jsx91(
+                estado === "vacio" && /* @__PURE__ */ jsx95("div", { role: "status", children: /* @__PURE__ */ jsx95(
                   EmptyState,
                   {
                     compact: true,
@@ -8395,54 +10004,61 @@ function PaletaComandos({
                     title: textoSinResultados,
                     description: descripcionVacio || `No encontramos nada para \xAB${termino}\xBB. Prob\xE1 con otro nombre o n\xFAmero.`
                   }
-                ),
-                estado === "listo" && /* @__PURE__ */ jsx91("div", { role: "listbox", "aria-label": "Resultados de la b\xFAsqueda", children: grupos.map((grupo) => /* @__PURE__ */ jsxs74("section", { role: "group", "aria-label": grupo.etiqueta, children: [
-                  /* @__PURE__ */ jsx91("p", { className: "px-2 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-mute", children: grupo.etiqueta }),
-                  grupo.items.map((item) => {
-                    const posicion = indice.get(item) ?? 0;
-                    const esActivo = posicion === activo;
-                    return /* @__PURE__ */ jsxs74(
-                      "button",
-                      {
-                        id: idOpcion(posicion),
-                        type: "button",
-                        role: "option",
-                        "aria-selected": esActivo,
-                        "data-paleta-index": posicion,
-                        "data-activo": esActivo ? "true" : void 0,
-                        onMouseEnter: () => setActivo(posicion),
-                        onClick: () => elegir(item),
-                        className: cn(
-                          "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition",
-                          esActivo ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
-                        ),
-                        children: [
-                          /* @__PURE__ */ jsx91(Icon, { name: item.icono || grupo.icono, className: "h-4 w-4 shrink-0" }),
-                          /* @__PURE__ */ jsxs74("span", { className: "min-w-0 flex-1", children: [
-                            /* @__PURE__ */ jsx91("span", { className: "block truncate font-medium text-fore", children: item.titulo }),
-                            item.detalle && /* @__PURE__ */ jsx91("span", { className: "block truncate text-xs text-mute", children: item.detalle })
-                          ] }),
-                          /* @__PURE__ */ jsx91(Icon, { name: "back", className: "h-3.5 w-3.5 shrink-0 rotate-180 text-mute" })
-                        ]
-                      },
-                      item.id ?? `${grupo.tipo}-${posicion}`
-                    );
-                  })
-                ] }, grupo.tipo)) })
+                ) }),
+                estado === "listo" && /* @__PURE__ */ jsxs77(Fragment13, { children: [
+                  /* @__PURE__ */ jsxs77("span", { className: "sr-only", role: "status", "aria-live": "polite", children: [
+                    planos.length,
+                    " resultado",
+                    planos.length === 1 ? "" : "s"
+                  ] }),
+                  /* @__PURE__ */ jsx95("div", { role: "listbox", "aria-label": "Resultados de la b\xFAsqueda", children: grupos.map((grupo) => /* @__PURE__ */ jsxs77("section", { role: "group", "aria-label": grupo.etiqueta, children: [
+                    /* @__PURE__ */ jsx95("p", { className: "px-2 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-mute", children: grupo.etiqueta }),
+                    grupo.items.map((item) => {
+                      const posicion = indice.get(item) ?? 0;
+                      const esActivo = posicion === activo;
+                      return /* @__PURE__ */ jsxs77(
+                        "button",
+                        {
+                          id: idOpcion(posicion),
+                          type: "button",
+                          role: "option",
+                          "aria-selected": esActivo,
+                          "data-paleta-index": posicion,
+                          "data-activo": esActivo ? "true" : void 0,
+                          onMouseEnter: () => setActivo(posicion),
+                          onClick: () => elegir(item),
+                          className: cn(
+                            "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition",
+                            esActivo ? "bg-fono/10 text-fore" : "text-mute hover:bg-ink-700/60 hover:text-fore"
+                          ),
+                          children: [
+                            /* @__PURE__ */ jsx95(Icon, { name: item.icono || grupo.icono, className: "h-4 w-4 shrink-0" }),
+                            /* @__PURE__ */ jsxs77("span", { className: "min-w-0 flex-1", children: [
+                              /* @__PURE__ */ jsx95("span", { className: "block truncate font-medium text-fore", children: item.titulo }),
+                              item.detalle && /* @__PURE__ */ jsx95("span", { className: "block truncate text-xs text-mute", children: item.detalle })
+                            ] }),
+                            /* @__PURE__ */ jsx95(Icon, { name: "back", className: "h-3.5 w-3.5 shrink-0 rotate-180 text-mute" })
+                          ]
+                        },
+                        item.id ?? `${grupo.tipo}-${posicion}`
+                      );
+                    })
+                  ] }, grupo.tipo)) })
+                ] })
               ] }),
-              /* @__PURE__ */ jsxs74("p", { className: "flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-ink-600 px-3 py-2 text-[11px] text-mute", children: [
-                /* @__PURE__ */ jsxs74("span", { children: [
-                  /* @__PURE__ */ jsx91("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "\u2191" }),
+              /* @__PURE__ */ jsxs77("p", { className: "flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-ink-600 px-3 py-2 text-[11px] text-mute", children: [
+                /* @__PURE__ */ jsxs77("span", { children: [
+                  /* @__PURE__ */ jsx95("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "\u2191" }),
                   " ",
-                  /* @__PURE__ */ jsx91("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "\u2193" }),
+                  /* @__PURE__ */ jsx95("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "\u2193" }),
                   " moverse"
                 ] }),
-                /* @__PURE__ */ jsxs74("span", { children: [
-                  /* @__PURE__ */ jsx91("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "Enter" }),
+                /* @__PURE__ */ jsxs77("span", { children: [
+                  /* @__PURE__ */ jsx95("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "Enter" }),
                   " abrir"
                 ] }),
-                /* @__PURE__ */ jsxs74("span", { children: [
-                  /* @__PURE__ */ jsx91("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "Esc" }),
+                /* @__PURE__ */ jsxs77("span", { children: [
+                  /* @__PURE__ */ jsx95("kbd", { className: "rounded border border-ink-600 bg-ink-700 px-1", children: "Esc" }),
                   " cerrar"
                 ] })
               ] })
@@ -8455,8 +10071,8 @@ function PaletaComandos({
 }
 
 // src/components/AyudaModulo.jsx
-import { useState as useState29 } from "react";
-import { jsx as jsx92, jsxs as jsxs75 } from "react/jsx-runtime";
+import { useState as useState31 } from "react";
+import { jsx as jsx96, jsxs as jsxs78 } from "react/jsx-runtime";
 function AyudaModulo({
   titulo: titulo2,
   resumen,
@@ -8469,7 +10085,7 @@ function AyudaModulo({
   onCerrar,
   className
 }) {
-  const [interna, setInterna] = useState29(false);
+  const [interna, setInterna] = useState31(false);
   if (!titulo2 && !resumen) return null;
   const controlada = abierta !== void 0;
   const visible = controlada ? Boolean(abierta) : interna;
@@ -8482,8 +10098,8 @@ function AyudaModulo({
     onCerrar?.();
   };
   const encabezado = tituloDialogo || `${etiquetaBoton} \xB7 ${titulo2 || "Ayuda"}`;
-  return /* @__PURE__ */ jsxs75("div", { className: cn("inline-flex", className), children: [
-    /* @__PURE__ */ jsx92(
+  return /* @__PURE__ */ jsxs78("div", { className: cn("inline-flex", className), children: [
+    /* @__PURE__ */ jsx96(
       "button",
       {
         type: "button",
@@ -8492,16 +10108,16 @@ function AyudaModulo({
         "aria-haspopup": "dialog",
         title: encabezado,
         className: "grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-sm font-bold text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
-        children: /* @__PURE__ */ jsx92("span", { "aria-hidden": "true", children: "?" })
+        children: /* @__PURE__ */ jsx96("span", { "aria-hidden": "true", children: "?" })
       }
     ),
-    /* @__PURE__ */ jsx92(Modal, { open: visible, onClose: cerrar, title: encabezado, size: "formulario", children: /* @__PURE__ */ jsxs75("div", { className: "space-y-4", children: [
-      resumen && /* @__PURE__ */ jsx92("p", { className: "text-sm leading-6 text-mute", children: resumen }),
-      puntos.length > 0 && /* @__PURE__ */ jsx92("ul", { className: "space-y-2", children: puntos.map((punto) => /* @__PURE__ */ jsxs75("li", { className: "flex items-start gap-2 text-sm leading-5 text-fore", children: [
-        /* @__PURE__ */ jsx92(Icon, { name: "check", className: "mt-0.5 h-3.5 w-3.5 shrink-0 text-ok-text" }),
-        /* @__PURE__ */ jsx92("span", { className: "min-w-0", children: punto })
+    /* @__PURE__ */ jsx96(Modal, { open: visible, onClose: cerrar, title: encabezado, size: "formulario", children: /* @__PURE__ */ jsxs78("div", { className: "space-y-4", children: [
+      resumen && /* @__PURE__ */ jsx96("p", { className: "text-sm leading-6 text-mute", children: resumen }),
+      puntos.length > 0 && /* @__PURE__ */ jsx96("ul", { className: "space-y-2", children: puntos.map((punto) => /* @__PURE__ */ jsxs78("li", { className: "flex items-start gap-2 text-sm leading-5 text-fore", children: [
+        /* @__PURE__ */ jsx96(Icon, { name: "check", className: "mt-0.5 h-3.5 w-3.5 shrink-0 text-ok-text" }),
+        /* @__PURE__ */ jsx96("span", { className: "min-w-0", children: punto })
       ] }, punto)) }),
-      enlaces.length > 0 && /* @__PURE__ */ jsx92("nav", { "aria-label": `Ir a otro m\xF3dulo desde ${titulo2 || "la ayuda"}`, className: "grid gap-1.5 border-t border-ink-600 pt-3", children: enlaces.map((enlace) => /* @__PURE__ */ jsxs75(
+      enlaces.length > 0 && /* @__PURE__ */ jsx96("nav", { "aria-label": `Ir a otro m\xF3dulo desde ${titulo2 || "la ayuda"}`, className: "grid gap-1.5 border-t border-ink-600 pt-3", children: enlaces.map((enlace) => /* @__PURE__ */ jsxs78(
         "a",
         {
           href: enlace.href,
@@ -8511,19 +10127,19 @@ function AyudaModulo({
           },
           className: "flex items-center justify-between gap-2 rounded-lg border border-ink-600 px-3 py-2 text-sm font-medium text-fore transition hover:border-fono hover:bg-fono/10",
           children: [
-            /* @__PURE__ */ jsx92("span", { className: "min-w-0 truncate", children: enlace.etiqueta }),
-            /* @__PURE__ */ jsx92(Icon, { name: "external", className: "h-3.5 w-3.5 shrink-0 text-mute" })
+            /* @__PURE__ */ jsx96("span", { className: "min-w-0 truncate", children: enlace.etiqueta }),
+            /* @__PURE__ */ jsx96(Icon, { name: "external", className: "h-3.5 w-3.5 shrink-0 text-mute" })
           ]
         },
         enlace.href || enlace.etiqueta
       )) }),
-      /* @__PURE__ */ jsx92("div", { className: "flex justify-end border-t border-ink-600 pt-3", children: /* @__PURE__ */ jsx92(Button, { type: "button", variant: "outline", onClick: cerrar, children: "Cerrar" }) })
+      /* @__PURE__ */ jsx96("div", { className: "flex justify-end border-t border-ink-600 pt-3", children: /* @__PURE__ */ jsx96(Button, { type: "button", variant: "outline", onClick: cerrar, children: "Cerrar" }) })
     ] }) })
   ] });
 }
 
 // src/components/BarraInferior.jsx
-import { Fragment as Fragment15, jsx as jsx93, jsxs as jsxs76 } from "react/jsx-runtime";
+import { Fragment as Fragment14, jsx as jsx97, jsxs as jsxs79 } from "react/jsx-runtime";
 var ESPACIO_BARRA_INFERIOR = "pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0";
 function BarraInferior({
   items = [],
@@ -8544,7 +10160,7 @@ function BarraInferior({
     "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-[10px] font-semibold transition",
     esActivo ? "text-fono-light" : "text-mute hover:text-fore"
   );
-  return /* @__PURE__ */ jsxs76(
+  return /* @__PURE__ */ jsxs79(
     "nav",
     {
       "aria-label": ariaLabel,
@@ -8555,16 +10171,16 @@ function BarraInferior({
       children: [
         visibles.map((item) => {
           const esActivo = item.id === activo;
-          const contenido = /* @__PURE__ */ jsxs76(Fragment15, { children: [
-            /* @__PURE__ */ jsxs76("span", { className: "relative", children: [
-              item.icono && /* @__PURE__ */ jsx93(Icon, { name: item.icono, className: "h-[18px] w-[18px]" }),
-              item.contador != null && item.contador !== 0 && /* @__PURE__ */ jsx93("span", { className: "absolute -right-2 -top-1.5 rounded-full bg-fono px-1 text-[9px] font-bold tabular-nums text-onbrand", children: item.contador })
+          const contenido = /* @__PURE__ */ jsxs79(Fragment14, { children: [
+            /* @__PURE__ */ jsxs79("span", { className: "relative", children: [
+              item.icono && /* @__PURE__ */ jsx97(Icon, { name: item.icono, className: "h-[18px] w-[18px]" }),
+              item.contador != null && item.contador !== 0 && /* @__PURE__ */ jsx97("span", { className: "absolute -right-2 -top-1.5 rounded-full bg-fono px-1 text-[9px] font-bold tabular-nums text-onbrand", children: item.contador })
             ] }),
-            /* @__PURE__ */ jsx93("span", { className: "max-w-full truncate", children: item.etiqueta })
+            /* @__PURE__ */ jsx97("span", { className: "max-w-full truncate", children: item.etiqueta })
           ] });
           const titulo2 = item.title || item.etiqueta;
           const clase = cn(claseItem(esActivo), "h-14");
-          return item.href ? /* @__PURE__ */ jsx93(
+          return item.href ? /* @__PURE__ */ jsx97(
             "a",
             {
               href: item.href,
@@ -8576,7 +10192,7 @@ function BarraInferior({
               children: contenido
             },
             item.id ?? item.href
-          ) : /* @__PURE__ */ jsx93(
+          ) : /* @__PURE__ */ jsx97(
             "button",
             {
               type: "button",
@@ -8593,7 +10209,7 @@ function BarraInferior({
             item.id ?? item.etiqueta
           );
         }),
-        onMas && /* @__PURE__ */ jsxs76(
+        onMas && /* @__PURE__ */ jsxs79(
           "button",
           {
             type: "button",
@@ -8604,8 +10220,8 @@ function BarraInferior({
             title: masEtiqueta,
             className: cn(claseItem(menuAbierto), "h-14"),
             children: [
-              /* @__PURE__ */ jsx93(Icon, { name: masIcono, className: "h-[18px] w-[18px]" }),
-              /* @__PURE__ */ jsx93("span", { className: "max-w-full truncate", children: masEtiqueta })
+              /* @__PURE__ */ jsx97(Icon, { name: masIcono, className: "h-[18px] w-[18px]" }),
+              /* @__PURE__ */ jsx97("span", { className: "max-w-full truncate", children: masEtiqueta })
             ]
           }
         )
@@ -8615,7 +10231,7 @@ function BarraInferior({
 }
 
 // src/components/PersonaChip.jsx
-import { useEffect as useEffect17, useState as useState30 } from "react";
+import { useEffect as useEffect21, useState as useState32 } from "react";
 
 // src/utils/identidad.js
 var primerTexto = (...valores) => {
@@ -8655,7 +10271,7 @@ function resumenPresencia(personas = []) {
 }
 
 // src/components/PersonaChip.jsx
-import { jsx as jsx94, jsxs as jsxs77 } from "react/jsx-runtime";
+import { jsx as jsx98, jsxs as jsxs80 } from "react/jsx-runtime";
 function PersonaChip({
   user,
   foto,
@@ -8676,15 +10292,15 @@ function PersonaChip({
   const presencia = ESTADOS_PRESENCIA[estado] || null;
   const local = foto ?? (identidad.hasAvatar === false ? "" : identidad.fotoLocal);
   const google = picture ?? identidad.picture;
-  const [localRota, setLocalRota] = useState30(false);
-  useEffect17(() => {
+  const [localRota, setLocalRota] = useState32(false);
+  useEffect21(() => {
     setLocalRota(false);
   }, [local]);
   const src = !localRota && local ? local : google;
   const etiqueta = title || [identidad.nombre, presencia?.etiqueta, identidad.scope].filter(Boolean).join(" \xB7 ");
-  return /* @__PURE__ */ jsxs77("span", { "data-testid": "persona-chip", className: cn("inline-flex min-w-0 items-center gap-2", className), title: etiqueta, children: [
-    /* @__PURE__ */ jsxs77("span", { className: "relative inline-flex shrink-0", children: [
-      /* @__PURE__ */ jsx94(
+  return /* @__PURE__ */ jsxs80("span", { "data-testid": "persona-chip", className: cn("inline-flex min-w-0 items-center gap-2", className), title: etiqueta, children: [
+    /* @__PURE__ */ jsxs80("span", { className: "relative inline-flex shrink-0", children: [
+      /* @__PURE__ */ jsx98(
         Avatar,
         {
           nombre: identidad.nombre,
@@ -8696,15 +10312,15 @@ function PersonaChip({
           title: etiqueta
         }
       ),
-      presencia ? /* @__PURE__ */ jsx94("i", { "aria-hidden": true, className: cn("absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-1 ring-paper", presencia.punto) }) : null
+      presencia ? /* @__PURE__ */ jsx98("i", { "aria-hidden": true, className: cn("absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-1 ring-paper", presencia.punto) }) : null
     ] }),
-    nombre ? /* @__PURE__ */ jsx94("span", { className: cn("min-w-0", CELDA_IDENTIDAD_GRANDE, textoClassName), children: visible }) : null,
-    children ? /* @__PURE__ */ jsx94("span", { className: CELDA_DATO, children }) : null
+    nombre ? /* @__PURE__ */ jsx98("span", { className: cn("min-w-0", CELDA_IDENTIDAD_GRANDE, textoClassName), children: visible }) : null,
+    children ? /* @__PURE__ */ jsx98("span", { className: CELDA_DATO, children }) : null
   ] });
 }
 
 // src/components/PilaPersonas.jsx
-import { Fragment as Fragment16, jsx as jsx95, jsxs as jsxs78 } from "react/jsx-runtime";
+import { Fragment as Fragment15, jsx as jsx99, jsxs as jsxs81 } from "react/jsx-runtime";
 function PilaPersonas({
   personas = [],
   max = 4,
@@ -8720,12 +10336,12 @@ function PilaPersonas({
   const visibles = lista.slice(0, Math.max(0, max));
   const restantes = lista.length - visibles.length;
   const texto = title || resumenPresencia(lista);
-  const contenido = /* @__PURE__ */ jsxs78(Fragment16, { children: [
-    /* @__PURE__ */ jsxs78("span", { className: "flex -space-x-2", children: [
+  const contenido = /* @__PURE__ */ jsxs81(Fragment15, { children: [
+    /* @__PURE__ */ jsxs81("span", { className: "flex -space-x-2", children: [
       visibles.map((persona, indice) => {
         const fuente = typeof persona === "string" ? { name: persona } : persona || {};
         const identidad = identidadDeUsuario(fuente);
-        return /* @__PURE__ */ jsx95(
+        return /* @__PURE__ */ jsx99(
           PersonaChip,
           {
             user: fuente,
@@ -8740,7 +10356,7 @@ function PilaPersonas({
           fuente.id ?? `${identidad.nombre}-${indice}`
         );
       }),
-      restantes > 0 && /* @__PURE__ */ jsxs78(
+      restantes > 0 && /* @__PURE__ */ jsxs81(
         "span",
         {
           className: cn(
@@ -8755,14 +10371,14 @@ function PilaPersonas({
         }
       )
     ] }),
-    resumen && texto ? /* @__PURE__ */ jsx95("span", { className: "whitespace-nowrap text-xs font-semibold text-mute", children: texto }) : null
+    resumen && texto ? /* @__PURE__ */ jsx99("span", { className: "whitespace-nowrap text-xs font-semibold text-mute", children: texto }) : null
   ] });
   const clases = "flex items-center gap-2 rounded-full border border-fore/10 bg-ink-700/60 px-2.5 py-1";
-  return onMas ? /* @__PURE__ */ jsx95("button", { type: "button", onClick: onMas, className: cn(clases, className), "aria-label": texto || ariaLabel, title: texto, children: contenido }) : /* @__PURE__ */ jsx95("div", { role: "group", "aria-label": texto || ariaLabel, title: texto, className: cn(clases, className), children: contenido });
+  return onMas ? /* @__PURE__ */ jsx99("button", { type: "button", onClick: onMas, className: cn(clases, className), "aria-label": texto || ariaLabel, title: texto, children: contenido }) : /* @__PURE__ */ jsx99("div", { role: "group", "aria-label": texto || ariaLabel, title: texto, className: cn(clases, className), children: contenido });
 }
 
 // src/components/ImporteDelta.jsx
-import { jsx as jsx96 } from "react/jsx-runtime";
+import { jsx as jsx100 } from "react/jsx-runtime";
 function tonoDelta(valor, { invertir = false } = {}) {
   const numero = Number(valor);
   if (!Number.isFinite(numero) || numero === 0) return "mute";
@@ -8782,9 +10398,9 @@ function ImporteDelta({
 }) {
   const numero = Number(valor);
   const ausente = valor === null || valor === void 0 || valor === "" || !Number.isFinite(numero);
-  if (ausente) return /* @__PURE__ */ jsx96("span", { className: cn("tabular-nums text-mute", className), children: vacio });
+  if (ausente) return /* @__PURE__ */ jsx100("span", { className: cn("tabular-nums text-mute", className), children: vacio });
   const texto = formato === "porcentaje" ? `${signoDe(numero) ? `${signoDe(numero)} ` : ""}${formatPercent(Math.abs(numero))} %` : montoConSigno(numero, moneda, vacio, { simbolo });
-  return /* @__PURE__ */ jsx96(
+  return /* @__PURE__ */ jsx100(
     "span",
     {
       className: cn(
@@ -8798,7 +10414,7 @@ function ImporteDelta({
 }
 
 // src/components/IndicadorConexion.jsx
-import { jsx as jsx97, jsxs as jsxs79 } from "react/jsx-runtime";
+import { jsx as jsx101, jsxs as jsxs82 } from "react/jsx-runtime";
 function IndicadorConexion({
   enLinea = true,
   pendientes = 0,
@@ -8815,7 +10431,7 @@ function IndicadorConexion({
   const texto = sincronizando ? etiquetaSincronizando : enLinea ? etiquetaEnLinea : etiquetaSinConexion;
   const detalle = cuenta > 0 ? `${formatoNumero(cuenta)} ${cuenta === 1 ? "pendiente" : "pendientes"} de subir` : "";
   const titulo2 = [texto, detalle].filter(Boolean).join(" \xB7 ");
-  const boton = onSincronizar && cuenta > 0 && /* @__PURE__ */ jsxs79(
+  const boton = onSincronizar && cuenta > 0 && /* @__PURE__ */ jsxs82(
     "button",
     {
       type: "button",
@@ -8828,13 +10444,13 @@ function IndicadorConexion({
         variante === "banner" ? "border-current/40 hover:bg-fore/10" : "border-ink-500 text-mute hover:border-fono hover:text-fore"
       ),
       children: [
-        /* @__PURE__ */ jsx97(Icon, { name: "refresh", className: cn("h-3.5 w-3.5", sincronizando && "animate-spin") }),
+        /* @__PURE__ */ jsx101(Icon, { name: "refresh", className: cn("h-3.5 w-3.5", sincronizando && "animate-spin") }),
         "Sincronizar"
       ]
     }
   );
   if (variante === "banner") {
-    return /* @__PURE__ */ jsxs79(
+    return /* @__PURE__ */ jsxs82(
       "div",
       {
         role: "status",
@@ -8846,18 +10462,18 @@ function IndicadorConexion({
           className
         ),
         children: [
-          /* @__PURE__ */ jsx97(Icon, { name: enLinea ? "refresh" : "alert", className: "h-4 w-4 shrink-0", "aria-hidden": "true" }),
-          /* @__PURE__ */ jsxs79("span", { children: [
+          /* @__PURE__ */ jsx101(Icon, { name: enLinea ? "refresh" : "alert", className: "h-4 w-4 shrink-0", "aria-hidden": "true" }),
+          /* @__PURE__ */ jsxs82("span", { children: [
             mensaje || texto,
             !mensaje && detalle ? ` \xB7 ${detalle}` : ""
           ] }),
-          !enLinea && !mensaje && /* @__PURE__ */ jsx97("span", { className: "hidden sm:inline", children: "Se sincroniza al reconectar." }),
+          !enLinea && !mensaje && /* @__PURE__ */ jsx101("span", { className: "hidden sm:inline", children: "Se sincroniza al reconectar." }),
           boton
         ]
       }
     );
   }
-  return /* @__PURE__ */ jsxs79(
+  return /* @__PURE__ */ jsxs82(
     "div",
     {
       role: "status",
@@ -8869,10 +10485,10 @@ function IndicadorConexion({
         className
       ),
       children: [
-        /* @__PURE__ */ jsx97(Dot, { color: enLinea ? "green" : "orange", pulse: sincronizando || !enLinea }),
-        /* @__PURE__ */ jsxs79("span", { className: "min-w-0 truncate font-medium", children: [
+        /* @__PURE__ */ jsx101(Dot, { color: enLinea ? "green" : "orange", pulse: sincronizando || !enLinea }),
+        /* @__PURE__ */ jsxs82("span", { className: "min-w-0 truncate font-medium", children: [
           texto,
-          detalle && /* @__PURE__ */ jsxs79("span", { className: "text-mute", children: [
+          detalle && /* @__PURE__ */ jsxs82("span", { className: "text-mute", children: [
             " \xB7 ",
             detalle
           ] })
@@ -8884,8 +10500,8 @@ function IndicadorConexion({
 }
 
 // src/components/CampanaAvisos.jsx
-import { useEffect as useEffect18, useRef as useRef16, useState as useState31 } from "react";
-import { Fragment as Fragment17, jsx as jsx98, jsxs as jsxs80 } from "react/jsx-runtime";
+import { useEffect as useEffect22, useId as useId21, useRef as useRef19, useState as useState33 } from "react";
+import { Fragment as Fragment16, jsx as jsx102, jsxs as jsxs83 } from "react/jsx-runtime";
 function contarSinLeer(avisos = []) {
   const conEstado = avisos.filter((aviso) => aviso && typeof aviso.leido === "boolean");
   if (conEstado.length) return conEstado.filter((aviso) => !aviso.leido).length;
@@ -8908,17 +10524,27 @@ function CampanaAvisos({
   pie,
   className
 }) {
-  const [abierto, setAbierto] = useState31(false);
-  const raiz = useRef16(null);
+  const [abierto, setAbierto] = useState33(false);
+  const raiz = useRef19(null);
+  const disparador = useRef19(null);
+  const panel = useRef19(null);
+  const tituloId = useId21();
   const sinLeer = contarSinLeer(avisos);
-  useEffect18(() => {
+  function cerrar({ devolverFoco = false } = {}) {
+    setAbierto(false);
+    if (devolverFoco) requestAnimationFrame(() => disparador.current?.focus());
+  }
+  useEffect22(() => {
     if (!abierto) return void 0;
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
-      setAbierto(false);
+      cerrar();
     };
     const cerrarEsc = (event) => {
-      if (event.key === "Escape") setAbierto(false);
+      if (event.key === "Escape") {
+        event.preventDefault();
+        cerrar({ devolverFoco: true });
+      }
     };
     document.addEventListener("mousedown", cerrarFuera);
     document.addEventListener("keydown", cerrarEsc);
@@ -8927,81 +10553,89 @@ function CampanaAvisos({
       document.removeEventListener("keydown", cerrarEsc);
     };
   }, [abierto]);
+  useEffect22(() => {
+    if (!abierto) return;
+    requestAnimationFrame(() => {
+      const primero = panel.current?.querySelector('a[href], button:not(:disabled), [tabindex]:not([tabindex="-1"])');
+      (primero || panel.current)?.focus();
+    });
+  }, [abierto]);
   function alternar() {
     setAbierto((actual) => {
-      if (!actual) onAbrir?.();
+      if (!actual) onAbrir?.(true);
       return !actual;
     });
   }
-  return /* @__PURE__ */ jsxs80("div", { ref: raiz, className: cn("relative", className), children: [
-    /* @__PURE__ */ jsxs80(
+  return /* @__PURE__ */ jsxs83("div", { ref: raiz, className: cn("relative", className), children: [
+    /* @__PURE__ */ jsxs83(
       "button",
       {
+        ref: disparador,
         type: "button",
         onClick: alternar,
         "data-testid": "campana-avisos",
-        "aria-label": ariaLabel,
-        "aria-haspopup": "menu",
+        "aria-label": sinLeer > 0 ? `${ariaLabel}, ${sinLeer} sin leer` : ariaLabel,
+        "aria-haspopup": "dialog",
         "aria-expanded": abierto,
         title: sinLeer > 0 ? `${ariaLabel} \xB7 ${sinLeer} sin leer` : ariaLabel,
-        className: "relative grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
+        className: "toque-44 relative grid h-11 w-11 place-items-center rounded-lg border border-interactivo text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore",
         children: [
-          /* @__PURE__ */ jsx98(Icon, { name: "bell", className: "h-4 w-4" }),
-          sinLeer > 0 && /* @__PURE__ */ jsx98("span", { className: "absolute -right-1 -top-1 rounded-full bg-bad px-1 text-[10px] font-bold tabular-nums text-white dark:text-onbrand", children: textoContador(sinLeer) })
+          /* @__PURE__ */ jsx102(Icon, { name: "bell", className: "h-4 w-4" }),
+          sinLeer > 0 && /* @__PURE__ */ jsx102("span", { className: "absolute -right-1 -top-1 rounded-full bg-bad px-1 text-[10px] font-bold tabular-nums text-white dark:text-onbrand", children: textoContador(sinLeer) })
         ]
       }
     ),
-    abierto && /* @__PURE__ */ jsxs80(
+    abierto && /* @__PURE__ */ jsxs83(
       "div",
       {
-        role: "menu",
-        "aria-label": titulo2,
+        ref: panel,
+        role: "dialog",
+        "aria-labelledby": tituloId,
+        tabIndex: -1,
         className: cn(
           "absolute z-30 mt-1 w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-ink-500 bg-ink shadow-float",
           anclaje === "left" ? "left-0" : "right-0"
         ),
         children: [
-          /* @__PURE__ */ jsxs80("header", { className: "flex items-center justify-between gap-2 border-b border-ink-600 px-3 py-2", children: [
-            /* @__PURE__ */ jsx98("p", { className: "text-sm font-semibold text-fore", children: titulo2 }),
-            sinLeer > 0 && /* @__PURE__ */ jsxs80("span", { className: "text-xs tabular-nums text-mute", children: [
+          /* @__PURE__ */ jsxs83("header", { className: "flex items-center justify-between gap-2 border-b border-ink-600 px-3 py-2", children: [
+            /* @__PURE__ */ jsx102("p", { id: tituloId, className: "text-sm font-semibold text-fore", children: titulo2 }),
+            sinLeer > 0 && /* @__PURE__ */ jsxs83("span", { className: "text-xs tabular-nums text-mute", children: [
               textoContador(sinLeer),
               " sin leer"
             ] })
           ] }),
-          /* @__PURE__ */ jsx98("div", { className: "max-h-80 overflow-y-auto p-1", children: avisos.length === 0 ? /* @__PURE__ */ jsx98(EmptyState, { compact: true, icon: "bell", title: vacioTitulo, description: vacioDetalle, action: vacioAccion }) : avisos.map((aviso) => {
+          /* @__PURE__ */ jsx102("div", { className: "max-h-80 overflow-y-auto p-1", children: avisos.length === 0 ? /* @__PURE__ */ jsx102(EmptyState, { compact: true, icon: "bell", title: vacioTitulo, description: vacioDetalle, action: vacioAccion }) : avisos.map((aviso) => {
             const tono = TONOS.punto[aviso.tono] || TONOS.punto.mute;
-            const contenido = /* @__PURE__ */ jsxs80(Fragment17, { children: [
-              /* @__PURE__ */ jsx98("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", tono), children: /* @__PURE__ */ jsx98(Icon, { name: aviso.icono || "bell", className: "h-3.5 w-3.5" }) }),
-              /* @__PURE__ */ jsxs80("span", { className: "min-w-0 flex-1", children: [
-                /* @__PURE__ */ jsx98("span", { className: cn("block truncate text-sm", aviso.leido === false ? "font-semibold text-fore" : "font-medium text-fore"), children: aviso.titulo }),
-                aviso.detalle && /* @__PURE__ */ jsx98("span", { className: "mt-0.5 block text-xs leading-5 text-mute", children: aviso.detalle }),
-                aviso.fecha && /* @__PURE__ */ jsx98("span", { className: "mt-1 block text-[10px] uppercase tracking-wide text-mute", children: aviso.fecha })
+            const contenido = /* @__PURE__ */ jsxs83(Fragment16, { children: [
+              /* @__PURE__ */ jsx102("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", tono), children: /* @__PURE__ */ jsx102(Icon, { name: aviso.icono || "bell", className: "h-3.5 w-3.5" }) }),
+              /* @__PURE__ */ jsxs83("span", { className: "min-w-0 flex-1", children: [
+                /* @__PURE__ */ jsx102("span", { className: cn("block truncate text-sm", aviso.leido === false ? "font-semibold text-fore" : "font-medium text-fore"), children: aviso.titulo }),
+                aviso.detalle && /* @__PURE__ */ jsx102("span", { className: "mt-0.5 block text-xs leading-5 text-mute", children: aviso.detalle }),
+                aviso.fecha && /* @__PURE__ */ jsx102("span", { className: "mt-1 block text-[10px] uppercase tracking-wide text-mute", children: aviso.fecha })
               ] })
             ] });
             const clases = "flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-ink-700/60";
             const ruta = aviso.href ?? aviso.destino;
-            return ruta ? /* @__PURE__ */ jsx98(
+            return ruta ? /* @__PURE__ */ jsx102(
               "a",
               {
-                role: "menuitem",
                 href: ruta,
                 className: clases,
                 onClick: () => {
-                  setAbierto(false);
+                  cerrar({ devolverFoco: true });
                   onElegir?.(aviso);
                   aviso.onClick?.();
                 },
                 children: contenido
               },
               aviso.id ?? aviso.titulo
-            ) : /* @__PURE__ */ jsx98(
+            ) : /* @__PURE__ */ jsx102(
               "button",
               {
                 type: "button",
-                role: "menuitem",
                 className: clases,
                 onClick: () => {
-                  setAbierto(false);
+                  cerrar({ devolverFoco: true });
                   onElegir?.(aviso);
                   aviso.onClick?.();
                 },
@@ -9010,7 +10644,7 @@ function CampanaAvisos({
               aviso.id ?? aviso.titulo
             );
           }) }),
-          pie && /* @__PURE__ */ jsx98("div", { className: "border-t border-ink-600 p-2", children: pie })
+          pie && /* @__PURE__ */ jsx102("div", { className: "border-t border-ink-600 p-2", children: pie })
         ]
       }
     )
@@ -9018,7 +10652,7 @@ function CampanaAvisos({
 }
 
 // src/components/GraficoBarras.jsx
-import { jsx as jsx99, jsxs as jsxs81 } from "react/jsx-runtime";
+import { jsx as jsx103, jsxs as jsxs84 } from "react/jsx-runtime";
 var COLORES = {
   fono: "bg-fono",
   ok: "bg-ok",
@@ -9052,47 +10686,47 @@ function GraficoBarras({
   className
 }) {
   const formatear = formatoValor || ((valor) => formatoNumero(valor));
-  if (!datos.length) return /* @__PURE__ */ jsx99(EmptyState, { compact: true, icon: "chart", title: "Sin datos para graficar", className });
+  if (!datos.length) return /* @__PURE__ */ jsx103(EmptyState, { compact: true, icon: "chart", title: "Sin datos para graficar", className });
   const tope = maximoDeBarras(datos, max);
   const colorDe = (dato) => COLORES[dato.tono] || COLORES[tono] || COLORES.fono;
-  const listaAccesible = /* @__PURE__ */ jsx99("ul", { className: "sr-only", children: datos.map((dato, indice) => /* @__PURE__ */ jsx99("li", { children: `${dato.etiqueta}: ${formatear(dato.valor)}` }, dato.id ?? indice)) });
+  const listaAccesible = /* @__PURE__ */ jsx103("ul", { className: "sr-only", children: datos.map((dato, indice) => /* @__PURE__ */ jsx103("li", { children: `${dato.etiqueta}: ${formatear(dato.valor)}` }, dato.id ?? indice)) });
   if (orientacion === "horizontal") {
-    return /* @__PURE__ */ jsxs81("div", { className: cn("space-y-1.5", className), children: [
-      datos.map((dato, indice) => /* @__PURE__ */ jsxs81("div", { className: "flex items-center gap-2 text-xs", children: [
-        /* @__PURE__ */ jsx99("span", { className: "w-28 shrink-0 truncate text-mute", title: dato.etiqueta, children: dato.etiqueta }),
-        /* @__PURE__ */ jsx99(
+    return /* @__PURE__ */ jsxs84("div", { className: cn("space-y-1.5", className), children: [
+      datos.map((dato, indice) => /* @__PURE__ */ jsxs84("div", { className: "flex items-center gap-2 text-xs", children: [
+        /* @__PURE__ */ jsx103("span", { className: "w-28 shrink-0 truncate text-mute", title: dato.etiqueta, children: dato.etiqueta }),
+        /* @__PURE__ */ jsx103(
           "span",
           {
             className: "h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-fore/10",
             role: "img",
             "aria-label": `${dato.etiqueta}: ${formatear(dato.valor)}`,
             title: `${dato.etiqueta}: ${formatear(dato.valor)}`,
-            children: /* @__PURE__ */ jsx99("span", { className: cn("block h-full rounded-full transition-[width] duration-500", colorDe(dato)), style: { width: `${porcentajeBarra(dato.valor, tope)}%` } })
+            children: /* @__PURE__ */ jsx103("span", { className: cn("block h-full rounded-full transition-[width] duration-500", colorDe(dato)), style: { width: `${porcentajeBarra(dato.valor, tope)}%` } })
           }
         ),
-        mostrarValores && /* @__PURE__ */ jsx99("span", { className: "w-24 shrink-0 text-right font-semibold tabular-nums text-fore", children: formatear(dato.valor) })
+        mostrarValores && /* @__PURE__ */ jsx103("span", { className: "w-24 shrink-0 text-right font-semibold tabular-nums text-fore", children: formatear(dato.valor) })
       ] }, dato.id ?? indice)),
       listaAccesible
     ] });
   }
-  return /* @__PURE__ */ jsxs81("div", { className: cn("space-y-1", className), children: [
-    /* @__PURE__ */ jsx99("div", { className: "flex items-end gap-2", style: { height: altura }, role: "img", "aria-label": etiqueta, children: datos.map((dato, indice) => /* @__PURE__ */ jsx99("div", { className: "relative h-full min-w-0 flex-1", children: /* @__PURE__ */ jsx99(
+  return /* @__PURE__ */ jsxs84("div", { className: cn("space-y-1", className), children: [
+    /* @__PURE__ */ jsx103("div", { className: "flex items-end gap-2", style: { height: altura }, role: "img", "aria-label": etiqueta, children: datos.map((dato, indice) => /* @__PURE__ */ jsx103("div", { className: "relative h-full min-w-0 flex-1", children: /* @__PURE__ */ jsx103(
       "span",
       {
         className: cn("absolute inset-x-0 bottom-0 rounded-t-md transition-[height] duration-500", colorDe(dato)),
         style: { height: `${porcentajeBarra(dato.valor, tope)}%` },
         title: `${dato.etiqueta}: ${formatear(dato.valor)}`,
-        children: mostrarValores && /* @__PURE__ */ jsx99("span", { className: "absolute inset-x-0 -top-4 truncate text-center text-[10px] font-semibold tabular-nums text-mute", children: formatear(dato.valor) })
+        children: mostrarValores && /* @__PURE__ */ jsx103("span", { className: "absolute inset-x-0 -top-4 truncate text-center text-[10px] font-semibold tabular-nums text-mute", children: formatear(dato.valor) })
       }
     ) }, dato.id ?? indice)) }),
-    /* @__PURE__ */ jsx99("div", { className: "flex gap-2", children: datos.map((dato, indice) => /* @__PURE__ */ jsx99("span", { className: "min-w-0 flex-1 truncate text-center text-[10px] text-mute", title: dato.etiqueta, children: dato.etiqueta }, dato.id ?? indice)) }),
+    /* @__PURE__ */ jsx103("div", { className: "flex gap-2", children: datos.map((dato, indice) => /* @__PURE__ */ jsx103("span", { className: "min-w-0 flex-1 truncate text-center text-[10px] text-mute", title: dato.etiqueta, children: dato.etiqueta }, dato.id ?? indice)) }),
     listaAccesible
   ] });
 }
 
 // src/components/TableroKanban.jsx
-import { useCallback as useCallback4, useEffect as useEffect19, useMemo as useMemo12, useRef as useRef17, useState as useState32 } from "react";
-import { jsx as jsx100, jsxs as jsxs82 } from "react/jsx-runtime";
+import { useCallback as useCallback4, useEffect as useEffect23, useMemo as useMemo15, useRef as useRef20, useState as useState34 } from "react";
+import { jsx as jsx104, jsxs as jsxs85 } from "react/jsx-runtime";
 var SIN_MOVIMIENTOS = /* @__PURE__ */ new Set();
 function columnasDelTablero(columnas = [], tarjetas = []) {
   const declaradas = [...columnas || []];
@@ -9113,18 +10747,18 @@ function destinosDeTarjeta(tarjeta, columnas = []) {
   return (permitidos || []).filter((valor, indice) => valor !== tarjeta?.estado && permitidos.indexOf(valor) === indice);
 }
 function useTableroOptimista({ tarjetas = [], onMover, onError } = {}) {
-  const [overrides, setOverrides] = useState32({});
-  const [moviendo, setMoviendo] = useState32(SIN_MOVIMIENTOS);
-  const tarjetasRef = useRef17(tarjetas);
-  const overridesRef = useRef17(overrides);
-  const enVueloRef = useRef17(/* @__PURE__ */ new Set());
-  useEffect19(() => {
+  const [overrides, setOverrides] = useState34({});
+  const [moviendo, setMoviendo] = useState34(SIN_MOVIMIENTOS);
+  const tarjetasRef = useRef20(tarjetas);
+  const overridesRef = useRef20(overrides);
+  const enVueloRef = useRef20(/* @__PURE__ */ new Set());
+  useEffect23(() => {
     tarjetasRef.current = tarjetas;
   }, [tarjetas]);
-  useEffect19(() => {
+  useEffect23(() => {
     overridesRef.current = overrides;
   }, [overrides]);
-  useEffect19(() => {
+  useEffect23(() => {
     setOverrides((actual) => {
       const entradas = Object.entries(actual);
       if (entradas.length === 0) return actual;
@@ -9136,7 +10770,7 @@ function useTableroOptimista({ tarjetas = [], onMover, onError } = {}) {
       return Object.keys(siguiente).length === entradas.length ? actual : siguiente;
     });
   }, [tarjetas]);
-  const efectivas = useMemo12(
+  const efectivas = useMemo15(
     () => (tarjetas || []).map((tarjeta) => {
       const optimista = overrides[tarjeta.id];
       return optimista && optimista !== tarjeta.estado ? { ...tarjeta, estado: optimista } : tarjeta;
@@ -9214,10 +10848,10 @@ function TableroKanban({
   className
 }) {
   const { tarjetas: efectivas, moverA, moviendo } = useTableroOptimista({ tarjetas, onMover, onError });
-  const [arrastrandoId, setArrastrandoId] = useState32("");
-  const [sobreColumna, setSobreColumna] = useState32("");
-  const columnasReales = useMemo12(() => columnasDelTablero(columnas, efectivas), [columnas, efectivas]);
-  const grupos = useMemo12(() => agruparTarjetas(columnasReales, efectivas), [columnasReales, efectivas]);
+  const [arrastrandoId, setArrastrandoId] = useState34("");
+  const [sobreColumna, setSobreColumna] = useState34("");
+  const columnasReales = useMemo15(() => columnasDelTablero(columnas, efectivas), [columnas, efectivas]);
+  const grupos = useMemo15(() => agruparTarjetas(columnasReales, efectivas), [columnasReales, efectivas]);
   const arrastrando = arrastrandoId ? efectivas.find((tarjeta) => tarjeta.id === arrastrandoId) ?? null : null;
   const acepta = (tarjeta, valor) => Boolean(onMover && puedeMover && tarjeta && !moviendo.has(tarjeta.id) && destinosDeTarjeta(tarjeta, columnasReales).includes(valor));
   function terminarArrastre() {
@@ -9225,10 +10859,10 @@ function TableroKanban({
     setSobreColumna("");
   }
   const tituloDe = (valor) => columnasReales.find((columna) => columna.valor === valor)?.titulo ?? valor;
-  return /* @__PURE__ */ jsx100("div", { className: cn("flex snap-x gap-3 overflow-x-auto pb-2", className), role: "group", "aria-label": etiqueta, children: columnasReales.map((columna) => {
+  return /* @__PURE__ */ jsx104("div", { className: cn("flex snap-x gap-3 overflow-x-auto pb-2", className), role: "group", "aria-label": etiqueta, children: columnasReales.map((columna) => {
     const deLaColumna = grupos[columna.valor] ?? [];
     const sobre = sobreColumna === columna.valor && acepta(arrastrando, columna.valor);
-    return /* @__PURE__ */ jsxs82(
+    return /* @__PURE__ */ jsxs85(
       "section",
       {
         "aria-label": `${columna.titulo}: ${deLaColumna.length}`,
@@ -9251,17 +10885,17 @@ function TableroKanban({
           if (id) moverA(id, columna.valor);
         },
         children: [
-          /* @__PURE__ */ jsxs82("header", { className: "flex items-center gap-2 border-b border-ink-600 px-3 py-2", children: [
-            /* @__PURE__ */ jsx100("span", { className: cn("h-2 w-2 shrink-0 rounded-full", puntoDeTono(columna.tono)), "aria-hidden": "true" }),
-            /* @__PURE__ */ jsx100("h3", { className: "min-w-0 flex-1 truncate text-[11px] font-bold uppercase tracking-wider text-mute", children: columna.titulo }),
-            /* @__PURE__ */ jsx100("span", { className: "shrink-0 rounded-md bg-ink-700 px-1.5 text-[11px] font-bold tabular-nums text-mute", title: `${deLaColumna.length} tarjeta${deLaColumna.length === 1 ? "" : "s"}`, children: deLaColumna.length })
+          /* @__PURE__ */ jsxs85("header", { className: "flex items-center gap-2 border-b border-ink-600 px-3 py-2", children: [
+            /* @__PURE__ */ jsx104("span", { className: cn("h-2 w-2 shrink-0 rounded-full", puntoDeTono(columna.tono)), "aria-hidden": "true" }),
+            /* @__PURE__ */ jsx104("h3", { className: "min-w-0 flex-1 truncate text-[11px] font-bold uppercase tracking-wider text-mute", children: columna.titulo }),
+            /* @__PURE__ */ jsx104("span", { className: "shrink-0 rounded-md bg-ink-700 px-1.5 text-[11px] font-bold tabular-nums text-mute", title: `${deLaColumna.length} tarjeta${deLaColumna.length === 1 ? "" : "s"}`, children: deLaColumna.length })
           ] }),
-          /* @__PURE__ */ jsxs82("div", { className: "flex min-h-[3rem] flex-col gap-2 p-2", children: [
+          /* @__PURE__ */ jsxs85("div", { className: "flex min-h-[3rem] flex-col gap-2 p-2", children: [
             deLaColumna.map((tarjeta) => {
               const destinos = destinosDeTarjeta(tarjeta, columnasReales);
               const movible = Boolean(onMover && puedeMover && destinos.length > 0 && !moviendo.has(tarjeta.id));
               const tieneMonto = tarjeta.monto !== null && tarjeta.monto !== void 0;
-              return /* @__PURE__ */ jsxs82(
+              return /* @__PURE__ */ jsxs85(
                 "article",
                 {
                   className: cn(
@@ -9282,34 +10916,34 @@ function TableroKanban({
                   },
                   onDragEnd: terminarArrastre,
                   children: [
-                    /* @__PURE__ */ jsxs82("div", { className: "flex items-start justify-between gap-2", children: [
-                      /* @__PURE__ */ jsx100("strong", { className: "min-w-0 flex-1 truncate text-sm font-semibold text-fore", title: tarjeta.titulo, children: tarjeta.titulo }),
-                      tarjeta.acciones && /* @__PURE__ */ jsx100("span", { className: "shrink-0", children: tarjeta.acciones })
+                    /* @__PURE__ */ jsxs85("div", { className: "flex items-start justify-between gap-2", children: [
+                      /* @__PURE__ */ jsx104("strong", { className: "min-w-0 flex-1 truncate text-sm font-semibold text-fore", title: tarjeta.titulo, children: tarjeta.titulo }),
+                      tarjeta.acciones && /* @__PURE__ */ jsx104("span", { className: "shrink-0", children: tarjeta.acciones })
                     ] }),
-                    tarjeta.subtitulo && /* @__PURE__ */ jsx100("p", { className: "mt-0.5 truncate text-xs text-mute", title: tarjeta.subtitulo, children: tarjeta.subtitulo }),
-                    tarjeta.chips?.length > 0 && /* @__PURE__ */ jsx100("div", { className: "mt-1.5 flex flex-wrap items-center gap-1", children: tarjeta.chips.map((chip, indice) => /* @__PURE__ */ jsxs82(
+                    tarjeta.subtitulo && /* @__PURE__ */ jsx104("p", { className: "mt-0.5 truncate text-xs text-mute", title: tarjeta.subtitulo, children: tarjeta.subtitulo }),
+                    tarjeta.chips?.length > 0 && /* @__PURE__ */ jsx104("div", { className: "mt-1.5 flex flex-wrap items-center gap-1", children: tarjeta.chips.map((chip, indice) => /* @__PURE__ */ jsxs85(
                       "span",
                       {
                         title: chip.titulo ?? chip.etiqueta,
                         className: cn("inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10.5px] font-semibold", chipDeTono(chip.tono)),
                         children: [
-                          chip.icono && /* @__PURE__ */ jsx100(Icon, { name: chip.icono, className: "h-3 w-3", "aria-hidden": "true" }),
+                          chip.icono && /* @__PURE__ */ jsx104(Icon, { name: chip.icono, className: "h-3 w-3", "aria-hidden": "true" }),
                           chip.etiqueta
                         ]
                       },
                       chip.etiqueta ?? indice
                     )) }),
-                    (tieneMonto || tarjeta.fecha) && /* @__PURE__ */ jsxs82("div", { className: "mt-1.5 flex items-baseline justify-between gap-2", children: [
-                      tieneMonto && /* @__PURE__ */ jsxs82("span", { className: "min-w-0 truncate text-xs font-semibold tabular-nums text-fore", children: [
-                        /* @__PURE__ */ jsx100(Money, { value: tarjeta.monto }),
-                        tarjeta.montoNota && /* @__PURE__ */ jsx100("small", { className: "ml-1 font-normal text-mute", children: tarjeta.montoNota })
+                    (tieneMonto || tarjeta.fecha) && /* @__PURE__ */ jsxs85("div", { className: "mt-1.5 flex items-baseline justify-between gap-2", children: [
+                      tieneMonto && /* @__PURE__ */ jsxs85("span", { className: "min-w-0 truncate text-xs font-semibold tabular-nums text-fore", children: [
+                        /* @__PURE__ */ jsx104(Money, { value: tarjeta.monto }),
+                        tarjeta.montoNota && /* @__PURE__ */ jsx104("small", { className: "ml-1 font-normal text-mute", children: tarjeta.montoNota })
                       ] }),
-                      tarjeta.fecha && /* @__PURE__ */ jsx100("span", { className: cn("shrink-0 text-[11px] tabular-nums text-mute", !tieneMonto && "ml-auto"), title: tarjeta.fechaTitulo, children: fechaDia(tarjeta.fecha) })
+                      tarjeta.fecha && /* @__PURE__ */ jsx104("span", { className: cn("shrink-0 text-[11px] tabular-nums text-mute", !tieneMonto && "ml-auto"), title: tarjeta.fechaTitulo, children: fechaDia(tarjeta.fecha) })
                     ] }),
-                    tarjeta.detalle && /* @__PURE__ */ jsx100("p", { className: "mt-1 text-[11px] leading-4 text-mute", children: tarjeta.detalle }),
-                    movible && /* @__PURE__ */ jsxs82("div", { className: "mt-2", onDragStart: (event) => event.preventDefault(), children: [
-                      /* @__PURE__ */ jsx100("label", { className: "sr-only", htmlFor: `mover-${tarjeta.id}`, children: `Mover ${tarjeta.titulo} a otro estado` }),
-                      /* @__PURE__ */ jsxs82(
+                    tarjeta.detalle && /* @__PURE__ */ jsx104("p", { className: "mt-1 text-[11px] leading-4 text-mute", children: tarjeta.detalle }),
+                    movible && /* @__PURE__ */ jsxs85("div", { className: "mt-2", onDragStart: (event) => event.preventDefault(), children: [
+                      /* @__PURE__ */ jsx104("label", { className: "sr-only", htmlFor: `mover-${tarjeta.id}`, children: `Mover ${tarjeta.titulo} a otro estado` }),
+                      /* @__PURE__ */ jsxs85(
                         "select",
                         {
                           id: `mover-${tarjeta.id}`,
@@ -9323,8 +10957,8 @@ function TableroKanban({
                             "outline-none transition focus:border-fono focus:ring-1 focus:ring-fono/40 [&>option]:bg-ink-800 [&>option]:text-fore"
                           ),
                           children: [
-                            /* @__PURE__ */ jsx100("option", { value: "", children: etiquetaMover }),
-                            destinos.map((valor) => /* @__PURE__ */ jsx100("option", { value: valor, children: tituloDe(valor) }, valor))
+                            /* @__PURE__ */ jsx104("option", { value: "", children: etiquetaMover }),
+                            destinos.map((valor) => /* @__PURE__ */ jsx104("option", { value: valor, children: tituloDe(valor) }, valor))
                           ]
                         }
                       )
@@ -9334,7 +10968,7 @@ function TableroKanban({
                 tarjeta.id
               );
             }),
-            deLaColumna.length === 0 && /* @__PURE__ */ jsx100("p", { className: "px-2 py-6 text-center text-xs text-mute", children: textoVacio })
+            deLaColumna.length === 0 && /* @__PURE__ */ jsx104("p", { className: "px-2 py-6 text-center text-xs text-mute", children: textoVacio })
           ] })
         ]
       },
@@ -9344,7 +10978,7 @@ function TableroKanban({
 }
 
 // src/components/Cronologia.jsx
-import { jsx as jsx101, jsxs as jsxs83 } from "react/jsx-runtime";
+import { jsx as jsx105, jsxs as jsxs86 } from "react/jsx-runtime";
 var ICONOS_HITO = {
   creado: "plus",
   actualizado: "edit",
@@ -9447,18 +11081,18 @@ function FilaHito({ hito, iconos, tonos, etiquetas, mostrarTipo }) {
   const tono = hito.tono || tonos[tipo] || "mute";
   const icono = hito.icono || iconos[tipo] || "info";
   const etiqueta = mostrarTipo ? etiquetaDeHito(tipo, etiquetas) : "";
-  return /* @__PURE__ */ jsxs83("li", { className: "flex gap-3", children: [
-    /* @__PURE__ */ jsx101("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", puntoDeTono(tono)), "aria-hidden": "true", children: /* @__PURE__ */ jsx101(Icon, { name: icono, className: "h-3.5 w-3.5" }) }),
-    /* @__PURE__ */ jsxs83("div", { className: "min-w-0 flex-1 border-b border-ink-700 pb-2.5", children: [
-      /* @__PURE__ */ jsxs83("p", { className: "text-sm font-semibold text-fore", children: [
-        /* @__PURE__ */ jsx101("span", { className: "break-words", children: hito.titulo }),
-        hito.actor && /* @__PURE__ */ jsxs83("span", { className: "font-normal text-mute", children: [
+  return /* @__PURE__ */ jsxs86("li", { className: "flex gap-3", children: [
+    /* @__PURE__ */ jsx105("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", puntoDeTono(tono)), "aria-hidden": "true", children: /* @__PURE__ */ jsx105(Icon, { name: icono, className: "h-3.5 w-3.5" }) }),
+    /* @__PURE__ */ jsxs86("div", { className: "min-w-0 flex-1 border-b border-ink-700 pb-2.5", children: [
+      /* @__PURE__ */ jsxs86("p", { className: "text-sm font-semibold text-fore", children: [
+        /* @__PURE__ */ jsx105("span", { className: "break-words", children: hito.titulo }),
+        hito.actor && /* @__PURE__ */ jsxs86("span", { className: "font-normal text-mute", children: [
           " \xB7 ",
           hito.actor
         ] })
       ] }),
-      hito.detalle && /* @__PURE__ */ jsx101("p", { className: "mt-0.5 text-xs leading-5 text-mute", children: hito.detalle }),
-      /* @__PURE__ */ jsx101("p", { className: "mt-0.5 text-[11px] tabular-nums text-mute", children: [fechaDelHito(hito.fecha), etiqueta].filter(Boolean).join(" \xB7 ") })
+      hito.detalle && /* @__PURE__ */ jsx105("p", { className: "mt-0.5 text-xs leading-5 text-mute", children: hito.detalle }),
+      /* @__PURE__ */ jsx105("p", { className: "mt-0.5 text-[11px] tabular-nums text-mute", children: [fechaDelHito(hito.fecha), etiqueta].filter(Boolean).join(" \xB7 ") })
     ] })
   ] });
 }
@@ -9491,62 +11125,63 @@ function Cronologia({
   vacioDetalle,
   className
 }) {
-  const fila = (hito) => /* @__PURE__ */ jsx101(FilaHito, { hito, iconos, tonos, etiquetas, mostrarTipo }, hito.id);
-  const cabecera = onActualizar ? /* @__PURE__ */ jsxs83("div", { className: "mb-3 flex flex-wrap items-center justify-between gap-2", children: [
-    textoCabecera ? /* @__PURE__ */ jsx101("p", { className: "text-xs text-mute", children: textoCabecera }) : null,
-    /* @__PURE__ */ jsx101(
+  const fila = (hito) => /* @__PURE__ */ jsx105(FilaHito, { hito, iconos, tonos, etiquetas, mostrarTipo }, hito.id);
+  const cabecera = onActualizar ? /* @__PURE__ */ jsxs86("div", { className: "mb-3 flex flex-wrap items-center justify-between gap-2", children: [
+    textoCabecera ? /* @__PURE__ */ jsx105("p", { className: "text-xs text-mute", children: textoCabecera }) : null,
+    /* @__PURE__ */ jsx105(
       "button",
       {
         type: "button",
         disabled: cargando,
         onClick: onActualizar,
-        className: "rounded-lg border border-ink-500 px-3 py-1.5 text-xs font-semibold text-mute transition hover:border-fono hover:text-fore disabled:opacity-40",
+        className: "min-h-11 rounded-lg border border-interactivo px-3 py-1.5 text-xs font-semibold text-mute transition hover:border-fono hover:text-fore disabled:opacity-40",
         children: textoActualizar
       }
     )
   ] }) : null;
   if (cargando) {
-    return /* @__PURE__ */ jsxs83("div", { className, children: [
+    return /* @__PURE__ */ jsxs86("div", { className, children: [
       cabecera,
-      /* @__PURE__ */ jsxs83("div", { className: "space-y-2", "aria-busy": "true", children: [
-        /* @__PURE__ */ jsx101(Skeleton, { className: "h-16" }),
-        /* @__PURE__ */ jsx101(Skeleton, { className: "h-16" }),
-        /* @__PURE__ */ jsx101(Skeleton, { className: "h-16" })
+      /* @__PURE__ */ jsxs86("div", { className: "space-y-2", role: "status", "aria-live": "polite", "aria-busy": "true", children: [
+        /* @__PURE__ */ jsx105("span", { className: "sr-only", children: "Cargando cronolog\xEDa\u2026" }),
+        /* @__PURE__ */ jsx105(Skeleton, { className: "h-16" }),
+        /* @__PURE__ */ jsx105(Skeleton, { className: "h-16" }),
+        /* @__PURE__ */ jsx105(Skeleton, { className: "h-16" })
       ] })
     ] });
   }
   if (error) {
-    return /* @__PURE__ */ jsxs83("div", { className, children: [
+    return /* @__PURE__ */ jsxs86("div", { className, children: [
       cabecera,
-      /* @__PURE__ */ jsx101(
+      /* @__PURE__ */ jsx105("div", { role: "alert", children: /* @__PURE__ */ jsx105(
         EmptyState,
         {
           compact: true,
           icon: "alert",
           title: errorTitulo,
           description: error,
-          action: onReintentar ? /* @__PURE__ */ jsx101(Button, { onClick: onReintentar, children: "Reintentar" }) : void 0
+          action: onReintentar ? /* @__PURE__ */ jsx105(Button, { onClick: onReintentar, children: "Reintentar" }) : void 0
         }
-      )
+      ) })
     ] });
   }
   if (!hitos?.length) {
-    return /* @__PURE__ */ jsxs83("div", { className, children: [
+    return /* @__PURE__ */ jsxs86("div", { className, children: [
       cabecera,
-      /* @__PURE__ */ jsx101(EmptyState, { compact: true, icon: "clock", title: vacioTitulo, description: vacioDetalle })
+      /* @__PURE__ */ jsx105("div", { role: "status", children: /* @__PURE__ */ jsx105(EmptyState, { compact: true, icon: "clock", title: vacioTitulo, description: vacioDetalle }) })
     ] });
   }
-  return /* @__PURE__ */ jsxs83("div", { className, children: [
+  return /* @__PURE__ */ jsxs86("div", { className, children: [
     cabecera,
-    agrupar ? /* @__PURE__ */ jsx101("div", { className: "space-y-3", children: agruparHitos(hitos).map((grupo) => /* @__PURE__ */ jsxs83("section", { children: [
-      /* @__PURE__ */ jsx101("h3", { className: "mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute", children: grupo.etiqueta }),
-      /* @__PURE__ */ jsx101("ol", { className: "space-y-2.5", "aria-label": `${etiqueta} \xB7 ${grupo.etiqueta}`, children: grupo.hitos.map(fila) })
-    ] }, grupo.clave)) }) : /* @__PURE__ */ jsx101("ol", { className: "space-y-2.5", "aria-label": etiqueta, children: hitos.map(fila) })
+    agrupar ? /* @__PURE__ */ jsx105("div", { className: "space-y-3", children: agruparHitos(hitos).map((grupo) => /* @__PURE__ */ jsxs86("section", { children: [
+      /* @__PURE__ */ jsx105("h3", { className: "mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute", children: grupo.etiqueta }),
+      /* @__PURE__ */ jsx105("ol", { className: "space-y-2.5", "aria-label": `${etiqueta} \xB7 ${grupo.etiqueta}`, children: grupo.hitos.map(fila) })
+    ] }, grupo.clave)) }) : /* @__PURE__ */ jsx105("ol", { className: "space-y-2.5", "aria-label": etiqueta, children: hitos.map(fila) })
   ] });
 }
 
 // src/components/PlanPagos.jsx
-import { jsx as jsx102, jsxs as jsxs84 } from "react/jsx-runtime";
+import { jsx as jsx106, jsxs as jsxs87 } from "react/jsx-runtime";
 var ESTADOS_CUOTA = {
   pendiente: { chip: "pendiente", etiqueta: "Pendiente", icono: "clock" },
   revision: { chip: "revision", etiqueta: "En revisi\xF3n", icono: "refresh" },
@@ -9556,18 +11191,18 @@ var ESTADOS_CUOTA = {
 function ChipCuota({ estado, estados }) {
   const config = estados[estado];
   if (!config) return null;
-  return /* @__PURE__ */ jsx102(ChipEstado, { estado: config.chip, etiqueta: config.etiqueta, icono: config.icono, tono: config.tono });
+  return /* @__PURE__ */ jsx106(ChipEstado, { estado: config.chip, etiqueta: config.etiqueta, icono: config.icono, tono: config.tono });
 }
 function FilaPlan({ etiqueta, monto, vence, estado, nota, moneda, simbolo, estados, destacada, conEstado }) {
-  return /* @__PURE__ */ jsxs84("tr", { className: "border-t border-ink-700", children: [
-    /* @__PURE__ */ jsxs84("td", { className: cn(CELDA_DATO, "py-1.5 pr-3 text-xs text-fore"), children: [
-      /* @__PURE__ */ jsx102("span", { className: "font-semibold", children: etiqueta }),
-      destacada && /* @__PURE__ */ jsx102("small", { className: "ml-1.5 font-medium text-fono-light", children: "A transferir ahora" }),
-      nota && /* @__PURE__ */ jsx102("small", { className: "mt-0.5 block text-[11px] text-mute", children: nota })
+  return /* @__PURE__ */ jsxs87("tr", { className: "border-t border-ink-700", children: [
+    /* @__PURE__ */ jsxs87("td", { className: cn(CELDA_DATO, "py-1.5 pr-3 text-xs text-fore"), children: [
+      /* @__PURE__ */ jsx106("span", { className: "font-semibold", children: etiqueta }),
+      destacada && /* @__PURE__ */ jsx106("small", { className: "ml-1.5 font-medium text-fono-light", children: "A transferir ahora" }),
+      nota && /* @__PURE__ */ jsx106("small", { className: "mt-0.5 block text-[11px] text-mute", children: nota })
     ] }),
-    /* @__PURE__ */ jsx102("td", { className: cn(CELDA_NUMERO, "py-1.5 pr-3 text-xs font-semibold text-fore"), children: /* @__PURE__ */ jsx102(Money, { value: monto, currency: moneda, simbolo }) }),
-    /* @__PURE__ */ jsx102("td", { className: cn(CELDA_DATO, "py-1.5 pr-3 whitespace-nowrap text-xs"), children: vence ? fechaDia(vence) : "\u2014" }),
-    conEstado && /* @__PURE__ */ jsx102("td", { className: cn(CELDA_DATO, "py-1.5 text-xs"), children: estado ? /* @__PURE__ */ jsx102(ChipCuota, { estado, estados }) : null })
+    /* @__PURE__ */ jsx106("td", { className: cn(CELDA_NUMERO, "py-1.5 pr-3 text-xs font-semibold text-fore"), children: /* @__PURE__ */ jsx106(Money, { value: monto, currency: moneda, simbolo }) }),
+    /* @__PURE__ */ jsx106("td", { className: cn(CELDA_DATO, "py-1.5 pr-3 whitespace-nowrap text-xs"), children: vence ? fechaDia(vence) : "\u2014" }),
+    conEstado && /* @__PURE__ */ jsx106("td", { className: cn(CELDA_DATO, "py-1.5 text-xs"), children: estado ? /* @__PURE__ */ jsx106(ChipCuota, { estado, estados }) : null })
   ] });
 }
 function PlanPagos({
@@ -9605,23 +11240,23 @@ function PlanPagos({
   const conEstado = (cuotas || []).some((cuota) => Boolean(cuota.estado));
   const vacioPlan = !hayAnticipo && !(cuotas || []).length;
   if (vacioPlan && total === null && !condiciones && !aTransferir) {
-    return /* @__PURE__ */ jsx102(EmptyState, { compact: true, icon: "receipt", title: vacio, className });
+    return /* @__PURE__ */ jsx106(EmptyState, { compact: true, icon: "receipt", title: vacio, className });
   }
-  return /* @__PURE__ */ jsxs84("div", { className: cn("space-y-2.5", className), children: [
-    aTransferir && /* @__PURE__ */ jsxs84("div", { className: "flex flex-wrap items-baseline justify-between gap-2 rounded-xl border border-fono/40 bg-fono/10 px-3 py-2", children: [
-      /* @__PURE__ */ jsx102("span", { className: "text-xs font-semibold text-fono-light", children: aTransferir.etiqueta || "A transferir ahora" }),
-      /* @__PURE__ */ jsx102("strong", { className: "text-lg font-bold tabular-nums text-fore", children: /* @__PURE__ */ jsx102(Money, { value: aTransferir.monto, currency: moneda, simbolo }) })
+  return /* @__PURE__ */ jsxs87("div", { className: cn("space-y-2.5", className), children: [
+    aTransferir && /* @__PURE__ */ jsxs87("div", { className: "flex flex-wrap items-baseline justify-between gap-2 rounded-xl border border-fono/40 bg-fono/10 px-3 py-2", children: [
+      /* @__PURE__ */ jsx106("span", { className: "text-xs font-semibold text-fono-light", children: aTransferir.etiqueta || "A transferir ahora" }),
+      /* @__PURE__ */ jsx106("strong", { className: "text-lg font-bold tabular-nums text-fore", children: /* @__PURE__ */ jsx106(Money, { value: aTransferir.monto, currency: moneda, simbolo }) })
     ] }),
-    vacioPlan ? /* @__PURE__ */ jsx102("p", { className: "text-xs text-mute", children: vacio }) : /* @__PURE__ */ jsxs84("table", { className: "w-full", children: [
-      /* @__PURE__ */ jsx102("caption", { className: "sr-only", children: "Plan de pagos" }),
-      /* @__PURE__ */ jsx102("thead", { children: /* @__PURE__ */ jsxs84("tr", { children: [
-        /* @__PURE__ */ jsx102("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-left"), scope: "col", children: "Cuota" }),
-        /* @__PURE__ */ jsx102("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-right"), scope: "col", children: "Monto" }),
-        /* @__PURE__ */ jsx102("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-left"), scope: "col", children: "Vencimiento" }),
-        conEstado && /* @__PURE__ */ jsx102("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-left"), scope: "col", children: "Estado" })
+    vacioPlan ? /* @__PURE__ */ jsx106("p", { className: "text-xs text-mute", children: vacio }) : /* @__PURE__ */ jsxs87("table", { className: "w-full", children: [
+      /* @__PURE__ */ jsx106("caption", { className: "sr-only", children: "Plan de pagos" }),
+      /* @__PURE__ */ jsx106("thead", { children: /* @__PURE__ */ jsxs87("tr", { children: [
+        /* @__PURE__ */ jsx106("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-left"), scope: "col", children: "Cuota" }),
+        /* @__PURE__ */ jsx106("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-right"), scope: "col", children: "Monto" }),
+        /* @__PURE__ */ jsx106("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-left"), scope: "col", children: "Vencimiento" }),
+        conEstado && /* @__PURE__ */ jsx106("th", { className: cn(CELDA_ENCABEZADO, "pb-1 text-left"), scope: "col", children: "Estado" })
       ] }) }),
-      /* @__PURE__ */ jsxs84("tbody", { children: [
-        hayAnticipo && /* @__PURE__ */ jsx102(
+      /* @__PURE__ */ jsxs87("tbody", { children: [
+        hayAnticipo && /* @__PURE__ */ jsx106(
           FilaPlan,
           {
             etiqueta: anticipoEtiqueta,
@@ -9634,7 +11269,7 @@ function PlanPagos({
             destacada: aTransferir?.id === "anticipo"
           }
         ),
-        (cuotas || []).map((cuota, indice) => /* @__PURE__ */ jsx102(
+        (cuotas || []).map((cuota, indice) => /* @__PURE__ */ jsx106(
           FilaPlan,
           {
             etiqueta: cuota.etiqueta,
@@ -9651,27 +11286,27 @@ function PlanPagos({
           cuota.id ?? `${cuota.etiqueta}-${indice}`
         ))
       ] }),
-      total !== null && /* @__PURE__ */ jsx102("tfoot", { children: /* @__PURE__ */ jsxs84("tr", { className: "border-t border-ink-500", children: [
-        /* @__PURE__ */ jsx102("td", { className: cn(CELDA_DATO, "py-2 text-xs font-semibold text-fore"), colSpan: conEstado ? 3 : 2, children: totalEtiqueta }),
-        /* @__PURE__ */ jsx102("td", { className: cn(CELDA_NUMERO, "py-2 text-sm font-bold text-fore"), children: /* @__PURE__ */ jsx102(Money, { value: total, currency: moneda, simbolo }) })
+      total !== null && /* @__PURE__ */ jsx106("tfoot", { children: /* @__PURE__ */ jsxs87("tr", { className: "border-t border-ink-500", children: [
+        /* @__PURE__ */ jsx106("td", { className: cn(CELDA_DATO, "py-2 text-xs font-semibold text-fore"), colSpan: conEstado ? 3 : 2, children: totalEtiqueta }),
+        /* @__PURE__ */ jsx106("td", { className: cn(CELDA_NUMERO, "py-2 text-sm font-bold text-fore"), children: /* @__PURE__ */ jsx106(Money, { value: total, currency: moneda, simbolo }) })
       ] }) })
     ] }),
-    vacioPlan && total !== null && /* @__PURE__ */ jsxs84("div", { className: "flex items-baseline justify-between gap-2 border-t border-ink-700 pt-2", children: [
-      /* @__PURE__ */ jsx102("span", { className: "text-xs font-semibold text-fore", children: totalEtiqueta }),
-      /* @__PURE__ */ jsx102("span", { className: "text-sm font-bold tabular-nums text-fore", children: /* @__PURE__ */ jsx102(Money, { value: total, currency: moneda, simbolo }) })
+    vacioPlan && total !== null && /* @__PURE__ */ jsxs87("div", { className: "flex items-baseline justify-between gap-2 border-t border-ink-700 pt-2", children: [
+      /* @__PURE__ */ jsx106("span", { className: "text-xs font-semibold text-fore", children: totalEtiqueta }),
+      /* @__PURE__ */ jsx106("span", { className: "text-sm font-bold tabular-nums text-fore", children: /* @__PURE__ */ jsx106(Money, { value: total, currency: moneda, simbolo }) })
     ] }),
-    saldoSinCuota > 0 && /* @__PURE__ */ jsxs84("p", { className: "text-xs text-mute", children: [
+    saldoSinCuota > 0 && /* @__PURE__ */ jsxs87("p", { className: "text-xs text-mute", children: [
       saldoEtiqueta,
       ":",
       " ",
-      /* @__PURE__ */ jsx102("span", { className: "font-semibold tabular-nums text-fore", children: /* @__PURE__ */ jsx102(Money, { value: saldoSinCuota, currency: moneda, simbolo }) })
+      /* @__PURE__ */ jsx106("span", { className: "font-semibold tabular-nums text-fore", children: /* @__PURE__ */ jsx106(Money, { value: saldoSinCuota, currency: moneda, simbolo }) })
     ] }),
-    condiciones && /* @__PURE__ */ jsx102(Nota, { tono: "info", compact: true, children: condiciones })
+    condiciones && /* @__PURE__ */ jsx106(Nota, { tono: "info", compact: true, children: condiciones })
   ] });
 }
 
 // src/components/DocumentoImpresion.jsx
-import { Fragment as Fragment18, jsx as jsx103, jsxs as jsxs85 } from "react/jsx-runtime";
+import { Fragment as Fragment17, jsx as jsx107, jsxs as jsxs88 } from "react/jsx-runtime";
 var CANTIDAD_FORMATTER = new Intl.NumberFormat("es-PY", { maximumFractionDigits: 3 });
 function cantidadTexto(cantidad) {
   if (cantidad === null || cantidad === void 0 || cantidad === "") return "";
@@ -9679,23 +11314,23 @@ function cantidadTexto(cantidad) {
 }
 function Dato2({ etiqueta, valor, className }) {
   if (!valor) return null;
-  return /* @__PURE__ */ jsxs85("p", { className: cn("min-w-0", className), children: [
-    /* @__PURE__ */ jsx103("span", { className: "block text-[9.5px] font-bold uppercase tracking-wider oc-print-suave", children: etiqueta }),
-    /* @__PURE__ */ jsx103("span", { className: "block whitespace-pre-wrap text-[12.5px]", children: valor })
+  return /* @__PURE__ */ jsxs88("p", { className: cn("min-w-0", className), children: [
+    /* @__PURE__ */ jsx107("span", { className: "block text-[9.5px] font-bold uppercase tracking-wider oc-print-suave", children: etiqueta }),
+    /* @__PURE__ */ jsx107("span", { className: "block whitespace-pre-wrap text-[12.5px]", children: valor })
   ] });
 }
 function Identidad({ titulo: titulo2, datos, logo, monograma }) {
   if (!datos) return null;
-  return /* @__PURE__ */ jsxs85("section", { className: "oc-print-bloque", children: [
-    /* @__PURE__ */ jsx103("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: titulo2 }),
-    /* @__PURE__ */ jsxs85("div", { className: "flex items-start gap-3", children: [
-      (logo || monograma) && /* @__PURE__ */ jsx103("span", { className: "shrink-0", children: logo ? /* @__PURE__ */ jsx103("img", { src: logo, alt: "", "aria-hidden": "true", className: "h-9 w-9 object-contain" }) : /* @__PURE__ */ jsx103("span", { className: "grid h-9 w-9 place-items-center rounded-lg border text-[11px] font-bold oc-print-linea oc-print-suave", "aria-hidden": "true", children: monograma }) }),
-      /* @__PURE__ */ jsxs85("div", { className: "grid min-w-0 flex-1 gap-1.5 sm:grid-cols-2", children: [
-        /* @__PURE__ */ jsx103(Dato2, { etiqueta: "Nombre", valor: datos.nombre, className: "sm:col-span-2" }),
-        /* @__PURE__ */ jsx103(Dato2, { etiqueta: datos.etiquetaDocumento || "RUC", valor: datos.documento }),
-        /* @__PURE__ */ jsx103(Dato2, { etiqueta: "Tel\xE9fono", valor: datos.telefono }),
-        /* @__PURE__ */ jsx103(Dato2, { etiqueta: "Correo", valor: datos.correo }),
-        /* @__PURE__ */ jsx103(Dato2, { etiqueta: "Direcci\xF3n", valor: datos.direccion, className: "sm:col-span-2" })
+  return /* @__PURE__ */ jsxs88("section", { className: "oc-print-bloque", children: [
+    /* @__PURE__ */ jsx107("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: titulo2 }),
+    /* @__PURE__ */ jsxs88("div", { className: "flex items-start gap-3", children: [
+      (logo || monograma) && /* @__PURE__ */ jsx107("span", { className: "shrink-0", children: logo ? /* @__PURE__ */ jsx107("img", { src: logo, alt: "", "aria-hidden": "true", className: "h-9 w-9 object-contain" }) : /* @__PURE__ */ jsx107("span", { className: "grid h-9 w-9 place-items-center rounded-lg border text-[11px] font-bold oc-print-linea oc-print-suave", "aria-hidden": "true", children: monograma }) }),
+      /* @__PURE__ */ jsxs88("div", { className: "grid min-w-0 flex-1 gap-1.5 sm:grid-cols-2", children: [
+        /* @__PURE__ */ jsx107(Dato2, { etiqueta: "Nombre", valor: datos.nombre, className: "sm:col-span-2" }),
+        /* @__PURE__ */ jsx107(Dato2, { etiqueta: datos.etiquetaDocumento || "RUC", valor: datos.documento }),
+        /* @__PURE__ */ jsx107(Dato2, { etiqueta: "Tel\xE9fono", valor: datos.telefono }),
+        /* @__PURE__ */ jsx107(Dato2, { etiqueta: "Correo", valor: datos.correo }),
+        /* @__PURE__ */ jsx107(Dato2, { etiqueta: "Direcci\xF3n", valor: datos.direccion, className: "sm:col-span-2" })
       ] })
     ] })
   ] });
@@ -9703,17 +11338,17 @@ function Identidad({ titulo: titulo2, datos, logo, monograma }) {
 function FilaLiquidacion({ etiqueta, valor, moneda, simbolo, nota, fuerte = false }) {
   const numero = Number(valor);
   const negativo = Number.isFinite(numero) && numero < 0;
-  return /* @__PURE__ */ jsxs85("div", { className: cn("oc-print-fila", fuerte ? "oc-print-fila--total" : "oc-print-linea"), children: [
-    /* @__PURE__ */ jsxs85("span", { className: "min-w-0", children: [
+  return /* @__PURE__ */ jsxs88("div", { className: cn("oc-print-fila", fuerte ? "oc-print-fila--total" : "oc-print-linea"), children: [
+    /* @__PURE__ */ jsxs88("span", { className: "min-w-0", children: [
       etiqueta,
-      nota && /* @__PURE__ */ jsxs85("small", { className: "oc-print-suave", children: [
+      nota && /* @__PURE__ */ jsxs88("small", { className: "oc-print-suave", children: [
         " ",
         nota
       ] })
     ] }),
-    /* @__PURE__ */ jsxs85("span", { className: "oc-print-num shrink-0 font-semibold", children: [
+    /* @__PURE__ */ jsxs88("span", { className: "oc-print-num shrink-0 font-semibold", children: [
       negativo && "\u2212 ",
-      /* @__PURE__ */ jsx103(Money, { value: negativo ? Math.abs(numero) : valor, currency: moneda, simbolo })
+      /* @__PURE__ */ jsx107(Money, { value: negativo ? Math.abs(numero) : valor, currency: moneda, simbolo })
     ] })
   ] });
 }
@@ -9765,70 +11400,70 @@ function DocumentoImpresion({
 }) {
   const monograma = String(emisor?.nombre ?? "").trim().slice(0, 2).toUpperCase() || "\xB7\xB7";
   const tieneLiquidacion = Boolean(liquidacion && (liquidacion.subtotal !== void 0 || liquidacion.total !== void 0));
-  return /* @__PURE__ */ jsxs85("div", { className: cn("oc-print min-h-screen px-3 py-4 md:px-6", className), children: [
-    onImprimir && /* @__PURE__ */ jsx103("div", { className: "oc-print-oculto mx-auto mb-3 flex w-full max-w-[210mm] justify-end", children: /* @__PURE__ */ jsxs85(Button, { type: "button", variant: "outline", onClick: onImprimir, children: [
-      /* @__PURE__ */ jsx103(Icon, { name: "printer", className: "h-4 w-4" }),
+  return /* @__PURE__ */ jsxs88("div", { className: cn("oc-print min-h-screen px-3 py-4 md:px-6", className), children: [
+    onImprimir && /* @__PURE__ */ jsx107("div", { className: "oc-print-oculto mx-auto mb-3 flex w-full max-w-[210mm] justify-end", children: /* @__PURE__ */ jsxs88(Button, { type: "button", variant: "outline", onClick: onImprimir, children: [
+      /* @__PURE__ */ jsx107(Icon, { name: "printer", className: "h-4 w-4" }),
       etiquetaImprimir
     ] }) }),
-    /* @__PURE__ */ jsxs85("article", { className: "oc-print-hoja", children: [
-      /* @__PURE__ */ jsxs85("header", { className: "oc-print-bloque flex flex-wrap items-start justify-between gap-4 border-b-2 pb-2.5 oc-print-linea", children: [
-        /* @__PURE__ */ jsxs85("div", { className: "flex min-w-0 items-center gap-2.5", children: [
-          emisor?.logo ? /* @__PURE__ */ jsx103("img", { src: emisor.logo, alt: "", "aria-hidden": "true", className: "h-8 w-8 object-contain" }) : /* @__PURE__ */ jsx103("span", { className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg border text-[11px] font-bold oc-print-linea oc-print-suave", "aria-hidden": "true", children: monograma }),
-          /* @__PURE__ */ jsxs85("span", { className: "grid min-w-0 gap-0.5", children: [
-            /* @__PURE__ */ jsx103("strong", { className: "truncate text-[13px] font-bold tracking-wider", children: emisor?.nombre || "\u2014" }),
-            emisor?.direccion && /* @__PURE__ */ jsx103("span", { className: "truncate text-[10.5px] uppercase tracking-wider oc-print-suave", children: emisor.direccion })
+    /* @__PURE__ */ jsxs88("article", { className: "oc-print-hoja", children: [
+      /* @__PURE__ */ jsxs88("header", { className: "oc-print-bloque flex flex-wrap items-start justify-between gap-4 border-b-2 pb-2.5 oc-print-linea", children: [
+        /* @__PURE__ */ jsxs88("div", { className: "flex min-w-0 items-center gap-2.5", children: [
+          emisor?.logo ? /* @__PURE__ */ jsx107("img", { src: emisor.logo, alt: "", "aria-hidden": "true", className: "h-8 w-8 object-contain" }) : /* @__PURE__ */ jsx107("span", { className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg border text-[11px] font-bold oc-print-linea oc-print-suave", "aria-hidden": "true", children: monograma }),
+          /* @__PURE__ */ jsxs88("span", { className: "grid min-w-0 gap-0.5", children: [
+            /* @__PURE__ */ jsx107("strong", { className: "truncate text-[13px] font-bold tracking-wider", children: emisor?.nombre || "\u2014" }),
+            emisor?.direccion && /* @__PURE__ */ jsx107("span", { className: "truncate text-[10.5px] uppercase tracking-wider oc-print-suave", children: emisor.direccion })
           ] })
         ] }),
-        /* @__PURE__ */ jsxs85("div", { className: "text-right", children: [
-          /* @__PURE__ */ jsx103("h1", { className: "text-lg font-bold uppercase tracking-wide", children: titulo2 }),
-          numero && /* @__PURE__ */ jsxs85("p", { className: "text-[12px] font-bold", children: [
+        /* @__PURE__ */ jsxs88("div", { className: "text-right", children: [
+          /* @__PURE__ */ jsx107("h1", { className: "text-lg font-bold uppercase tracking-wide", children: titulo2 }),
+          numero && /* @__PURE__ */ jsxs88("p", { className: "text-[12px] font-bold", children: [
             etiquetaNumero,
             " ",
             numero
           ] }),
-          estado && /* @__PURE__ */ jsx103("span", { className: cn("mt-0.5 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10.5px] font-semibold", chipDeTono(estadoTono)), children: estado })
+          estado && /* @__PURE__ */ jsx107("span", { className: cn("mt-0.5 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10.5px] font-semibold", chipDeTono(estadoTono)), children: estado })
         ] })
       ] }),
-      (emisor || receptor) && /* @__PURE__ */ jsxs85("div", { className: "mt-3.5 grid gap-4 sm:grid-cols-2", children: [
-        /* @__PURE__ */ jsx103(Identidad, { titulo: etiquetaEmisor, datos: emisor, logo: emisor?.logo, monograma }),
-        /* @__PURE__ */ jsx103(Identidad, { titulo: etiquetaReceptor, datos: receptor ? { ...receptor, etiquetaDocumento: receptor.etiquetaDocumento || "RUC" } : null })
+      (emisor || receptor) && /* @__PURE__ */ jsxs88("div", { className: "mt-3.5 grid gap-4 sm:grid-cols-2", children: [
+        /* @__PURE__ */ jsx107(Identidad, { titulo: etiquetaEmisor, datos: emisor, logo: emisor?.logo, monograma }),
+        /* @__PURE__ */ jsx107(Identidad, { titulo: etiquetaReceptor, datos: receptor ? { ...receptor, etiquetaDocumento: receptor.etiquetaDocumento || "RUC" } : null })
       ] }),
-      meta?.length > 0 && /* @__PURE__ */ jsxs85("section", { className: "oc-print-bloque mt-3.5", children: [
-        /* @__PURE__ */ jsx103("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: etiquetaMeta }),
-        /* @__PURE__ */ jsx103("div", { className: "grid gap-1.5 sm:grid-cols-3", children: meta.map((dato, indice) => /* @__PURE__ */ jsx103(Dato2, { etiqueta: dato.etiqueta, valor: dato.valor }, dato.etiqueta ?? indice)) })
+      meta?.length > 0 && /* @__PURE__ */ jsxs88("section", { className: "oc-print-bloque mt-3.5", children: [
+        /* @__PURE__ */ jsx107("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: etiquetaMeta }),
+        /* @__PURE__ */ jsx107("div", { className: "grid gap-1.5 sm:grid-cols-3", children: meta.map((dato, indice) => /* @__PURE__ */ jsx107(Dato2, { etiqueta: dato.etiqueta, valor: dato.valor }, dato.etiqueta ?? indice)) })
       ] }),
-      /* @__PURE__ */ jsxs85("section", { className: "oc-print-bloque mt-3.5", children: [
-        /* @__PURE__ */ jsx103("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: etiquetaDetalle }),
-        detalle?.length > 0 ? /* @__PURE__ */ jsxs85("table", { className: "oc-print-tabla", children: [
-          /* @__PURE__ */ jsx103("thead", { children: /* @__PURE__ */ jsxs85("tr", { children: [
-            /* @__PURE__ */ jsx103("th", { scope: "col", children: "Cantidad" }),
-            /* @__PURE__ */ jsx103("th", { scope: "col", children: "Concepto" }),
-            /* @__PURE__ */ jsx103("th", { scope: "col", className: "oc-print-num", children: "Unitario" }),
-            /* @__PURE__ */ jsx103("th", { scope: "col", className: "oc-print-num", children: "Subtotal" })
+      /* @__PURE__ */ jsxs88("section", { className: "oc-print-bloque mt-3.5", children: [
+        /* @__PURE__ */ jsx107("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: etiquetaDetalle }),
+        detalle?.length > 0 ? /* @__PURE__ */ jsxs88("table", { className: "oc-print-tabla", children: [
+          /* @__PURE__ */ jsx107("thead", { children: /* @__PURE__ */ jsxs88("tr", { children: [
+            /* @__PURE__ */ jsx107("th", { scope: "col", children: "Cantidad" }),
+            /* @__PURE__ */ jsx107("th", { scope: "col", children: "Concepto" }),
+            /* @__PURE__ */ jsx107("th", { scope: "col", className: "oc-print-num", children: "Unitario" }),
+            /* @__PURE__ */ jsx107("th", { scope: "col", className: "oc-print-num", children: "Subtotal" })
           ] }) }),
-          /* @__PURE__ */ jsx103("tbody", { children: detalle.map((item, indice) => /* @__PURE__ */ jsxs85("tr", { children: [
-            /* @__PURE__ */ jsx103("td", { className: "oc-print-num w-16", children: cantidadTexto(item.cantidad) }),
-            /* @__PURE__ */ jsxs85("td", { children: [
+          /* @__PURE__ */ jsx107("tbody", { children: detalle.map((item, indice) => /* @__PURE__ */ jsxs88("tr", { children: [
+            /* @__PURE__ */ jsx107("td", { className: "oc-print-num w-16", children: cantidadTexto(item.cantidad) }),
+            /* @__PURE__ */ jsxs88("td", { children: [
               item.concepto,
-              item.nota && /* @__PURE__ */ jsx103("small", { className: "block oc-print-suave", children: item.nota })
+              item.nota && /* @__PURE__ */ jsx107("small", { className: "block oc-print-suave", children: item.nota })
             ] }),
-            /* @__PURE__ */ jsx103("td", { className: "oc-print-num", children: /* @__PURE__ */ jsx103(Money, { value: item.unitario, currency: moneda, simbolo }) }),
-            /* @__PURE__ */ jsx103("td", { className: "oc-print-num", children: /* @__PURE__ */ jsx103(Money, { value: item.subtotal, currency: moneda, simbolo }) })
+            /* @__PURE__ */ jsx107("td", { className: "oc-print-num", children: /* @__PURE__ */ jsx107(Money, { value: item.unitario, currency: moneda, simbolo }) }),
+            /* @__PURE__ */ jsx107("td", { className: "oc-print-num", children: /* @__PURE__ */ jsx107(Money, { value: item.subtotal, currency: moneda, simbolo }) })
           ] }, item.id ?? indice)) })
-        ] }) : /* @__PURE__ */ jsx103("p", { className: "rounded-md border border-dashed px-2.5 py-2 text-[11.5px] oc-print-linea oc-print-suave", children: vacioDetalle })
+        ] }) : /* @__PURE__ */ jsx107("p", { className: "rounded-md border border-dashed px-2.5 py-2 text-[11.5px] oc-print-linea oc-print-suave", children: vacioDetalle })
       ] }),
-      tieneLiquidacion && /* @__PURE__ */ jsxs85("section", { className: "oc-print-totales oc-print-bloque mt-3 ml-auto w-full max-w-[86mm]", children: [
-        /* @__PURE__ */ jsx103("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: etiquetaLiquidacion }),
-        liquidacion.subtotal !== void 0 && /* @__PURE__ */ jsx103(FilaLiquidacion, { etiqueta: "Subtotal", valor: liquidacion.subtotal, moneda, simbolo }),
-        liquidacion.descuento ? /* @__PURE__ */ jsx103(FilaLiquidacion, { etiqueta: liquidacion.descuentoEtiqueta || "Descuento", valor: -Number(liquidacion.descuento), moneda, simbolo }) : null,
-        liquidacion.otros?.map((otro, indice) => /* @__PURE__ */ jsx103(FilaLiquidacion, { etiqueta: otro.etiqueta, valor: otro.monto, moneda, simbolo }, otro.etiqueta ?? indice)),
-        liquidacion.iva?.map((iva, indice) => /* @__PURE__ */ jsx103(
+      tieneLiquidacion && /* @__PURE__ */ jsxs88("section", { className: "oc-print-totales oc-print-bloque mt-3 ml-auto w-full max-w-[86mm]", children: [
+        /* @__PURE__ */ jsx107("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: etiquetaLiquidacion }),
+        liquidacion.subtotal !== void 0 && /* @__PURE__ */ jsx107(FilaLiquidacion, { etiqueta: "Subtotal", valor: liquidacion.subtotal, moneda, simbolo }),
+        liquidacion.descuento ? /* @__PURE__ */ jsx107(FilaLiquidacion, { etiqueta: liquidacion.descuentoEtiqueta || "Descuento", valor: -Number(liquidacion.descuento), moneda, simbolo }) : null,
+        liquidacion.otros?.map((otro, indice) => /* @__PURE__ */ jsx107(FilaLiquidacion, { etiqueta: otro.etiqueta, valor: otro.monto, moneda, simbolo }, otro.etiqueta ?? indice)),
+        liquidacion.iva?.map((iva, indice) => /* @__PURE__ */ jsx107(
           FilaLiquidacion,
           {
             etiqueta: `IVA ${iva.tasa}%`,
-            nota: iva.base !== void 0 ? /* @__PURE__ */ jsxs85(Fragment18, { children: [
+            nota: iva.base !== void 0 ? /* @__PURE__ */ jsxs88(Fragment17, { children: [
               "sobre ",
-              /* @__PURE__ */ jsx103(Money, { value: iva.base, currency: moneda, simbolo })
+              /* @__PURE__ */ jsx107(Money, { value: iva.base, currency: moneda, simbolo })
             ] }) : null,
             valor: iva.monto,
             moneda,
@@ -9836,20 +11471,20 @@ function DocumentoImpresion({
           },
           `${iva.tasa}-${indice}`
         )),
-        liquidacion.total !== void 0 && /* @__PURE__ */ jsx103(FilaLiquidacion, { etiqueta: "Total", valor: liquidacion.total, moneda, simbolo, fuerte: true })
+        liquidacion.total !== void 0 && /* @__PURE__ */ jsx107(FilaLiquidacion, { etiqueta: "Total", valor: liquidacion.total, moneda, simbolo, fuerte: true })
       ] }),
-      notas && /* @__PURE__ */ jsxs85("section", { className: "oc-print-bloque mt-3.5", children: [
-        /* @__PURE__ */ jsx103("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: notasEtiqueta }),
-        /* @__PURE__ */ jsx103("div", { className: "oc-print-nota", children: notas })
+      notas && /* @__PURE__ */ jsxs88("section", { className: "oc-print-bloque mt-3.5", children: [
+        /* @__PURE__ */ jsx107("h2", { className: "mb-1.5 border-b pb-1 text-[10.5px] font-bold uppercase tracking-wider oc-print-suave oc-print-linea", children: notasEtiqueta }),
+        /* @__PURE__ */ jsx107("div", { className: "oc-print-nota", children: notas })
       ] }),
-      pie && /* @__PURE__ */ jsx103("footer", { className: "oc-print-bloque mt-5 flex flex-wrap items-baseline justify-between gap-3 border-t pt-2 text-[10px] oc-print-linea oc-print-suave", children: pie })
+      pie && /* @__PURE__ */ jsx107("footer", { className: "oc-print-bloque mt-5 flex flex-wrap items-baseline justify-between gap-3 border-t pt-2 text-[10px] oc-print-linea oc-print-suave", children: pie })
     ] })
   ] });
 }
 
 // src/components/SubidaImagen.jsx
-import { useId as useId18, useRef as useRef18, useState as useState33 } from "react";
-import { jsx as jsx104, jsxs as jsxs86 } from "react/jsx-runtime";
+import { useId as useId22, useRef as useRef21, useState as useState35 } from "react";
+import { jsx as jsx108, jsxs as jsxs89 } from "react/jsx-runtime";
 var MIMES_IMAGEN = ["image/jpeg", "image/png", "image/webp"];
 var EXTENSION_IMAGEN = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
 var TAMANO_MAXIMO_IMAGEN = 5 * 1024 * 1024;
@@ -10005,14 +11640,14 @@ function SubidaImagen({
   ocupado = false,
   className
 }) {
-  const inputRef = useRef18(null);
-  const campoId = useId18();
+  const inputRef = useRef21(null);
+  const campoId = useId22();
   const errorId = `${campoId}-error`;
   const ayudaId = `${campoId}-ayuda`;
-  const [preparando, setPreparando] = useState33(false);
-  const [errorLocal, setErrorLocal] = useState33("");
-  const [vistaLocal, setVistaLocal] = useState33(null);
-  const [arrastrando, setArrastrando] = useState33(false);
+  const [preparando, setPreparando] = useState35(false);
+  const [errorLocal, setErrorLocal] = useState35("");
+  const [vistaLocal, setVistaLocal] = useState35(null);
+  const [arrastrando, setArrastrando] = useState35(false);
   const mensaje = error || errorLocal;
   const trabajando = Boolean(ocupado) || preparando;
   const vista = vistaLocal ?? valor;
@@ -10045,9 +11680,9 @@ function SubidaImagen({
     if (inputRef.current) inputRef.current.value = "";
     onLimpiar?.();
   }
-  return /* @__PURE__ */ jsxs86("div", { className: cn("min-w-0", className), children: [
-    etiqueta && /* @__PURE__ */ jsx104("span", { className: "mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-mute", children: etiqueta }),
-    /* @__PURE__ */ jsxs86(
+  return /* @__PURE__ */ jsxs89("div", { className: cn("min-w-0", className), children: [
+    etiqueta && /* @__PURE__ */ jsx108("span", { className: "mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-mute", children: etiqueta }),
+    /* @__PURE__ */ jsxs89(
       "div",
       {
         className: cn(
@@ -10069,23 +11704,23 @@ function SubidaImagen({
           void elegir(event.dataTransfer.files?.[0] ?? null);
         },
         children: [
-          vista ? /* @__PURE__ */ jsx104("span", { className: cn("grid shrink-0 place-items-center overflow-hidden rounded-xl border border-ink-500 bg-ink-800", cuadrado ? "h-20 w-20" : "h-20 w-28"), children: /* @__PURE__ */ jsx104("img", { src: vista, alt: "", className: cn("h-full w-full", cuadrado ? "object-cover" : "object-contain") }) }) : /* @__PURE__ */ jsx104("span", { className: "grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-ink-600 bg-ink-800 text-mute", "aria-hidden": "true", children: /* @__PURE__ */ jsx104(Icon, { name: "image", className: "h-6 w-6" }) }),
-          /* @__PURE__ */ jsxs86("div", { className: "min-w-0 flex-1", children: [
-            /* @__PURE__ */ jsx104("p", { className: "text-xs text-mute", children: vista ? "La imagen est\xE1 lista." : "Arrastr\xE1 una imagen o eleg\xED un archivo." }),
-            /* @__PURE__ */ jsxs86("p", { className: "mt-0.5 text-[11px] text-mute", children: [
+          vista ? /* @__PURE__ */ jsx108("span", { className: cn("grid shrink-0 place-items-center overflow-hidden rounded-xl border border-ink-500 bg-ink-800", cuadrado ? "h-20 w-20" : "h-20 w-28"), children: /* @__PURE__ */ jsx108("img", { src: vista, alt: "", className: cn("h-full w-full", cuadrado ? "object-cover" : "object-contain") }) }) : /* @__PURE__ */ jsx108("span", { className: "grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-ink-600 bg-ink-800 text-mute", "aria-hidden": "true", children: /* @__PURE__ */ jsx108(Icon, { name: "image", className: "h-6 w-6" }) }),
+          /* @__PURE__ */ jsxs89("div", { className: "min-w-0 flex-1", children: [
+            /* @__PURE__ */ jsx108("p", { className: "text-xs text-mute", children: vista ? "La imagen est\xE1 lista." : "Arrastr\xE1 una imagen o eleg\xED un archivo." }),
+            /* @__PURE__ */ jsxs89("p", { className: "mt-0.5 text-[11px] text-mute", children: [
               tipos.map((tipo) => ETIQUETA_TIPO[tipo] || tipo).join(" \xB7 "),
               " \xB7 hasta ",
               pesoLegible(tamanoMaximo)
             ] }),
-            /* @__PURE__ */ jsxs86("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: [
-              /* @__PURE__ */ jsxs86(Button, { type: "button", variant: "outline", disabled: disabled || trabajando, onClick: () => inputRef.current?.click(), "aria-describedby": mensaje ? errorId : descripcion ? ayudaId : void 0, children: [
-                /* @__PURE__ */ jsx104(Icon, { name: "upload", className: "h-4 w-4" }),
+            /* @__PURE__ */ jsxs89("div", { className: "mt-2 flex flex-wrap items-center gap-2", children: [
+              /* @__PURE__ */ jsxs89(Button, { type: "button", variant: "outline", disabled: disabled || trabajando, onClick: () => inputRef.current?.click(), "aria-describedby": mensaje ? errorId : descripcion ? ayudaId : void 0, children: [
+                /* @__PURE__ */ jsx108(Icon, { name: "upload", className: "h-4 w-4" }),
                 trabajando ? "Procesando\u2026" : vista ? cambiarEtiqueta : subirEtiqueta
               ] }),
-              (vista || vistaLocal) && /* @__PURE__ */ jsx104(IconAction, { icon: "trash", label: limpiarEtiqueta, disabled: disabled || trabajando, onClick: limpiar })
+              (vista || vistaLocal) && /* @__PURE__ */ jsx108(IconAction, { icon: "trash", label: limpiarEtiqueta, disabled: disabled || trabajando, onClick: limpiar })
             ] })
           ] }),
-          /* @__PURE__ */ jsx104(
+          /* @__PURE__ */ jsx108(
             "input",
             {
               ref: inputRef,
@@ -10103,12 +11738,12 @@ function SubidaImagen({
         ]
       }
     ),
-    mensaje ? /* @__PURE__ */ jsx104("p", { className: "mt-1.5 text-xs text-bad-text", id: errorId, role: "alert", children: mensaje }) : descripcion ? /* @__PURE__ */ jsx104("p", { className: "mt-1.5 text-xs text-mute", id: ayudaId, children: descripcion }) : null
+    mensaje ? /* @__PURE__ */ jsx108("p", { className: "mt-1.5 text-xs text-bad-text", id: errorId, role: "alert", children: mensaje }) : descripcion ? /* @__PURE__ */ jsx108("p", { className: "mt-1.5 text-xs text-mute", id: ayudaId, children: descripcion }) : null
   ] });
 }
 
 // src/components/ProgresoChecklist.jsx
-import { jsx as jsx105, jsxs as jsxs87 } from "react/jsx-runtime";
+import { jsx as jsx109, jsxs as jsxs90 } from "react/jsx-runtime";
 function progresoChecklist({
   hechas = 0,
   total = 0,
@@ -10164,19 +11799,19 @@ function ProgresoChecklist({
   const avance = progresoChecklist({ hechas, total, vencidas, riesgo, sustantivo, textoVacio });
   const tonoTexto = avance.tono === "ok" ? "text-ok-text" : avance.tono === "bad" ? "text-bad-text" : avance.tono === "warn" ? "text-warn-text" : "text-fore";
   const hayDetalle = avance.vencidas > 0 || avance.riesgo;
-  return /* @__PURE__ */ jsxs87("div", { className: cn("min-w-0", className), children: [
-    /* @__PURE__ */ jsxs87("div", { className: "flex items-baseline justify-between gap-2", children: [
-      /* @__PURE__ */ jsx105("span", { className: cn("min-w-0 truncate text-xs font-semibold", avance.total > 0 ? tonoTexto : "text-mute"), title: avance.detalle, children: avance.etiqueta }),
-      porcentaje && avance.total > 0 && /* @__PURE__ */ jsxs87("span", { className: "shrink-0 text-xs tabular-nums text-mute", children: [
+  return /* @__PURE__ */ jsxs90("div", { className: cn("min-w-0", className), children: [
+    /* @__PURE__ */ jsxs90("div", { className: "flex items-baseline justify-between gap-2", children: [
+      /* @__PURE__ */ jsx109("span", { className: cn("min-w-0 truncate text-xs font-semibold", avance.total > 0 ? tonoTexto : "text-mute"), title: avance.detalle, children: avance.etiqueta }),
+      porcentaje && avance.total > 0 && /* @__PURE__ */ jsxs90("span", { className: "shrink-0 text-xs tabular-nums text-mute", children: [
         avance.porcentaje,
         "%"
       ] })
     ] }),
-    avance.total > 0 && /* @__PURE__ */ jsx105(BarraProgreso, { valor: avance.hechas, max: avance.total, tono: avance.tono, alto, etiqueta: avance.detalle, className: "mt-1.5" }),
-    mostrarDetalle && hayDetalle && /* @__PURE__ */ jsxs87("p", { className: "mt-1 text-[11px] text-mute", children: [
-      avance.riesgo && /* @__PURE__ */ jsx105("span", { className: "text-bad-text", children: "Sin avance" }),
+    avance.total > 0 && /* @__PURE__ */ jsx109(BarraProgreso, { valor: avance.hechas, max: avance.total, tono: avance.tono, alto, etiqueta: avance.detalle, className: "mt-1.5" }),
+    mostrarDetalle && hayDetalle && /* @__PURE__ */ jsxs90("p", { className: "mt-1 text-[11px] text-mute", children: [
+      avance.riesgo && /* @__PURE__ */ jsx109("span", { className: "text-bad-text", children: "Sin avance" }),
       avance.riesgo && avance.vencidas > 0 && " \xB7 ",
-      avance.vencidas > 0 && /* @__PURE__ */ jsxs87("span", { className: "text-warn-text", children: [
+      avance.vencidas > 0 && /* @__PURE__ */ jsxs90("span", { className: "text-warn-text", children: [
         avance.vencidas,
         " vencida",
         avance.vencidas === 1 ? "" : "s"
@@ -10186,7 +11821,7 @@ function ProgresoChecklist({
 }
 
 // src/components/CargaIA.jsx
-import { useEffect as useEffect20, useId as useId19, useMemo as useMemo13, useRef as useRef19, useState as useState34 } from "react";
+import { useEffect as useEffect24, useId as useId23, useMemo as useMemo16, useRef as useRef22, useState as useState36 } from "react";
 
 // src/utils/cargaIA.js
 var IA_TEXTO_MAX = 2e4;
@@ -10326,7 +11961,7 @@ function normalizarResultadoIA(resultado, opciones = {}) {
 }
 
 // src/components/CargaIA.jsx
-import { Fragment as Fragment19, jsx as jsx106, jsxs as jsxs88 } from "react/jsx-runtime";
+import { Fragment as Fragment18, jsx as jsx110, jsxs as jsxs91 } from "react/jsx-runtime";
 var PLACEHOLDER = "Ejemplo:\nNombre Apellido \u2014 0981 123 456, correo@ejemplo.com\nProducto: pantalla LED 3x2, cantidad 4, precio 1.500.000";
 var listar = (cantidad, singular, plural) => `${cantidad} ${cantidad === 1 ? singular : plural}`;
 function mensajeDeError(falla, respaldo) {
@@ -10334,7 +11969,7 @@ function mensajeDeError(falla, respaldo) {
   return texto.trim() || respaldo;
 }
 function BotonCargaIA({ onAbrir, texto = IA_BOTON, tooltip = IA_TOOLTIP, className, ...props }) {
-  return /* @__PURE__ */ jsxs88(
+  return /* @__PURE__ */ jsxs91(
     "button",
     {
       type: "button",
@@ -10349,8 +11984,8 @@ function BotonCargaIA({ onAbrir, texto = IA_BOTON, tooltip = IA_TOOLTIP, classNa
       ),
       ...props,
       children: [
-        /* @__PURE__ */ jsx106(Icon, { name: "sparkles", className: "h-4 w-4" }),
-        /* @__PURE__ */ jsx106("span", { className: "hidden sm:inline", children: texto })
+        /* @__PURE__ */ jsx110(Icon, { name: "sparkles", className: "h-4 w-4" }),
+        /* @__PURE__ */ jsx110("span", { className: "hidden sm:inline", children: texto })
       ]
     }
   );
@@ -10370,15 +12005,15 @@ function CargaIA({
   className,
   classNameBoton
 }) {
-  const [abierto, setAbierto] = useState34(false);
-  const [montado, setMontado] = useState34(false);
+  const [abierto, setAbierto] = useState36(false);
+  const [montado, setMontado] = useState36(false);
   function abrir() {
     setMontado(true);
     setAbierto(true);
   }
-  return /* @__PURE__ */ jsxs88(Fragment19, { children: [
-    /* @__PURE__ */ jsx106(BotonCargaIA, { onAbrir: abrir, texto, tooltip, className: classNameBoton }),
-    montado ? /* @__PURE__ */ jsx106(
+  return /* @__PURE__ */ jsxs91(Fragment18, { children: [
+    /* @__PURE__ */ jsx110(BotonCargaIA, { onAbrir: abrir, texto, tooltip, className: classNameBoton }),
+    montado ? /* @__PURE__ */ jsx110(
       DialogoCargaIA,
       {
         abierto,
@@ -10398,7 +12033,7 @@ function CargaIA({
   ] });
 }
 function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
-  const id = useId19();
+  const id = useId23();
   const htmlFor = `${id}-${campo.id}`;
   const descripcionId = campo.ayuda || error ? `${htmlFor}-descripcion` : void 0;
   const valor = registro.valores?.[campo.id];
@@ -10411,7 +12046,7 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
   };
   let control;
   if (campo.tipo === "moneda") {
-    control = /* @__PURE__ */ jsx106(
+    control = /* @__PURE__ */ jsx110(
       MoneyInput,
       {
         ...comunes,
@@ -10421,22 +12056,22 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       }
     );
   } else if (campo.tipo === "select") {
-    control = /* @__PURE__ */ jsxs88(
+    control = /* @__PURE__ */ jsxs91(
       Select,
       {
         ...comunes,
         value: valor === null || valor === void 0 ? "" : String(valor),
         onChange: (evento) => onCambiar(evento.target.value),
         children: [
-          /* @__PURE__ */ jsx106("option", { value: "", children: "\u2014 Eleg\xED \u2014" }),
-          opcionesDeCampoIA(campo).map((opcion) => /* @__PURE__ */ jsx106("option", { value: opcion.value, children: opcion.label }, opcion.value))
+          /* @__PURE__ */ jsx110("option", { value: "", children: "\u2014 Eleg\xED \u2014" }),
+          opcionesDeCampoIA(campo).map((opcion) => /* @__PURE__ */ jsx110("option", { value: opcion.value, children: opcion.label }, opcion.value))
         ]
       }
     );
   } else if (campo.tipo === "fecha") {
-    control = /* @__PURE__ */ jsx106(Input, { ...comunes, type: "date", value: valor || "", onChange: (evento) => onCambiar(evento.target.value) });
+    control = /* @__PURE__ */ jsx110(Input, { ...comunes, type: "date", value: valor || "", onChange: (evento) => onCambiar(evento.target.value) });
   } else if (campo.tipo === "numero") {
-    control = /* @__PURE__ */ jsx106(
+    control = /* @__PURE__ */ jsx110(
       Input,
       {
         ...comunes,
@@ -10447,7 +12082,7 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       }
     );
   } else {
-    control = /* @__PURE__ */ jsx106(
+    control = /* @__PURE__ */ jsx110(
       Input,
       {
         ...comunes,
@@ -10457,12 +12092,12 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       }
     );
   }
-  return /* @__PURE__ */ jsx106(
+  return /* @__PURE__ */ jsx110(
     FormField,
     {
-      label: /* @__PURE__ */ jsxs88(Fragment19, { children: [
+      label: /* @__PURE__ */ jsxs91(Fragment18, { children: [
         campo.label,
-        obligatorio ? /* @__PURE__ */ jsxs88("span", { "aria-hidden": "true", className: "text-bad-text", children: [
+        obligatorio ? /* @__PURE__ */ jsxs91("span", { "aria-hidden": "true", className: "text-bad-text", children: [
           " ",
           "*"
         ] }) : null
@@ -10477,17 +12112,17 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
 }
 function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
   const titulo2 = tituloDeRegistroIA(registro, tipo);
-  return /* @__PURE__ */ jsxs88(
+  return /* @__PURE__ */ jsxs91(
     "article",
     {
       "aria-label": titulo2,
       className: cn("rounded-xl border border-ink-600 bg-ink-800/40 p-3 sm:p-4", !registro.incluir && "opacity-60"),
       children: [
-        /* @__PURE__ */ jsxs88("header", { className: "mb-3 flex items-start justify-between gap-3", children: [
-          /* @__PURE__ */ jsx106("p", { className: "min-w-0 flex-1 break-words text-sm font-semibold text-fore", children: titulo2 }),
-          /* @__PURE__ */ jsxs88("label", { className: "flex shrink-0 cursor-pointer items-center gap-2 text-xs text-mute", children: [
-            /* @__PURE__ */ jsx106("span", { className: "hidden sm:inline", children: registro.incluir ? "Incluir" : "Descartado" }),
-            /* @__PURE__ */ jsx106(
+        /* @__PURE__ */ jsxs91("header", { className: "mb-3 flex items-start justify-between gap-3", children: [
+          /* @__PURE__ */ jsx110("p", { className: "min-w-0 flex-1 break-words text-sm font-semibold text-fore", children: titulo2 }),
+          /* @__PURE__ */ jsxs91("label", { className: "flex shrink-0 cursor-pointer items-center gap-2 text-xs text-mute", children: [
+            /* @__PURE__ */ jsx110("span", { className: "hidden sm:inline", children: registro.incluir ? "Incluir" : "Descartado" }),
+            /* @__PURE__ */ jsx110(
               Switch,
               {
                 checked: Boolean(registro.incluir),
@@ -10497,8 +12132,8 @@ function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
             )
           ] })
         ] }),
-        registro.avisos?.length > 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "warn", compact: true, className: "mb-3", children: registro.avisos.join(" ") }) : null,
-        /* @__PURE__ */ jsx106("div", { className: "grid gap-3 sm:grid-cols-2", children: (tipo?.campos ?? []).map((campo) => /* @__PURE__ */ jsx106(
+        registro.avisos?.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", compact: true, className: "mb-3", children: registro.avisos.join(" ") }) : null,
+        /* @__PURE__ */ jsx110("div", { className: "grid gap-3 sm:grid-cols-2", children: (tipo?.campos ?? []).map((campo) => /* @__PURE__ */ jsx110(
           CampoRegistroIA,
           {
             campo,
@@ -10527,26 +12162,26 @@ function DialogoCargaIA({
   maxRegistros = IA_REGISTROS_MAX,
   className
 }) {
-  const idTexto = useId19();
-  const consultarRef = useRef19(consultarConfig);
+  const idTexto = useId23();
+  const consultarRef = useRef22(consultarConfig);
   consultarRef.current = consultarConfig;
-  const [config, setConfig] = useState34(() => consultarConfig ? null : { configurada: true, modelo: null });
-  const [configError, setConfigError] = useState34("");
-  const [reintento, setReintento] = useState34(0);
-  const [entrada, setEntrada] = useState34("");
-  const [fase, setFase] = useState34("entrada");
-  const [analizando, setAnalizando] = useState34(false);
-  const [creando, setCreando] = useState34(false);
-  const [error, setError] = useState34("");
-  const [avisos, setAvisos] = useState34([]);
-  const [registros, setRegistros] = useState34([]);
-  const [resultado, setResultado] = useState34(null);
-  const [intento, setIntento] = useState34(false);
+  const [config, setConfig] = useState36(() => consultarConfig ? null : { configurada: true, modelo: null });
+  const [configError, setConfigError] = useState36("");
+  const [reintento, setReintento] = useState36(0);
+  const [entrada3, setEntrada] = useState36("");
+  const [fase, setFase] = useState36("entrada");
+  const [analizando, setAnalizando] = useState36(false);
+  const [creando, setCreando] = useState36(false);
+  const [error, setError] = useState36("");
+  const [avisos, setAvisos] = useState36([]);
+  const [registros, setRegistros] = useState36([]);
+  const [resultado, setResultado] = useState36(null);
+  const [intento, setIntento] = useState36(false);
   const topeTexto = Number.isFinite(Number(maxTexto)) && Number(maxTexto) > 0 ? Math.floor(Number(maxTexto)) : IA_TEXTO_MAX;
   const topeRegistros = Number.isFinite(Number(maxRegistros)) && Number(maxRegistros) > 0 ? Math.floor(Number(maxRegistros)) : IA_REGISTROS_MAX;
   const idsEsquema = (esquema?.tipos ?? []).map((tipo) => tipo?.id).filter(Boolean);
   const permitidos = config?.tipos ? config.tipos.filter((id) => idsEsquema.includes(id)) : idsEsquema;
-  useEffect20(() => {
+  useEffect24(() => {
     if (!abierto) return void 0;
     setEntrada("");
     setFase("entrada");
@@ -10580,13 +12215,13 @@ function DialogoCargaIA({
       vigente = false;
     };
   }, [abierto, reintento]);
-  const grupos = useMemo13(
+  const grupos = useMemo16(
     () => (esquema?.tipos ?? []).map((tipo) => ({ tipo, registros: registros.filter((registro) => registro.tipo === tipo.id) })).filter((grupo) => grupo.registros.length > 0),
     [esquema, registros]
   );
   const incluidos = registrosIncluidosIA(registros);
   const totalIncluidos = incluidos.length;
-  const valido = useMemo13(() => validarRegistrosIA(registros, esquema), [registros, esquema]);
+  const valido = useMemo16(() => validarRegistrosIA(registros, esquema), [registros, esquema]);
   const partes = grupos.map(
     ({ tipo, registros: delTipo }) => listar(delTipo.length, tipo.singular || tipo.label.toLowerCase(), tipo.plural || tipo.label.toLowerCase())
   );
@@ -10601,7 +12236,7 @@ function DialogoCargaIA({
     setRegistros((actuales) => actuales.map((registro) => registro.id === registroId ? { ...registro, incluir } : registro));
   }
   async function analizarTexto() {
-    const limpio = entrada.trim();
+    const limpio = entrada3.trim();
     if (!limpio || analizando) return;
     setAnalizando(true);
     setError("");
@@ -10666,7 +12301,7 @@ function DialogoCargaIA({
     errores: resultado.errores,
     advertencias: resultado.advertencias
   } : null;
-  return /* @__PURE__ */ jsxs88(
+  return /* @__PURE__ */ jsxs91(
     Modal,
     {
       open: Boolean(abierto),
@@ -10676,31 +12311,31 @@ function DialogoCargaIA({
       busy: analizando || creando,
       className,
       children: [
-        config === null && !configError ? /* @__PURE__ */ jsxs88("div", { className: "space-y-3", role: "status", "aria-busy": "true", children: [
-          /* @__PURE__ */ jsx106(Skeleton, { className: "h-4 w-40" }),
-          /* @__PURE__ */ jsx106(Skeleton, { className: "h-24 w-full" }),
-          /* @__PURE__ */ jsx106("p", { className: "text-sm text-mute", children: "Consultando la configuraci\xF3n\u2026" })
+        config === null && !configError ? /* @__PURE__ */ jsxs91("div", { className: "space-y-3", role: "status", "aria-busy": "true", children: [
+          /* @__PURE__ */ jsx110(Skeleton, { className: "h-4 w-40" }),
+          /* @__PURE__ */ jsx110(Skeleton, { className: "h-24 w-full" }),
+          /* @__PURE__ */ jsx110("p", { className: "text-sm text-mute", children: "Consultando la configuraci\xF3n\u2026" })
         ] }) : null,
-        configError ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: configError }),
-          /* @__PURE__ */ jsxs88(FormActions, { children: [
-            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: onCerrar, children: "Cancelar" }),
-            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: () => setReintento((valor) => valor + 1), children: "Reintentar" })
+        configError ? /* @__PURE__ */ jsxs91("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: configError }),
+          /* @__PURE__ */ jsxs91(FormActions, { children: [
+            /* @__PURE__ */ jsx110(Button, { type: "button", variant: "ghost", onClick: onCerrar, children: "Cancelar" }),
+            /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: () => setReintento((valor) => valor + 1), children: "Reintentar" })
           ] })
         ] }) : null,
-        config && !config.configurada ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: "La IA no est\xE1 configurada en este servidor. Mientras tanto, los registros se cargan a mano desde cada m\xF3dulo, sin perder nada." }),
-          /* @__PURE__ */ jsx106("p", { className: "text-sm text-mute", children: "Cuando la app tenga proveedor configurado, este asistente vuelve solo." }),
-          /* @__PURE__ */ jsxs88(FormActions, { children: [
-            consultarConfig ? /* @__PURE__ */ jsx106(Button, { type: "button", variant: "outline", onClick: () => setReintento((valor) => valor + 1), children: "Volver a chequear" }) : null,
-            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" })
+        config && !config.configurada ? /* @__PURE__ */ jsxs91("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: "La IA no est\xE1 configurada en este servidor. Mientras tanto, los registros se cargan a mano desde cada m\xF3dulo, sin perder nada." }),
+          /* @__PURE__ */ jsx110("p", { className: "text-sm text-mute", children: "Cuando la app tenga proveedor configurado, este asistente vuelve solo." }),
+          /* @__PURE__ */ jsxs91(FormActions, { children: [
+            consultarConfig ? /* @__PURE__ */ jsx110(Button, { type: "button", variant: "outline", onClick: () => setReintento((valor) => valor + 1), children: "Volver a chequear" }) : null,
+            /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" })
           ] })
         ] }) : null,
-        config?.configurada && permitidos.length === 0 ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: "No ten\xE9s permiso para crear ninguno de los tipos de este asistente." }),
-          /* @__PURE__ */ jsx106(FormActions, { children: /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" }) })
+        config?.configurada && permitidos.length === 0 ? /* @__PURE__ */ jsxs91("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: "No ten\xE9s permiso para crear ninguno de los tipos de este asistente." }),
+          /* @__PURE__ */ jsx110(FormActions, { children: /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" }) })
         ] }) : null,
-        config?.configurada && permitidos.length > 0 && fase === "entrada" ? /* @__PURE__ */ jsxs88(
+        config?.configurada && permitidos.length > 0 && fase === "entrada" ? /* @__PURE__ */ jsxs91(
           "form",
           {
             className: "space-y-4",
@@ -10709,32 +12344,32 @@ function DialogoCargaIA({
               void analizarTexto();
             },
             children: [
-              /* @__PURE__ */ jsxs88("div", { children: [
-                /* @__PURE__ */ jsx106(FormField, { label: "Texto para cargar", htmlFor: idTexto, hint: pista, children: /* @__PURE__ */ jsx106(
+              /* @__PURE__ */ jsxs91("div", { children: [
+                /* @__PURE__ */ jsx110(FormField, { label: "Texto para cargar", htmlFor: idTexto, hint: pista, children: /* @__PURE__ */ jsx110(
                   Textarea,
                   {
                     id: idTexto,
                     rows: 10,
                     maxLength: topeTexto,
-                    value: entrada,
+                    value: entrada3,
                     disabled: analizando,
                     placeholder,
                     "aria-describedby": `${idTexto}-descripcion`,
                     onChange: (evento) => setEntrada(evento.target.value)
                   }
                 ) }),
-                /* @__PURE__ */ jsxs88("p", { className: "mt-1.5 text-right text-xs text-mute", children: [
-                  entrada.length.toLocaleString("es-PY"),
+                /* @__PURE__ */ jsxs91("p", { className: "mt-1.5 text-right text-xs text-mute", children: [
+                  entrada3.length.toLocaleString("es-PY"),
                   " / ",
                   topeTexto.toLocaleString("es-PY")
                 ] })
               ] }),
-              /* @__PURE__ */ jsxs88("p", { className: "text-xs leading-5 text-mute", children: [
+              /* @__PURE__ */ jsxs91("p", { className: "text-xs leading-5 text-mute", children: [
                 "Se manda solo este texto al proveedor de IA configurado",
                 config.modelo ? ` (${config.modelo})` : "",
                 " para armar la vista previa; no se guarda ni se toca la base.",
                 " ",
-                enlacePrivacidad ? /* @__PURE__ */ jsx106(
+                enlacePrivacidad ? /* @__PURE__ */ jsx110(
                   "a",
                   {
                     className: "font-medium text-fono-light underline-offset-2 hover:underline",
@@ -10745,23 +12380,23 @@ function DialogoCargaIA({
                   }
                 ) : null
               ] }),
-              error ? /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: error }) : null,
-              /* @__PURE__ */ jsxs88(FormActions, { children: [
-                /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: onCerrar, disabled: analizando, children: "Cancelar" }),
-                /* @__PURE__ */ jsx106(Button, { type: "submit", variant: "primary", disabled: !entrada.trim() || analizando, children: analizando ? "Analizando\u2026" : "Analizar con IA" })
+              error ? /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: error }) : null,
+              /* @__PURE__ */ jsxs91(FormActions, { children: [
+                /* @__PURE__ */ jsx110(Button, { type: "button", variant: "ghost", onClick: onCerrar, disabled: analizando, children: "Cancelar" }),
+                /* @__PURE__ */ jsx110(Button, { type: "submit", variant: "primary", disabled: !entrada3.trim() || analizando, children: analizando ? "Analizando\u2026" : "Analizar con IA" })
               ] })
             ]
           }
         ) : null,
-        config?.configurada && permitidos.length > 0 && fase === "revision" ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ jsx106("p", { className: "text-sm text-mute", children: grupos.length > 0 ? /* @__PURE__ */ jsxs88(Fragment19, { children: [
+        config?.configurada && permitidos.length > 0 && fase === "revision" ? /* @__PURE__ */ jsxs91("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx110("p", { className: "text-sm text-mute", children: grupos.length > 0 ? /* @__PURE__ */ jsxs91(Fragment18, { children: [
             "Detectamos ",
-            /* @__PURE__ */ jsx106("strong", { className: "text-fore", children: partes.join(", ") }),
+            /* @__PURE__ */ jsx110("strong", { className: "text-fore", children: partes.join(", ") }),
             ". Revis\xE1, correg\xED o descart\xE1: nada se crea sin tu confirmaci\xF3n."
           ] }) : "No detectamos registros en el texto." }),
-          avisos.length > 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: avisos.join(" ") }) : null,
-          error ? /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: error }) : null,
-          grupos.length === 0 ? /* @__PURE__ */ jsx106(
+          avisos.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: avisos.join(" ") }) : null,
+          error ? /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: error }) : null,
+          grupos.length === 0 ? /* @__PURE__ */ jsx110(
             EmptyState,
             {
               icon: "sparkles",
@@ -10769,13 +12404,13 @@ function DialogoCargaIA({
               description: "Prob\xE1 con un texto m\xE1s completo (nombres, fechas o precios) o volv\xE9 a pegar."
             }
           ) : null,
-          grupos.map(({ tipo, registros: delTipo }) => /* @__PURE__ */ jsxs88("section", { "aria-label": `${tipo.label} detectados (${delTipo.length})`, className: "space-y-2.5", children: [
-            /* @__PURE__ */ jsxs88("h3", { className: "text-[10px] font-bold uppercase tracking-wider text-mute", children: [
+          grupos.map(({ tipo, registros: delTipo }) => /* @__PURE__ */ jsxs91("section", { "aria-label": `${tipo.label} detectados (${delTipo.length})`, className: "space-y-2.5", children: [
+            /* @__PURE__ */ jsxs91("h3", { className: "text-[10px] font-bold uppercase tracking-wider text-mute", children: [
               tipo.label,
               " ",
-              /* @__PURE__ */ jsx106("span", { className: "text-mute/80", children: delTipo.length })
+              /* @__PURE__ */ jsx110("span", { className: "text-mute/80", children: delTipo.length })
             ] }),
-            delTipo.map((registro) => /* @__PURE__ */ jsx106(
+            delTipo.map((registro) => /* @__PURE__ */ jsx110(
               TarjetaRegistroIA,
               {
                 registro,
@@ -10787,9 +12422,9 @@ function DialogoCargaIA({
               registro.id
             ))
           ] }, tipo.id)),
-          /* @__PURE__ */ jsxs88(FormActions, { children: [
-            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: () => setFase("entrada"), disabled: creando, children: "Volver" }),
-            /* @__PURE__ */ jsx106(
+          /* @__PURE__ */ jsxs91(FormActions, { children: [
+            /* @__PURE__ */ jsx110(Button, { type: "button", variant: "ghost", onClick: () => setFase("entrada"), disabled: creando, children: "Volver" }),
+            /* @__PURE__ */ jsx110(
               Button,
               {
                 type: "button",
@@ -10801,13 +12436,13 @@ function DialogoCargaIA({
             )
           ] })
         ] }) : null,
-        config?.configurada && permitidos.length > 0 && fase === "listo" && resumen ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
-          resumen.creados === null ? /* @__PURE__ */ jsx106(Nota, { tono: "info", children: "La app termin\xF3 el alta; el detalle queda en su m\xF3dulo." }) : resumen.creados > 0 ? /* @__PURE__ */ jsx106(Aviso, { tono: "ok", children: resumen.total !== null && resumen.creados < resumen.total ? `Creamos ${resumen.creados} de ${resumen.total} registros.` : `Creamos ${listar(resumen.creados, "registro", "registros")}.` }) : resumen.errores.length === 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "neutro", children: "No se cre\xF3 ning\xFAn registro." }) : null,
-          resumen.advertencias.length > 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: resumen.advertencias.join(" ") }) : null,
-          resumen.errores.length > 0 ? /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: `No pudimos crear ${listar(resumen.errores.length, "registro", "registros")}: ${resumen.errores.join(" \xB7 ")}` }) : null,
-          /* @__PURE__ */ jsxs88(FormActions, { children: [
-            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: cargarOtroTexto, children: "Cargar otro texto" }),
-            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Listo" })
+        config?.configurada && permitidos.length > 0 && fase === "listo" && resumen ? /* @__PURE__ */ jsxs91("div", { className: "space-y-4", children: [
+          resumen.creados === null ? /* @__PURE__ */ jsx110(Nota, { tono: "info", children: "La app termin\xF3 el alta; el detalle queda en su m\xF3dulo." }) : resumen.creados > 0 ? /* @__PURE__ */ jsx110(Aviso, { tono: "ok", children: resumen.total !== null && resumen.creados < resumen.total ? `Creamos ${resumen.creados} de ${resumen.total} registros.` : `Creamos ${listar(resumen.creados, "registro", "registros")}.` }) : resumen.errores.length === 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "neutro", children: "No se cre\xF3 ning\xFAn registro." }) : null,
+          resumen.advertencias.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: resumen.advertencias.join(" ") }) : null,
+          resumen.errores.length > 0 ? /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: `No pudimos crear ${listar(resumen.errores.length, "registro", "registros")}: ${resumen.errores.join(" \xB7 ")}` }) : null,
+          /* @__PURE__ */ jsxs91(FormActions, { children: [
+            /* @__PURE__ */ jsx110(Button, { type: "button", variant: "ghost", onClick: cargarOtroTexto, children: "Cargar otro texto" }),
+            /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Listo" })
           ] })
         ] }) : null
       ]
@@ -10816,7 +12451,7 @@ function DialogoCargaIA({
 }
 
 // src/hooks/useSingleFlightSubmit.js
-import { useCallback as useCallback5, useRef as useRef20, useState as useState35 } from "react";
+import { useCallback as useCallback5, useRef as useRef23, useState as useState37 } from "react";
 
 // src/utils/guardado.js
 var AVISO_REFRESCO = "Se guard\xF3 correctamente, pero no se pudo actualizar la lista. Recarg\xE1 la p\xE1gina para ver los cambios; no hace falta guardar otra vez.";
@@ -10850,10 +12485,10 @@ async function completeSave(cerrar, refrescar, { avisar: avisar2 } = {}) {
 
 // src/hooks/useSingleFlightSubmit.js
 function useSingleFlightSubmit(enviar) {
-  const [pendiente, setPendiente] = useState35(false);
-  const ultimoEnviar = useRef20(enviar);
+  const [pendiente, setPendiente] = useState37(false);
+  const ultimoEnviar = useRef23(enviar);
   ultimoEnviar.current = enviar;
-  const envio = useRef20(null);
+  const envio = useRef23(null);
   if (!envio.current) {
     envio.current = crearEnvioUnico(async (evento) => {
       setPendiente(true);
@@ -11376,6 +13011,7 @@ export {
   AvisoPrivacidad,
   AyudaModulo,
   BANCOS_PARAGUAY,
+  BANCOS_Y_FINANCIERAS_PARAGUAY,
   Badge,
   BancoCombobox,
   BancoLogo,
@@ -11412,6 +13048,7 @@ export {
   COLOR_DE_TONO,
   CONDICION_UNIDAD,
   CONECTIVIDADES_MOVIL,
+  COOPERATIVAS_PARAGUAY,
   CORTES_PRUEBA,
   CREDITO_PIE,
   CREDITO_PIE_URL,
@@ -11436,6 +13073,7 @@ export {
   ContadorLote,
   ContadoresCompra,
   ConteoChecklist,
+  CountryPhoneSelect,
   Cronologia,
   CurrencySelect,
   DEPARTAMENTOS_PARAGUAY,
@@ -11472,6 +13110,7 @@ export {
   EstadoGuardado,
   EtiquetaLote,
   Eyebrow,
+  FECHA_VERIFICACION_MARCAS_FINANCIERAS,
   FichaCertificado,
   FilaChecklist,
   FilaDato,
@@ -11515,8 +13154,10 @@ export {
   ListGridToggle,
   LoadingScreen,
   MARCAS_ACCESORIOS,
+  MARCAS_MEDIOS_PAGO,
   MARGEN_VENTANA,
   MEDIOS_CUENTA,
+  MEDIOS_PAGO_CON_MARCA,
   MENSAJE_RUC,
   MENSAJE_RUC_CONSULTA,
   MENSAJE_RUC_SIN_DATOS,
@@ -11527,6 +13168,7 @@ export {
   ManifiestoEnvio,
   MedidorBateria,
   MedidorStock,
+  MedioPagoLogo,
   MenuDesplegable,
   Modal,
   Money,
@@ -11537,6 +13179,7 @@ export {
   NumericKeypad,
   OAuthDivider,
   ORIGENES_NECESIDAD,
+  PAISES_TELEFONO,
   PASOS_ENVIO,
   PASOS_NECESIDAD,
   PATRON_RUC,
@@ -11563,6 +13206,7 @@ export {
   PreviewFusion,
   ProductCombobox,
   ProductFooter,
+  ProductPrefooter,
   ProgresoChecklist,
   QR_OPCIONES,
   ROTULO_DATO,
@@ -11624,6 +13268,7 @@ export {
   UMBRAL_BATERIA_ATENCION,
   UMBRAL_BATERIA_OK,
   VARIANTES_CORTE,
+  VERSION_APP_RE,
   Vencimiento,
   VistaPreviaPapel,
   agregarEstado,
@@ -11637,6 +13282,7 @@ export {
   buscarCiudad,
   buscarDispositivo,
   buscarEnCatalogo,
+  buscarPaisesTelefono,
   campoBuscableCliente,
   campoBuscableCuenta,
   campoDeTipoIA,
@@ -11655,6 +13301,8 @@ export {
   claveRevision,
   claveTelefonoCliente,
   cn,
+  coberturaBancos,
+  coberturaMediosPago,
   codigoDeDispositivo,
   codigoPais,
   coincideTelefonoCliente,
@@ -11672,6 +13320,7 @@ export {
   conexionDeDestino,
   contarSinLeer,
   crearEnvioUnico,
+  crearIdentidadApp,
   crearPilaCapas,
   crearRegistroPendientes,
   crearTicket,
@@ -11694,6 +13343,7 @@ export {
   esRazonSocial,
   esRuc,
   esToken,
+  esVersionApp,
   estadoChip,
   estadoCompra,
   estadoDeDiagnostico,
@@ -11723,6 +13373,7 @@ export {
   etiquetaRecepcion,
   etiquetaRevision,
   etiquetaTrabajo,
+  etiquetaVersionApp,
   excedeMonto,
   extractTokenFromUrl,
   extraerRuc,
@@ -11766,6 +13417,7 @@ export {
   limpiarPercent,
   limpiarTaxId,
   logoDeBanco,
+  logoDeMedioPago,
   maximoDeBarras,
   metodoEnvio,
   mimeDeImagen,
@@ -11784,6 +13436,7 @@ export {
   normalizarBusqueda,
   normalizarCategoria,
   normalizarInstagram,
+  normalizarMarcaPago,
   normalizarMontoInput,
   normalizarNombre,
   normalizarPersonaTexto,
@@ -11802,9 +13455,12 @@ export {
   origenDe,
   paginaDePrueba,
   paginaDePruebaSimple,
+  paisTelefonoPorIso,
+  paisesDeCodigo,
   parseGsInput,
   parsePercent,
   parseTelefono,
+  parseTelefonoInternacional,
   parseUsdInput,
   partesVersion,
   partirSerial,
@@ -11842,6 +13498,8 @@ export {
   taxIdGenericoValid,
   taxIdValid,
   taxIdValidoParaPais,
+  telefonoE164,
+  telefonoInternacionalValido,
   telefonoValido,
   telefonoVisible,
   textoContador,
@@ -11861,6 +13519,7 @@ export {
   tonoRevision,
   tonoVencimiento,
   ultimos4,
+  useComboboxNavigation,
   useDialogClose,
   useDialogFocusTrap,
   useDialogPending,

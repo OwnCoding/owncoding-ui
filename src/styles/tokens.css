@@ -39,9 +39,7 @@
   --c-info: 32 89 190;
   --c-reserved: 109 40 217;
   --c-onbrand: 4 28 18;
-  /* Texto sobre los rellenos semánticos llenos (#13): el par viaja con el
-     relleno —claro sobre los tonos oscuros del tema claro, oscuro sobre los
-     claros del oscuro—. Se usa en `Button` success/danger. */
+  /* Texto AA sobre botones semánticos sólidos. */
   --c-on-ok: 255 255 255;
   --c-on-bad: 255 255 255;
   /* Verde pass/certificado y azul acción (tema consola, épica #241) */

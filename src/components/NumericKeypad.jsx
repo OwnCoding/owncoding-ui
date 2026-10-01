@@ -11,7 +11,7 @@ export default function NumericKeypad({ value = '', onChange, max, className, ar
     onChange(max ? siguiente.slice(0, max) : siguiente)
   }
   return (
-    <div className={className ?? 'mt-2 grid max-w-[19rem] grid-cols-3 gap-2'} aria-label={ariaLabel}>
+    <div role="group" className={className ?? 'mt-2 grid max-w-[19rem] grid-cols-3 gap-2'} aria-label={ariaLabel}>
       {TECLAS.map((tecla) => (
         <button
           key={tecla}

@@ -33,6 +33,7 @@ export function limpiarPercent(valor, max = 100) {
 export default function PercentField({
   value = '',
   onChange,
+  onValueChange,
   disabled = false,
   placeholder = '0',
   max = 100,
@@ -40,6 +41,11 @@ export default function PercentField({
   id,
   ...props
 }) {
+  function notificar(siguiente) {
+    onChange?.(siguiente)
+    if (onValueChange && onValueChange !== onChange) onValueChange(siguiente)
+  }
+
   return (
     <Input
       id={id}
@@ -52,7 +58,7 @@ export default function PercentField({
       placeholder={placeholder}
       {...props}
       value={limpiarPercent(value, max)}
-      onChange={(event) => onChange?.(limpiarPercent(event.target.value, max))}
+      onChange={(event) => notificar(limpiarPercent(event.target.value, max))}
     />
   )
 }

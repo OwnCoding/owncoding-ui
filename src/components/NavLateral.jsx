@@ -42,26 +42,39 @@ function ItemNav({ item, activo, colapsado, onSelect, hijo = false }) {
   )
 }
 
-export default function NavLateral({
-  items = [],
-  grupos,
-  gruposPlegados,
-  onToggleGrupo,
-  activeId,
-  onSelect,
-  colapsado = false,
-  onToggle,
-  cabecera,
-  pie,
-  ancho = 'w-64',
-  ariaLabel = 'Navegación principal',
-  className,
-}) {
-  const [plegadosInterno, setPlegadosInterno] = useState({})
-  const plegados = gruposPlegados ?? plegadosInterno
+export default function NavLateral(props) {
+  const {
+    items = [],
+    grupos,
+    gruposPlegados,
+    defaultGruposPlegados = {},
+    onToggleGrupo,
+    activeId,
+    onSelect,
+    colapsado: colapsadoProp,
+    defaultColapsado = false,
+    onToggle,
+    cabecera,
+    pie,
+    ancho = 'w-64',
+    ariaLabel = 'Navegación principal',
+    className,
+  } = props
+  const gruposControlados = Object.prototype.hasOwnProperty.call(props, 'gruposPlegados')
+  const colapsoControlado = Object.prototype.hasOwnProperty.call(props, 'colapsado')
+  const [plegadosInterno, setPlegadosInterno] = useState(defaultGruposPlegados)
+  const [colapsadoInterno, setColapsadoInterno] = useState(defaultColapsado)
+  const plegados = gruposControlados ? (gruposPlegados || {}) : plegadosInterno
+  const colapsado = colapsoControlado ? Boolean(colapsadoProp) : colapsadoInterno
   const alternarGrupo = (titulo) => {
-    if (onToggleGrupo) onToggleGrupo(titulo)
-    else setPlegadosInterno((previos) => ({ ...previos, [titulo]: !previos[titulo] }))
+    const siguiente = !Boolean(plegados[titulo])
+    if (!gruposControlados) setPlegadosInterno((previos) => ({ ...previos, [titulo]: siguiente }))
+    onToggleGrupo?.(titulo, siguiente)
+  }
+  const alternarColapso = () => {
+    const siguiente = !colapsado
+    if (!colapsoControlado) setColapsadoInterno(siguiente)
+    onToggle?.(siguiente)
   }
 
   const lista = (listaItems) => (
@@ -100,7 +113,7 @@ export default function NavLateral({
         {onToggle && (
           <button
             type="button"
-            onClick={onToggle}
+            onClick={alternarColapso}
             aria-label={colapsado ? 'Expandir menú' : 'Contraer menú'}
             aria-expanded={!colapsado}
             className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-700 hover:text-fore', colapsado && 'w-full')}

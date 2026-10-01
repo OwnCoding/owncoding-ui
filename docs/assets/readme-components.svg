@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Muestra de componentes de OwnCoding UI</title>
+  <desc id="desc">Panel ilustrativo basado en los tokens reales con primitivas, campos, datos, estados y navegación.</desc>
+  <rect width="1200" height="720" rx="28" fill="#0e1116"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
+    <text x="56" y="58" fill="#7cffc9" font-size="13" font-weight="700" letter-spacing="2">MUESTRA DEL SISTEMA</text>
+    <text x="56" y="98" fill="#f4f6fa" font-size="30" font-weight="760">Primitivas que se combinan sin perder coherencia</text>
+    <text x="56" y="128" fill="#aab3c2" font-size="14">Representación editorial basada en los componentes y tokens reales; no es una captura de producto.</text>
+
+    <g transform="translate(56 164)">
+      <rect width="522" height="226" rx="22" fill="#1f2430" stroke="#3e475a"/>
+      <text x="24" y="34" fill="#7cffc9" font-size="11" font-weight="700" letter-spacing="1.4">CAMPOS Y ACCIONES</text>
+      <text x="24" y="64" fill="#d9dee8" font-size="13">Cliente</text>
+      <rect x="24" y="76" width="474" height="46" rx="12" fill="#181d27" stroke="#7c879b"/>
+      <text x="42" y="105" fill="#f4f6fa" font-size="13">Acme Paraguay</text>
+      <text x="24" y="148" fill="#d9dee8" font-size="13">Estado</text>
+      <rect x="24" y="160" width="224" height="42" rx="11" fill="#181d27" stroke="#7c879b"/>
+      <text x="42" y="186" fill="#f4f6fa" font-size="12">Activo</text>
+      <path d="m226 176 6 6 6-6" fill="none" stroke="#aab3c2" stroke-width="2"/>
+      <rect x="262" y="160" width="116" height="42" rx="11" fill="#05f19c"/>
+      <text x="320" y="186" fill="#061e14" font-size="12" font-weight="750" text-anchor="middle">Guardar</text>
+      <rect x="390" y="160" width="108" height="42" rx="11" fill="none" stroke="#7c879b"/>
+      <text x="444" y="186" fill="#f4f6fa" font-size="12" font-weight="650" text-anchor="middle">Cancelar</text>
+    </g>
+
+    <g transform="translate(594 164)">
+      <rect width="550" height="226" rx="22" fill="#1f2430" stroke="#3e475a"/>
+      <text x="24" y="34" fill="#9fb5ff" font-size="11" font-weight="700" letter-spacing="1.4">DATOS</text>
+      <rect x="24" y="52" width="502" height="36" rx="10" fill="#181d27"/>
+      <text x="40" y="75" fill="#aab3c2" font-size="11" font-weight="700">PEDIDO</text>
+      <text x="226" y="75" fill="#aab3c2" font-size="11" font-weight="700">ESTADO</text>
+      <text x="434" y="75" fill="#aab3c2" font-size="11" font-weight="700">TOTAL</text>
+      <line x1="24" y1="100" x2="526" y2="100" stroke="#3e475a"/>
+      <text x="40" y="126" fill="#f4f6fa" font-size="12" font-weight="650">OC-1048</text>
+      <rect x="226" y="108" width="84" height="25" rx="12.5" fill="#073923"/>
+      <text x="268" y="125" fill="#80f2b0" font-size="10" font-weight="700" text-anchor="middle">PAGADO</text>
+      <text x="434" y="126" fill="#f4f6fa" font-size="12">₲ 1.250.000</text>
+      <line x1="24" y1="144" x2="526" y2="144" stroke="#3e475a"/>
+      <text x="40" y="170" fill="#f4f6fa" font-size="12" font-weight="650">OC-1049</text>
+      <rect x="226" y="152" width="94" height="25" rx="12.5" fill="#3e2b0d"/>
+      <text x="273" y="169" fill="#fcd34d" font-size="10" font-weight="700" text-anchor="middle">PENDIENTE</text>
+      <text x="434" y="170" fill="#f4f6fa" font-size="12">₲ 480.000</text>
+      <line x1="24" y1="188" x2="526" y2="188" stroke="#3e475a"/>
+    </g>
+
+    <g transform="translate(56 406)">
+      <rect width="360" height="246" rx="22" fill="#1f2430" stroke="#3e475a"/>
+      <text x="24" y="34" fill="#ddc7fa" font-size="11" font-weight="700" letter-spacing="1.4">NAVEGACIÓN</text>
+      <rect x="24" y="52" width="312" height="46" rx="12" fill="#063426" stroke="#087a57"/>
+      <rect x="40" y="67" width="16" height="16" rx="4" fill="#05f19c"/>
+      <text x="70" y="80" fill="#f4f6fa" font-size="13" font-weight="700">Resumen</text>
+      <rect x="24" y="108" width="312" height="46" rx="12" fill="#181d27"/>
+      <circle cx="48" cy="131" r="8" fill="none" stroke="#7c879b" stroke-width="2"/>
+      <text x="70" y="136" fill="#c7ceda" font-size="13">Operaciones</text>
+      <rect x="24" y="164" width="312" height="46" rx="12" fill="#181d27"/>
+      <path d="M40 184h16M40 190h16" stroke="#7c879b" stroke-width="2" stroke-linecap="round"/>
+      <text x="70" y="192" fill="#c7ceda" font-size="13">Configuración</text>
+    </g>
+
+    <g transform="translate(432 406)">
+      <rect width="330" height="246" rx="22" fill="#1f2430" stroke="#3e475a"/>
+      <text x="24" y="34" fill="#fcd34d" font-size="11" font-weight="700" letter-spacing="1.4">ESTADOS</text>
+      <rect x="24" y="52" width="282" height="60" rx="14" fill="#162540" stroke="#35538d"/>
+      <circle cx="48" cy="82" r="8" fill="#4d7cfe"/>
+      <text x="67" y="78" fill="#cbd6ff" font-size="12" font-weight="680">Datos actualizados</text>
+      <text x="67" y="96" fill="#9aa9c6" font-size="10">Hace menos de un minuto</text>
+      <rect x="24" y="124" width="282" height="60" rx="14" fill="#31230d" stroke="#76520d"/>
+      <path d="M48 141 59 161H37z" fill="#fcd34d"/>
+      <text x="67" y="150" fill="#fde68a" font-size="12" font-weight="680">Requiere atención</text>
+      <text x="67" y="168" fill="#c4a86a" font-size="10">Revisá los datos pendientes</text>
+      <rect x="24" y="196" width="94" height="24" rx="12" fill="#073923"/>
+      <text x="71" y="212" fill="#80f2b0" font-size="10" font-weight="700" text-anchor="middle">OPERATIVO</text>
+    </g>
+
+    <g transform="translate(778 406)">
+      <rect width="366" height="246" rx="22" fill="#1f2430" stroke="#3e475a"/>
+      <text x="24" y="34" fill="#7cffc9" font-size="11" font-weight="700" letter-spacing="1.4">MÉTRICAS</text>
+      <text x="24" y="78" fill="#aab3c2" font-size="12">Componentes visuales</text>
+      <text x="24" y="122" fill="#f4f6fa" font-size="42" font-weight="780">143</text>
+      <rect x="24" y="144" width="318" height="12" rx="6" fill="#181d27"/>
+      <rect x="24" y="144" width="232" height="12" rx="6" fill="#05f19c"/>
+      <text x="24" y="188" fill="#aab3c2" font-size="12">Catálogo con guard automático</text>
+      <circle cx="32" cy="214" r="6" fill="#16c65c"/>
+      <text x="48" y="218" fill="#d9dee8" font-size="11">Cobertura sincronizada con la entrada raíz</text>
+    </g>
+  </g>
+</svg>

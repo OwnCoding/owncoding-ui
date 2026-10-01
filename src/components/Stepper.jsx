@@ -23,7 +23,7 @@ export default function Stepper({ pasos = [], actual = 0, hechos = [], variante 
           const hecho = esHecho(paso, indice)
           const activo = !hecho && esActual(paso, indice)
           return (
-            <li key={claveDe(paso, indice)} className={cn('flex items-center gap-2.5 rounded-xl border p-2.5', activo ? 'border-info/40 bg-info/5' : 'border-ink-600')}>
+            <li key={claveDe(paso, indice)} aria-current={activo ? 'step' : undefined} className={cn('flex items-center gap-2.5 rounded-xl border p-2.5', activo ? 'border-info/40 bg-info/5' : 'border-ink-600')}>
               <span
                 className={cn(
                   'grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold',
@@ -50,7 +50,7 @@ export default function Stepper({ pasos = [], actual = 0, hechos = [], variante 
         const hecho = esHecho(paso, indice)
         const enCurso = esActual(paso, indice)
         return (
-          <li key={claveDe(paso, indice)} className="flex items-center gap-2">
+          <li key={claveDe(paso, indice)} aria-current={enCurso ? 'step' : undefined} className="flex items-center gap-2">
             <span
               className={cn(
                 'grid h-6 w-6 shrink-0 place-items-center rounded-full border text-[11px] font-bold',

@@ -41,9 +41,8 @@ describe('nombres y documentos', () => {
 describe('bancos de Paraguay', () => {
   test('el catálogo por defecto y sus sugerencias', () => {
     expect(BANCOS_PARAGUAY).toContain('Banco Atlas')
-    // El nombre canónico va capitalizado (el alias `ueno` sigue resolviendo).
-    expect(BANCOS_PARAGUAY).toContain('Ueno Bank')
-    expect(BANCOS_PARAGUAY).toContain('Visión Banco')
+    expect(BANCOS_PARAGUAY).toContain('ueno bank')
+    expect(BANCOS_PARAGUAY).not.toContain('Visión Banco')
     expect(BANCOS_PARAGUAY).toContain('Financiera FIC')
     expect(sugerenciasDeBanco('continental')).toEqual(['Banco Continental'])
     expect(sugerenciasDeBanco('basa')).toEqual(['Banco Basa'])
@@ -54,21 +53,20 @@ describe('bancos de Paraguay', () => {
     const esperado = {
       continental: 'Banco Continental',
       bnf: 'Banco Nacional de Fomento',
-      interfisa: 'Banco Interfisa',
+      interfisa: 'Interfisa Banco',
       atlas: 'Banco Atlas',
       familiar: 'Banco Familiar',
-      vision: 'Visión Banco',
-      sudameris: 'Banco Sudameris',
+      vision: 'ueno bank',
+      sudameris: 'Sudameris',
       fic: 'Financiera FIC',
-      rio: 'Banco Río',
-      ueno: 'Ueno Bank',
+      rio: 'Banco Continental',
+      ueno: 'ueno bank',
     }
     for (const [alias, banco] of Object.entries(esperado)) {
       expect(logoDeBanco(alias), `${alias} → ${banco}`).toMatchObject({ banco })
     }
-    // `Banco Río` quedó absorbido: resuelve para datos históricos pero no se
-    // sugiere en el catálogo vigente.
-    expect(sugerenciasDeBanco('rio')).toEqual([])
+    // Los alias históricos sugieren la entidad activa que los sucedió.
+    expect(sugerenciasDeBanco('rio')).toEqual(['Banco Continental'])
   })
 
   test('el registro resuelve archivo, marca y monograma', () => {
@@ -80,7 +78,10 @@ describe('bancos de Paraguay', () => {
   })
 
   test('el logo y el combo se renderizan', () => {
-    expect(renderToStaticMarkup(<BancoLogo banco="Banco Basa" />)).toContain('/bancos/banco-basa.svg')
+    const basa = renderToStaticMarkup(<BancoLogo banco="Banco Basa" />)
+    expect(basa).toContain('Banco Basa')
+    expect(basa).toContain('data-logo-estado="permiso-pendiente"')
+    expect(basa).not.toContain('<img')
     expect(renderToStaticMarkup(<BancoLogo banco="Coomecipar" />)).toContain('CO')
     expect(renderToStaticMarkup(<BancoCombobox value="Banco At" onChange={() => {}} />)).toContain('role="combobox"')
   })

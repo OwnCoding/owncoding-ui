@@ -11,6 +11,32 @@ export type Tono = TonoCanonico | 'neutral' | 'neutro' | 'accent' | 'acento' | '
 /** Moneda de los montos del sistema. */
 export type Moneda = 'PYG' | 'USD' | 'BRL' | 'EUR' | 'USDT' | (string & {})
 
+/** Identidad visible de la app. `version` usa X.Y.Z o X.Y.Z-rc.N. */
+export type AppIdentity = Readonly<{
+  nombre: string
+  version: string
+  etiquetaVersion: string
+  url: string
+  logoUrl: string
+  soporteUrl: string
+  color: string
+  credito: string | null
+  creditoUrl: string
+}>
+export const VERSION_APP_RE: RegExp
+export function esVersionApp(version?: unknown): boolean
+export function etiquetaVersionApp(version: string): string
+export function crearIdentidadApp(identidad: {
+  nombre: string
+  version: string
+  url?: string
+  logoUrl?: string
+  soporteUrl?: string
+  color?: string
+  credito?: string | null
+  creditoUrl?: string
+}): AppIdentity
+
 // ── Lógica compartida ───────────────────────────────────────────────────────
 
 export function cn(...inputs: any[]): string
@@ -20,31 +46,137 @@ export function nombrePartes(nombre: string): { nombres: string; apellidos: stri
 export function esApellidosPrimero(nombre: string): boolean
 export function esRazonSocial(nombre: string): boolean
 
-/** Nombres del catálogo por defecto (`BANCOS_PARAGUAY`, listado vigente del BCP). */
-export type BancoParaguay = string
-/** Registro de logo: archivo del host, marca vectorial o monograma. */
-export type RegistroLogoBanco =
-  | { banco: string; tipo: 'archivo'; archivo: string; chip?: boolean }
-  | { banco: string; tipo: 'marca'; marca: string }
-  | { banco: string; tipo: 'monograma'; iniciales: string; color: string; generico?: boolean }
-/** Entrada del registro `LOGOS_BANCOS` (el nombre canónico es la clave). */
-export type EntradaLogoBanco = {
+/** Tratamiento visual verificable de una marca financiera. */
+export type VisualFinanciero = {
+  tipo: 'archivo' | 'horizontal-contained' | 'monograma' | 'texto'
+  estado: 'oficial' | 'fallback' | 'permiso-pendiente' | 'producto-padre' | string
   archivo?: string
-  marca?: string
-  monograma?: string
-  color?: string
-  chip?: boolean
-  alias?: string[]
+  asset?: string
+  empaquetado?: string
+  marcaPadre?: string
+  fondo?: string
+  padding?: boolean
 }
+export type EvidenciaRedistribucionMarca = Readonly<{
+  permitida: boolean
+  evidencia: string | null
+}>
+
+/** Nombres del catálogo financiero predeterminado de Paraguay. */
+export type BancoParaguay = string
+export type RegistroLogoBanco = ({
+  banco: string
+  categoria: 'banco' | 'financiera' | 'cooperativa' | 'desconocida' | string
+  estado: string
+  variante: 'compacto' | 'horizontal'
+  visual: VisualFinanciero
+  redistribucion?: EvidenciaRedistribucionMarca
+  fuenteOficial?: string | null
+  verificadoEn?: string | null
+  aliasHistorico?: string
+  generico?: boolean
+} & (
+  | { tipo: 'archivo'; archivo: string; chip?: boolean; marca?: string }
+  | { tipo: 'marca'; marca: string }
+  | { tipo: 'monograma'; iniciales: string; color: string }
+))
+
+export type EntradaLogoBanco =
+  | {
+      redirigeA?: never
+      archivo?: string
+      marca?: string
+      monograma?: string
+      color?: string
+      chip?: boolean
+      alias?: string[]
+      categoria: string
+      estado: string
+      fuenteOficial?: string
+      verificadoEn?: string
+      redistribucion?: EvidenciaRedistribucionMarca
+      variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
+    }
+  | {
+      redirigeA: string
+      alias?: string[]
+      categoria: 'legado'
+      estado: 'legado'
+      verificadoEn?: string
+      fuenteOficial?: string
+      variantes?: never
+    }
+
+export type CoberturaMarcaFinanciera = {
+  nombre: string
+  categoria: string
+  estado: string
+  fuenteOficial: string | null
+  verificadoEn?: string
+  redistribucion?: EvidenciaRedistribucionMarca
+  marcaPadre?: string | null
+  variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
+}
+
 export const BANCOS_PARAGUAY: string[]
+export const BANCOS_Y_FINANCIERAS_PARAGUAY: string[]
+export const COOPERATIVAS_PARAGUAY: string[]
 export const LOGOS_BANCOS: Record<string, EntradaLogoBanco>
 export const COLORES_BANCO_RESPALDO: string[]
+export const FECHA_VERIFICACION_MARCAS_FINANCIERAS: string
 export function normalizarBanco(nombre: string): string
 export function inicialesDeBanco(nombre: string): string
 export function colorDeBanco(nombre: string): string
-/** Resuelve archivo/marca/monograma por nombre o alias; sin nombre, `null`. */
-export function logoDeBanco(nombre: string): RegistroLogoBanco | null
+/** @deprecated Usá `compacto`. Se mantendrá por al menos dos releases menores. */
+export type VarianteLogoFinancieroLegacy = 'compact'
+export type VarianteLogoFinanciero = 'compacto' | 'horizontal' | VarianteLogoFinancieroLegacy
+export function logoDeBanco(nombre: string, variante?: VarianteLogoFinanciero): RegistroLogoBanco | null
+export function coberturaBancos(catalogo?: readonly string[]): CoberturaMarcaFinanciera[]
 export function sugerenciasDeBanco(consulta?: string, bancos?: readonly string[]): string[]
+
+export type EntradaMarcaMedioPago =
+  | {
+      redirigeA?: never
+      categoria: string
+      alias?: string[]
+      monograma?: string
+      color?: string
+      fuenteOficial?: string
+      verificadoEn?: string
+      estado: string
+      redistribucion?: EvidenciaRedistribucionMarca
+      marcaPadre?: string
+      variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
+    }
+  | {
+      redirigeA: string
+      categoria: 'legado'
+      alias?: string[]
+      estado: 'legado'
+      verificadoEn?: string
+      variantes?: never
+    }
+export type RegistroLogoMedioPago = {
+  marca: string
+  tipo: 'archivo' | 'monograma'
+  iniciales: string
+  color: string
+  categoria: string
+  estado: string
+  redistribucion?: EvidenciaRedistribucionMarca
+  variante: 'compacto' | 'horizontal'
+  visual: VisualFinanciero
+  fuenteOficial?: string | null
+  verificadoEn?: string | null
+  marcaPadre?: string
+  aliasHistorico?: string
+  generico?: boolean
+}
+export const MARCAS_MEDIOS_PAGO: Record<string, EntradaMarcaMedioPago>
+export const MEDIOS_PAGO_CON_MARCA: string[]
+export function normalizarMarcaPago(nombre: string): string
+export function logoDeMedioPago(nombre: string, variante?: VarianteLogoFinanciero): RegistroLogoMedioPago | null
+export function coberturaMediosPago(catalogo?: readonly string[]): CoberturaMarcaFinanciera[]
 
 export const TAMANOS_CAMPO: Record<string, string>
 export function anchoParaLargo(largo: number): string
@@ -171,10 +303,21 @@ export function extractTokenFromUrl(url: string): string
 export function esToken(valor: string): boolean
 
 export const CODIGOS_PAIS: string[]
+export type PaisTelefono = { country: string; countryCode: string; name: string; flag: string; custom?: boolean }
+export type TelefonoInternacional = { country: string; countryCode: string; phone: string; e164: string; isValid: boolean }
+export const PAISES_TELEFONO: readonly PaisTelefono[]
+export function paisTelefonoPorIso(iso: string, locale?: string): PaisTelefono | null
+export function paisesDeCodigo(countryCode: string, locale?: string, countries?: readonly (string | PaisTelefono)[]): PaisTelefono[]
+export function buscarPaisesTelefono(consulta?: string, countries?: readonly (string | PaisTelefono)[], locale?: string): PaisTelefono[]
 /** Parte `+595 981 123 456`, `+595981123456` o el pegado `00595 …`. */
 export function parseTelefono(valor: string, countryCodePorDefecto?: string): { countryCode: string; phone: string }
+/** Interpreta un valor local/internacional y conserva el ISO en DDI compartidos. */
+export function parseTelefonoInternacional(valor: string, country?: string, countryCodePorDefecto?: string): TelefonoInternacional
 /** Arma `+<código> <número>`; sin número devuelve `null`. */
 export function componerTelefono(datos?: { countryCode?: string; phone?: string }): string | null
+/** Devuelve E.164 cuando es válido; inválido/incompleto devuelve `''`. */
+export function telefonoE164(valor: string, country?: string): string
+export function telefonoInternacionalValido(valor: string, country?: string): boolean
 /** Formato canónico agrupado: `+595 981 123 456`; sin teléfono, `''`. */
 export function normalizarTelefono(telefono: string, countryCode?: string): string
 export function internationalPhone(telefono: string, countryCode?: string): string

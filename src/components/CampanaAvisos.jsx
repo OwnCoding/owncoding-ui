@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 import { EmptyState } from './ui.jsx'
 import { cn } from '../utils/cn.js'
@@ -44,16 +44,27 @@ export default function CampanaAvisos({
 }) {
   const [abierto, setAbierto] = useState(false)
   const raiz = useRef(null)
+  const disparador = useRef(null)
+  const panel = useRef(null)
+  const tituloId = useId()
   const sinLeer = contarSinLeer(avisos)
+
+  function cerrar({ devolverFoco = false } = {}) {
+    setAbierto(false)
+    if (devolverFoco) requestAnimationFrame(() => disparador.current?.focus())
+  }
 
   useEffect(() => {
     if (!abierto) return undefined
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return
-      setAbierto(false)
+      cerrar()
     }
     const cerrarEsc = (event) => {
-      if (event.key === 'Escape') setAbierto(false)
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        cerrar({ devolverFoco: true })
+      }
     }
     document.addEventListener('mousedown', cerrarFuera)
     document.addEventListener('keydown', cerrarEsc)
@@ -63,9 +74,17 @@ export default function CampanaAvisos({
     }
   }, [abierto])
 
+  useEffect(() => {
+    if (!abierto) return
+    requestAnimationFrame(() => {
+      const primero = panel.current?.querySelector('a[href], button:not(:disabled), [tabindex]:not([tabindex="-1"])')
+      ;(primero || panel.current)?.focus()
+    })
+  }, [abierto])
+
   function alternar() {
     setAbierto((actual) => {
-      if (!actual) onAbrir?.()
+      if (!actual) onAbrir?.(true)
       return !actual
     })
   }
@@ -73,14 +92,15 @@ export default function CampanaAvisos({
   return (
     <div ref={raiz} className={cn('relative', className)}>
       <button
+        ref={disparador}
         type="button"
         onClick={alternar}
         data-testid="campana-avisos"
-        aria-label={ariaLabel}
-        aria-haspopup="menu"
+        aria-label={sinLeer > 0 ? `${ariaLabel}, ${sinLeer} sin leer` : ariaLabel}
+        aria-haspopup="dialog"
         aria-expanded={abierto}
         title={sinLeer > 0 ? `${ariaLabel} · ${sinLeer} sin leer` : ariaLabel}
-        className="relative grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
+        className="toque-44 relative grid h-11 w-11 place-items-center rounded-lg border border-interactivo text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
       >
         <Icon name="bell" className="h-4 w-4" />
         {sinLeer > 0 && (
@@ -92,15 +112,17 @@ export default function CampanaAvisos({
 
       {abierto && (
         <div
-          role="menu"
-          aria-label={titulo}
+          ref={panel}
+          role="dialog"
+          aria-labelledby={tituloId}
+          tabIndex={-1}
           className={cn(
             'absolute z-30 mt-1 w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-ink-500 bg-ink shadow-float',
             anclaje === 'left' ? 'left-0' : 'right-0',
           )}
         >
           <header className="flex items-center justify-between gap-2 border-b border-ink-600 px-3 py-2">
-            <p className="text-sm font-semibold text-fore">{titulo}</p>
+            <p id={tituloId} className="text-sm font-semibold text-fore">{titulo}</p>
             {sinLeer > 0 && <span className="text-xs tabular-nums text-mute">{textoContador(sinLeer)} sin leer</span>}
           </header>
 
@@ -129,11 +151,10 @@ export default function CampanaAvisos({
                 return ruta ? (
                   <a
                     key={aviso.id ?? aviso.titulo}
-                    role="menuitem"
                     href={ruta}
                     className={clases}
                     onClick={() => {
-                      setAbierto(false)
+                      cerrar({ devolverFoco: true })
                       onElegir?.(aviso)
                       aviso.onClick?.()
                     }}
@@ -144,10 +165,9 @@ export default function CampanaAvisos({
                   <button
                     key={aviso.id ?? aviso.titulo}
                     type="button"
-                    role="menuitem"
                     className={clases}
                     onClick={() => {
-                      setAbierto(false)
+                      cerrar({ devolverFoco: true })
                       onElegir?.(aviso)
                       aviso.onClick?.()
                     }}

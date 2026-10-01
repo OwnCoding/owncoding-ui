@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import {
@@ -542,6 +542,36 @@ describe('DataTable (#109)', () => {
       <DataTable encabezadoFijo columns={[{ key: 'nombre', label: 'Nombre' }]} rows={[{ id: 'a', nombre: 'Ana' }]} />,
     )
     expect(fijo).toContain('sticky top-12')
+  })
+
+  test('conserva los datos en tarjetas móviles genéricas y expone semántica de tabla', () => {
+    const getRowKey = vi.fn((row) => `persona-${row.id}`)
+    const html = renderToStaticMarkup(
+      <DataTable
+        caption="Personas"
+        getRowKey={getRowKey}
+        columns={[
+          { key: 'nombre', label: 'Nombre' },
+          { key: 'correo', label: 'Correo', render: (row) => <a href={`mailto:${row.correo}`}>{row.correo}</a> },
+          { key: 'interno', label: 'Interno', mobile: false },
+        ]}
+        rows={[{ id: 'a', nombre: 'Ana', correo: 'ana@example.com', interno: 'oculto en móvil' }]}
+      />,
+    )
+    expect(html).toContain('<caption class="sr-only">Personas</caption>')
+    expect(html).toContain('scope="col"')
+    expect(html).toContain('<dl')
+    expect(html).toContain('<dt class="text-xs font-medium text-mute">Nombre</dt>')
+    expect(html).toContain('ana@example.com')
+    expect(html).not.toContain('text-xs font-medium text-mute">Interno</dt>')
+    expect(getRowKey).toHaveBeenCalledWith(expect.objectContaining({ id: 'a' }), 0)
+  })
+
+  test('el estado de carga se anuncia sin exponer una tabla vacía', () => {
+    const html = renderToStaticMarkup(<DataTable columns={[]} rows={[]} loading />)
+    expect(html).toContain('role="status"')
+    expect(html).toContain('aria-busy="true"')
+    expect(html).toContain('Cargando datos…')
   })
 })
 

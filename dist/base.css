@@ -86,6 +86,17 @@ input::placeholder, textarea::placeholder {
   100% { transform: translateX(320%); }
 }
 @media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
   .motion-safe\:animate-\[oc-respira_2\.6s_ease-in-out_infinite\],
   .motion-safe\:animate-\[oc-carga_1\.25s_ease-in-out_infinite\] {
     animation: none;

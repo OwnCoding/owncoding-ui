@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Aviso, Input, Label } from './ui.jsx'
 import { cn } from '../utils/cn.js'
 import { ETIQUETA_PERIODO, PERIODOS_FECHA, periodoDeRango, rangoDePeriodo, rangoInvertido } from '../utils/rangoFecha.js'
@@ -13,20 +13,22 @@ import { ETIQUETA_PERIODO, PERIODOS_FECHA, periodoDeRango, rangoDePeriodo, rango
 // día, no por instante, y `onCambio(desde, hasta)` entrega el par ya listo para
 // la API. El rango invertido se marca en pantalla, pero no se corrige solo.
 
-export default function RangoFecha({
-  desde,
-  hasta,
-  onCambio,
-  desdePorDefecto,
-  hastaPorDefecto,
-  periodoPorDefecto = 'este-mes',
-  atajos = PERIODOS_FECHA,
-  hoy,
-  ariaLabel = 'Filtro por rango de fechas',
-  mostrarCampos = true,
-  className,
-}) {
-  const controlado = desde !== undefined || hasta !== undefined
+export default function RangoFecha(props) {
+  const {
+    desde,
+    hasta,
+    onCambio,
+    desdePorDefecto,
+    hastaPorDefecto,
+    periodoPorDefecto = 'este-mes',
+    atajos = PERIODOS_FECHA,
+    hoy,
+    ariaLabel = 'Filtro por rango de fechas',
+    mostrarCampos = true,
+    className,
+  } = props
+  const desdeControlado = Object.prototype.hasOwnProperty.call(props, 'desde')
+  const hastaControlado = Object.prototype.hasOwnProperty.call(props, 'hasta')
   const [interno, setInterno] = useState(() => {
     if (desdePorDefecto !== undefined || hastaPorDefecto !== undefined) {
       return { desde: desdePorDefecto || '', hasta: hastaPorDefecto || '' }
@@ -35,15 +37,31 @@ export default function RangoFecha({
   })
   const idDesde = useId()
   const idHasta = useId()
+  const errorId = useId()
   const refDesde = useRef(null)
 
-  const actual = controlado ? { desde: desde ?? '', hasta: hasta ?? '' } : interno
+  useEffect(() => {
+    if (desdeControlado === hastaControlado) return
+    if (typeof process === 'undefined' || process.env.NODE_ENV !== 'production') {
+      console.warn('RangoFecha: controlá `desde` y `hasta` juntos cuando sea posible. El campo omitido permanece no controlado por compatibilidad.')
+    }
+  }, [desdeControlado, hastaControlado])
+
+  const actual = {
+    desde: desdeControlado ? (desde ?? '') : interno.desde,
+    hasta: hastaControlado ? (hasta ?? '') : interno.hasta,
+  }
   const activo = periodoDeRango(actual.desde, actual.hasta, { hoy })
   const invertido = rangoInvertido(actual.desde, actual.hasta)
 
   function aplicar(siguienteDesde, siguienteHasta) {
     const par = { desde: siguienteDesde ?? '', hasta: siguienteHasta ?? '' }
-    if (!controlado) setInterno(par)
+    if (!desdeControlado || !hastaControlado) {
+      setInterno((anterior) => ({
+        desde: desdeControlado ? anterior.desde : par.desde,
+        hasta: hastaControlado ? anterior.hasta : par.hasta,
+      }))
+    }
     onCambio?.(par.desde, par.hasta)
   }
 
@@ -63,7 +81,7 @@ export default function RangoFecha({
                 else refDesde.current?.focus()
               }}
               className={cn(
-                'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition',
+                'min-h-11 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition',
                 esActivo
                   ? 'border-fono/30 bg-fono/15 text-fono-text'
                   : 'border-ink-600 text-mute hover:border-fono/40 hover:text-fore',
@@ -85,6 +103,8 @@ export default function RangoFecha({
               type="date"
               value={actual.desde}
               max={actual.hasta || undefined}
+              aria-invalid={invertido || undefined}
+              aria-describedby={invertido ? errorId : undefined}
               onChange={(event) => aplicar(event.target.value, actual.hasta)}
               className="w-40 max-w-full tabular-nums"
             />
@@ -96,6 +116,8 @@ export default function RangoFecha({
               type="date"
               value={actual.hasta}
               min={actual.desde || undefined}
+              aria-invalid={invertido || undefined}
+              aria-describedby={invertido ? errorId : undefined}
               onChange={(event) => aplicar(actual.desde, event.target.value)}
               className="w-40 max-w-full tabular-nums"
             />
@@ -104,7 +126,7 @@ export default function RangoFecha({
       )}
 
       {invertido && (
-        <Aviso tono="warn" compact>
+        <Aviso id={errorId} tono="warn" compact>
           El rango está invertido: «desde» es posterior a «hasta».
         </Aviso>
       )}

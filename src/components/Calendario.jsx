@@ -175,7 +175,7 @@ export default function Calendario({
             onClick={() => mover(-1)}
             aria-label={vistaActual === 'semana' ? 'Semana anterior' : 'Mes anterior'}
             title={vistaActual === 'semana' ? 'Semana anterior' : 'Mes anterior'}
-            className="grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
+            className="toque-44 grid h-11 w-11 place-items-center rounded-lg border border-interactivo text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
           >
             <Icon name="back" className="h-4 w-4" />
           </button>
@@ -187,7 +187,7 @@ export default function Calendario({
             onClick={() => mover(1)}
             aria-label={vistaActual === 'semana' ? 'Semana siguiente' : 'Mes siguiente'}
             title={vistaActual === 'semana' ? 'Semana siguiente' : 'Mes siguiente'}
-            className="grid h-9 w-9 place-items-center rounded-lg border border-ink-500 text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
+            className="toque-44 grid h-11 w-11 place-items-center rounded-lg border border-interactivo text-mute transition hover:border-fono hover:bg-fono/10 hover:text-fore"
           >
             <Icon name="back" className="h-4 w-4 rotate-180" />
           </button>
@@ -211,7 +211,8 @@ export default function Calendario({
       </div>
 
       {cargando ? (
-        <div className="grid grid-cols-7 gap-1 p-1" aria-busy="true">
+        <div className="grid grid-cols-7 gap-1 p-1" role="status" aria-live="polite" aria-busy="true">
+          <span className="sr-only">Cargando calendario…</span>
           {Array.from({ length: 35 }, (_, indice) => (
             <Skeleton key={indice} className="h-20" />
           ))}
@@ -303,7 +304,7 @@ export default function Calendario({
       )}
 
       {!cargando && totalEnRango === 0 && (
-        <EmptyState compact icon="calendar" title="Sin movimientos en el período" />
+        <div role="status"><EmptyState compact icon="calendar" title="Sin movimientos en el período" /></div>
       )}
 
       {mostrarDetalle && seleccion && (

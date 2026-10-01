@@ -12,15 +12,18 @@ a una nueva, sin romper nada. Complementa:
 ## 1. Requisitos y versión
 
 - **Node ≥ 18**, **React 18+**, **Tailwind CSS 3.4+**.
-- Se adopta una **versión fija** (tag) y se sube a propósito: `#v0.14.7`.
+- Se adopta una **versión fija** (tag) y se sube a propósito. Este candidato
+  prepara `#v0.60.0`, pero el tag todavía no fue creado ni publicado.
   No mezclar tags con la rama `main` en la misma app.
 
 ## 2. Instalación
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.14.7                 # git
-npm install git+ssh://git@github.com:dariodeoli/owncoding-ui.git#v0.14.7   # SSH
+npm install github:dariodeoli/owncoding-ui#v0.60.0                 # git
+npm install git+ssh://git@github.com:dariodeoli/owncoding-ui.git#v0.60.0   # SSH
 ```
+
+Ejecutar esos comandos únicamente después de publicar el tag `v0.60.0`.
 
 - `prepare` corre el build al instalar; el bundle también queda **commiteado en
   `dist/`** para instalaciones con `--ignore-scripts` (npm 11 no ejecuta
@@ -55,6 +58,10 @@ export default { presets: [preset], content: [...owncodingContent, './index.html
 - Utils en el **servidor** (server components, route handlers, scripts):
   importarlos de `owncoding-ui/utils`; la entrada principal es de cliente
   (`"use client"`) y en Next obligaría a `serverExternalPackages`.
+- Preferir los subpaths por capacidad: `app-identity`, `email` y
+  `financial-metadata` son puros; `phone` y `financial` son de cliente. En
+  v0.60.0 ningún subpath incluye bytes de marcas financieras de terceros sin
+  autorización de redistribución explícita.
 
 ## 4. Peers opcionales
 
@@ -100,3 +107,14 @@ export default { presets: [preset], content: [...owncodingContent, './index.html
 - [ ] Objetos reemplazados uno por commit, sin ramas de estilo por pantalla.
 - [ ] Bloques locales de tokens y alias eliminados.
 - [ ] `docs/ALIMENTAR.md`: si falta un objeto, se crea acá y se adopta después.
+
+## 9. Deprecaciones y auditoría
+
+- Un alias con `@deprecated` permanece disponible por **al menos dos releases
+  menores publicadas** desde su aviso.
+- La app migra al nombre canónico dentro de esa ventana; no copia el alias
+  localmente.
+- Ningún componente o export se elimina hasta auditar su uso en todas las apps
+  del ecosistema. Buscar solo en este repositorio no alcanza.
+- Todo retiro necesita guía, changelog, test del reemplazo y un release mayor o
+  la política explícita vigente para la línea `0.x`.

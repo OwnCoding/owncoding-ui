@@ -14,14 +14,25 @@ export { cn, primerNombre } from './cn.js'
 export { normalizarNombre, nombrePartes, esApellidosPrimero, esRazonSocial } from './nombre.js'
 export {
   BANCOS_PARAGUAY,
+  BANCOS_Y_FINANCIERAS_PARAGUAY,
+  COOPERATIVAS_PARAGUAY,
   LOGOS_BANCOS,
   COLORES_BANCO_RESPALDO,
+  FECHA_VERIFICACION_MARCAS_FINANCIERAS,
   normalizarBanco,
   inicialesDeBanco,
   colorDeBanco,
   logoDeBanco,
+  coberturaBancos,
   sugerenciasDeBanco,
 } from './bancos.js'
+export {
+  MARCAS_MEDIOS_PAGO,
+  MEDIOS_PAGO_CON_MARCA,
+  normalizarMarcaPago,
+  logoDeMedioPago,
+  coberturaMediosPago,
+} from './mediosPago.js'
 export { TAMANOS_CAMPO, anchoParaLargo } from './tamanos.js'
 export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO } from './modal.js'
 export { GRILLA_DOS_COLUMNAS, GRILLA_DOS_COLUMNAS_COMPACTA, PIE_ACCIONES, PIE_ACCIONES_REVERSO } from './formulario.js'
@@ -107,7 +118,10 @@ export { extractTokenFromUrl, esToken } from './token.js'
 export {
   CODIGOS_PAIS,
   parseTelefono,
+  parseTelefonoInternacional,
   componerTelefono,
+  telefonoE164,
+  telefonoInternacionalValido,
   normalizarTelefono,
   internationalPhone,
   whatsappUrl,
@@ -117,6 +131,12 @@ export {
   telefonoValido,
   MENSAJE_TELEFONO,
 } from './telefono.js'
+export {
+  PAISES_TELEFONO,
+  paisTelefonoPorIso,
+  paisesDeCodigo,
+  buscarPaisesTelefono,
+} from './paisesTelefono.js'
 
 // ── Estados y tonos ─────────────────────────────────────────────────────────
 export { TONOS, TONOS_ALIAS, tonoCanonico, puntoDeTono, chipDeTono, textoDeTono } from './tonos.js'
@@ -234,6 +254,7 @@ export { crearPilaCapas, crearRegistroPendientes } from './pilaOverlays.js'
 export { registroConsentimiento } from './consentimiento.js'
 export { rutaDeAviso, payloadPush, enHorarioSilencioso } from './avisos.js'
 export { partesVersion, compararVersiones, hayVersionNueva } from './version.js'
+export { VERSION_APP_RE, esVersionApp, etiquetaVersionApp, crearIdentidadApp } from './appIdentity.js'
 export { QR_OPCIONES, qrDataUrl } from './qr.js'
 
 // ── «Carga con IA»: contrato puro (#11) ─────────────────────────────────────

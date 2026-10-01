@@ -1,9 +1,9 @@
-// Campos cortos sin truncar (bug de anchos): el teléfono reparte código de
-// país (DDI) + número en una fila `flex`, y el contenedor de la app puede
+// Campos cortos sin truncar (bug de anchos): el teléfono reparte selector de
+// país (bandera + DDI) + número en una fila `flex`, y el contenedor de la app puede
 // fijarle un ancho corto (`TAMANOS_CAMPO.telefono` = `w-44`). Con `min-w-0` el
 // número se comprimía hasta recortar el texto; ahora conserva un mínimo
 // legible y la fila envuelve en vez de aplastarlo. Mismo criterio para el
-// código de país: su ancho fijo tiene que entrar `+` y hasta 6 dígitos.
+// selector de país: su ancho fijo tiene que entrar bandera y DDI.
 import { describe, expect, test } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 
@@ -32,11 +32,10 @@ describe('campos cortos sin truncar', () => {
   test('la fila código + número envuelve si el contenedor es angosto', () => {
     const html = renderToStaticMarkup(<PhoneField phone="981 123 456" onChange={() => {}} />)
     expect(claseDeFila(html)).toContain('flex-wrap')
-    const codigo = claseDeCampo(html, 'Código de país')
-    // 96 px (w-24) menos el padding del `Input` (px-3.5 = 28 px) dejan 68 px:
-    // entran «+» y hasta 6 dígitos incluso con el `text-base` de móvil.
-    expect(codigo).toContain('w-24')
-    expect(codigo).toContain('shrink-0')
+    // El contenedor del combobox conserva 96 px y no se comprime; el trigger
+    // mantiene además el target táctil de 44 px (`h-11`).
+    expect(html).toContain('relative w-24 shrink-0')
+    expect(html).toContain('h-11 w-full')
   })
 
   test('con el ancho recomendado (TAMANOS_CAMPO.telefono = w-44) el número no se recorta', () => {

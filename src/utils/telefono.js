@@ -1,3 +1,6 @@
+import { parsePhoneNumberFromString } from 'libphonenumber-js/min'
+import { PAISES_TELEFONO, paisTelefonoPorIso, paisesDeCodigo } from './paisesTelefono.js'
+
 // Validación de teléfono para WhatsApp y clientes.
 // Paraguay (+595): solo móviles 9XXXXXXXX (9 dígitos después del código).
 // Otros países: entre 6 y 12 dígitos, sin formato estricto.
@@ -11,9 +14,7 @@
 // un pegado con prefijo internacional `00…` (el código más largo primero).
 export const CODIGOS_PAIS = ['+595', '+55', '+54', '+56', '+591', '+598', '+1', '+34', '+44', '+351']
 
-const CODIGOS_ORDENADOS = CODIGOS_PAIS
-  .map((codigo) => codigo.replace(/\D/g, ''))
-  .filter(Boolean)
+const CODIGOS_INTERNACIONALES_ORDENADOS = [...new Set(PAISES_TELEFONO.map((pais) => pais.countryCode.replace(/\D/g, '')))]
   .sort((a, b) => b.length - a.length)
 
 // Teléfono en el formato canónico: `+595 981 123 456`. Sin teléfono devuelve
@@ -78,7 +79,7 @@ export function telefonoValido(value, countryCode = '+595') {
 // +59); si no, prueba el código por defecto; por último asume 1–3 dígitos.
 function partirCeroCero(digitos, countryCodePorDefecto) {
   if (!digitos) return null
-  for (const codigo of CODIGOS_ORDENADOS) {
+  for (const codigo of CODIGOS_INTERNACIONALES_ORDENADOS) {
     if (digitos.startsWith(codigo)) return { countryCode: `+${codigo}`, phone: digitos.slice(codigo.length) }
   }
   const porDefecto = String(countryCodePorDefecto || '').replace(/\D/g, '')
@@ -88,14 +89,25 @@ function partirCeroCero(digitos, countryCodePorDefecto) {
   return { countryCode: `+${digitos.slice(0, 3)}`, phone: digitos.slice(3) }
 }
 
+function partirConMas(texto) {
+  const digitos = texto.replace(/\D/g, '')
+  const codigo = CODIGOS_INTERNACIONALES_ORDENADOS.find((prefijo) => digitos.startsWith(prefijo))
+  if (!codigo) return null
+  const indiceCodigo = texto.indexOf(codigo)
+  const resto = texto.slice(indiceCodigo + codigo.length).trim()
+  return { countryCode: `+${codigo}`, phone: resto }
+}
+
 // Separa un teléfono guardado o pegado en código de país y parte local.
 // Acepta `+595 981 123 456` (con `+`) y el prefijo internacional `00…`
 // (`00595 981 123 456` → +595). Sin `+` ni `00`, la parte local va con el
 // código por defecto y sin tocarla (puede traer espacios mientras se tipea).
 export function parseTelefono(value, countryCodePorDefecto = '+595') {
   const texto = String(value || '').trim()
-  const conMas = texto.match(/^\+(\d{1,3})\s*(.*)$/)
-  if (conMas) return { countryCode: `+${conMas[1]}`, phone: conMas[2].trim() }
+  if (texto.startsWith('+')) {
+    const partes = partirConMas(texto)
+    if (partes) return partes
+  }
   const conCeroCero = texto.match(/^00[\s.-]*(.*)$/)
   if (conCeroCero) {
     const resto = conCeroCero[1].trim()
@@ -103,6 +115,75 @@ export function parseTelefono(value, countryCodePorDefecto = '+595') {
     if (partes) return partes
   }
   return { countryCode: countryCodePorDefecto, phone: texto }
+}
+
+function paisCompatible(country, countryCode) {
+  const preferido = paisTelefonoPorIso(country)
+  return preferido?.countryCode === countryCode ? preferido.country : ''
+}
+
+function estadoInternacionalVacio(country = 'PY') {
+  const pais = paisTelefonoPorIso(country) || paisTelefonoPorIso('PY')
+  return { country: pais.country, countryCode: pais.countryCode, phone: '', e164: '', isValid: false }
+}
+
+/**
+ * Interpreta un teléfono local o internacional y devuelve su país, DDI, parte
+ * nacional y E.164. En códigos compartidos (como +1) conserva el ISO elegido
+ * cuando sigue siendo compatible.
+ */
+export function parseTelefonoInternacional(value, country = 'PY', countryCodePorDefecto = '') {
+  const texto = String(value || '').trim()
+  if (!texto) return estadoInternacionalVacio(country)
+  const internacional = texto.startsWith('+') || /^00/.test(texto)
+  const entrada = /^00/.test(texto) ? `+${texto.replace(/^00[\s.-]*/, '')}` : texto
+  const paisPreferido = paisTelefonoPorIso(country) || paisTelefonoPorIso('PY')
+  const parsed = parsePhoneNumberFromString(entrada, internacional ? undefined : paisPreferido.country)
+
+  if (parsed) {
+    const countryCode = `+${parsed.countryCallingCode}`
+    const pais = paisCompatible(paisPreferido.country, countryCode) || parsed.country || paisesDeCodigo(countryCode)[0]?.country || paisPreferido.country
+    const phone = parsed.nationalNumber || ''
+    const pyValido = pais !== 'PY' || /^9\d{8}$/.test(phone)
+    const isValid = parsed.isValid() && pyValido
+    return { country: pais, countryCode, phone, e164: isValid ? parsed.number : '', isValid }
+  }
+
+  if (internacional) {
+    const digitos = entrada.replace(/\D/g, '')
+    const codigo = CODIGOS_INTERNACIONALES_ORDENADOS.find((prefijo) => digitos.startsWith(prefijo))
+    if (codigo) {
+      const countryCode = `+${codigo}`
+      const pais = paisCompatible(paisPreferido.country, countryCode) || paisesDeCodigo(countryCode)[0]?.country || paisPreferido.country
+      return { country: pais, countryCode, phone: digitos.slice(codigo.length), e164: '', isValid: false }
+    }
+    const codigoExplicito = codigoPais(countryCodePorDefecto)
+    const codigoExplicitoDigitos = codigoExplicito.replace(/\D/g, '')
+    const codigoDesconocido = codigoExplicitoDigitos && digitos.startsWith(codigoExplicitoDigitos)
+      ? codigoExplicitoDigitos
+      : digitos.slice(0, Math.min(3, digitos.length))
+    if (codigoDesconocido) {
+      return {
+        country: '',
+        countryCode: `+${codigoDesconocido}`,
+        phone: digitos.slice(codigoDesconocido.length),
+        e164: '',
+        isValid: false,
+      }
+    }
+  }
+
+  return { ...estadoInternacionalVacio(paisPreferido.country), phone: texto }
+}
+
+/** Devuelve E.164 solo cuando el número es válido; inválido/incompleto da ''. */
+export function telefonoE164(value, country = 'PY') {
+  return parseTelefonoInternacional(value, country).e164
+}
+
+/** Valida con libphonenumber/min y mantiene la regla móvil estricta de PY. */
+export function telefonoInternacionalValido(value, country = 'PY') {
+  return parseTelefonoInternacional(value, country).isValid
 }
 
 // Arma el string canónico que se guarda: `+<código> <número>`. Sin número,

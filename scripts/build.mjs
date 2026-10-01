@@ -1,10 +1,13 @@
-// Build del paquete: el bundle principal (`dist/index.js`, con el banner
-// `"use client"`), la entrada pura para servidor (`dist/utils.js`, sin banner
-// ni React), los tipos declarados y las tres hojas CSS (`styles.css` = tokens +
-// base, `tokens.css` sola y `base.css` sola). Sin TypeScript: los `.d.ts` se
-// escriben a mano en `types/` y se copian tal cual al `dist/` publicado.
+// Build del paquete: barrel compatible, subpaths granulares cliente/servidor,
+// declaraciones y CSS. Los `.d.ts` se mantienen en `types/`, se validan con un
+// consumidor TypeScript real y se copian al `dist/` publicado.
 import { build } from 'esbuild'
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+
+// Los assets financieros solo podrían viajar en los bundles visuales si el
+// registro documenta permiso de redistribución explícito. Limpiamos outputs
+// viejos al pasar cualquier marca a fallback por falta de evidencia.
+rmSync('dist/assets/financial', { recursive: true, force: true })
 
 const opciones = {
   bundle: true,
@@ -13,7 +16,8 @@ const opciones = {
   platform: 'neutral',
   jsx: 'automatic',
   sourcemap: true,
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'qrcode'],
+  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'qrcode', 'libphonenumber-js/min'],
+  loader: { '.svg': 'dataurl', '.png': 'dataurl' },
   logLevel: 'info',
 }
 
@@ -21,6 +25,20 @@ await build({
   ...opciones,
   entryPoints: ['src/index.js'],
   outfile: 'dist/index.js',
+  banner: { js: '"use client"' },
+})
+
+await build({
+  ...opciones,
+  entryPoints: ['src/phone/index.js'],
+  outfile: 'dist/phone.js',
+  banner: { js: '"use client"' },
+})
+
+await build({
+  ...opciones,
+  entryPoints: ['src/financial/index.js'],
+  outfile: 'dist/financial.js',
   banner: { js: '"use client"' },
 })
 
@@ -40,6 +58,26 @@ await build({
   outfile: 'dist/ia.js',
 })
 
+await build({
+  ...opciones,
+  entryPoints: ['src/financial/metadata.js'],
+  outfile: 'dist/financial-metadata.js',
+})
+
+await build({
+  ...opciones,
+  entryPoints: ['src/appIdentity/index.js'],
+  outfile: 'dist/app-identity.js',
+})
+
+// Presentación transaccional pura: no envía, no lee secretos ni depende de
+// React. Los backends conectan este HTML/texto a su relay.
+await build({
+  ...opciones,
+  entryPoints: ['src/email/index.js'],
+  outfile: 'dist/email.js',
+})
+
 mkdirSync('dist', { recursive: true })
 const tokens = readFileSync('src/styles/tokens.css', 'utf8')
 const base = readFileSync('src/styles/base.css', 'utf8')
@@ -51,4 +89,9 @@ writeFileSync('dist/styles.css', `${tokens.trimEnd()}\n\n${base}`)
 copyFileSync('types/index.d.ts', 'dist/index.d.ts')
 copyFileSync('types/utils.d.ts', 'dist/utils.d.ts')
 copyFileSync('types/ia.d.ts', 'dist/ia.d.ts')
-console.log('build ok: dist/index.js + dist/utils.js + dist/ia.js + dist/index.d.ts + dist/utils.d.ts + dist/ia.d.ts + dist/styles.css + dist/tokens.css + dist/base.css')
+copyFileSync('types/email.d.ts', 'dist/email.d.ts')
+copyFileSync('types/phone.d.ts', 'dist/phone.d.ts')
+copyFileSync('types/financial.d.ts', 'dist/financial.d.ts')
+copyFileSync('types/financial-metadata.d.ts', 'dist/financial-metadata.d.ts')
+copyFileSync('types/app-identity.d.ts', 'dist/app-identity.d.ts')
+console.log('build ok: root + ia + granular subpaths + types + CSS')

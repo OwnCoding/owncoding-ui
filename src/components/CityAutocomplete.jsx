@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Input } from './ui.jsx'
 import { buscarCiudad, departamentoDe } from '../catalog/ciudades.js'
 import { cn } from '../utils/cn.js'
+import useComboboxNavigation from '../hooks/useComboboxNavigation.js'
 
 // Ciudad con autocompletado y departamento automático: el departamento es
 // dependiente de la ciudad, así que se resuelve solo (al tipear una coincidencia
@@ -25,6 +26,7 @@ function departamentoDeFila(fila) {
 export default function CityAutocomplete({
   value = '',
   onSelect,
+  onChange,
   placeholder = 'Ej: Asunción, Ciudad del Este…',
   disabled = false,
   className,
@@ -39,6 +41,7 @@ export default function CityAutocomplete({
   const [error, setError] = useState('')
   const timer = useRef(null)
   const raiz = useRef(null)
+  const errorId = useId()
 
   useEffect(() => {
     const cerrarFuera = (event) => {
@@ -78,6 +81,7 @@ export default function CityAutocomplete({
   function change(texto) {
     // Al escribir se resuelve el departamento si la ciudad coincide exacta;
     // si no, queda vacío hasta que el usuario elija una sugerencia.
+    onChange?.(texto)
     onSelect?.(texto, departamentoDe(texto))
     resolver(texto)
   }
@@ -86,10 +90,20 @@ export default function CityAutocomplete({
     if (timer.current) clearTimeout(timer.current)
     const ciudad = ciudadDe(fila)
     const departamento = departamentoDeFila(fila) || departamentoDe(ciudad)
+    onChange?.(ciudad)
     onSelect?.(ciudad, departamento)
     setSugerencias([])
     setAbierto(false)
   }
+
+  const listaVisible = abierto && sugerencias.length > 0
+  const navegacion = useComboboxNavigation({
+    options: sugerencias,
+    open: listaVisible,
+    onOpenChange: setAbierto,
+    onSelect: elegir,
+    getOptionKey: (fila) => `${ciudadDe(fila)}-${departamentoDeFila(fila)}`,
+  })
 
   function alPerderFoco() {
     // Al salir del campo, si tipearon una ciudad del catálogo, el departamento
@@ -101,37 +115,44 @@ export default function CityAutocomplete({
   return (
     <div ref={raiz} className={cn('relative', className)}>
       <Input
+        {...inputProps}
+        ref={navegacion.inputRef}
         maxLength={maxLength}
         disabled={disabled}
         value={value}
-        onChange={(event) => change(event.target.value)}
-        onFocus={() => { if (value.trim().length >= 2 && sugerencias.length) setAbierto(true) }}
-        onBlur={alPerderFoco}
+        onChange={(event) => { inputProps?.onChange?.(event); change(event.target.value); navegacion.setActiveIndex(0) }}
+        onFocus={(event) => { inputProps?.onFocus?.(event); if (value.trim().length >= 2 && sugerencias.length) setAbierto(true) }}
+        onBlur={(event) => { inputProps?.onBlur?.(event); alPerderFoco() }}
+        onKeyDown={(event) => { inputProps?.onKeyDown?.(event); if (!event.defaultPrevented) navegacion.inputProps.onKeyDown(event) }}
         placeholder={placeholder}
         autoComplete="off"
         aria-label="Ciudad"
         role="combobox"
-        aria-expanded={abierto && sugerencias.length > 0}
-        {...inputProps}
+        aria-expanded={listaVisible}
+        aria-controls={navegacion.listboxId}
+        aria-autocomplete="list"
+        aria-activedescendant={navegacion.activeOptionId}
+        aria-describedby={[inputProps?.['aria-describedby'], error ? errorId : null].filter(Boolean).join(' ') || undefined}
+        aria-invalid={inputProps?.['aria-invalid'] ?? (error ? true : undefined)}
       />
-      {abierto && sugerencias.length > 0 && (
-        <ul role="listbox" aria-label="Ciudades" className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-ink-500 bg-ink shadow-float">
-          {sugerencias.map((fila) => (
-            <li key={`${ciudadDe(fila)}-${departamentoDeFila(fila)}`} role="option" aria-selected={false}>
-              <button
-                type="button"
-                className="flex w-full items-baseline justify-between gap-3 px-3 py-2 text-left text-sm transition hover:bg-ink-700"
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => elegir(fila)}
-              >
-                <span className="truncate font-medium text-fore">{ciudadDe(fila)}</span>
-                <span className="shrink-0 text-xs text-mute">{departamentoDeFila(fila)}</span>
-              </button>
+      {listaVisible && (
+        <ul {...navegacion.listboxProps} aria-label="Ciudades" className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-ink-500 bg-ink shadow-float">
+          {sugerencias.map((fila, indice) => (
+            <li
+              key={`${ciudadDe(fila)}-${departamentoDeFila(fila)}`}
+              {...navegacion.getOptionProps(indice)}
+              className={cn(
+                'flex min-h-11 cursor-pointer items-baseline justify-between gap-3 px-3 py-2 text-left text-sm transition',
+                indice === navegacion.activeIndex ? 'bg-ink-700' : 'hover:bg-ink-700',
+              )}
+            >
+              <span className="truncate font-medium text-fore">{ciudadDe(fila)}</span>
+              <span className="shrink-0 text-xs text-mute">{departamentoDeFila(fila)}</span>
             </li>
           ))}
         </ul>
       )}
-      {error ? <p role="alert" className="mt-1 text-xs text-bad-text">{error}</p> : null}
+      {error ? <p id={errorId} role="alert" className="mt-1 text-xs text-bad-text">{error}</p> : null}
     </div>
   )
 }

@@ -1,10 +1,15 @@
+// @vitest-environment jsdom
 // Buscador global del shell (#241, lote 33): agrupa por tipo conservando el
 // orden de los resultados, resuelve los estados honestos y expone el contrato
 // combobox (foco en el campo + `aria-activedescendant` sobre la opción activa).
+import { act } from 'react'
+import { createRoot } from 'react-dom/client'
 import { describe, expect, test } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { PaletaComandos, agruparResultados, estadoPaleta } from '../src/index.js'
+
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
 const RESULTADOS = [
   { id: 'c1', tipo: 'clientes', titulo: 'Ana Giménez', detalle: '0981 000 000' },
@@ -59,5 +64,32 @@ describe('PaletaComandos', () => {
     )
     expect(boton).toContain('aria-haspopup="dialog"')
     expect(boton).toContain('Buscar · ⌘K')
+  })
+
+  test('gestiona foco, scroll, Escape único y retorno al disparador', async () => {
+    const contenedor = document.createElement('div')
+    document.body.appendChild(contenedor)
+    const root = createRoot(contenedor)
+    let cierres = 0
+    await act(async () => {
+      root.render(<PaletaComandos boton conAtajo={false} onCerrar={() => { cierres += 1 }} />)
+    })
+    const disparador = contenedor.querySelector('button')
+    disparador.focus()
+    await act(async () => {
+      disparador.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+    const campo = contenedor.querySelector('[role="combobox"]')
+    expect(document.activeElement).toBe(campo)
+    expect(document.body.style.overflow).toBe('hidden')
+    await act(async () => {
+      campo.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    })
+    expect(cierres).toBe(1)
+    expect(contenedor.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.body.style.overflow).toBe('')
+    expect(document.activeElement).toBe(disparador)
+    act(() => root.unmount())
+    contenedor.remove()
   })
 })

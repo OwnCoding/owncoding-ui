@@ -197,6 +197,18 @@ describe('texto de chips sobre relleno tenue (#5)', () => {
     expect(renderToStaticMarkup(h(PageHeader, { title: 'Clientes', backTo: () => {} }))).toContain('border-interactivo')
     expect(renderToStaticMarkup(h(ThemeToggle, {}))).toContain('border-interactivo')
   })
+
+  test('los botones semánticos usan texto AA sobre su relleno sólido', () => {
+    for (const [tema, bloques] of Object.entries({ ...PALETAS, consola: [':root {', '.consola {'] })) {
+      const paleta = efectiva(bloques)
+      for (const [fondo, frente] of [['ok', 'on-ok'], ['bad', 'on-bad']]) {
+        const ratio = contraste(paleta[frente], paleta[fondo])
+        expect(ratio, `${tema}: --c-${frente} sobre --c-${fondo} da ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+    expect(renderToStaticMarkup(h(Button, { variant: 'success' }, 'Guardar'))).toContain('text-on-ok')
+    expect(renderToStaticMarkup(h(Button, { variant: 'danger' }, 'Eliminar'))).toContain('text-on-bad')
+  })
 })
 
 // ── Ronda 13 de a11y (#13) ──────────────────────────────────────────────────

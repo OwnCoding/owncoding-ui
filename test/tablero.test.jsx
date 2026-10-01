@@ -116,7 +116,8 @@ describe('CampanaAvisos', () => {
 
   test('la campana muestra el contador y el panel no se monta cerrado', () => {
     const html = renderToStaticMarkup(<CampanaAvisos avisos={AVISOS} />)
-    expect(html).toContain('aria-label="Avisos"')
+    expect(html).toContain('aria-label="Avisos, 1 sin leer"')
+    expect(html).toContain('aria-haspopup="dialog"')
     expect(html).toContain('aria-expanded="false"')
     expect(html).toContain('>1<')
     expect(html).not.toContain('Cobro vencido')

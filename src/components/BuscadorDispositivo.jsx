@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Input, Label, Select } from './ui.jsx'
 import { PERFILES_DISPOSITIVO, buscarDispositivo, codigoDeDispositivo, limpiarDependientes, nombreDeDispositivo, opcionesDependiente } from '../catalog/dispositivos.js'
 import { cn } from '../utils/cn.js'
+import useComboboxNavigation from '../hooks/useComboboxNavigation.js'
 
 // Buscador dependiente de dispositivos (#241/#250): se elige el modelo (por
 // nombre o código) y recién ahí se despliegan sus variantes —capacidad, color,
@@ -40,8 +41,7 @@ export default function BuscadorDispositivo({
 
   const [texto, setTexto] = useState(() => valor.modelo || '')
   const [abierto, setAbierto] = useState(false)
-  const [resaltado, setResaltado] = useState(0)
-  const listaId = useId()
+  const campoId = useId()
   const raiz = useRef(null)
 
   useEffect(() => { setTexto(valor.modelo || '') }, [valor.modelo])
@@ -67,7 +67,6 @@ export default function BuscadorDispositivo({
     emitir(limpiarDependientes(valor, modelo, config))
     setTexto(nombreDeDispositivo(modelo))
     setAbierto(false)
-    setResaltado(0)
   }
   function confirmarLibre() {
     if (!permitirLibre) return
@@ -78,60 +77,56 @@ export default function BuscadorDispositivo({
   function cambiarDependiente(campo, valorCampo) {
     emitir({ ...valor, [campo]: valorCampo }, campo)
   }
+  const listaVisible = abierto && Boolean(texto.trim()) && sugerencias.length > 0
+  const navegacion = useComboboxNavigation({
+    options: sugerencias,
+    open: listaVisible,
+    onOpenChange: setAbierto,
+    onSelect: elegir,
+    getOptionKey: (modelo) => `${nombreDeDispositivo(modelo)}-${codigoDeDispositivo(modelo)}`,
+    listboxId: `${campoId}-lista`,
+  })
+
   function onKeyDown(event) {
-    if (event.key === 'Escape') { setAbierto(false); return }
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    navegacion.inputProps.onKeyDown(event)
+    if (event.key === 'Enter' && !event.defaultPrevented) {
       event.preventDefault()
-      if (!abierto) { setAbierto(true); return }
-      if (!sugerencias.length) return
-      const delta = event.key === 'ArrowDown' ? 1 : -1
-      setResaltado((actual) => (actual + delta + sugerencias.length) % sugerencias.length)
-      return
-    }
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      const modelo = sugerencias[resaltado]
-      if (abierto && modelo) elegir(modelo)
-      else confirmarLibre()
+      confirmarLibre()
     }
   }
 
   return (
     <div className={cn('space-y-3', className)}>
       <div ref={raiz} className="relative">
-        <Label htmlFor={listaId}>{etiqueta('modelo')}</Label>
+        <Label htmlFor={campoId}>{etiqueta('modelo')}</Label>
         <Input
-          id={listaId}
+          id={campoId}
+          ref={navegacion.inputRef}
           type="text"
           role="combobox"
-          aria-expanded={abierto}
-          aria-controls={`${listaId}-lista`}
+          aria-expanded={listaVisible}
+          aria-controls={navegacion.listboxId}
           aria-autocomplete="list"
+          aria-activedescendant={navegacion.activeOptionId}
           autoComplete="off"
           disabled={disabled}
           value={texto}
           placeholder={permitirLibre ? 'Buscar por nombre o código…' : 'Buscar modelo…'}
-          onChange={(event) => { setTexto(event.target.value); setAbierto(true); setResaltado(0); if (!event.target.value) emitir(limpiarDependientes(valor, '', config)) }}
+          onChange={(event) => { setTexto(event.target.value); setAbierto(true); navegacion.setActiveIndex(0); if (!event.target.value) emitir(limpiarDependientes(valor, '', config)) }}
           onFocus={() => setAbierto(true)}
           onBlur={() => { setTimeout(() => { setAbierto(false); confirmarLibre() }, 120) }}
           onKeyDown={onKeyDown}
         />
-        {abierto && texto.trim() && sugerencias.length > 0 && (
-          <ul id={`${listaId}-lista`} role="listbox" className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float">
+        {listaVisible && (
+          <ul {...navegacion.listboxProps} className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float">
             {sugerencias.map((modelo, indice) => (
-              <li key={nombreDeDispositivo(modelo)}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={indice === resaltado}
-                  tabIndex={-1}
-                  className={cn('flex w-full items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition', indice === resaltado && 'bg-ink-700')}
-                  onMouseDown={(event) => { event.preventDefault(); elegir(modelo) }}
-                  onMouseEnter={() => setResaltado(indice)}
-                >
-                  <span className="min-w-0 truncate">{nombreDeDispositivo(modelo)}</span>
-                  {codigoDeDispositivo(modelo) ? <span className="shrink-0 font-mono text-[11px] text-mute">{codigoDeDispositivo(modelo)}</span> : null}
-                </button>
+              <li
+                key={nombreDeDispositivo(modelo)}
+                {...navegacion.getOptionProps(indice)}
+                className={cn('flex min-h-11 cursor-pointer items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition', indice === navegacion.activeIndex && 'bg-ink-700')}
+              >
+                <span className="min-w-0 truncate">{nombreDeDispositivo(modelo)}</span>
+                {codigoDeDispositivo(modelo) ? <span className="shrink-0 font-mono text-[11px] text-mute">{codigoDeDispositivo(modelo)}</span> : null}
               </li>
             ))}
           </ul>
@@ -145,7 +140,7 @@ export default function BuscadorDispositivo({
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {campos.map((campo) => {
             const opciones = opcionesDependiente(modeloElegido, campo, config)
-            const id = `${listaId}-${campo}`
+            const id = `${campoId}-${campo}`
             return (
               <div key={campo} className="space-y-1">
                 <Label htmlFor={id}>{etiqueta(campo)}</Label>

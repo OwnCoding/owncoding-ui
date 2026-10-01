@@ -194,7 +194,7 @@ export default function Cronologia({
         type="button"
         disabled={cargando}
         onClick={onActualizar}
-        className="rounded-lg border border-ink-500 px-3 py-1.5 text-xs font-semibold text-mute transition hover:border-fono hover:text-fore disabled:opacity-40"
+        className="min-h-11 rounded-lg border border-interactivo px-3 py-1.5 text-xs font-semibold text-mute transition hover:border-fono hover:text-fore disabled:opacity-40"
       >
         {textoActualizar}
       </button>
@@ -205,7 +205,8 @@ export default function Cronologia({
     return (
       <div className={className}>
         {cabecera}
-        <div className="space-y-2" aria-busy="true">
+        <div className="space-y-2" role="status" aria-live="polite" aria-busy="true">
+          <span className="sr-only">Cargando cronología…</span>
           <Skeleton className="h-16" />
           <Skeleton className="h-16" />
           <Skeleton className="h-16" />
@@ -218,13 +219,15 @@ export default function Cronologia({
     return (
       <div className={className}>
         {cabecera}
-        <EmptyState
-          compact
-          icon="alert"
-          title={errorTitulo}
-          description={error}
-          action={onReintentar ? <Button onClick={onReintentar}>Reintentar</Button> : undefined}
-        />
+        <div role="alert">
+          <EmptyState
+            compact
+            icon="alert"
+            title={errorTitulo}
+            description={error}
+            action={onReintentar ? <Button onClick={onReintentar}>Reintentar</Button> : undefined}
+          />
+        </div>
       </div>
     )
   }
@@ -233,7 +236,7 @@ export default function Cronologia({
     return (
       <div className={className}>
         {cabecera}
-        <EmptyState compact icon="clock" title={vacioTitulo} description={vacioDetalle} />
+        <div role="status"><EmptyState compact icon="clock" title={vacioTitulo} description={vacioDetalle} /></div>
       </div>
     )
   }

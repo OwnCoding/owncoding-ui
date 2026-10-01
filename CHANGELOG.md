@@ -4,6 +4,100 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## Sin publicar
+
+- Sin cambios todavía.
+
+## v0.60.0 — 2026-10-01 (preparada, no publicada)
+
+- **Presentación del repositorio:** README reorganizado como portada del
+  sistema, con jerarquía progresiva, métricas verificadas del catálogo,
+  ejemplos de adopción e imports granulares, matriz de soporte y previews SVG
+  propios para componentes, teléfono/finanzas e identidad. `readme:check`
+  valida rutas locales, versión, métricas y seguridad básica de los SVG.
+
+- **Fronteras de bundle:** nuevos subpaths `owncoding-ui/phone`,
+  `owncoding-ui/financial`, `owncoding-ui/financial-metadata` y
+  `owncoding-ui/app-identity`. `utils` y `financial-metadata` quedan puros y
+  sin bytes visuales; el registro que empaqueta SVG/PNG vive en `financial`.
+  Los imports raíz se conservan.
+- **Contratos controlados:** `NavLateral` decide el modo por presencia de prop
+  y suma defaults no controlados; `DestinoRecepcion` suma
+  `destinoId`/`defaultDestinoId`/`onDestinoChange` y reconcilia cambios del
+  `destino` legado; `RangoFecha` permite control parcial sin congelar el otro
+  extremo y avisa en desarrollo.
+- **Garantías de publicación:** fixture TypeScript real, instalación temporal
+  desde `npm pack`, smoke de todos los subpaths y presupuestos raw/gzip forman
+  parte de CI. Los alias `@deprecated` tienen una ventana mínima de dos
+  releases menores y ningún export se retira sin auditoría del ecosistema.
+
+- **Identidad de app y versión estricta:** `crearIdentidadApp` produce un
+  modelo inmutable sin leer el `package.json` consumidor; acepta `X.Y.Z` o
+  `X.Y.Z-rc.N` y expone la etiqueta visible `v…` desde la entrada raíz y
+  `owncoding-ui/utils`.
+- **Pies configurables:** `ProductFooter` conserva su API y suma `identidad`,
+  enlaces estructurados y modelos `compacto`/`apilado`/`distribuido`; nuevo
+  `ProductPrefooter` opcional con modelos `enlaces`/`accion`/`completo`.
+- **Correo transaccional puro:** nuevo subpath `owncoding-ui/email` con modelo,
+  HTML y texto escapados, CTA y URL de respaldo. No envía ni maneja relay,
+  credenciales, reintentos o tracking.
+  Los renderers normalizan también objetos congelados creados por consumidores
+  y solo admiten CTA `https:`/`mailto:`; `javascript:`, `data:`, `vbscript:` y
+  `http:` fallan antes de producir HTML o texto.
+- **Galería pública:** React + Vite + Tailwind enumera todos los exports con
+  fixtures explícitos, modo claro/oscuro, búsqueda/filtros y guard de cobertura.
+  `gallery:build` produce `site-dist` y un `/status.json` estático para Coolify.
+- Docs: `docs/IDENTIDAD-APP-Y-CORREO.md` y `docs/GALERIA.md`.
+- **Contratos runtime/TypeScript compatibles:** `MoneyInput` reenvía refs;
+  `PercentField` admite `onChange(value)` y `onValueChange(value)` sin duplicar
+  una misma función; `BancoCombobox` suma `onSelect`; `CityAutocomplete` suma
+  `onChange`; y los callbacks de correo, serial e Instagram quedan declarados
+  como strings. Se completan además los tipos de `LoadingScreen`, `Label`,
+  `ErrorState`, `SeccionColapsable` y `MedidorBateria`.
+- **Accesibilidad crítica:** `Button` usa foregrounds semánticos AA para éxito
+  y peligro, los campos compartidos usan el borde interactivo de 3:1,
+  `DataTable` conserva datos en móvil con tarjetas genéricas y suma caption,
+  encabezados con scope, claves configurables y estado de carga anunciado.
+  `PaletaComandos` adopta la trampa compartida de foco, bloqueo de scroll, pila
+  de overlays y retorno de foco, sin cierre duplicado por Escape.
+- **Teléfono internacional:** `PhoneField` usa Paraguay (`PY`, `+595`, 🇵🇾)
+  por defecto y suma un selector accesible con catálogo internacional completo,
+  bandera Unicode, nombre localizado, ISO, DDI, búsqueda sin acentos y teclado.
+  Mantiene `onChange(local)`/`onCountryCodeChange(dial)` y agrega `country`,
+  `onCountryChange` y `onInternationalChange(E.164, meta)`; pegados/autofill con
+  `+` o `00` separan país y parte nacional sin reformatear cada tecla.
+- **Utilidades de teléfono:** dependencia runtime `libphonenumber-js/min`
+  (v1.13.14), `PAISES_TELEFONO`, `paisTelefonoPorIso`, `paisesDeCodigo`,
+  `buscarPaisesTelefono`, `parseTelefonoInternacional` y `telefonoE164`. Los
+  inválidos/incompletos producen E.164 vacío y Paraguay conserva la validación
+  móvil estricta `9XXXXXXXX`.
+  Los DDI legados desconocidos permanecen visibles como selección neutral y
+  nunca caen silenciosamente a Paraguay; los códigos compartidos usan países
+  principales deterministas (`+1` Estados Unidos, `+7` Rusia, `+44` Reino
+  Unido) sin reemplazar un ISO explícito.
+- **Marcas financieras:** `BancoLogo` suma variantes `compacto` y `horizontal`
+  con cobertura visual completa y fallback seguro; esto no implica que cada
+  par sea oficial. `BancoCombobox`
+  usa la variante compacta. Nuevo `MedioPagoLogo` y registro puro
+  `MARCAS_MEDIOS_PAGO` para Visa, Mastercard, American Express, Bancard, Red
+  Infonet, Dinelco, upay, uPOS, Procard, PayPro, Cabal y Panal.
+- **Catálogo corregido:** Finexpar pasa a `Zeta Banco`; El Comercio y Visión
+  quedan como alias históricos de `ueno bank`; Banco Río queda como alias de
+  Continental. Se agregan Finlatina y Tu Financiera, y las cooperativas se
+  publican por separado en `COOPERATIVAS_PARAGUAY`.
+- Cada entrada declara fuente oficial, fecha, categoría, estado y cobertura por
+  variante. Citi, Bancard, Dinelco, Procard y otras marcas con redistribución
+  no confirmada usan fallback explícito: autenticidad no equivale a permiso y
+  no se inventan símbolos recortando wordmarks.
+- **Redistribución fail-closed:** v0.60.0 no empaqueta ningún logo de terceros.
+  La URL oficial documenta procedencia, pero solo una licencia o autorización
+  explícita y auditable habilitará bytes en una versión futura. El paquete, los
+  subpaths financieros y la galería usan únicamente fallbacks tipográficos.
+- **Scripts portables:** los subprocesses de package smoke y presupuesto de
+  bundle resuelven `npm.cmd` en Windows y `npm` en el resto de plataformas.
+- Docs: `docs/MARCAS-FINANCIERAS.md`. Tests de catálogo, alias, variantes,
+  cobertura, fuentes autocontenidas y seguridad SVG.
+
 ## v0.59.0 — 2026-10-01
 
 - **A11y ronda 13 (#13):** verificación de los hallazgos de `dariodeoli/scale-os#60`

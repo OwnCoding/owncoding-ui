@@ -44,6 +44,7 @@ export {
   CeldaMoneda,
   BarraProgreso,
 } from './components/ui.jsx'
+export { default as useComboboxNavigation } from './hooks/useComboboxNavigation.js'
 
 // Campos y objetos compartidos
 export { default as Icon, ICONOS } from './components/Icon.jsx'
@@ -60,6 +61,7 @@ export { default as NumericKeypad } from './components/NumericKeypad.jsx'
 export { default as BarraLote } from './components/BarraLote.jsx'
 export { default as EmailField, DOMINIOS_EMAIL, sugerenciasDe } from './components/EmailField.jsx'
 export { default as PhoneField } from './components/PhoneField.jsx'
+export { default as CountryPhoneSelect } from './components/CountryPhoneSelect.jsx'
 export { default as SerialField, normalizarSerial } from './components/SerialField.jsx'
 export { imeiValido, separarSeriales, normalizarSeriales } from './utils/serial.js'
 export { default as InstagramField, normalizarInstagram } from './components/InstagramField.jsx'
@@ -116,6 +118,7 @@ export {
 export { MARGEN_VENTANA, ventanaDeLista } from './utils/ventana.js'
 export { rutaDeAviso, payloadPush, enHorarioSilencioso } from './utils/avisos.js'
 export { partesVersion, compararVersiones, hayVersionNueva } from './utils/version.js'
+export { VERSION_APP_RE, esVersionApp, etiquetaVersionApp, crearIdentidadApp } from './utils/appIdentity.js'
 export { default as BuscadorDispositivo } from './components/BuscadorDispositivo.jsx'
 export {
   PERFILES_DISPOSITIVO, CAMPOS_DISPOSITIVO, DISPOSITIVOS_MOBILE, CONECTIVIDADES_MOVIL,
@@ -146,6 +149,7 @@ export {
 export { default as GoogleButton, GoogleMark, OAuthDivider } from './components/GoogleButton.jsx'
 export { default as AuthLayout } from './components/AuthLayout.jsx'
 export { default as ProductFooter, CREDITO_PIE, CREDITO_PIE_URL } from './components/ProductFooter.jsx'
+export { default as ProductPrefooter } from './components/ProductPrefooter.jsx'
 export { default as LoadingScreen } from './components/LoadingScreen.jsx'
 export { default as PegarEnlaceToken } from './components/PegarEnlaceToken.jsx'
 export { default as NavLateral } from './components/NavLateral.jsx'
@@ -168,6 +172,7 @@ export { default as AjustesImpresion } from './components/AjustesImpresion.jsx'
 export { default as BotonImprimir } from './components/BotonImprimir.jsx'
 export { default as BancoCombobox } from './components/BancoCombobox.jsx'
 export { default as BancoLogo } from './components/BancoLogo.jsx'
+export { default as MedioPagoLogo } from './components/MedioPagoLogo.jsx'
 export { default as CityAutocomplete } from './components/CityAutocomplete.jsx'
 
 // Clases de tabla/listado
@@ -391,14 +396,25 @@ export { completeSave, crearEnvioUnico, AVISO_REFRESCO } from './utils/guardado.
 export { normalizarNombre, nombrePartes, esApellidosPrimero, esRazonSocial } from './utils/nombre.js'
 export {
   BANCOS_PARAGUAY,
+  BANCOS_Y_FINANCIERAS_PARAGUAY,
+  COOPERATIVAS_PARAGUAY,
   LOGOS_BANCOS,
   COLORES_BANCO_RESPALDO,
+  FECHA_VERIFICACION_MARCAS_FINANCIERAS,
   normalizarBanco,
   inicialesDeBanco,
   colorDeBanco,
   logoDeBanco,
+  coberturaBancos,
   sugerenciasDeBanco,
 } from './utils/bancos.js'
+export {
+  MARCAS_MEDIOS_PAGO,
+  MEDIOS_PAGO_CON_MARCA,
+  normalizarMarcaPago,
+  logoDeMedioPago,
+  coberturaMediosPago,
+} from './utils/mediosPago.js'
 export {
   ESTADO_IMPRESORA,
   ETIQUETA_ESTADO,
@@ -468,7 +484,10 @@ export { extractTokenFromUrl, esToken } from './utils/token.js'
 export {
   CODIGOS_PAIS,
   parseTelefono,
+  parseTelefonoInternacional,
   componerTelefono,
+  telefonoE164,
+  telefonoInternacionalValido,
   normalizarTelefono,
   internationalPhone,
   whatsappUrl,
@@ -478,3 +497,9 @@ export {
   telefonoValido,
   MENSAJE_TELEFONO,
 } from './utils/telefono.js'
+export {
+  PAISES_TELEFONO,
+  paisTelefonoPorIso,
+  paisesDeCodigo,
+  buscarPaisesTelefono,
+} from './utils/paisesTelefono.js'

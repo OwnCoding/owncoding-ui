@@ -63,6 +63,16 @@ describe('tipos publicados (.d.ts)', () => {
     expect(presetDts).toContain('export default')
   })
 
+  test('los contratos aditivos coinciden con los valores que entrega el runtime', () => {
+    expect(dts).toContain('LabelHTMLAttributes<HTMLLabelElement>')
+    expect(dts).toMatch(/PercentField[\s\S]*onChange\?: \(value: string\)/)
+    expect(dts).toMatch(/EmailField[\s\S]*onChange\?: \(value: string\)/)
+    expect(dts).toMatch(/LoadingScreen[\s\S]*mensaje\?: string/)
+    expect(dts).toMatch(/DataTableColumn[\s\S]*mobile\?: boolean/)
+    expect(dts).toContain('getRowKey?: (row: Row, index: number) => string | number')
+    expect(dts).toMatch(/MedidorBateria[\s\S]*mostrarEtiqueta\?: boolean/)
+  })
+
   test('todo export del runtime está declarado y toda declaración de valor existe', () => {
     // La entrada principal no se vuelve a despegar del `.d.ts`: si un objeto
     // nuevo sale por `owncoding-ui`, tiene que quedar declarado acá.

@@ -44,7 +44,7 @@ export const Input = forwardRef(function Input({ className, ...props }, ref) {
     <input
       ref={ref}
       className={cn(
-        'w-full rounded-lg border border-ink-500 bg-ink-800 px-3.5 text-fore',
+        'w-full rounded-lg border border-interactivo bg-ink-800 px-3.5 text-fore',
         'h-11 md:h-9 text-base md:text-sm outline-none transition',
         'focus:border-fono focus:ring-1 focus:ring-fono/40 placeholder:text-mute/60',
         className,
@@ -101,7 +101,7 @@ export function PinInput({ value, onChange, onComplete, length = 4, autoFocus = 
         }}
         placeholder=""
         aria-label={ariaLabel || `PIN de ${largoMax} dígitos`}
-        className="pin-oculto h-full w-full rounded-2xl border border-ink-500 bg-paper text-center text-3xl font-bold tracking-[.45em] shadow-card transition-all duration-150 focus:border-fono focus:ring-2 focus:ring-fono/30 focus:outline-none"
+        className="pin-oculto h-full w-full rounded-2xl border border-interactivo bg-paper text-center text-3xl font-bold tracking-[.45em] shadow-card transition-all duration-150 focus:border-fono focus:ring-2 focus:ring-fono/30 focus:outline-none"
       />
       <span aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center gap-[.5em]">
         {Array.from({ length: largoMax }, (_, indice) => (
@@ -128,12 +128,17 @@ export function PinInput({ value, onChange, onComplete, length = 4, autoFocus = 
 // admita decimales (transporte entero de previsión/informes). El caret se
 // mantiene tras el dígito que se está editando —también al pegar— con
 // `caretTrasDigitos` y `normalizarMontoInput`.
-export function MoneyInput({ currency = 'PYG', symbol, value, onValueChange, className, max = LIMITE_MONTO_GENERAL, maxLength, integerOnly = false, onKeyDown, ...props }) {
+export const MoneyInput = forwardRef(function MoneyInput({ currency = 'PYG', symbol, value, onValueChange, className, max = LIMITE_MONTO_GENERAL, maxLength, integerOnly = false, onKeyDown, ...props }, ref) {
   const soloEnteros = currency === 'PYG' || integerOnly
   const prefix = String(symbol ?? '').trim() || SIMBOLOS_MONEDA[currency] || currency
   const display = soloEnteros ? formatGsInput(String(value ?? '').split('.')[0]) : formatUsdInput(value)
   const excede = excedeMonto(value, max)
   const inputRef = useRef(null)
+  const establecerRef = useCallback((node) => {
+    inputRef.current = node
+    if (typeof ref === 'function') ref(node)
+    else if (ref) ref.current = node
+  }, [ref])
   // Largo máximo del campo: el monto más grande documentado (con separadores)
   // entra completo y no se puede escribir de más; se puede pisar por prop.
   const topeLargo = maxLength ?? largoMaximoMonto(max, { decimales: !soloEnteros })
@@ -144,7 +149,7 @@ export function MoneyInput({ currency = 'PYG', symbol, value, onValueChange, cla
       </span>
       <Input
         {...props}
-        ref={inputRef}
+        ref={establecerRef}
         aria-invalid={excede || undefined}
         title={excede ? `El monto supera el máximo permitido (${max.toLocaleString('es-PY')})` : props.title}
         inputMode={soloEnteros ? 'numeric' : 'decimal'}
@@ -174,7 +179,7 @@ export function MoneyInput({ currency = 'PYG', symbol, value, onValueChange, cla
       />
     </div>
   )
-}
+})
 
 // ── Money ───────────────────────────────────────────────────────────
 // Importe de solo lectura: guaraníes con el formato canónico del repo y
@@ -198,7 +203,7 @@ export function Select({ className, children, ...props }) {
   return (
     <select
       className={cn(
-        'w-full rounded-lg border border-ink-500 bg-ink-800 px-3 text-fore',
+        'w-full rounded-lg border border-interactivo bg-ink-800 px-3 text-fore',
         'h-11 md:h-9 text-base md:text-sm outline-none transition cursor-pointer',
         'focus:border-fono focus:ring-1 focus:ring-fono/40',
         '[&>option]:bg-ink-800 [&>option]:text-fore',
@@ -216,7 +221,7 @@ export function Textarea({ className, ...props }) {
   return (
     <textarea
       className={cn(
-        'w-full rounded-lg border border-ink-500 bg-ink-800 px-3.5 py-2.5 text-fore',
+        'w-full rounded-lg border border-interactivo bg-ink-800 px-3.5 py-2.5 text-fore',
         'text-base md:text-sm outline-none transition focus:border-fono focus:ring-1 focus:ring-fono/40',
         'placeholder:text-mute/60 resize-none',
         className,
@@ -551,16 +556,68 @@ let toastCounter = 0
 const TOAST_ICON = { success: 'check', error: 'alert', info: 'info' }
 const TOAST_TONE = { success: 'text-ok-text', error: 'text-bad-text', info: 'text-fono-light' }
 
+function ToastItem({ toast, dismiss, demo }) {
+  const timer = useRef(null)
+  const startedAt = useRef(0)
+  const remaining = useRef(toast.duration)
+
+  const pause = useCallback(() => {
+    if (!timer.current) return
+    clearTimeout(timer.current)
+    timer.current = null
+    remaining.current = Math.max(0, remaining.current - (Date.now() - startedAt.current))
+  }, [])
+
+  const resume = useCallback(() => {
+    if (toast.persistent || timer.current || remaining.current <= 0) return
+    startedAt.current = Date.now()
+    timer.current = setTimeout(() => dismiss(toast.id), remaining.current)
+  }, [dismiss, toast.id, toast.persistent])
+
+  useEffect(() => {
+    resume()
+    return () => { if (timer.current) clearTimeout(timer.current) }
+  }, [resume])
+
+  return (
+    <div
+      role={toast.variant === 'error' ? 'alert' : 'status'}
+      aria-live={toast.variant === 'error' ? 'assertive' : 'polite'}
+      onMouseEnter={pause}
+      onMouseLeave={resume}
+      onFocusCapture={pause}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) resume() }}
+      className={cn('pointer-events-auto flex items-start gap-3 rounded-xl border bg-ink-700 p-3.5 shadow-card', toast.variant === 'error' ? 'border-bad/40' : toast.variant === 'success' ? 'border-ok/40' : 'border-ink-500')}
+    >
+      <Icon name={TOAST_ICON[toast.variant]} className={cn('mt-0.5 h-4 w-4', TOAST_TONE[toast.variant])} aria-hidden />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-fore">{toast.title}</p>
+        {toast.description && <p className="mt-0.5 text-xs text-mute">{toast.description}</p>}
+        {demo && (
+          <p className="mt-1 inline-flex rounded border border-fono/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-light">
+            Demo · no se guardó en la tienda
+          </p>
+        )}
+      </div>
+      <button type="button" onClick={() => dismiss(toast.id)} className="toque-44 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-600 hover:text-fore" aria-label="Cerrar aviso">×</button>
+    </div>
+  )
+}
+
 export function ToastProvider({ children, demo = false }) {
   const [toasts, setToasts] = useState([])
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const dismiss = useCallback((id) => setToasts(current => current.filter(toast => toast.id !== id)), [])
-  const toast = useCallback((variant, title, description) => {
+  const toast = useCallback((variant, title, description, options) => {
+    const detalles = description && typeof description === 'object' && !isValidElement(description) ? description : options
+    const texto = detalles === description ? undefined : description
     const id = `toast-${++toastCounter}`
-    setToasts(current => [...current, { id, variant: TOAST_ICON[variant] ? variant : 'info', title, description }])
-    setTimeout(() => dismiss(id), 4000)
-  }, [dismiss])
+    const variantResolved = TOAST_ICON[variant] ? variant : 'info'
+    const persistent = detalles?.persistent ?? variantResolved === 'error'
+    const duration = Math.max(0, Number(detalles?.duration ?? 4000))
+    setToasts(current => [...current, { id, variant: variantResolved, title, description: texto, persistent, duration }])
+  }, [])
   // En la demo pública, cada guardado avisa que quedó simulado (#192).
   useEffect(() => {
     if (!demo) return undefined
@@ -575,30 +632,16 @@ export function ToastProvider({ children, demo = false }) {
     return () => window.removeEventListener('mobos:demo-guardado', aviso)
   }, [demo, toast])
   const value = useMemo(() => ({
-    success: (title, description) => toast('success', title, description),
-    error: (title, description) => toast('error', title, description),
-    info: (title, description) => toast('info', title, description),
+    success: (title, description, options) => toast('success', title, description, options),
+    error: (title, description, options) => toast('error', title, description, options),
+    info: (title, description, options) => toast('info', title, description, options),
   }), [toast])
   if (!mounted) return children
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-[60] flex max-w-sm flex-col gap-2 sm:left-auto sm:w-full" aria-live="polite" role="status">
-        {toasts.map(toast => (
-          <div key={toast.id} className={cn('pointer-events-auto flex items-start gap-3 rounded-xl border bg-ink-700 p-3.5 shadow-card', toast.variant === 'error' ? 'border-bad/40' : toast.variant === 'success' ? 'border-ok/40' : 'border-ink-500')}>
-            <Icon name={TOAST_ICON[toast.variant]} className={cn('mt-0.5 h-4 w-4', TOAST_TONE[toast.variant])} />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-fore">{toast.title}</p>
-              {toast.description && <p className="mt-0.5 text-xs text-mute">{toast.description}</p>}
-              {demo && (
-                <p className="mt-1 inline-flex rounded border border-fono/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-light">
-                  Demo · no se guardó en la tienda
-                </p>
-              )}
-            </div>
-            <button type="button" onClick={() => dismiss(toast.id)} className="rounded-md p-1 text-mute transition hover:bg-ink-600 hover:text-fore" aria-label="Cerrar aviso">×</button>
-          </div>
-        ))}
+      <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-[60] flex max-w-sm flex-col gap-2 sm:left-auto sm:w-full">
+        {toasts.map(item => <ToastItem key={item.id} toast={item} dismiss={dismiss} demo={demo} />)}
       </div>
     </ToastContext.Provider>
   )
@@ -772,11 +815,14 @@ export function PageHeader({ title, subtitle, actions, backTo, eyebrow, migas })
 // El encabezado **no** es pegajoso por defecto (#114): con el scroll de página
 // (#109) un `sticky` puede montarse sobre filas cuando la tabla vive en un
 // scroller interno (p. ej. Finanzas). `encabezadoFijo` lo habilita solo donde
-// el contenedor sea la página.
-export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.', loading = false, mobileCard, encabezadoFijo = false, className }) {
+// el contenedor sea la página. `caption` y `getRowKey` conservan los contratos
+// de accesibilidad y estabilidad de la tabla responsiva.
+export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.', loading = false, mobileCard, encabezadoFijo = false, caption = 'Datos', getRowKey, className }) {
+  const claveDeFila = (row, index) => getRowKey?.(row, index) ?? row?.id ?? row?.key ?? index
   if (loading) {
     return (
-      <div className={cn('space-y-2 p-4', className)} aria-busy="true">
+      <div className={cn('space-y-2 p-4', className)} role="status" aria-busy="true">
+        <span className="sr-only">Cargando datos…</span>
         <Skeleton className="h-4 w-1/3" />
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-10 w-full" />
@@ -793,16 +839,17 @@ export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.
           del panel (h-12). */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
-          <thead className={cn('border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute select-none bg-ink-800', encabezadoFijo && 'sticky top-12 z-10')}>
+          {caption ? <caption className="sr-only">{caption}</caption> : null}
+          <thead className={cn('select-none bg-ink-800', encabezadoFijo && 'sticky top-12 z-10')}>
             <tr className="border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute">
               {columns.map(column => (
-                <th key={column.key} className={cn('px-2.5 py-1.5 font-medium', column.align === 'right' && 'text-right', column.align === 'center' && 'text-center')}>{column.label}</th>
+                <th scope="col" key={column.key} className={cn('px-2.5 py-1.5 font-medium', column.align === 'right' && 'text-right', column.align === 'center' && 'text-center')}>{column.label}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.map(row => (
-              <tr key={row.id ?? row.key ?? JSON.stringify(row)} className="border-b border-ink-600/60 last:border-0">
+            {rows.map((row, index) => (
+              <tr key={claveDeFila(row, index)} className="border-b border-ink-600/60 last:border-0">
                 {columns.map(column => (
                   <td key={column.key} className={cn('px-2.5 py-1.5 text-fore', column.align === 'right' && 'text-right', column.align === 'center' && 'text-center')}>
                     {column.render ? column.render(row) : row[column.key]}
@@ -815,8 +862,19 @@ export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.
       </div>
       <div className="grid grid-cols-1 gap-2 p-2.5 md:hidden">
         {mobileCard
-          ? rows.map(row => <div key={row.id ?? row.key ?? JSON.stringify(row)}>{mobileCard(row)}</div>)
-          : <EmptyState icon="filter" title={emptyLabel} />}
+          ? rows.map((row, index) => <div key={claveDeFila(row, index)}>{mobileCard(row)}</div>)
+          : rows.map((row, index) => (
+            <dl key={claveDeFila(row, index)} className="rounded-xl border border-ink-600 bg-ink-800 p-3 shadow-card">
+              {columns.filter((column) => column.mobile !== false).map((column) => (
+                <div key={column.key} className="flex items-start justify-between gap-4 border-b border-ink-600/60 py-2 first:pt-0 last:border-0 last:pb-0">
+                  <dt className="text-xs font-medium text-mute">{column.label}</dt>
+                  <dd className={cn('min-w-0 text-right text-sm text-fore', column.align === 'left' && 'text-left')}>
+                    {column.render ? column.render(row) : row[column.key]}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ))}
       </div>
     </div>
   )
@@ -831,18 +889,45 @@ export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.
 // el borde del input— y el mensaje queda **debajo de la fila**: evita el
 // desalineado clásico de poner el botón como hermano con `items-end`. En
 // mobile el botón puede pasar a ancho completo con `className="w-full sm:w-auto"`.
+function mergeIds(...values) {
+  return [...new Set(values.flatMap((value) => String(value || '').split(/\s+/)).filter(Boolean))].join(' ') || undefined
+}
+
+function relacionarControl(children, { htmlFor, mensajeId, error }, estado = { aplicado: false }) {
+  return Children.map(children, (child) => {
+    if (!isValidElement(child) || estado.aplicado) return child
+    const esNativo = ['input', 'select', 'textarea'].includes(child.type)
+    const coincideId = Boolean(htmlFor && child.props.id === htmlFor)
+    const esComponenteDirecto = typeof child.type !== 'string' && !child.props.children
+    if (coincideId || (!htmlFor && (esNativo || esComponenteDirecto))) {
+      estado.aplicado = true
+      return cloneElement(child, {
+        'aria-describedby': mensajeId ? mergeIds(child.props['aria-describedby'], mensajeId) : child.props['aria-describedby'],
+        'aria-invalid': error ? true : child.props['aria-invalid'],
+      })
+    }
+    if (child.props.children) {
+      return cloneElement(child, undefined, relacionarControl(child.props.children, { htmlFor, mensajeId, error }, estado))
+    }
+    return child
+  })
+}
+
 export function FormField({ label, hint, error, children, htmlFor, descripcionId, accion, className }) {
   const mensajeId = descripcionId || (htmlFor ? `${htmlFor}-descripcion` : undefined)
+  const control = (error || hint) && mensajeId
+    ? relacionarControl(children, { htmlFor, mensajeId, error })
+    : children
   return (
     <div className={className}>
       {label && <Label htmlFor={htmlFor}>{label}</Label>}
       {accion ? (
         <div className="flex flex-wrap items-stretch gap-2">
-          <div className="min-w-0 flex-1">{children}</div>
+          <div className="min-w-0 flex-1">{control}</div>
           <div className="flex shrink-0 items-stretch">{accion}</div>
         </div>
       ) : (
-        children
+        control
       )}
       {error ? <p id={mensajeId} role="alert" className="mt-1.5 text-xs text-bad-text">{error}</p> : hint ? <p id={mensajeId} className="mt-1.5 text-xs text-mute">{hint}</p> : null}
     </div>
@@ -895,19 +980,39 @@ export function Stat({ label, valor, delta, sub, nota, tono, destacado = false, 
 // `items` usa la convención `[id, etiqueta]` y acepta un tercer valor opcional
 // con el contador de la cola (`[id, etiqueta, 12]`): las pestañas del panel de
 // abastecimiento muestran cuántas hay en cada estado sin armar el badge aparte.
-export function Subtabs({ value, onChange, items = [], className }) {
+export function Subtabs({ value, onChange, items = [], className, ariaLabel = 'Secciones' }) {
+  const baseId = useId()
+  const refs = useRef([])
   if (!items.length) return null
+
+  function mover(event, indice) {
+    let siguiente
+    if (event.key === 'ArrowRight') siguiente = (indice + 1) % items.length
+    else if (event.key === 'ArrowLeft') siguiente = (indice - 1 + items.length) % items.length
+    else if (event.key === 'Home') siguiente = 0
+    else if (event.key === 'End') siguiente = items.length - 1
+    else return
+    event.preventDefault()
+    const id = items[siguiente]?.[0]
+    onChange?.(id)
+    requestAnimationFrame(() => refs.current[siguiente]?.focus())
+  }
+
   return (
-    <div className={cn('mb-5 flex flex-wrap gap-2 rounded-2xl border border-fore/10 bg-ink p-2', className)} role="tablist">
-      {items.map(([id, label, contador]) => {
+    <div className={cn('mb-5 flex flex-wrap gap-2 rounded-2xl border border-fore/10 bg-ink p-2', className)} role="tablist" aria-label={ariaLabel}>
+      {items.map(([id, label, contador], indice) => {
         const numero = Number(contador)
         const tieneContador = contador !== undefined && contador !== null && contador !== '' && Number.isFinite(numero)
         return (
           <button
             key={id}
+            id={`${baseId}-tab-${id}`}
+            ref={(node) => { refs.current[indice] = node }}
             type="button"
             role="tab"
             aria-selected={value === id}
+            tabIndex={value === id ? 0 : -1}
+            onKeyDown={(event) => mover(event, indice)}
             onClick={() => onChange(id)}
             className={cn(
               'min-h-11 rounded-xl px-3 py-2 text-sm font-medium transition',

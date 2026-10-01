@@ -23,17 +23,18 @@ export function normalizarInstagram(value) {
     .slice(0, MAX_USERNAME)
 }
 
-export default function InstagramField({ value = '', onChange, disabled = false, placeholder = 'usuario', className }) {
+export default function InstagramField({ value = '', onChange, disabled = false, placeholder = 'usuario', className, inputClassName, ...props }) {
   return (
     <div className={cn('relative', className)}>
       <span aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-mute">@</span>
       <Input
+        {...props}
         maxLength={MAX_USERNAME}
         disabled={disabled}
         value={normalizarInstagram(value)}
         onChange={(event) => onChange?.(normalizarInstagram(event.target.value))}
         placeholder={placeholder}
-        className="pl-8"
+        className={cn('pl-8', inputClassName)}
       />
     </div>
   )

@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Input } from './ui.jsx'
 import IconoCategoria from './IconoCategoria.jsx'
 import { cn } from '../utils/cn.js'
+import useComboboxNavigation from '../hooks/useComboboxNavigation.js'
 
 const MAX_SUGGESTIONS = 8
 
@@ -16,9 +17,7 @@ function productName(product) {
 export default function ProductCombobox({ products = [], selectedId = '', onSelect, onCreate, onQueryChange, placeholder = 'Buscar producto…', disabled = false, className }) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
-  const [highlight, setHighlight] = useState(0)
   const [creating, setCreating] = useState(false)
-  const listId = useId()
   const rootRef = useRef(null)
 
   // El listado va en flujo (no superpuesto), así que se cierra solo con un clic
@@ -57,16 +56,17 @@ export default function ProductCombobox({ products = [], selectedId = '', onSele
     return products.filter(coincide).slice(0, MAX_SUGGESTIONS)
   }, [products, term])
   const canCreate = Boolean(term && onCreate && suggestions.length === 0)
-  const optionCount = suggestions.length + (canCreate ? 1 : 0)
+  const options = useMemo(
+    () => canCreate ? [...suggestions, { id: '__create__', __create: true }] : suggestions,
+    [canCreate, suggestions],
+  )
 
   function close() {
     setOpen(false)
-    setHighlight(0)
   }
   function choose(product) {
     setearQuery(productName(product))
     setOpen(false)
-    setHighlight(0)
     onSelect?.(product)
   }
   async function createNew() {
@@ -86,42 +86,25 @@ export default function ProductCombobox({ products = [], selectedId = '', onSele
     }
   }
 
-  function onKeyDown(event) {
-    if (event.key === 'Escape') {
-      close()
-      return
-    }
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault()
-      if (!open) {
-        setOpen(true)
-        return
-      }
-      if (!optionCount) return
-      const delta = event.key === 'ArrowDown' ? 1 : -1
-      setHighlight((current) => (current + delta + optionCount) % optionCount)
-      return
-    }
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      if (!open || !term) return
-      if (canCreate && highlight >= suggestions.length) {
-        createNew()
-        return
-      }
-      const product = suggestions[highlight]
-      if (product) choose(product)
-    }
-  }
+  const listaVisible = open && Boolean(term)
+  const navegacion = useComboboxNavigation({
+    options,
+    open: listaVisible,
+    onOpenChange: setOpen,
+    onSelect: (option) => { if (option.__create) void createNew(); else choose(option) },
+    getOptionKey: (option) => option.id,
+  })
 
   return (
     <div ref={rootRef} className={cn('relative', className)}>
       <Input
         type="text"
+        ref={navegacion.inputRef}
         role="combobox"
-        aria-expanded={open}
-        aria-controls={listId}
+        aria-expanded={listaVisible}
+        aria-controls={navegacion.listboxId}
         aria-autocomplete="list"
+        aria-activedescendant={navegacion.activeOptionId}
         autoComplete="off"
         disabled={disabled}
         value={query}
@@ -129,50 +112,31 @@ export default function ProductCombobox({ products = [], selectedId = '', onSele
         onChange={(event) => {
           setearQuery(event.target.value)
           setOpen(true)
-          setHighlight(0)
+          navegacion.setActiveIndex(0)
         }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(close, 120)}
-        onKeyDown={onKeyDown}
+        onKeyDown={navegacion.inputProps.onKeyDown}
       />
-      {open && term && (
-        <ul id={listId} role="listbox" className="mt-1 max-h-48 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float">
+      {listaVisible && (
+        <ul {...navegacion.listboxProps} className="mt-1 max-h-48 w-full overflow-auto rounded-lg border border-ink-500 bg-ink py-1 shadow-float">
           {suggestions.map((product, index) => (
-            <li key={product.id}>
-              <button
-                type="button"
-                role="option"
-                aria-selected={index === highlight}
-                tabIndex={-1}
-                className={cn('flex w-full items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition', index === highlight ? 'bg-ink-700' : '')}
-                onMouseDown={(event) => {
-                  event.preventDefault()
-                  choose(product)
-                }}
-                onMouseEnter={() => setHighlight(index)}
-              >
-                <span className="flex min-w-0 items-center gap-2"><IconoCategoria categoria={product.category || productName(product)} className="h-4 w-4 text-mute" /><span className="truncate text-fore">{productName(product)}</span></span>
-                {product.sku ? <span className="shrink-0 text-xs text-mute">{product.sku}</span> : null}
-              </button>
+            <li
+              key={product.id}
+              {...navegacion.getOptionProps(index)}
+              className={cn('flex min-h-11 cursor-pointer items-baseline justify-between gap-2 px-3 py-2 text-left text-sm transition', index === navegacion.activeIndex ? 'bg-ink-700' : '')}
+            >
+              <span className="flex min-w-0 items-center gap-2"><IconoCategoria categoria={product.category || productName(product)} className="h-4 w-4 text-mute" /><span className="truncate text-fore">{productName(product)}</span></span>
+              {product.sku ? <span className="shrink-0 text-xs text-mute">{product.sku}</span> : null}
             </li>
           ))}
           {canCreate && (
-            <li>
-              <button
-                type="button"
-                role="option"
-                aria-selected={highlight >= suggestions.length}
-                tabIndex={-1}
-                disabled={creating}
-                className={cn('flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-fono-light transition disabled:opacity-50', highlight >= suggestions.length ? 'bg-ink-700' : '')}
-                onMouseDown={(event) => {
-                  event.preventDefault()
-                  createNew()
-                }}
-                onMouseEnter={() => setHighlight(suggestions.length)}
-              >
-                {creating ? 'Creando…' : `＋ Agregar «${query.trim()}» como producto nuevo`}
-              </button>
+            <li
+              {...navegacion.getOptionProps(suggestions.length)}
+              aria-disabled={creating || undefined}
+              className={cn('flex min-h-11 cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-fono-light transition', creating && 'pointer-events-none opacity-50', navegacion.activeIndex >= suggestions.length ? 'bg-ink-700' : '')}
+            >
+              {creating ? 'Creando…' : `＋ Agregar «${query.trim()}» como producto nuevo`}
             </li>
           )}
         </ul>

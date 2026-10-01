@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import Icon from './Icon.jsx'
 import { cn } from '../utils/cn.js'
 
@@ -33,11 +33,26 @@ export default function NavegacionSeccion({
   children,
 }) {
   const activoRef = useRef(null)
+  const tabsRef = useRef([])
+  const baseId = useId()
   const lista = (Array.isArray(items) ? items : [])
     .map((item) => (Array.isArray(item) ? { id: item[0], label: item[1] } : item))
     .filter((item) => item && item.id)
   const activo = lista.find((item) => item.id === value) || lista[0]
+  const activeId = activo?.id
   const conRiel = variante !== 'horizontal'
+
+  function mover(event, indice) {
+    let siguiente
+    if (event.key === 'ArrowRight') siguiente = (indice + 1) % lista.length
+    else if (event.key === 'ArrowLeft') siguiente = (indice - 1 + lista.length) % lista.length
+    else if (event.key === 'Home') siguiente = 0
+    else if (event.key === 'End') siguiente = lista.length - 1
+    else return
+    event.preventDefault()
+    onChange?.(lista[siguiente].id)
+    requestAnimationFrame(() => tabsRef.current[siguiente]?.focus())
+  }
 
   useEffect(() => {
     // En mobile la tira puede dejar la sección activa fuera de vista al entrar
@@ -67,7 +82,7 @@ export default function NavegacionSeccion({
               aria-controls={testId}
               title={colapsado ? textoExpandir : textoColapsar}
               aria-label={colapsado ? textoExpandir : textoColapsar}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-700 hover:text-fore"
+              className="toque-44 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-700 hover:text-fore"
             >
               <Icon name="chevron" className={cn('h-4 w-4 transition-transform', colapsado ? '-rotate-90' : 'rotate-90')} />
             </button>
@@ -84,19 +99,23 @@ export default function NavegacionSeccion({
             conRiel && colapsado && 'lg:items-center lg:p-1.5',
           )}
         >
-          {lista.map((item) => {
-            const esta = item.id === value
+          {lista.map((item, indice) => {
+            const esta = item.id === activeId
             return (
               <button
                 key={item.id}
+                id={`${baseId}-tab-${item.id}`}
                 type="button"
                 role="tab"
                 aria-selected={esta}
                 aria-current={esta ? 'page' : undefined}
+                aria-controls={`${baseId}-panel-${item.id}`}
+                tabIndex={esta ? 0 : -1}
                 aria-label={item.label}
                 title={item.label}
-                ref={esta ? activoRef : undefined}
+                ref={(node) => { tabsRef.current[indice] = node; if (esta) activoRef.current = node }}
                 onClick={() => onChange?.(item.id)}
+                onKeyDown={(event) => mover(event, indice)}
                 className={cn(
                   'group relative flex min-h-11 shrink-0 items-center gap-2 rounded-[10px] border px-3 text-left text-[13px] leading-snug transition',
                   conRiel && (colapsado ? 'lg:w-12 lg:justify-center lg:px-0' : 'lg:w-full'),
@@ -114,7 +133,13 @@ export default function NavegacionSeccion({
         </nav>
       </div>
 
-      <div className={cn('min-w-0 space-y-3', classNameContenido)}>
+      <div
+        id={`${baseId}-panel-${activeId}`}
+        role="tabpanel"
+        aria-labelledby={`${baseId}-tab-${activeId}`}
+        tabIndex={0}
+        className={cn('min-w-0 space-y-3', classNameContenido)}
+      >
         {mostrarDescripcion && activo?.descripcion ? (
           <p data-testid={testIdDescripcion || `${testId}-descripcion`} className="flex items-start gap-2 px-0.5 text-sm text-mute">
             <Icon name={activo.icono} className="mt-0.5 h-4 w-4 shrink-0 text-fono-light" />

@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Button, Select } from './ui.jsx'
 import Icon from './Icon.jsx'
 import { cn } from '../utils/cn.js'
@@ -10,20 +10,37 @@ import { cn } from '../utils/cn.js'
 //
 //   <DestinoRecepcion destino={{ id: 'dep-1', nombre: 'Depósito 1' }} depositos={DEPOSITOS}
 //     pendientes={3} onRecibir={(id) => recibir(id)} />
-export default function DestinoRecepcion({
-  destino,
-  depositos = [],
-  pendientes = 0,
-  recibiendo = false,
-  onRecibir,
-  etiqueta = 'Recibir en',
-  textoRecibir = 'Recibir todo',
-  className,
-}) {
-  const [elegido, setElegido] = useState(destino?.id ?? depositos[0]?.id ?? '')
+export default function DestinoRecepcion(props) {
+  const {
+    destino,
+    destinoId,
+    defaultDestinoId,
+    onDestinoChange,
+    depositos = [],
+    pendientes = 0,
+    recibiendo = false,
+    onRecibir,
+    etiqueta = 'Recibir en',
+    textoRecibir = 'Recibir todo',
+    className,
+  } = props
+  const controlado = Object.prototype.hasOwnProperty.call(props, 'destinoId')
+  const [elegidoInterno, setElegidoInterno] = useState(defaultDestinoId ?? destino?.id ?? depositos[0]?.id ?? '')
+  const destinoAnterior = useRef(destino?.id)
+  useEffect(() => {
+    if (controlado || destinoAnterior.current === destino?.id) return
+    destinoAnterior.current = destino?.id
+    setElegidoInterno(destino?.id ?? defaultDestinoId ?? depositos[0]?.id ?? '')
+  }, [controlado, defaultDestinoId, depositos, destino?.id])
+  const elegido = controlado ? (destinoId ?? '') : elegidoInterno
   const id = useId()
   const actual = depositos.find((deposito) => deposito.id === elegido) || destino || null
   const alternativas = depositos.filter((deposito) => deposito.id !== actual?.id)
+
+  const elegir = (siguiente) => {
+    if (!controlado) setElegidoInterno(siguiente)
+    onDestinoChange?.(siguiente)
+  }
 
   return (
     <section className={cn('rounded-xl border border-ink-600 bg-ink-800 p-3', className)} aria-label="Cierre de la recepción">
@@ -31,7 +48,7 @@ export default function DestinoRecepcion({
         <label htmlFor={id} className="min-w-0 flex-1 space-y-1 text-xs text-mute">
           <span className="block font-semibold">{etiqueta}</span>
           {alternativas.length > 0 ? (
-            <Select id={id} value={elegido} onChange={(event) => setElegido(event.target.value)} className="w-full">
+            <Select id={id} value={elegido} onChange={(event) => elegir(event.target.value)} className="w-full">
               {actual ? <option value={actual.id}>{actual.nombre}</option> : null}
               {alternativas.map((deposito) => <option key={deposito.id} value={deposito.id}>{deposito.nombre}</option>)}
             </Select>
