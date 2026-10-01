@@ -28,4 +28,11 @@ describe('alto táctil de 44 px (#249)', () => {
     expect(leer('components/ListGridToggle.jsx')).toContain('toque-44')
     expect(leer('components/ui.jsx')).toContain("'toque-44 h-9 w-9'")
   })
+
+  test('IconAction chico: 44 px reales en móvil y 28 px en escritorio (#13)', () => {
+    // El hallazgo de la ronda 13 medía el target del IconAction por defecto en
+    // 28 px; ahora el área es real (sin pseudo-elemento, sin solaparse con las
+    // acciones vecinas) y la densidad de escritorio no cambia.
+    expect(leer('components/ui.jsx')).toContain("'h-11 w-11 md:h-7 md:w-7'")
+  })
 })

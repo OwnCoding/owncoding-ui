@@ -181,7 +181,7 @@ export default function BuscadorCliente({
                         <span className="block min-w-0 truncate font-medium text-fore">{opcion.name || opcion.nombre || 'Sin nombre'}</span>
                         {listaMotivos.length > 0 ? (
                           <span
-                            className="inline-flex shrink-0 items-center gap-1 rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] font-bold text-warn"
+                            className="inline-flex shrink-0 items-center gap-1 rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] font-bold text-warn-text"
                             title={`Coincide en ${listaMotivos.join(', ')}`}
                           >
                             <Icon name="alert" className="h-3 w-3" />

@@ -5,7 +5,7 @@
 // texto, este test lo frena. Medición de referencia: shell v2 de MobOS (DSN),
 // tabla de contrastes en `docs/SHELL.md`.
 import { describe, expect, test } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { createElement as h } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
@@ -196,5 +196,69 @@ describe('texto de chips sobre relleno tenue (#5)', () => {
     expect(renderToStaticMarkup(h(Button, { variant: 'outline' }, 'Cancelar'))).toContain('border-interactivo')
     expect(renderToStaticMarkup(h(PageHeader, { title: 'Clientes', backTo: () => {} }))).toContain('border-interactivo')
     expect(renderToStaticMarkup(h(ThemeToggle, {}))).toContain('border-interactivo')
+  })
+})
+
+// ── Ronda 13 de a11y (#13) ──────────────────────────────────────────────────
+// Verificación de los hallazgos de scale-os#60 sobre la versión actual: el par
+// de los botones llenos (primary en hover, success y danger), el enlace en
+// línea (`text-fono` en claro daba 2.54:1) y el target del `IconAction` por
+// defecto (28 px). El chip ya estaba en la familia `*-text` desde #5.
+
+const COMPONENTES = new URL('../src/components/', import.meta.url)
+
+describe('ronda 13 de a11y (#13)', () => {
+  test('los botones llenos y su hover cumplen AA en los dos temas', () => {
+    // El hover de la casa aclara con `brightness-110` (no cambia de tono), así
+    // el par texto/relleno se mantiene. Success/danger usan el par `on-ok`/
+    // `on-bad`, que invierte la tinta con el tema.
+    const aclarar = (color) => color.map((valor) => Math.min(255, Math.round(valor * 1.1)))
+    for (const [tema, paleta] of [['claro', efectiva(PALETAS.claro)], ['oscuro', efectiva(PALETAS.oscuro)]]) {
+      expect(contraste(paleta.onbrand, paleta.fono), `${tema}: primary`).toBeGreaterThanOrEqual(4.5)
+      expect(contraste(paleta.onbrand, aclarar(paleta.fono)), `${tema}: primary hover`).toBeGreaterThanOrEqual(4.5)
+      expect(contraste(paleta['on-ok'], paleta.ok), `${tema}: success`).toBeGreaterThanOrEqual(4.5)
+      expect(contraste(paleta['on-ok'], aclarar(paleta.ok)), `${tema}: success hover`).toBeGreaterThanOrEqual(4.5)
+      expect(contraste(paleta['on-bad'], paleta.bad), `${tema}: danger`).toBeGreaterThanOrEqual(4.5)
+      expect(contraste(paleta['on-bad'], aclarar(paleta.bad)), `${tema}: danger hover`).toBeGreaterThanOrEqual(4.5)
+    }
+    // El scope consola pisa `--c-ink`/`--c-fono` pero no los tonos base: el par
+    // de ok/bad se define ahí explícitamente (tinta clara sobre relleno oscuro).
+    const consola = { ...efectiva(PALETAS.claro), ...tokensDe('.consola {') }
+    expect(contraste(consola['on-ok'], consola.ok), 'consola: success').toBeGreaterThanOrEqual(4.5)
+    expect(contraste(consola['on-bad'], consola.bad), 'consola: danger').toBeGreaterThanOrEqual(4.5)
+    const fuente = readFileSync(new URL('../src/components/ui.jsx', import.meta.url), 'utf8')
+    expect(fuente).toContain("primary: 'bg-fono text-onbrand hover:brightness-110'")
+    expect(fuente).toContain("success: 'bg-ok text-on-ok hover:brightness-110'")
+    expect(fuente).toContain("danger: 'bg-bad text-on-bad hover:brightness-110'")
+    expect(fuente).not.toContain('hover:bg-fono-light')
+  })
+
+  test('el enlace en línea usa el rol de texto AA (no el verde vivo)', () => {
+    const fuente = readFileSync(new URL('../src/components/EnlaceLinea.jsx', import.meta.url), 'utf8')
+    expect(fuente).toContain('text-fono-light')
+    expect(fuente).not.toMatch(/text-fono(?![\w-])/)
+    for (const [tema, paleta] of [['claro', efectiva(PALETAS.claro)], ['oscuro', efectiva(PALETAS.oscuro)]]) {
+      expect(contraste(paleta['fono-light'], paleta.ink), `${tema}: enlace`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  test('ningún componente pinta texto con el tono base', () => {
+    const archivos = readdirSync(COMPONENTES).filter((nombre) => nombre.endsWith('.jsx'))
+    expect(archivos.length).toBeGreaterThan(50)
+    const base = /text-(ok|warn|bad|info|pass|fono)(?![\w-])/g
+    for (const archivo of archivos) {
+      const fuente = readFileSync(new URL(archivo, COMPONENTES), 'utf8')
+      const hallazgos = fuente.match(base)
+      expect(hallazgos, `${archivo} usa el tono base como texto: ${hallazgos?.join(', ')}`).toBeNull()
+    }
+    expect(readFileSync(new URL('../src/utils/tonos.js', import.meta.url), 'utf8')).not.toMatch(base)
+  })
+
+  test('el ámbar de una app se mide sobre su chip compuesto', () => {
+    // OPS midió el chip real de Scale OS en rgb(231 224 212): el #8A6207
+    // propuesto queda en 4.18:1 ✗; un paso más oscuro (#7E5A06) pasa (4.78:1).
+    // La app mapea `--c-warn-text` sin tocar los rellenos.
+    expect(contraste([138, 98, 7], [231, 224, 212])).toBeLessThan(4.5)
+    expect(contraste([126, 90, 6], [231, 224, 212])).toBeGreaterThanOrEqual(4.5)
   })
 })

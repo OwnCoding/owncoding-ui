@@ -98,15 +98,16 @@ describe('render de los objetos base', () => {
   })
 
   test('IconAction: el tamaño táctil agranda el área y conserva el contrato', () => {
+    // #13: el chico mide 44 px reales en móvil y vuelve a 28 px en escritorio.
     const chico = renderToStaticMarkup(<IconAction icon="eye" label="Ver resumen" />)
     expect(chico).toContain('aria-label="Ver resumen"')
-    expect(chico).toContain('h-7 w-7')
+    expect(chico).toContain('h-11 w-11 md:h-7 md:w-7')
     const tactil = renderToStaticMarkup(<IconAction icon="eye" label="Ver resumen" tone="fono" size="touch" />)
     expect(tactil).toContain('aria-label="Ver resumen"')
     expect(tactil).toContain('h-9 w-9')
     // 36 px de dibujo + 44 px de área de toque (#249).
     expect(tactil).toContain('toque-44')
-    expect(tactil).not.toContain('h-7 w-7')
+    expect(tactil).not.toContain('h-11 w-11')
   })
 
   test('los controles agrupados miden 44 px de alto (#249)', () => {

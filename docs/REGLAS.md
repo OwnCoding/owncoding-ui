@@ -442,6 +442,31 @@ botones de solo-icono con borde, `ThemeToggle`) usa `--c-interactivo`, medido
 ≥3:1 sobre las superficies en ambos temas (WCAG 1.4.11). No se aplica a los
 bordes decorativos ni a los de las tarjetas (`--c-ink-600`).
 
+### Botones llenos, enlaces y paletas propias (#13)
+
+- `Button` usa pares texto/relleno que cumplen AA en los dos temas:
+  `text-onbrand` sobre `--c-fono` (**primary**; el hover **aclara con
+  `brightness-110`** en vez de cambiar de tono, que era el 3.25:1 de la ronda
+  13) y **`text-on-ok`/`text-on-bad`** sobre `--c-ok`/`--c-bad`
+  (**success**/**danger**): son tokens de par que invierten la tinta por tema
+  (clara en claro, oscura en oscuro), no un color fijo. La app que pise
+  `--c-fono` pisa `--c-onbrand` con el mismo criterio, y quien pise
+  `--c-ok`/`--c-bad` pisa `--c-on-ok`/`--c-on-bad`; los estados de hover no
+  cambian de token para no romper el par.
+- Los **enlaces en línea** (`EnlaceLinea`, `ProductFooter`) usan los roles de
+  texto AA (`text-fono-light`/`text-fono-dark`), nunca el verde vivo
+  (`text-fono` daba 2.54:1 en claro). La regla de un objeto por tipo de dato
+  aplica igual: no hay estilos de enlace por pantalla.
+- La app que **remapea los tonos base** (p. ej. la paleta lila de Scale OS)
+  tiene que mapear también la familia de texto: el chip `warn` real de OPS
+  medía 4.18:1 con el `#8A6207` propuesto sobre su tinte compuesto
+  (`rgb(231 224 212)`); un paso más oscuro (`#7E5A06`) pasa 4.78:1. El valor se
+  elige **midiendo sobre el tinte compuesto de esa app**, no copiando el de la
+  biblioteca; `test/contraste-tokens.test.js` deja el caso medido.
+- El `pie` de `NavLateral` hereda `text-fore`: un riel propio de la app pinta su
+  texto con los roles AA (`text-fore`/`text-mute`), nunca con colores legacy
+  fijos.
+
 ## 8 bis. Operación de equipos (#240/#241)
 
 Base del piloto de DSN: checklist/tile/rack de inspección. Todo es portable

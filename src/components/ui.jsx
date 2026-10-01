@@ -11,10 +11,15 @@ import { PIE_ACCIONES } from '../utils/formulario.js'
 import Icon from './Icon.jsx'
 
 // ── Button ──────────────────────────────────────────────────────────
+// Los rellenos llenos llevan el texto del par que cumple AA en los dos temas
+// (#13): `text-onbrand` viaja con `--c-fono` y `text-on-ok`/`text-on-bad` con
+// `--c-ok`/`--c-bad` (tokens que invierten la tinta por tema). El hover aclara
+// el relleno con `brightness-110` en vez de cambiar de tono, así el par no se
+// rompe.
 const VARIANTS = {
-  primary: 'bg-fono text-onbrand hover:bg-fono-light',
-  success: 'bg-ok text-black hover:brightness-110',
-  danger: 'bg-bad text-fore hover:brightness-110',
+  primary: 'bg-fono text-onbrand hover:brightness-110',
+  success: 'bg-ok text-on-ok hover:brightness-110',
+  danger: 'bg-bad text-on-bad hover:brightness-110',
   outline: 'bg-transparent text-fore border border-interactivo hover:border-fono hover:bg-fono/10',
   ghost: 'bg-transparent text-mute hover:bg-ink-700 hover:text-fore',
 }
@@ -467,6 +472,9 @@ const ICON_ACTION_TONE = {
 }
 // `size="touch"` agranda el área táctil (móvil): mismo ícono y tono. En
 // paridad con MobOS (#236), donde la lista de Clientes lo estrenó.
+// El tamaño chico mide 44 px **en móvil** (target §15.4/#13) y vuelve a 28 px
+// de escritorio para no perder densidad: el área es real, sin pseudo-elemento,
+// así no se solapa con las acciones vecinas.
 export function IconAction({ icon, label, tone = 'mute', onClick, disabled = false, size = 'sm' }) {
   return (
     <button
@@ -477,7 +485,7 @@ export function IconAction({ icon, label, tone = 'mute', onClick, disabled = fal
       onClick={onClick}
       className={cn(
         'inline-flex items-center justify-center rounded-lg border transition active:scale-95 disabled:pointer-events-none disabled:opacity-40',
-        size === 'touch' ? 'toque-44 h-9 w-9' : 'h-7 w-7',
+        size === 'touch' ? 'toque-44 h-9 w-9' : 'h-11 w-11 md:h-7 md:w-7',
         ICON_ACTION_TONE[tone],
       )}
     >

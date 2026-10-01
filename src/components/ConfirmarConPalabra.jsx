@@ -34,7 +34,7 @@ export default function ConfirmarConPalabra({
       data-testid={testId}
     >
       <div className="rounded-xl border border-bad/30 bg-bad/5 p-3">
-        <p className="text-sm font-semibold text-bad">{titulo}</p>
+        <p className="text-sm font-semibold text-bad-text">{titulo}</p>
         {resumen ? <div className="mt-1 text-sm">{resumen}</div> : null}
         <p className="mt-1 text-xs text-mute">{advertencia}</p>
       </div>

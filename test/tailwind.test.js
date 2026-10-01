@@ -29,4 +29,11 @@ describe('owncodingContent del preset', () => {
     expect(readme).toContain('owncodingContent')
     expect(readme).toContain('content: [...owncodingContent')
   })
+
+  test('el par de texto de los botones llenos (#13) está en el preset', () => {
+    const colores = preset.theme.extend.colors
+    expect(colores.onbrand).toContain('--c-onbrand')
+    expect(colores['on-ok']).toContain('--c-on-ok')
+    expect(colores['on-bad']).toContain('--c-on-bad')
+  })
 })

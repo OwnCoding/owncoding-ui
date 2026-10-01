@@ -39,6 +39,11 @@
   --c-info: 32 89 190;
   --c-reserved: 109 40 217;
   --c-onbrand: 4 28 18;
+  /* Texto sobre los rellenos semánticos llenos (#13): el par viaja con el
+     relleno —claro sobre los tonos oscuros del tema claro, oscuro sobre los
+     claros del oscuro—. Se usa en `Button` success/danger. */
+  --c-on-ok: 255 255 255;
+  --c-on-bad: 255 255 255;
   /* Verde pass/certificado y azul acción (tema consola, épica #241) */
   --c-pass: 22 197 94;
   --c-pass-dark: 26 141 79;
@@ -167,6 +172,8 @@ html.dark {
   --c-info: 159 184 255;
   --c-reserved: 196 181 253;
   --c-onbrand: 6 30 20;
+  --c-on-ok: 31 36 48;
+  --c-on-bad: 31 36 48;
 
   /* Texto de chips en oscuro (#5): los mismos tonos claros del tema (todos
      ≥5:1 sobre el tinte) para que la familia quede definida también acá. */
@@ -210,6 +217,8 @@ html.dark {
   --c-fono-glow: 34 197 94;
   --c-fono-soft: 6 46 34;
   --c-onbrand: 6 30 20;
+  --c-on-ok: 255 255 255;
+  --c-on-bad: 255 255 255;
   --c-interactivo: 124 135 155;
 
   --oc-canvas: rgb(var(--c-paper));
