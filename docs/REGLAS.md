@@ -108,7 +108,9 @@ con versión/fecha/canal y se revoca con el mismo peso. Objetos
   empujar ni descuadrar la fila). La pantalla no compensa con márgenes,
   `min-h` ni alturas fijas: no se pelea el layout a mano.
 - Campo y botón en la misma fila alinean por el **borde del control**, no por
-  su texto; los controles que no cambian su dibujo usan las utilidades del kit
+  su texto. Si el campo tiene `hint`/`error`, la fila va **dentro** del
+  `FormField` con el slot `accion` (label → fila [input + botón] → mensaje
+  debajo); nunca el botón hermano con `items-end` (#112). los controles que no cambian su dibujo usan las utilidades del kit
   (`.toque-44`, `PIE_ACCIONES`, `GRILLA_DOS_COLUMNAS`).
 - El error/hint usa el mecanismo del campo (`FormField`, §1 y §3): **uno u
   otro, nunca los dos**, con `aria-describedby`/`aria-invalid`, y su aparición

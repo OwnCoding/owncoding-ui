@@ -1149,11 +1149,14 @@ function DataTable({ columns, rows, emptyLabel = "Sin datos para mostrar.", load
     /* @__PURE__ */ jsx2("div", { className: "grid grid-cols-1 gap-2 p-2.5 md:hidden", children: mobileCard ? rows.map((row) => /* @__PURE__ */ jsx2("div", { children: mobileCard(row) }, row.id ?? row.key ?? JSON.stringify(row))) : /* @__PURE__ */ jsx2(EmptyState, { icon: "filter", title: emptyLabel }) })
   ] });
 }
-function FormField({ label, hint, error, children, htmlFor, descripcionId }) {
+function FormField({ label, hint, error, children, htmlFor, descripcionId, accion, className }) {
   const mensajeId = descripcionId || (htmlFor ? `${htmlFor}-descripcion` : void 0);
-  return /* @__PURE__ */ jsxs("div", { children: [
+  return /* @__PURE__ */ jsxs("div", { className, children: [
     label && /* @__PURE__ */ jsx2(Label, { htmlFor, children: label }),
-    children,
+    accion ? /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-stretch gap-2", children: [
+      /* @__PURE__ */ jsx2("div", { className: "min-w-0 flex-1", children }),
+      /* @__PURE__ */ jsx2("div", { className: "flex shrink-0 items-stretch", children: accion })
+    ] }) : children,
     error ? /* @__PURE__ */ jsx2("p", { id: mensajeId, role: "alert", className: "mt-1.5 text-xs text-bad-text", children: error }) : hint ? /* @__PURE__ */ jsx2("p", { id: mensajeId, className: "mt-1.5 text-xs text-mute", children: hint }) : null
   ] });
 }

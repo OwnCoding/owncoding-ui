@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 import {
   Aviso,
+  FormField,
   DataTable,
   Badge,
   BarraProgreso,
@@ -534,5 +535,23 @@ describe('DataTable (#109)', () => {
     expect(html).not.toContain('overflow-auto')
     expect(html).toContain('sticky top-12')
     expect(html).toContain('select-none')
+  })
+})
+
+describe('FormField con acción (#112)', () => {
+  test('label → fila [input + botón] → hint debajo de la fila', () => {
+    const html = renderToStaticMarkup(
+      <FormField label="RUC / C.I." htmlFor="ruc" hint="Con el padrón conectado el titular se completa solo." accion={<Button>Consultar titular</Button>}>
+        <input id="ruc" />
+      </FormField>,
+    )
+    const input = html.indexOf('<input')
+    const boton = html.indexOf('Consultar titular')
+    const hint = html.indexOf('Con el padrón conectado')
+    expect(input).toBeGreaterThan(-1)
+    expect(boton).toBeGreaterThan(input)
+    expect(hint).toBeGreaterThan(boton)
+    expect(html).toContain('min-w-0 flex-1')
+    expect(html).toContain('shrink-0')
   })
 })

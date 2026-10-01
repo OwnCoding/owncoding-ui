@@ -813,12 +813,24 @@ export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.
 // Envoltorio label + mensaje. El mensaje (error o hint) lleva `id` para que el
 // campo lo declare en `aria-describedby`: por defecto se deriva de `htmlFor` y
 // se puede pisar con `descripcionId` (campos con id generado por `useId`).
-export function FormField({ label, hint, error, children, htmlFor, descripcionId }) {
+//
+// Con `accion` (#112) el control y un botón comparten la fila —alineados por
+// el borde del input— y el mensaje queda **debajo de la fila**: evita el
+// desalineado clásico de poner el botón como hermano con `items-end`. En
+// mobile el botón puede pasar a ancho completo con `className="w-full sm:w-auto"`.
+export function FormField({ label, hint, error, children, htmlFor, descripcionId, accion, className }) {
   const mensajeId = descripcionId || (htmlFor ? `${htmlFor}-descripcion` : undefined)
   return (
-    <div>
+    <div className={className}>
       {label && <Label htmlFor={htmlFor}>{label}</Label>}
-      {children}
+      {accion ? (
+        <div className="flex flex-wrap items-stretch gap-2">
+          <div className="min-w-0 flex-1">{children}</div>
+          <div className="flex shrink-0 items-stretch">{accion}</div>
+        </div>
+      ) : (
+        children
+      )}
       {error ? <p id={mensajeId} role="alert" className="mt-1.5 text-xs text-bad-text">{error}</p> : hint ? <p id={mensajeId} className="mt-1.5 text-xs text-mute">{hint}</p> : null}
     </div>
   )
