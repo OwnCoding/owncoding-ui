@@ -775,9 +775,12 @@ export function DataTable({ columns, rows, emptyLabel = 'Sin datos para mostrar.
   if (!rows?.length) return <EmptyState title={emptyLabel} description="" className={className} />
   return (
     <div className={className}>
-      <div className="hidden max-h-[70vh] overflow-auto md:block">
+      {/* #109: la página scrollea; acá solo queda el scroll horizontal de
+          tablas anchas. El encabezado se ancla debajo del header del panel
+          (h-12) y el chrome no se selecciona. */}
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 z-10 bg-ink-800">
+          <thead className="sticky top-12 z-10 select-none bg-ink-800">
             <tr className="border-b border-ink-600 text-left text-xs uppercase tracking-wider text-mute">
               {columns.map(column => (
                 <th key={column.key} className={cn('px-2.5 py-1.5 font-medium', column.align === 'right' && 'text-right', column.align === 'center' && 'text-center')}>{column.label}</th>

@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 import {
   Aviso,
+  DataTable,
   Badge,
   BarraProgreso,
   Button,
@@ -520,5 +521,18 @@ describe('render de los objetos base', () => {
     expect(porVencer).toContain('en 3 d')
     expect(porVencer).toContain('text-warn')
     expect(renderToStaticMarkup(<Vencimiento fecha={null} />)).toContain('—')
+  })
+})
+
+describe('DataTable (#109)', () => {
+  test('sin tope de altura: la página scrollea y solo queda overflow horizontal', () => {
+    const html = renderToStaticMarkup(
+      <DataTable columns={[{ key: 'nombre', label: 'Nombre' }]} rows={[{ id: 'a', nombre: 'Ana' }]} />,
+    )
+    expect(html).toContain('overflow-x-auto')
+    expect(html).not.toContain('max-h-')
+    expect(html).not.toContain('overflow-auto')
+    expect(html).toContain('sticky top-12')
+    expect(html).toContain('select-none')
   })
 })
