@@ -93,6 +93,18 @@ describe('PhoneField internacional', () => {
     expect(html).toContain('aria-hidden="true"')
   })
 
+  test('inputProps asocia la etiqueta al número sin reutilizar el control de país', () => {
+    const html = renderToStaticMarkup(
+      <div>
+        <label htmlFor="gallery-telefono">Teléfono</label>
+        <PhoneField id="gallery-telefono" inputProps={{ id: 'gallery-telefono' }} phone="" />
+      </div>,
+    )
+    expect(html).toContain('<label for="gallery-telefono">Teléfono</label>')
+    expect(html).toMatch(/<input[^>]*id="gallery-telefono"[^>]*type="tel"/)
+    expect(html).toMatch(/<button[^>]*role="combobox"[^>]*aria-controls="gallery-telefono-pais-lista"/)
+  })
+
   test('country controlado tiene prioridad y disabled bloquea ambos controles', () => {
     const html = renderToStaticMarkup(<PhoneField country="BR" countryCode="+595" phone="" disabled />)
     expect(html).toContain('🇧🇷')

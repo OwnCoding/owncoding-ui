@@ -3,10 +3,11 @@ import { cn } from '../utils/cn.js'
 
 function fuenteDe(visual, baseAssets) {
   if (!visual?.archivo) return null
+  if (visual.asset) return visual.asset
   if (typeof baseAssets === 'string' && baseAssets) {
     return `${baseAssets.replace(/\/$/, '')}/${visual.archivo}`
   }
-  return visual.asset || visual.archivo
+  return visual.archivo
 }
 
 function Monograma({ iniciales, color, compacto }) {
@@ -86,6 +87,7 @@ export default function LogoFinanciero({
           src={fuente}
           alt=""
           loading="lazy"
+          decoding="async"
           onError={() => setAssetFallido(fuente)}
           className={cn(
             'object-contain',
@@ -97,17 +99,21 @@ export default function LogoFinanciero({
     )
   }
 
-  if (!compacto && visual.tipo === 'texto') {
+  if (visual.tipo === 'texto' || fallo) {
     return (
       <span
         {...semantica}
-        className={cn('inline-flex items-center gap-1.5 whitespace-nowrap', alto, className)}
-        data-logo-estado={visual.estado || registro.estado}
+        className={cn(
+          'inline-flex items-center justify-center text-center font-semibold leading-tight text-current',
+          compacto ? 'aspect-square shrink-0 overflow-hidden rounded-[5px] px-0.5 text-[7px]' : 'whitespace-nowrap text-xs',
+          alto,
+          className,
+        )}
+        data-logo-estado={fallo ? 'asset-fallido' : (visual.estado || registro.estado)}
         data-logo-variante={registro.variante}
         data-logo-tipo="texto"
       >
-        <Monograma iniciales={iniciales} color={color} compacto={false} />
-        <span aria-hidden="true" className="text-xs font-semibold leading-none text-current">{etiqueta}</span>
+        <span aria-hidden="true">{etiqueta}</span>
       </span>
     )
   }

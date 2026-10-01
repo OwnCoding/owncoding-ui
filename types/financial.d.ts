@@ -30,6 +30,15 @@ export {
   normalizarMarcaPago,
   logoDeMedioPago,
   coberturaMediosPago,
+  sugerenciasDeMarcaPago,
+  FECHA_VERIFICACION_RELACIONES_FINANCIERAS,
+  RELACIONES_FINANCIERAS,
+  MARCAS_CON_RELACION_FINANCIERA,
+  normalizarRelacionFinanciera,
+  relacionFinancieraDe,
+  buscarRelacionesFinancieras,
+  institucionesSugeridasPorMarca,
+  marcasRelacionadasConInstitucion,
 } from './utils.js'
 export type {
   VisualFinanciero,
@@ -39,4 +48,23 @@ export type {
   EntradaLogoBanco,
   EntradaMarcaMedioPago,
   CoberturaMarcaFinanciera,
+  OperadorMarcaFinanciera,
+  RelacionFinanciera,
 } from './utils.js'
+
+
+export const AUTORIZACION_ASSETS_FINANCIEROS: Readonly<{
+  permitida: true
+  evidencia: string
+  base: string
+  confirmadaEn: string
+  alcance: readonly string[]
+}>
+export const BLOQUEOS_ASSETS_FINANCIEROS: readonly Readonly<{
+  catalogo: 'banco' | 'pago'
+  id: string
+  motivo: string
+}>[]
+export const ASSETS_FINANCIEROS: Readonly<Record<string, string>>
+export const ASSET_KEYS_FINANCIEROS: readonly string[]
+export function obtenerAssetFinanciero(clave: string): string | null

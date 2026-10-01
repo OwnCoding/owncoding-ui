@@ -17,8 +17,21 @@ import {
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
   normalizarMarcaPago,
+  sugerenciasDeMarcaPago,
 } from '../utils/mediosPago.js'
 export { logoDeBanco, coberturaBancos, logoDeMedioPago, coberturaMediosPago } from './resolvers.js'
+export { ASSETS_FINANCIEROS, ASSET_KEYS_FINANCIEROS, obtenerAssetFinanciero } from './assets.js'
+export { AUTORIZACION_ASSETS_FINANCIEROS, BLOQUEOS_ASSETS_FINANCIEROS } from '../utils/financialAssets.js'
+export {
+  FECHA_VERIFICACION_RELACIONES_FINANCIERAS,
+  RELACIONES_FINANCIERAS,
+  MARCAS_CON_RELACION_FINANCIERA,
+  normalizarRelacionFinanciera,
+  relacionFinancieraDe,
+  buscarRelacionesFinancieras,
+  institucionesSugeridasPorMarca,
+  marcasRelacionadasConInstitucion,
+} from '../utils/relacionesFinancieras.js'
 
 export {
   BancoLogo,
@@ -37,4 +50,5 @@ export {
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
   normalizarMarcaPago,
+  sugerenciasDeMarcaPago,
 }

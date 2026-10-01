@@ -8,31 +8,47 @@ import './styles.css'
 import {
   Aviso,
   Badge,
+  BancoCombobox,
   BancoLogo,
+  BuscadorCliente,
   Button,
-  Card,
   CargaIA,
+  Card,
   Checkbox,
+  CityAutocomplete,
   Dot,
+  EmailField,
   EmptyState,
   ErrorState,
   Input,
+  Label,
   MedioPagoLogo,
   Money,
+  MoneyInput,
   PercentField,
   PhoneField,
   ProductFooter,
   ProductPrefooter,
+  RangoFecha,
+  RucField,
   SearchField,
   Select,
+  SerialField,
   Skeleton,
   Stat,
   Switch,
   Textarea,
   ThemeToggle,
   crearIdentidadApp,
+  departamentoDe,
+  logoDeBanco,
+  logoDeMedioPago,
+  relacionFinancieraDe,
+  telefonoE164,
+  telefonoInternacionalValido,
 } from '../src/index.js'
-import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO } from './catalog.js'
+import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from './catalog.js'
+import { BANCO_DESTACADO, BANCOS_PREVIEW, MARCAS_CONECTADAS_PREVIEW, MARCAS_PAGO_RESTO_PREVIEW } from './financial-fixtures.js'
 
 const METRICAS_CATALOGO = Object.freeze({
   total: CATALOGO_EXPORTS.length,
@@ -61,6 +77,47 @@ const ESQUEMA_IA_DEMO = {
   }],
 }
 
+const CLIENTES_DEMO = Object.freeze([
+  {
+    id: 'cliente-demo-1',
+    name: 'Cliente Demo S.A.',
+    document: '80012345-6',
+    phone: '+595 981 123 456',
+    email: 'demo@ejemplo.com.py',
+    tags: ['fixture', 'mayorista'],
+  },
+  {
+    id: 'cliente-demo-2',
+    name: 'Ana Ejemplo',
+    document: '4567890',
+    phone: '+595 971 555 010',
+    email: 'ana@ejemplo.com.py',
+    tags: ['fixture', 'persona'],
+  },
+])
+
+const MARCAS_PAGO_DEMO = MARCAS_PAGO_RESTO_PREVIEW
+
+const ETIQUETA_ESTADO_MARCA = Object.freeze({
+  verificado: 'Verificado',
+  oficial: 'Oficial',
+  parcial: 'Parcial',
+  fallback: 'Fallback neutral',
+  'permiso-pendiente': 'Permiso pendiente',
+  'producto-padre': 'Marca padre',
+  legado: 'Legado',
+})
+
+function etiquetaEstadoMarca(estado) {
+  return ETIQUETA_ESTADO_MARCA[estado] || 'Fallback neutral'
+}
+
+function tonoEstadoMarca(estado) {
+  if (estado === 'verificado' || estado === 'oficial') return 'green'
+  if (estado === 'permiso-pendiente' || estado === 'parcial') return 'orange'
+  return 'slate'
+}
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
@@ -75,6 +132,324 @@ class ErrorBoundary extends Component {
   }
 }
 
+function EtiquetaFixture({ children = 'Fixture local' }) {
+  return <span className="fixture-label">{children}</span>
+}
+
+function VistaBancosPagos() {
+  const [banco, setBanco] = useState(BANCO_DESTACADO)
+  const registro = logoDeBanco(banco, 'horizontal')
+
+  return (
+    <div className="preview-layout preview-layout--financial">
+      <section className="preview-panel" aria-labelledby="preview-banco-titulo">
+        <div className="preview-panel__heading">
+          <div>
+            <p className="preview-kicker">Selección bancaria</p>
+            <h4 id="preview-banco-titulo">ueno bank primero, logos auténticos para elegir</h4>
+          </div>
+          <Badge color={tonoEstadoMarca(registro?.estado)}>{etiquetaEstadoMarca(registro?.estado)}</Badge>
+        </div>
+
+        <Label htmlFor="gallery-banco">Banco o financiera</Label>
+        <BancoCombobox
+          id="gallery-banco"
+          value={banco}
+          onChange={setBanco}
+          placeholder="Buscar por nombre o alias"
+          logoProps={{ decorativo: true }}
+        />
+
+        <p className="bank-picker__label" id="gallery-bancos-rapidos">Bancos frecuentes</p>
+        <ul className="bank-picker" aria-labelledby="gallery-bancos-rapidos">
+          {BANCOS_PREVIEW.map((nombre) => (
+            <li key={nombre}>
+              <button
+                type="button"
+                aria-label={`Seleccionar ${nombre}`}
+                aria-pressed={banco === nombre}
+                onClick={() => setBanco(nombre)}
+              >
+                <BancoLogo banco={nombre} variante="compacto" alto="h-8" decorativo />
+                <span>{nombre}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <div className="brand-selection" aria-live="polite">
+          <div className="brand-selection__compact" aria-label={`Variante compacta de ${banco}`}>
+            <BancoLogo banco={banco} variante="compacto" alto="h-10" />
+          </div>
+          <div className="brand-selection__wordmark">
+            <span className="brand-selection__eyebrow">Seleccionado</span>
+            <BancoLogo banco={banco} variante="horizontal" alto="h-7" />
+            <span className="brand-selection__meta">{registro?.categoria || 'entidad financiera'} · {registro?.verificadoEn || 'sin fecha'}</span>
+          </div>
+        </div>
+        <p className="preview-note">
+          Assets locales obtenidos de fuentes oficiales, con procedencia y hash auditables. Las marcas bloqueadas nunca se recrean.
+        </p>
+      </section>
+
+      <section className="preview-panel" aria-labelledby="preview-pagos-titulo">
+        <div className="preview-panel__heading">
+          <div>
+            <p className="preview-kicker">Medios de pago</p>
+            <h4 id="preview-pagos-titulo">Redes, billeteras y procesadores oficiales</h4>
+          </div>
+          <EtiquetaFixture>Assets autorizados</EtiquetaFixture>
+        </div>
+        <p className="bank-picker__label" id="gallery-marcas-conectadas">Apps conectadas a instituciones</p>
+        <ul className="connected-brand-grid" aria-labelledby="gallery-marcas-conectadas">
+          {MARCAS_CONECTADAS_PREVIEW.map((marca) => {
+            const relacion = relacionFinancieraDe(marca)
+            const institucion = relacion?.institucionPadre || relacion?.financialProvider
+            return (
+              <li key={marca}>
+                <div className="connected-brand-grid__logos">
+                  <MedioPagoLogo marca={marca} variante="compacto" alto="h-9" decorativo />
+                  <MedioPagoLogo marca={marca} variante="horizontal" alto="h-6" />
+                </div>
+                <div className="connected-brand-grid__relationship">
+                  <span>{institucion ? `Con ${institucion}` : 'Relación verificada'}</span>
+                  {institucion ? <BancoLogo banco={institucion} variante="horizontal" alto="h-5" decorativo /> : null}
+                </div>
+                <small>{relacion?.operador?.nombreLegal}</small>
+              </li>
+            )
+          })}
+        </ul>
+        <p className="preview-note">Cada app conserva su propia identidad. La relación informa proveedor u organización matriz verificada, sin convertir la marca en banco ni sustituir logos.</p>
+        <p className="bank-picker__label" id="gallery-medios-pago">Redes y medios de pago</p>
+        <ul className="payment-grid" aria-labelledby="gallery-medios-pago">
+          {MARCAS_PAGO_DEMO.map((marca) => {
+            const marcaRegistro = logoDeMedioPago(marca, 'horizontal')
+            return (
+              <li key={marca}>
+                <div className="payment-grid__logos">
+                  <MedioPagoLogo marca={marca} variante="compacto" alto="h-8" decorativo />
+                  <MedioPagoLogo marca={marca} variante="horizontal" alto="h-6" />
+                </div>
+                <span className="payment-grid__status">{etiquetaEstadoMarca(marcaRegistro?.estado)}</span>
+              </li>
+            )
+          })}
+        </ul>
+        <p className="preview-note">Bancard, Dinelco, upay, Pagopar y otras marcas usan archivos locales oficiales. Los casos sin bytes verificables quedan registrados como bloqueos, no como logos falsos.</p>
+      </section>
+    </div>
+  )
+}
+
+function VistaTelefono() {
+  const [telefono, setTelefono] = useState('981 123 456')
+  const [pais, setPais] = useState('PY')
+  const valido = telefonoInternacionalValido(telefono, pais)
+  const e164 = telefonoE164(telefono, pais)
+
+  function ejemploValido() {
+    setPais('PY')
+    setTelefono('981 123 456')
+  }
+
+  function ejemploInvalido() {
+    setPais('PY')
+    setTelefono('12')
+  }
+
+  return (
+    <div className="preview-layout preview-layout--phone">
+      <section className="preview-panel">
+        <div className="preview-panel__heading">
+          <div>
+            <p className="preview-kicker">PhoneField</p>
+            <h4>🇵🇾 Paraguay listo por defecto</h4>
+          </div>
+          <Badge color={valido ? 'green' : 'orange'}>{valido ? 'Válido' : 'Revisar'}</Badge>
+        </div>
+        <Label htmlFor="gallery-telefono">Teléfono</Label>
+        <PhoneField
+          id="gallery-telefono"
+          inputProps={{ id: 'gallery-telefono' }}
+          country={pais}
+          phone={telefono}
+          onCountryChange={(siguiente) => setPais(siguiente || 'PY')}
+          onChange={setTelefono}
+          onInternationalChange={() => {}}
+          countryAriaLabel="Elegir país para el teléfono de muestra"
+          phoneAriaLabel="Número telefónico de muestra"
+        />
+        <div className="phone-output" aria-live="polite">
+          <span>Salida E.164</span>
+          <code>{e164 || 'Sin salida válida'}</code>
+          <strong>{valido ? 'Lista para guardar' : 'El número necesita más dígitos'}</strong>
+        </div>
+        <div className="preview-actions" aria-label="Estados del campo telefónico">
+          <button type="button" onClick={ejemploValido} aria-pressed={valido}>Ejemplo válido</button>
+          <button type="button" onClick={ejemploInvalido} aria-pressed={!valido}>Ver error</button>
+        </div>
+        <p className="preview-note">Abrí el selector para buscar por país, ISO o prefijo. También admite pegado internacional.</p>
+      </section>
+    </div>
+  )
+}
+
+function VistaCiudadDepartamento() {
+  const [ciudad, setCiudad] = useState('Encarnación')
+  const [departamento, setDepartamento] = useState('Itapúa')
+
+  function elegirEjemplo(siguiente) {
+    setCiudad(siguiente)
+    setDepartamento(departamentoDe(siguiente))
+  }
+
+  return (
+    <div className="preview-layout preview-layout--city">
+      <section className="preview-panel">
+        <div className="preview-panel__heading">
+          <div>
+            <p className="preview-kicker">CityAutocomplete</p>
+            <h4>Ciudad → departamento</h4>
+          </div>
+          <EtiquetaFixture>Catálogo local PY</EtiquetaFixture>
+        </div>
+        <Label htmlFor="gallery-ciudad">Ciudad</Label>
+        <CityAutocomplete
+          value={ciudad}
+          onChange={setCiudad}
+          onSelect={(siguienteCiudad, siguienteDepartamento) => {
+            setCiudad(siguienteCiudad)
+            setDepartamento(siguienteDepartamento)
+          }}
+          inputProps={{ id: 'gallery-ciudad' }}
+        />
+        <div className="derived-value" aria-live="polite">
+          <span>Departamento derivado</span>
+          <strong>{departamento || 'Elegí una ciudad del catálogo'}</strong>
+        </div>
+        <div className="preview-actions" aria-label="Ejemplos de ciudades">
+          {['Asunción', 'Encarnación', 'Ciudad del Este'].map((item) => (
+            <button key={item} type="button" onClick={() => elegirEjemplo(item)} aria-pressed={ciudad === item}>{item}</button>
+          ))}
+        </div>
+        <p className="preview-note">Datos de muestra del catálogo incluido. No consulta ni representa un proveedor gubernamental en vivo.</p>
+      </section>
+    </div>
+  )
+}
+
+function ResumenCliente({ cliente, titulo }) {
+  return (
+    <div className="customer-result" aria-live="polite">
+      <span>{titulo}</span>
+      {cliente ? (
+        <>
+          <strong>{cliente.name || cliente.nombre}</strong>
+          <small>{cliente.document || cliente.fullRuc} · {cliente.phone || cliente.email || 'sin contacto'}</small>
+        </>
+      ) : <strong>Elegí un resultado para completar</strong>}
+    </div>
+  )
+}
+
+function VistaClienteDocumento() {
+  const [cliente, setCliente] = useState(CLIENTES_DEMO[0])
+  const [ruc, setRuc] = useState('80012345-6')
+  const [extraido, setExtraido] = useState(null)
+
+  return (
+    <div className="preview-layout preview-layout--customer">
+      <section className="preview-panel">
+        <div className="preview-panel__heading">
+          <div>
+            <p className="preview-kicker">BuscadorCliente</p>
+            <h4>Encontrar por CI, RUC o contacto</h4>
+          </div>
+          <EtiquetaFixture>2 clientes ficticios</EtiquetaFixture>
+        </div>
+        <Label htmlFor="gallery-cliente">Cliente</Label>
+        <BuscadorCliente
+          id="gallery-cliente"
+          clientes={CLIENTES_DEMO}
+          selectedId={cliente?.id || ''}
+          onSelect={setCliente}
+          placeholder="Probá 4567890 o Cliente Demo"
+        />
+        <ResumenCliente cliente={cliente} titulo="Datos completados desde el fixture" />
+      </section>
+
+      <section className="preview-panel">
+        <div className="preview-panel__heading">
+          <div>
+            <p className="preview-kicker">RucField</p>
+            <h4>Extracción confirmable</h4>
+          </div>
+          <EtiquetaFixture>Proveedor simulado</EtiquetaFixture>
+        </div>
+        <Label htmlFor="gallery-ruc">RUC</Label>
+        <RucField
+          id="gallery-ruc"
+          value={ruc}
+          onChange={setRuc}
+          consultar={async (valor) => ({
+            name: 'Comercial Demo S.A.',
+            fullRuc: valor,
+            phone: '+595 981 000 000',
+            email: 'facturacion@ejemplo.com.py',
+            simulado: true,
+          })}
+          onAplicar={setExtraido}
+          textoAyuda="Fixture local: revisá el resultado antes de aplicarlo."
+        />
+        <ResumenCliente cliente={extraido} titulo="Datos aplicados con confirmación" />
+        <p className="preview-note">CI y RUC son búsquedas independientes: la demo nunca afirma que una CI se convierta universalmente en RUC.</p>
+      </section>
+    </div>
+  )
+}
+
+function OtrosCamposInteligentes() {
+  const [monto, setMonto] = useState(1250000)
+  const [porcentaje, setPorcentaje] = useState('18')
+  const [correo, setCorreo] = useState('ventas@')
+  const [serial, setSerial] = useState('ABC123456')
+
+  return (
+    <details className="smart-inputs">
+      <summary>
+        <span>
+          <strong>Otros campos inteligentes</strong>
+          <small>Moneda, porcentaje, correo, fechas y serial</small>
+        </span>
+        <span aria-hidden="true" className="smart-inputs__toggle">+</span>
+      </summary>
+      <div className="smart-inputs__grid">
+        <div>
+          <Label htmlFor="gallery-monto">Monto en guaraníes</Label>
+          <MoneyInput id="gallery-monto" value={monto} onValueChange={setMonto} aria-label="Monto de muestra" />
+        </div>
+        <div>
+          <Label htmlFor="gallery-porcentaje">Porcentaje</Label>
+          <PercentField id="gallery-porcentaje" value={porcentaje} onChange={setPorcentaje} aria-label="Porcentaje de muestra" />
+        </div>
+        <div>
+          <Label htmlFor="gallery-correo">Correo con sugerencias</Label>
+          <EmailField id="gallery-correo" value={correo} onChange={setCorreo} aria-label="Correo de muestra" />
+        </div>
+        <div>
+          <Label htmlFor="gallery-serial">IMEI o serial normalizado</Label>
+          <SerialField id="gallery-serial" value={serial} onChange={setSerial} aria-label="Serial de muestra" />
+        </div>
+        <div className="smart-inputs__dates">
+          <span className="block pb-1 text-xs font-semibold text-mute">Rango con atajos</span>
+          <RangoFecha periodoPorDefecto="este-mes" mostrarCampos={false} />
+        </div>
+      </div>
+    </details>
+  )
+}
+
 function Presentacion({ id }) {
   const [activo, setActivo] = useState(true)
   const [porcentaje, setPorcentaje] = useState('18')
@@ -82,6 +457,14 @@ function Presentacion({ id }) {
   const [pais, setPais] = useState('PY')
 
   switch (id) {
+    case 'bancos-pagos':
+      return <VistaBancosPagos />
+    case 'telefono-py':
+      return <VistaTelefono />
+    case 'ciudad-departamento':
+      return <VistaCiudadDepartamento />
+    case 'cliente-ci-ruc':
+      return <VistaClienteDocumento />
     case 'acciones':
       return <div className="flex flex-wrap gap-2"><Button>Primaria</Button><Button variant="outline">Secundaria</Button><Button variant="danger">Eliminar</Button></div>
     case 'campos':
@@ -93,9 +476,9 @@ function Presentacion({ id }) {
     case 'seleccion':
       return <div className="grid gap-2"><Checkbox checked={activo} onChange={(event) => setActivo(event.target.checked)} label="Recibir avisos" /><label className="flex min-h-11 items-center justify-between gap-4 text-sm"><span>Modo operativo</span><Switch checked={activo} onChange={(event) => setActivo(event.target.checked)} ariaLabel="Modo operativo" /></label><PercentField value={porcentaje} onChange={setPorcentaje} /></div>
     case 'bancos':
-      return <div className="grid gap-3"><p className="text-xs leading-5 text-mute">Fallbacks tipográficos: no se distribuyen logos de terceros sin autorización auditable.</p><div className="flex min-h-12 items-center rounded-xl border border-ink-600 bg-ink-800 px-3"><BancoLogo banco="ueno bank" /></div><div className="grid grid-cols-3 gap-2"><div className="grid min-h-14 place-items-center rounded-xl border border-ink-600"><BancoLogo banco="Itaú" variante="compacto" /></div><div className="grid min-h-14 place-items-center rounded-xl border border-ink-600"><BancoLogo banco="Banco Continental" variante="compacto" /></div><div className="grid min-h-14 place-items-center rounded-xl border border-ink-600"><BancoLogo banco="Sudameris" variante="compacto" /></div></div></div>
+      return <div className="grid gap-3"><p className="text-xs leading-5 text-mute">Logos oficiales locales con autorización documentada y fallback seguro ante error.</p><div className="flex min-h-12 items-center rounded-xl border border-ink-600 bg-ink-800 px-3"><BancoLogo banco="ueno bank" /></div><div className="grid grid-cols-3 gap-2"><div className="grid min-h-14 place-items-center rounded-xl border border-ink-600"><BancoLogo banco="Itaú" variante="compacto" /></div><div className="grid min-h-14 place-items-center rounded-xl border border-ink-600"><BancoLogo banco="Banco Continental" variante="compacto" /></div><div className="grid min-h-14 place-items-center rounded-xl border border-ink-600"><BancoLogo banco="Sudameris" variante="compacto" /></div></div></div>
     case 'pagos':
-      return <div className="grid gap-3"><p className="text-xs leading-5 text-mute">Marcas identificadas por texto o monograma; bytes externos bloqueados por defecto.</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{['Visa', 'Mastercard', 'Bancard', 'Dinelco', 'upay', 'uPOS'].map((marca) => <div key={marca} className="grid min-h-14 place-items-center rounded-xl border border-ink-600 bg-ink-800 p-2"><MedioPagoLogo marca={marca} /></div>)}</div></div>
+      return <div className="grid gap-3"><p className="text-xs leading-5 text-mute">Marcas oficiales locales; sin hotlinks ni recursos remotos.</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{MARCAS_PAGO_DEMO.map((marca) => <div key={marca} className="grid min-h-14 place-items-center rounded-xl border border-ink-600 bg-ink-800 p-2"><MedioPagoLogo marca={marca} /></div>)}</div></div>
     case 'telefono':
       return <PhoneField country={pais} phone={telefono} onCountryChange={setPais} onChange={setTelefono} onInternationalChange={() => {}} />
     case 'footer':
@@ -109,6 +492,25 @@ function Presentacion({ id }) {
   }
 }
 
+function Destacado({ item }) {
+  const { destacado } = item
+  return (
+    <article id={`preview-${destacado.id}`} className={`priority-card priority-card--${destacado.prioridad}`}>
+      <header className="priority-card__header">
+        <div>
+          <p>{destacado.etiqueta}</p>
+          <h3>{destacado.titulo}</h3>
+          <span>{destacado.descripcion}</span>
+        </div>
+        <code>{item.nombre}</code>
+      </header>
+      <div className="priority-card__body">
+        <ErrorBoundary><Presentacion id={destacado.id} /></ErrorBoundary>
+      </div>
+    </article>
+  )
+}
+
 function Ficha({ item, onAbrir }) {
   return (
     <article className="gallery-card min-w-0 rounded-2xl border border-ink-600 bg-ink p-4 shadow-card">
@@ -119,7 +521,14 @@ function Ficha({ item, onAbrir }) {
         </div>
         <Badge color={item.tipo === 'visual' ? 'green' : 'slate'}>{item.tipo === 'visual' ? 'Visual' : 'API'}</Badge>
       </div>
-      {item.presentacion ? <div className="mt-4 min-w-0 overflow-hidden rounded-xl border border-ink-600 bg-ink-800 p-3"><ErrorBoundary><Presentacion id={item.presentacion} /></ErrorBoundary></div> : null}
+      {item.destacado ? (
+        <a className="catalog-priority-link" href={`#preview-${item.destacado.id}`}>
+          <span>Preview profesional #{item.destacado.prioridad}</span>
+          <strong>{item.destacado.titulo}</strong>
+        </a>
+      ) : item.presentacion ? (
+        <div className="mt-4 min-w-0 overflow-hidden rounded-xl border border-ink-600 bg-ink-800 p-3"><ErrorBoundary><Presentacion id={item.presentacion} /></ErrorBoundary></div>
+      ) : null}
       <button type="button" onClick={() => onAbrir(item)} className="mt-4 inline-flex min-h-11 items-center rounded-lg px-1 text-sm font-semibold text-fono-dark underline-offset-4 hover:underline dark:text-fono-light">Ver ficha del export</button>
     </article>
   )
@@ -135,11 +544,17 @@ function App() {
 
   const resultados = useMemo(() => {
     const termino = consultaDiferida.trim().toLocaleLowerCase('es')
-    return CATALOGO_EXPORTS.filter((item) => {
-      if (tipo !== 'todos' && item.tipo !== tipo) return false
-      if (categoria !== 'Todas' && item.categoria !== categoria) return false
-      return !termino || `${item.nombre} ${item.categoria} ${item.tipo}`.toLocaleLowerCase('es').includes(termino)
-    })
+    return CATALOGO_EXPORTS
+      .filter((item) => {
+        if (tipo !== 'todos' && item.tipo !== tipo) return false
+        if (categoria !== 'Todas' && item.categoria !== categoria) return false
+        return !termino || `${item.nombre} ${item.categoria} ${item.tipo} ${item.destacado?.titulo || ''}`.toLocaleLowerCase('es').includes(termino)
+      })
+      .sort((a, b) => (
+        (a.destacado?.prioridad ?? Number.POSITIVE_INFINITY)
+        - (b.destacado?.prioridad ?? Number.POSITIVE_INFINITY)
+        || a.nombre.localeCompare(b.nombre, 'es')
+      ))
   }, [categoria, consultaDiferida, tipo])
 
   const { api, visuales } = METRICAS_CATALOGO
@@ -165,11 +580,19 @@ function App() {
       </header>
 
       <main id="contenido" className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
-        <section className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,.52fr)]">
+        <section className="gallery-hero">
           <div>
             <Badge color="green">Catálogo verificable</Badge>
-            <h1 className="mt-4 max-w-4xl text-4xl font-bold tracking-tight text-fore sm:text-5xl">Una vista para encontrar cada objeto de OwnCoding UI.</h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-mute">Explorá componentes, estados, marcas financieras y API pura. Las vistas vivas usan fixtures controlados; ningún export arbitrario se ejecuta.</p>
+            <h1>Automatizaciones que hacen más simples los formularios reales.</h1>
+            <p>Primero: bancos y pagos, teléfono con +595, ciudad con departamento y clientes por CI/RUC. Después, los {METRICAS_CATALOGO.total} exports del sistema.</p>
+            <nav aria-label="Vistas principales" className="hero-priority-nav">
+              {DESTACADOS_CATALOGO.map((item) => (
+                <a key={item.destacado.id} href={`#preview-${item.destacado.id}`}>
+                  <span>{String(item.destacado.prioridad).padStart(2, '0')}</span>
+                  {item.destacado.titulo}
+                </a>
+              ))}
+            </nav>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Stat label="Total" valor={METRICAS_CATALOGO.total} />
@@ -178,9 +601,23 @@ function App() {
           </div>
         </section>
 
+        <section aria-labelledby="titulo-destacados" className="priority-section">
+          <div className="section-heading">
+            <div>
+              <p>Recorrido recomendado</p>
+              <h2 id="titulo-destacados">Previews profesionales y funcionales</h2>
+            </div>
+            <span>Fixtures locales · sin llamadas externas</span>
+          </div>
+          <div className="priority-grid">
+            {DESTACADOS_CATALOGO.map((item) => <Destacado key={item.destacado.id} item={item} />)}
+          </div>
+          <OtrosCamposInteligentes />
+        </section>
+
         <section aria-label="Controles del catálogo" className="sticky top-0 z-20 -mx-4 mt-10 border-y border-fore/10 bg-paper/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center">
-            <SearchField className="min-w-0 flex-1" value={consulta} onChange={(event) => { setConsulta(event.target.value); setLimite(60) }} placeholder="Buscar componente o API" />
+            <SearchField className="min-w-0 flex-1" value={consulta} onChange={(event) => { setConsulta(event.target.value); setLimite(60) }} placeholder="Buscar componente, automatización o API" />
             <div className="flex flex-wrap gap-2" aria-label="Tipo de export">
               {[['visual', 'Visuales'], ['api', 'API'], ['todos', 'Todos']].map(([valor, etiqueta]) => <button key={valor} type="button" aria-pressed={tipo === valor} onClick={() => { setTipo(valor); setLimite(60) }} className={`min-h-11 rounded-xl border px-4 text-sm font-semibold ${tipo === valor ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{etiqueta}</button>)}
             </div>
@@ -197,7 +634,7 @@ function App() {
         ) : null}
 
         <section id="catalogo" aria-labelledby="titulo-catalogo" className="mt-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 id="titulo-catalogo" className="text-2xl font-bold">Catálogo</h2><p className="text-sm text-mute" role="status">{resultados.length} resultados</p></div>
+          <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 id="titulo-catalogo" className="text-2xl font-bold">Catálogo completo</h2><p className="text-sm text-mute" role="status">{resultados.length} resultados</p></div>
           {resultados.length > 0 ? (
             <><div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{resultados.slice(0, limite).map((item) => <Ficha key={item.nombre} item={item} onAbrir={abrirFicha} />)}</div>{resultados.length > limite ? <div className="mt-6 text-center"><Button variant="outline" onClick={() => setLimite((actual) => actual + 60)}>Mostrar más exports</Button></div> : null}</>
           ) : <div className="mt-5"><EmptyState title="No encontramos ese export" description="Probá otra palabra o cambiá los filtros." action={<Button variant="outline" onClick={() => { setConsulta(''); setCategoria('Todas'); setTipo('visual'); setLimite(60) }}>Limpiar filtros</Button>} /></div>}

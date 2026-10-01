@@ -25,13 +25,13 @@ describe('subpaths granulares publicados', () => {
     expect(readFileSync(js, 'utf8').startsWith('"use client"')).toBe(cliente)
   })
 
-  test('ningún subpath financiero contiene bytes sin permiso de redistribución', () => {
+  test('solo el subpath visual contiene bytes financieros autorizados', () => {
     const utils = readFileSync(new URL('../dist/utils.js', import.meta.url), 'utf8')
     const metadata = readFileSync(new URL('../dist/financial-metadata.js', import.meta.url), 'utf8')
     const financiero = readFileSync(new URL('../dist/financial.js', import.meta.url), 'utf8')
     expect(utils).not.toContain('data:image/')
     expect(metadata).not.toContain('data:image/')
-    expect(financiero).not.toContain('data:image/')
+    expect(financiero).toContain('data:image/')
   })
 
   test('los módulos publicados exponen contratos representativos', async () => {
@@ -45,9 +45,12 @@ describe('subpaths granulares publicados', () => {
     expect(ia.motorIA).toBeTypeOf('function')
     expect(phone.PhoneField).toBeTypeOf('function')
     expect(financiero.BancoLogo).toBeTypeOf('function')
-    expect(financiero.logoDeBanco('ueno')?.visual?.asset).toBeUndefined()
-    expect(financiero.logoDeBanco('ueno')?.redistribucion).toEqual({ permitida: false, evidencia: null })
+    expect(financiero.logoDeBanco('ueno')?.visual?.asset).toMatch(/^data:image\//)
+    expect(financiero.logoDeBanco('ueno')?.redistribucion).toMatchObject({ permitida: true, evidencia: 'docs/financial-assets-manifest.json' })
+    expect(financiero.relacionFinancieraDe('Mango')?.financialProvider).toBe('Tu Financiera')
     expect(metadata.logoDeBanco('ueno')?.visual?.asset).toBeUndefined()
+    expect(metadata.relacionFinancieraDe('App Vaquita')?.operador?.nombreLegal).toBe('MUTECH S.R.L.')
+    expect(metadata.sugerenciasDeMarcaPago('Banco Familiar')).toEqual(['EKO'])
     expect(identidad.crearIdentidadApp({ nombre: 'App', version: '1.0.0' }).etiquetaVersion).toBe('v1.0.0')
   })
 })

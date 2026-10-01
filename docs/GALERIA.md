@@ -29,7 +29,7 @@ incluye `/status.json` como archivo estático real —no como fallback del SPA�
 {
   "status": "ok",
   "service": "owncoding-ui-gallery",
-  "packageVersion": "0.60.0",
+  "packageVersion": "0.60.1",
   "buildIdentity": "<commit-o-BUILD_ID>"
 }
 ```

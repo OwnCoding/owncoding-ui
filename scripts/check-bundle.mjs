@@ -3,14 +3,13 @@ import { gzipSync } from 'node:zlib'
 import { execNpmSync } from './npm-command.mjs'
 
 const budgets = {
-  'dist/index.js': { raw: 650_000, gzip: 160_000 },
-  'dist/utils.js': { raw: 150_000, gzip: 40_000 },
+  'dist/index.js': { raw: 2_100_000, gzip: 1_120_000 },
+  'dist/utils.js': { raw: 165_000, gzip: 42_000 },
   'dist/ia.js': { raw: 20_000, gzip: 6_000 },
   'dist/phone.js': { raw: 35_000, gzip: 11_000 },
-  // Sin licencias/autorizaciones explícitas no hay bytes de terceros; este
-  // presupuesto evita reintroducirlos accidentalmente en el subpath visual.
-  'dist/financial.js': { raw: 45_000, gzip: 10_000 },
-  'dist/financial-metadata.js': { raw: 27_000, gzip: 7_000 },
+  // Incluye 63 assets visuales autorizados; metadata continúa byte-free.
+  'dist/financial.js': { raw: 1_520_000, gzip: 990_000 },
+  'dist/financial-metadata.js': { raw: 42_000, gzip: 9_000 },
   'dist/app-identity.js': { raw: 3_000, gzip: 1_500 },
   'dist/email.js': { raw: 9_000, gzip: 3_500 },
 }
@@ -33,10 +32,10 @@ const [{ size, unpackedSize, entryCount }] = JSON.parse(
   execNpmSync(['pack', '--dry-run', '--json', '--ignore-scripts'], { encoding: 'utf8' }),
 )
 const paquete = { packed: size, unpacked: unpackedSize }
-// v0.58/v0.59 incorporaron evidencia visual de QA (CargaIA y a11y ronda 13)
-// dentro de docs/qa. El presupuesto contempla esos recibos publicados sin
-// relajar los límites de cada bundle ejecutable definidos arriba.
-const limitePaquete = { packed: 2_100_000, unpacked: 5_500_000 }
+// v0.60.1 incorpora el catálogo financiero oficial tanto en `src` como en los
+// bundles publicables. El margen sigue acotado y los presupuestos ejecutables
+// individuales de arriba continúan detectando regresiones de código.
+const limitePaquete = { packed: 5_100_000, unpacked: 9_800_000 }
 console.log(`npm package: ${paquete.packed} B packed / ${paquete.unpacked} B unpacked / ${entryCount} entries (budget ${limitePaquete.packed}/${limitePaquete.unpacked})`)
 for (const [tipo, bytes] of Object.entries(paquete)) {
   if (bytes > limitePaquete[tipo]) {

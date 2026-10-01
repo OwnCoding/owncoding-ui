@@ -1,7 +1,8 @@
 import { readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { CATALOGO_EXPORTS } from '../gallery/catalog.js'
+import { CATALOGO_EXPORTS, DESTACADOS_CATALOGO } from '../gallery/catalog.js'
+import { CIUDADES_PARAGUAY } from '../src/catalog/ciudades.js'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const readmePath = path.join(root, 'README.md')
@@ -55,8 +56,10 @@ if (!/No se\s+considera publicado/.test(readme)) fallar('la galería debe conser
 
 const previews = [
   'docs/assets/readme-hero.svg',
+  'docs/assets/readme-financial.svg',
+  'docs/assets/readme-phone.svg',
+  'docs/assets/readme-smart-inputs.svg',
   'docs/assets/readme-components.svg',
-  'docs/assets/readme-financial-phone.svg',
   'docs/assets/readme-identity.svg',
 ]
 
@@ -70,10 +73,62 @@ for (const preview of previews) {
   }
 }
 
+const financialPreview = await readFile(path.join(root, 'docs/assets/readme-financial.svg'), 'utf8')
+const financialAssets = [...financialPreview.matchAll(/<image\b[^>]*data-financial-asset="([^"]+)"[^>]*href="(data:image\/[^"]+)"/g)]
+const requiredFinancialAssets = [
+  'bancos/ueno-compacto.svg',
+  'bancos/ueno-horizontal.svg',
+  'bancos/basa-horizontal.svg',
+  'pagos/bancard-horizontal.png',
+  'pagos/dinelco-horizontal.svg',
+  'pagos/upay-horizontal.svg',
+  'pagos/pagopar-horizontal.svg',
+  'pagos/mango-horizontal.svg',
+  'pagos/vaquita-horizontal.png',
+  'pagos/eko-horizontal.svg',
+  'pagos/eclub-horizontal.svg',
+  'pagos/pik-horizontal.svg',
+]
+if (financialAssets.length < requiredFinancialAssets.length) fallar('preview financiero no contiene suficientes logos reales embebidos')
+for (const required of requiredFinancialAssets) {
+  if (!financialAssets.some(([_, file]) => file === required)) fallar(`preview financiero sin asset real: ${required}`)
+}
+for (const [_, file, dataUrl] of financialAssets) {
+  const payload = dataUrl.split(',', 2)[1]
+  if (!payload || !/;base64,/.test(dataUrl) || Buffer.from(payload, 'base64').byteLength < 100) fallar(`asset embebido inválido: ${file}`)
+}
+if (/<image\b[^>]*href="https?:/i.test(financialPreview)) fallar('preview financiero contiene un hotlink')
+
+const smartInputs = await readFile(path.join(root, 'docs/assets/readme-smart-inputs.svg'), 'utf8')
+const fixturesCiudad = [...smartInputs.matchAll(/<g\b[^>]*data-city-fixture="([^"]+)"[^>]*data-department-fixture="([^"]+)"[^>]*>([\s\S]*?)<\/g>/g)]
+if (fixturesCiudad.length === 0) fallar('preview de ciudad sin fixtures verificables')
+for (const [, ciudad, departamento, contenido] of fixturesCiudad) {
+  const existe = CIUDADES_PARAGUAY.some((item) => item.ciudad === ciudad && item.departamento === departamento)
+  if (!existe) fallar(`fixture de ciudad fuera de CIUDADES_PARAGUAY: ${ciudad} · ${departamento}`)
+  if (!contenido.includes(`>${ciudad}</text>`) || !contenido.includes(`>${departamento}</text>`)) {
+    fallar(`fixture de ciudad no coincide con el texto visible: ${ciudad} · ${departamento}`)
+  }
+}
+
+const previewsPrioritarios = previews.slice(1, 4)
+let indiceAnterior = -1
+for (const preview of previewsPrioritarios) {
+  const indice = readme.indexOf(preview)
+  if (indice <= indiceAnterior) fallar(`orden de previews prioritarios incorrecto: ${previewsPrioritarios.join(' > ')}`)
+  indiceAnterior = indice
+}
+
+const idsDestacados = DESTACADOS_CATALOGO.map((item) => item.destacado.id)
+for (const id of idsDestacados) {
+  if (!readme.includes(`\`${id}\``)) fallar(`README no documenta el preview prioritario: ${id}`)
+}
+
 const hero = await readFile(path.join(root, previews[0]), 'utf8')
 for (const dato of [`${total} exports`, `${visuales} visuales`, `${categorias} categorías`, `v${version}`]) {
   if (!hero.includes(dato)) fallar(`hero desactualizado: ${dato}`)
 }
+const componentes = await readFile(path.join(root, 'docs/assets/readme-components.svg'), 'utf8')
+if (!componentes.includes(`>${visuales}</text>`)) fallar(`preview de componentes desactualizado: ${visuales} visuales`)
 
 if (errores.length > 0) {
   console.error(`readme check failed (${errores.length})`)

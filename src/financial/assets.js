@@ -1,12 +1,144 @@
-// Registro fail-closed. Un asset solo puede entrar acá junto con evidencia de
-// redistribución explícita y auditable en los metadatos del repositorio. La
-// procedencia oficial prueba autenticidad, no concede permiso para republicar.
-// En v0.60.0 no existe todavía ninguna autorización que satisfaga ese contrato.
-export const ASSETS_FINANCIEROS = Object.freeze({})
+// Canonical visual asset registry. Metadata stays pure and byte-free.
+import asset0 from '../assets/financial/bancos/atlas-horizontal-negro.svg'
+import asset1 from '../assets/financial/bancos/bancop-compacto.png'
+import asset2 from '../assets/financial/bancos/bancop-horizontal.png'
+import asset3 from '../assets/financial/bancos/basa-compacto.svg'
+import asset4 from '../assets/financial/bancos/basa-horizontal.svg'
+import asset5 from '../assets/financial/bancos/bna-compacto.ico'
+import asset6 from '../assets/financial/bancos/bna-horizontal.svg'
+import asset7 from '../assets/financial/bancos/bnf-horizontal.svg'
+import asset8 from '../assets/financial/bancos/continental-compacto.png'
+import asset9 from '../assets/financial/bancos/coomecipar-compacto.png'
+import asset10 from '../assets/financial/bancos/coomecipar-horizontal.png'
+import asset11 from '../assets/financial/bancos/familiar-compacto.png'
+import asset12 from '../assets/financial/bancos/familiar-horizontal.webp'
+import asset13 from '../assets/financial/bancos/fic-compacto.png'
+import asset14 from '../assets/financial/bancos/fic-horizontal.png'
+import asset15 from '../assets/financial/bancos/finlatina-compacto.png'
+import asset16 from '../assets/financial/bancos/finlatina-horizontal.png'
+import asset17 from '../assets/financial/bancos/fpj-compacto.png'
+import asset18 from '../assets/financial/bancos/fpj-horizontal.png'
+import asset19 from '../assets/financial/bancos/interfisa-horizontal.png'
+import asset20 from '../assets/financial/bancos/itau-compacto.png'
+import asset21 from '../assets/financial/bancos/itau-horizontal.png'
+import asset22 from '../assets/financial/bancos/medalla-compacto.webp'
+import asset23 from '../assets/financial/bancos/medalla-horizontal.png'
+import asset24 from '../assets/financial/bancos/san-cristobal-compacto.ico'
+import asset25 from '../assets/financial/bancos/san-cristobal-horizontal.png'
+import asset26 from '../assets/financial/bancos/solar-horizontal.svg'
+import asset27 from '../assets/financial/bancos/sudameris-compacto.png'
+import asset28 from '../assets/financial/bancos/sudameris-horizontal.svg'
+import asset29 from '../assets/financial/bancos/tu-financiera-horizontal.svg'
+import asset30 from '../assets/financial/bancos/ueno-compacto.svg'
+import asset31 from '../assets/financial/bancos/ueno-horizontal.svg'
+import asset32 from '../assets/financial/bancos/zeta-compacto.png'
+import asset33 from '../assets/financial/bancos/zeta-horizontal.png'
+import asset34 from '../assets/financial/pagos/amex-compacto.svg'
+import asset35 from '../assets/financial/pagos/amex-horizontal.svg'
+import asset36 from '../assets/financial/pagos/bancard-compacto.png'
+import asset37 from '../assets/financial/pagos/bancard-horizontal.png'
+import asset38 from '../assets/financial/pagos/cabal-horizontal.png'
+import asset39 from '../assets/financial/pagos/dinelco-compacto.png'
+import asset40 from '../assets/financial/pagos/dinelco-horizontal.svg'
+import asset41 from '../assets/financial/pagos/pagopar-horizontal.svg'
+import asset42 from '../assets/financial/pagos/paypro-horizontal.png'
+import asset43 from '../assets/financial/pagos/personal-pay-compacto.png'
+import asset44 from '../assets/financial/pagos/personal-pay-horizontal.svg'
+import asset45 from '../assets/financial/pagos/procard-compacto.png'
+import asset46 from '../assets/financial/pagos/procard-horizontal.png'
+import asset47 from '../assets/financial/pagos/upay-compacto.svg'
+import asset48 from '../assets/financial/pagos/upay-horizontal.svg'
+import asset49 from '../assets/financial/pagos/wally-compacto.ico'
+import asset50 from '../assets/financial/pagos/wally-horizontal.svg'
+import asset51 from '../assets/financial/pagos/zimple-compacto.ico'
+import asset52 from '../assets/financial/pagos/zimple-horizontal.png'
+import asset53 from '../assets/financial/pagos/mango-compacto.png'
+import asset54 from '../assets/financial/pagos/mango-horizontal.svg'
+import asset55 from '../assets/financial/pagos/vaquita-compacto.png'
+import asset56 from '../assets/financial/pagos/vaquita-horizontal.png'
+import asset57 from '../assets/financial/pagos/eko-compacto.svg'
+import asset58 from '../assets/financial/pagos/eko-horizontal.svg'
+import asset59 from '../assets/financial/pagos/eclub-compacto.svg'
+import asset60 from '../assets/financial/pagos/eclub-horizontal.svg'
+import asset61 from '../assets/financial/pagos/pik-compacto.png'
+import asset62 from '../assets/financial/pagos/pik-horizontal.svg'
+
+export const ASSETS_FINANCIEROS = Object.freeze({
+  'bancos/atlas-horizontal-negro.svg': asset0,
+  'bancos/bancop-compacto.png': asset1,
+  'bancos/bancop-horizontal.png': asset2,
+  'bancos/basa-compacto.svg': asset3,
+  'bancos/basa-horizontal.svg': asset4,
+  'bancos/bna-compacto.ico': asset5,
+  'bancos/bna-horizontal.svg': asset6,
+  'bancos/bnf-horizontal.svg': asset7,
+  'bancos/continental-compacto.png': asset8,
+  'bancos/coomecipar-compacto.png': asset9,
+  'bancos/coomecipar-horizontal.png': asset10,
+  'bancos/familiar-compacto.png': asset11,
+  'bancos/familiar-horizontal.webp': asset12,
+  'bancos/fic-compacto.png': asset13,
+  'bancos/fic-horizontal.png': asset14,
+  'bancos/finlatina-compacto.png': asset15,
+  'bancos/finlatina-horizontal.png': asset16,
+  'bancos/fpj-compacto.png': asset17,
+  'bancos/fpj-horizontal.png': asset18,
+  'bancos/interfisa-horizontal.png': asset19,
+  'bancos/itau-compacto.png': asset20,
+  'bancos/itau-horizontal.png': asset21,
+  'bancos/medalla-compacto.webp': asset22,
+  'bancos/medalla-horizontal.png': asset23,
+  'bancos/san-cristobal-compacto.ico': asset24,
+  'bancos/san-cristobal-horizontal.png': asset25,
+  'bancos/solar-horizontal.svg': asset26,
+  'bancos/sudameris-compacto.png': asset27,
+  'bancos/sudameris-horizontal.svg': asset28,
+  'bancos/tu-financiera-horizontal.svg': asset29,
+  'bancos/ueno-compacto.svg': asset30,
+  'bancos/ueno-horizontal.svg': asset31,
+  'bancos/zeta-compacto.png': asset32,
+  'bancos/zeta-horizontal.png': asset33,
+  'pagos/amex-compacto.svg': asset34,
+  'pagos/amex-horizontal.svg': asset35,
+  'pagos/bancard-compacto.png': asset36,
+  'pagos/bancard-horizontal.png': asset37,
+  'pagos/cabal-horizontal.png': asset38,
+  'pagos/dinelco-compacto.png': asset39,
+  'pagos/dinelco-horizontal.svg': asset40,
+  'pagos/pagopar-horizontal.svg': asset41,
+  'pagos/paypro-horizontal.png': asset42,
+  'pagos/personal-pay-compacto.png': asset43,
+  'pagos/personal-pay-horizontal.svg': asset44,
+  'pagos/procard-compacto.png': asset45,
+  'pagos/procard-horizontal.png': asset46,
+  'pagos/upay-compacto.svg': asset47,
+  'pagos/upay-horizontal.svg': asset48,
+  'pagos/wally-compacto.ico': asset49,
+  'pagos/wally-horizontal.svg': asset50,
+  'pagos/zimple-compacto.ico': asset51,
+  'pagos/zimple-horizontal.png': asset52,
+  'pagos/mango-compacto.png': asset53,
+  'pagos/mango-horizontal.svg': asset54,
+  'pagos/vaquita-compacto.png': asset55,
+  'pagos/vaquita-horizontal.png': asset56,
+  'pagos/eko-compacto.svg': asset57,
+  'pagos/eko-horizontal.svg': asset58,
+  'pagos/eclub-compacto.svg': asset59,
+  'pagos/eclub-horizontal.svg': asset60,
+  'pagos/pik-compacto.png': asset61,
+  'pagos/pik-horizontal.svg': asset62,
+})
+
+export const ASSET_KEYS_FINANCIEROS = Object.freeze(Object.keys(ASSETS_FINANCIEROS))
+
+export function obtenerAssetFinanciero(clave) {
+  if (typeof clave !== 'string' || !Object.hasOwn(ASSETS_FINANCIEROS, clave)) return null
+  return ASSETS_FINANCIEROS[clave]
+}
 
 export function adjuntarAssetFinanciero(visual) {
   if (!visual || !visual.empaquetado) return visual
-  const asset = ASSETS_FINANCIEROS[visual.empaquetado]
+  const asset = obtenerAssetFinanciero(visual.empaquetado)
   return asset ? { ...visual, asset } : visual
 }
 
@@ -17,11 +149,5 @@ export function adjuntarAssetsAlRegistro(registro) {
 
 export function adjuntarAssetsACobertura(fila) {
   if (!fila?.variantes) return fila
-  return {
-    ...fila,
-    variantes: {
-      compacto: adjuntarAssetFinanciero(fila.variantes.compacto),
-      horizontal: adjuntarAssetFinanciero(fila.variantes.horizontal),
-    },
-  }
+  return { ...fila, variantes: { compacto: adjuntarAssetFinanciero(fila.variantes.compacto), horizontal: adjuntarAssetFinanciero(fila.variantes.horizontal) } }
 }

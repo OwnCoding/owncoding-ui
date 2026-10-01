@@ -21,6 +21,35 @@ documenta acá y en el README).
   `REGLAS-ECOSISTEMA.md` §12.5 el aviso de datos sensibles. Docs-only: sin
   cambios de API ni de componentes.
 
+## v0.60.1 — 2026-10-01 (preparada, no publicada)
+
+- **Galería priorizada:** la portada y el README muestran primero cuatro
+  previews profesionales e interactivos: bancos/medios de pago,
+  `PhoneField` con Paraguay y `+595`, ciudad con departamento automático y
+  clientes por CI/RUC. Los fixtures de ciudad y clientes se rotulan como
+  locales/simulados; no consultan proveedores reales ni asumen una conversión
+  universal de CI a RUC.
+- `gallery:check` fija los IDs y el orden de esas cuatro vistas para evitar
+  drift, y `readme:check` valida la jerarquía y seguridad de los nuevos SVG.
+- **Logos financieros reales:** `BancoLogo` y `MedioPagoLogo` incorporan un
+  manifiesto local por variante con 63 archivos obtenidos de fuentes oficiales,
+  SHA-256, fecha y autorización de proyecto. ueno encabeza la galería; Bancard,
+  Dinelco, upay, Pagopar, billeteras y bancos disponibles se renderizan como
+  imágenes auténticas. Los 11 casos/variantes bloqueados quedan identificados
+  por ID sin recrear símbolos o iniciales.
+- Mango, Vaquita, EKO, eCLUB y Pik se incorporan como marcas de pago o acceso
+  financiero independientes, con operador, proveedor/institución relacionada,
+  actividad y fuentes oficiales. No se modelan como bancos ni como alias de la
+  institución; una búsqueda puede sugerir la relación sin sustituir el logo de
+  ninguna de las partes.
+- Pagopar vuelve al catálogo activo como producto de upay; uPOS conserva la
+  relación de producto padre sin atribuirle una marca independiente. Se corrigen
+  Dinelco y las URLs oficiales de Medalla, Universitaria, TU Financiera y Zeta.
+- Sudameris usa el campo oficial rojo `#FF0000` para mantener contraste y espacio
+  de seguridad del lockup blanco, en vez del fondo verde inferido previamente.
+- El auditor de assets rechaza XML/SVG malformado, SMIL, eventos y SVG activos
+  anidados; el lookup visual ignora claves heredadas y el gate corre también en CI.
+
 ## v0.60.0 — 2026-10-01 (preparada, no publicada)
 
 - **Presentación del repositorio:** README reorganizado como portada del

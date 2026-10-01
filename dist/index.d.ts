@@ -1281,6 +1281,27 @@ export type VisualFinanciero = {
 export type EvidenciaRedistribucionMarca = Readonly<{
   permitida: boolean
   evidencia: string | null
+  base?: string
+  confirmadaEn?: string
+  alcance?: readonly string[]
+}>
+export type OperadorMarcaFinanciera = Readonly<{
+  nombreLegal: string
+  fuenteOficial: string
+  verificadoEn: string
+  ruc?: string
+}>
+export type RelacionFinanciera = Readonly<{
+  marca: string
+  alias: readonly string[]
+  institucionPadre?: string
+  financialProvider?: string
+  fuenteRelacion: string
+  verificadoEnRelacion: string
+  actividad: 'activa' | 'inactiva' | string
+  fuenteActividad: string
+  operador: OperadorMarcaFinanciera
+  reguladores?: readonly string[]
 }>
 
 /** Nombres del catálogo financiero predeterminado de Paraguay. */
@@ -1336,6 +1357,7 @@ export type CoberturaMarcaFinanciera = {
   verificadoEn?: string
   redistribucion?: EvidenciaRedistribucionMarca
   marcaPadre?: string | null
+  relacionFinanciera?: RelacionFinanciera | null
   variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
 }
 
@@ -1364,6 +1386,7 @@ export type EntradaMarcaMedioPago =
       estado: string
       redistribucion?: EvidenciaRedistribucionMarca
       marcaPadre?: string
+      relacionFinanciera?: RelacionFinanciera
       variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
     }
   | {
@@ -1387,6 +1410,7 @@ export type RegistroLogoMedioPago = {
   fuenteOficial?: string | null
   verificadoEn?: string | null
   marcaPadre?: string
+  relacionFinanciera?: RelacionFinanciera
   aliasHistorico?: string
   generico?: boolean
 }
@@ -1395,6 +1419,16 @@ export const MEDIOS_PAGO_CON_MARCA: string[]
 export function normalizarMarcaPago(nombre: string): string
 export function logoDeMedioPago(nombre: string, variante?: 'compacto' | 'horizontal' | 'compact'): RegistroLogoMedioPago | null
 export function coberturaMediosPago(catalogo?: readonly string[]): CoberturaMarcaFinanciera[]
+export function sugerenciasDeMarcaPago(consulta?: string, catalogo?: readonly string[]): string[]
+
+export const FECHA_VERIFICACION_RELACIONES_FINANCIERAS: string
+export const RELACIONES_FINANCIERAS: Readonly<Record<string, RelacionFinanciera>>
+export const MARCAS_CON_RELACION_FINANCIERA: readonly string[]
+export function normalizarRelacionFinanciera(texto: string): string
+export function relacionFinancieraDe(marca: string): RelacionFinanciera | null
+export function buscarRelacionesFinancieras(consulta?: string): RelacionFinanciera[]
+export function institucionesSugeridasPorMarca(consulta: string): string[]
+export function marcasRelacionadasConInstitucion(institucion: string): string[]
 
 export const ESTADO_IMPRESORA: Record<string, string>
 export const ETIQUETA_ESTADO: Record<string, string>

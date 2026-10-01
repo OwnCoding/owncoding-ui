@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, test } from 'vitest'
 
-import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO } from '../gallery/catalog.js'
+import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from '../gallery/catalog.js'
 import { diffSelection, validateSha } from '../scripts/ci-diff-check.mjs'
 
 const SHA = {
@@ -25,11 +25,34 @@ describe('contrato publico de la galeria', () => {
       api,
       curadas,
       categorias: CATEGORIAS_CATALOGO.length,
-    }).toEqual({ total: 531, visuales: 146, api: 385, curadas: 28, categorias: 14 })
+    }).toEqual({ total: 540, visuales: 146, api: 394, curadas: 30, categorias: 14 })
+
+    expect(DESTACADOS_CATALOGO.map((item) => item.destacado.id)).toEqual([
+      'bancos-pagos',
+      'telefono-py',
+      'ciudad-departamento',
+      'cliente-ci-ruc',
+    ])
 
     const galeria = readFileSync('gallery/main.jsx', 'utf8')
     expect(galeria).toContain('valor={METRICAS_CATALOGO.visuales}')
     expect(galeria).not.toMatch(/valor=["{]143/)
+
+    const vistaTelefono = galeria.match(/function VistaTelefono\(\) \{([\s\S]*?)\n\}\n\nfunction VistaCiudadDepartamento/)?.[1]
+    expect(vistaTelefono).toBeTruthy()
+    const labelId = vistaTelefono.match(/<Label htmlFor="([^"]+)">Teléfono<\/Label>/)?.[1]
+    const inputId = vistaTelefono.match(/inputProps=\{\{ id: '([^']+)' \}\}/)?.[1]
+    expect(labelId).toBe('gallery-telefono')
+    expect(inputId).toBe(labelId)
+
+    const vistaBancos = galeria.match(/function VistaBancosPagos\(\) \{([\s\S]*?)\n\}\n\nfunction VistaTelefono/)?.[1]
+    expect(vistaBancos).toContain('useState(BANCO_DESTACADO)')
+    expect(vistaBancos).toContain('BANCOS_PREVIEW.map')
+    expect(vistaBancos).toContain('aria-pressed={banco === nombre}')
+    expect(vistaBancos).toContain('variante="compacto"')
+    expect(vistaBancos).toContain('variante="horizontal"')
+    expect(vistaBancos).toContain('MARCAS_CONECTADAS_PREVIEW.map')
+    expect(vistaBancos).toContain('BancoLogo banco={institucion}')
   })
 })
 
@@ -38,6 +61,7 @@ describe('gates de CI', () => {
     const workflow = readFileSync('.github/workflows/ci.yml', 'utf8')
 
     expect(workflow).toContain('fetch-depth: 0')
+    expect(workflow).toContain('npm run financial-assets:check')
     expect(workflow).toContain('npm run readme:check')
     expect(workflow).toContain('node scripts/ci-diff-check.mjs')
   })

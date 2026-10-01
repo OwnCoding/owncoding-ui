@@ -69,10 +69,10 @@ describe('bancos de Paraguay', () => {
     expect(sugerenciasDeBanco('rio')).toEqual(['Banco Continental'])
   })
 
-  test('el registro resuelve archivo, marca y monograma', () => {
-    expect(logoDeBanco('Banco Basa')).toMatchObject({ tipo: 'archivo', archivo: 'banco-basa.svg' })
+  test('el registro resuelve assets oficiales y fallback genérico', () => {
+    expect(logoDeBanco('Banco Basa')).toMatchObject({ tipo: 'archivo', archivo: 'basa-horizontal.svg' })
     expect(logoDeBanco('Banco Continental')).toMatchObject({ tipo: 'marca', marca: 'continental' })
-    expect(logoDeBanco('Coomecipar')).toMatchObject({ tipo: 'monograma', iniciales: 'CO' })
+    expect(logoDeBanco('Coomecipar')).toMatchObject({ tipo: 'archivo', archivo: 'coomecipar-horizontal.png' })
     expect(logoDeBanco('Banco Inventado')).toMatchObject({ tipo: 'monograma', generico: true })
     expect(logoDeBanco('')).toBe(null)
   })
@@ -80,9 +80,9 @@ describe('bancos de Paraguay', () => {
   test('el logo y el combo se renderizan', () => {
     const basa = renderToStaticMarkup(<BancoLogo banco="Banco Basa" />)
     expect(basa).toContain('Banco Basa')
-    expect(basa).toContain('data-logo-estado="permiso-pendiente"')
-    expect(basa).not.toContain('<img')
-    expect(renderToStaticMarkup(<BancoLogo banco="Coomecipar" />)).toContain('CO')
+    expect(basa).toContain('data-logo-estado="oficial"')
+    expect(basa).toContain('<img')
+    expect(renderToStaticMarkup(<BancoLogo banco="Coomecipar" />)).toContain('<img')
     expect(renderToStaticMarkup(<BancoCombobox value="Banco At" onChange={() => {}} />)).toContain('role="combobox"')
   })
 })

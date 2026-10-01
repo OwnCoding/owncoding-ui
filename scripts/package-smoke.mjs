@@ -40,10 +40,9 @@ export function runPackageSmoke() {
       if (!root.Button || !root.CargaIA || !utils.formatGs || !phone.PhoneField || !financial.BancoLogo) throw new Error('exports visuales ausentes')
       if (!ia.motorIA || !metadata.LOGOS_BANCOS || !identity.crearIdentidadApp || !email.renderCorreoHtml) throw new Error('exports puros ausentes')
       if (metadata.logoDeBanco('ueno bank')?.visual?.asset) throw new Error('financial-metadata no debe incluir bytes visuales')
-      const cobertura = [...financial.coberturaBancos(), ...financial.coberturaMediosPago()]
-      if (cobertura.some((item) => Object.values(item.variantes).some((visual) => visual.asset || visual.empaquetado))) {
-        throw new Error('el paquete no debe habilitar assets financieros sin evidencia de redistribución')
-      }
+      const ueno = financial.logoDeBanco('ueno bank', 'compacto')
+      if (!ueno?.visual?.asset?.startsWith('data:image/') || !ueno?.redistribucion?.permitida) throw new Error('asset autorizado de ueno ausente')
+      if (financial.ASSET_KEYS_FINANCIEROS.length < 50 || financial.BLOQUEOS_ASSETS_FINANCIEROS.length < 1) throw new Error('manifest financiero incompleto')
     `
     writeFileSync(join(app, 'smoke.mjs'), smoke)
     execFileSync(process.execPath, ['smoke.mjs'], { cwd: app, stdio: 'inherit' })
@@ -52,16 +51,14 @@ export function runPackageSmoke() {
     for (const archivo of ['dist/index.d.ts', 'dist/utils.d.ts', 'dist/ia.d.ts', 'dist/phone.d.ts', 'dist/financial.d.ts', 'dist/financial-metadata.d.ts', 'dist/app-identity.d.ts', 'dist/email.d.ts']) {
       readFileSync(join(paquete, archivo))
     }
-    for (const archivo of ['dist/financial.js', 'dist/financial-metadata.js']) {
-      const fuente = readFileSync(join(paquete, archivo), 'utf8')
-      if (/data:image\/svg\+xml,[^`"']{100,}/i.test(fuente) || /data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]{100,}/i.test(fuente)) {
-        throw new Error(`${archivo} contiene bytes visuales financieros no autorizados`)
-      }
+    const visualBundle = readFileSync(join(paquete, 'dist/financial.js'), 'utf8')
+    const metadataBundle = readFileSync(join(paquete, 'dist/financial-metadata.js'), 'utf8')
+    if (!visualBundle.includes('data:image/')) throw new Error('financial no contiene assets autorizados')
+    if (metadataBundle.includes('data:image/')) throw new Error('financial-metadata contiene bytes visuales')
+    if (!existsSync(join(paquete, 'src/assets/financial')) || !existsSync(join(paquete, 'docs/financial-assets-manifest.json'))) {
+      throw new Error('el tarball no contiene assets locales o su manifest')
     }
-    if (existsSync(join(paquete, 'src/assets/financial')) || existsSync(join(paquete, 'dist/assets/financial'))) {
-      throw new Error('el tarball contiene archivos financieros de terceros')
-    }
-    console.log('package smoke ok: npm pack + temp install + root/utils/ia/subpaths/types + financial redistribution gate')
+    console.log('package smoke ok: npm pack + temp install + subpaths/types + financial manifest autorizado')
   } finally {
     rmSync(temporal, { recursive: true, force: true })
   }

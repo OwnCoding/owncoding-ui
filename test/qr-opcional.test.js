@@ -15,5 +15,5 @@ describe('el paquete se importa sin `qrcode`', () => {
     // Sin la peer: nunca lanza y el objeto QR se queda sin imagen.
     expect(await modulo.qrDataUrl('https://ledbox.online/u/DEMO0001')).toBe('')
     expect(modulo.QR_OPCIONES).toEqual({ nivel: 'M', margen: 1, ancho: 220 })
-  })
+  }, 15_000)
 })

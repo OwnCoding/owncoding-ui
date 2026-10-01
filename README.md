@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 531 exports, 146 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 540 exports, 146 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.60.0" src="https://img.shields.io/badge/versi%C3%B3n-0.60.0-05a36f" />
+  <img alt="Versión 0.60.1" src="https://img.shields.io/badge/versi%C3%B3n-0.60.1-05a36f" />
   <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
   <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
 </p>
@@ -28,6 +28,56 @@
 > **No se considera publicado** hasta completar deploy, HTTPS, `status.json` y smoke del
 > catálogo. Mientras tanto, puede ejecutarse localmente con
 > `npm run gallery:dev`.
+
+## Primero: las automatizaciones de mayor valor
+
+El recorrido visual empieza por los campos que más trabajo manual evitan en
+aplicaciones paraguayas. Todos son componentes reales de la biblioteca; las
+imágenes son representaciones editoriales, no capturas inventadas de una app.
+
+### 1. Bancos y medios de pago
+
+<p align="center">
+  <img src="docs/assets/readme-financial.svg" width="1200" alt="Preview del selector de bancos con logos oficiales de ueno, Basa, Familiar y Sudameris, junto con Bancard, Dinelco, Mango, Vaquita, EKO, eCLUB y Pik" />
+</p>
+
+`BancoCombobox`, `BancoLogo` y `MedioPagoLogo` renderizan archivos oficiales
+locales en variantes `compacto` y `horizontal`. ueno bank abre la selección;
+Bancard, Dinelco, upay, Pagopar y las demás marcas disponibles conservan su
+geometría original. Mango, Vaquita, EKO, eCLUB y Pik se muestran como marcas
+propias conectadas con su institución o proveedor financiero verificado, sin
+convertirlas en bancos ni sustituir una identidad por otra. Cada archivo registra fuente, fecha, SHA-256 y la
+autorización escrita proporcionada para este repositorio público y la web de
+Own UI. No se declara una licencia abierta ni un permiso universal.
+
+### 2. Teléfono mobile con Paraguay por defecto
+
+<p align="center">
+  <img src="docs/assets/readme-phone.svg" width="1200" alt="Preview editorial del PhoneField con bandera de Paraguay, prefijo +595, búsqueda de país y salida E.164" />
+</p>
+
+`PhoneField` abre en 🇵🇾 Paraguay con `+595`, permite buscar país o prefijo,
+interpreta pegado internacional y entrega la salida E.164 junto con su estado
+de validación.
+
+### 3–4. Ciudad/departamento y clientes por CI/RUC
+
+<p align="center">
+  <img src="docs/assets/readme-smart-inputs.svg" width="1200" alt="Preview editorial de ciudad con departamento automático y búsqueda simulada de clientes por CI o RUC" />
+</p>
+
+`CityAutocomplete` deriva el departamento desde el catálogo local de Paraguay.
+`BuscadorCliente` encuentra fixtures por nombre, contacto, CI o RUC, y
+`RucField` demuestra una extracción **simulada y confirmable**. La galería no
+consulta un proveedor real ni afirma que una CI se convierta universalmente en
+RUC.
+
+| Orden estable de la galería | Export principal | Preview ID |
+| ---: | --- | --- |
+| 1 | `BancoCombobox` | `bancos-pagos` |
+| 2 | `PhoneField` | `telefono-py` |
+| 3 | `CityAutocomplete` | `ciudad-departamento` |
+| 4 | `RucField` | `cliente-ci-ruc` |
 
 ## Por qué existe
 
@@ -52,19 +102,15 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **531** |
+| Exports de la entrada raíz | **540** |
 | Exports visuales | **146** |
-| API, modelos y utilidades | **385** |
-| Vistas curadas con fixtures controlados | **28** |
+| API, modelos y utilidades | **394** |
+| Vistas curadas con fixtures controlados | **30** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
 está asociada explícitamente a un fixture aprobado y el resto aparece como
 ficha consultable.
-
-<p align="center">
-  <img src="docs/assets/readme-components.svg" width="1200" alt="Muestra editorial de campos, acciones, datos, navegación, estados y métricas de OwnCoding UI" />
-</p>
 
 ## Áreas del sistema
 
@@ -79,25 +125,32 @@ ficha consultable.
 | Carga con IA | asistente declarativo con confirmación humana y motor server opcional en `owncoding-ui/ia` |
 | Operación e impresión | inventario, dispositivos, documentos, QR, tickets ESC/POS y estado de impresoras |
 
+### Después: el resto del sistema
+
+Los previews prioritarios no ocultan el catálogo completo. Después aparecen
+moneda, porcentaje, correo, fechas, seriales y el resto de primitivas, datos,
+estados, navegación e identidad.
+
 <p align="center">
-  <img src="docs/assets/readme-financial-phone.svg" width="1200" alt="Muestra del PhoneField internacional y de las variantes seguras de marcas financieras" />
+  <img src="docs/assets/readme-components.svg" width="1200" alt="Muestra editorial de campos, acciones, datos, navegación, estados y métricas de OwnCoding UI" />
 </p>
 
-Las marcas financieras declaran procedencia, fecha, estado y cobertura. Si no
-existe permiso de redistribución confirmado, el componente utiliza un fallback
-neutral: **un logo auténtico no implica automáticamente que pueda empaquetarse**.
-Consulta el contrato completo en
-[`docs/MARCAS-FINANCIERAS.md`](docs/MARCAS-FINANCIERAS.md).
+Las marcas financieras declaran procedencia, fecha, SHA-256, estado y cobertura.
+Los assets verificados se empaquetan localmente; los casos cuyo origen oficial
+quedó bloqueado se registran por ID y nunca se sustituyen por iniciales que
+puedan confundirse con una marca. Consulta el manifiesto y el contrato en
+[`docs/MARCAS-FINANCIERAS.md`](docs/MARCAS-FINANCIERAS.md) y
+[`docs/financial-assets-manifest.json`](docs/financial-assets-manifest.json).
 
 ## Inicio rápido
 
 ### 1. Instalar una versión fija
 
-El paquete preparado por este candidato es `v0.60.0`, pero el tag todavía no
+El paquete preparado por este candidato es `v0.60.1`, pero el tag todavía no
 se creó ni se publicó. Después de publicar ese tag, la instalación fija será:
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.60.0
+npm install github:dariodeoli/owncoding-ui#v0.60.1
 ```
 
 Para probar la rama principal sin fijar un release:
@@ -177,7 +230,7 @@ import { formatGs, fechaDia } from 'owncoding-ui/utils'
 | `owncoding-ui` | cliente React | superficie compatible completa |
 | `owncoding-ui/ia` | servidor/universal | motor OpenAI-compatible, validación y rate-limit sin React |
 | `owncoding-ui/phone` | cliente React | campo telefónico y UI de países |
-| `owncoding-ui/financial` | cliente React | fallbacks seguros; assets solo con licencia/autorización auditable |
+| `owncoding-ui/financial` | cliente React | logos locales, variantes, resolvers y manifest visual autorizado |
 | `owncoding-ui/financial-metadata` | universal | registros puros, sin bytes de imágenes |
 | `owncoding-ui/app-identity` | universal | identidad y versión estricta |
 | `owncoding-ui/email` | servidor/universal | modelo y HTML/texto escapados; no envía |

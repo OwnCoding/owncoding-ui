@@ -20,4 +20,18 @@ export {
   normalizarMarcaPago,
   logoDeMedioPago,
   coberturaMediosPago,
+  sugerenciasDeMarcaPago,
 } from '../utils/mediosPago.js'
+
+export {
+  FECHA_VERIFICACION_RELACIONES_FINANCIERAS,
+  RELACIONES_FINANCIERAS,
+  MARCAS_CON_RELACION_FINANCIERA,
+  normalizarRelacionFinanciera,
+  relacionFinancieraDe,
+  buscarRelacionesFinancieras,
+  institucionesSugeridasPorMarca,
+  marcasRelacionadasConInstitucion,
+} from '../utils/relacionesFinancieras.js'
+
+export { AUTORIZACION_ASSETS_FINANCIEROS, BLOQUEOS_ASSETS_FINANCIEROS } from '../utils/financialAssets.js'

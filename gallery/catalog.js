@@ -115,7 +115,14 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BancoCombobox",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": "bancos"
+    "presentacion": "bancos-pagos",
+    "destacado": {
+      "id": "bancos-pagos",
+      "prioridad": 1,
+      "etiqueta": "01 · Finanzas",
+      "titulo": "Bancos y medios de pago",
+      "descripcion": "Selección bancaria con variantes compacta y horizontal, más marcas de pago con procedencia y fallback seguro."
+    }
   },
   {
     "nombre": "BancoLogo",
@@ -420,8 +427,15 @@ export const CATALOGO_EXPORTS = [
   {
     "nombre": "CityAutocomplete",
     "tipo": "visual",
-    "categoria": "Componentes generales",
-    "presentacion": null
+    "categoria": "Campos y formularios",
+    "presentacion": "ciudad-departamento",
+    "destacado": {
+      "id": "ciudad-departamento",
+      "prioridad": 3,
+      "etiqueta": "03 · Ubicación",
+      "titulo": "Ciudad con departamento automático",
+      "descripcion": "Autocompletado local de ciudades paraguayas que deriva el departamento al escribir o seleccionar."
+    }
   },
   {
     "nombre": "CIUDADES_PARAGUAY",
@@ -2346,8 +2360,15 @@ export const CATALOGO_EXPORTS = [
   {
     "nombre": "PhoneField",
     "tipo": "visual",
-    "categoria": "Campos y formularios",
-    "presentacion": "telefono"
+    "categoria": "Teléfono y países",
+    "presentacion": "telefono-py",
+    "destacado": {
+      "id": "telefono-py",
+      "prioridad": 2,
+      "etiqueta": "02 · Mobile",
+      "titulo": "Teléfono internacional",
+      "descripcion": "Paraguay, +595 y bandera por defecto; búsqueda de países, salida E.164 y estados de validación."
+    }
   },
   {
     "nombre": "PIE_ACCIONES",
@@ -2587,7 +2608,14 @@ export const CATALOGO_EXPORTS = [
     "nombre": "RucField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "cliente-ci-ruc",
+    "destacado": {
+      "id": "cliente-ci-ruc",
+      "prioridad": 4,
+      "etiqueta": "04 · Clientes",
+      "titulo": "Búsqueda por CI/RUC",
+      "descripcion": "Encuentra clientes por documento y simula la extracción de datos de un RUC sin llamar proveedores reales."
+    }
   },
   {
     "nombre": "rutaDeAviso",
@@ -3188,7 +3216,80 @@ export const CATALOGO_EXPORTS = [
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
+  },
+  {
+    "nombre": "FECHA_VERIFICACION_RELACIONES_FINANCIERAS",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "MARCAS_CON_RELACION_FINANCIERA",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "RELACIONES_FINANCIERAS",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "buscarRelacionesFinancieras",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "institucionesSugeridasPorMarca",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "marcasRelacionadasConInstitucion",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "normalizarRelacionFinanciera",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "relacionFinancieraDe",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "sugerenciasDeMarcaPago",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
   }
 ]
 
+export const DESTACADOS_CATALOGO = CATALOGO_EXPORTS
+  .filter((item) => item.destacado)
+  .sort((a, b) => a.destacado.prioridad - b.destacado.prioridad)
+
+const prioridadPorCategoria = DESTACADOS_CATALOGO.reduce((mapa, item) => {
+  const actual = mapa.get(item.categoria) ?? Number.POSITIVE_INFINITY
+  mapa.set(item.categoria, Math.min(actual, item.destacado.prioridad))
+  return mapa
+}, new Map())
+
+// Las categorías que contienen automatizaciones destacadas aparecen primero;
+// el resto conserva el orden estable del catálogo raíz.
 export const CATEGORIAS_CATALOGO = [...new Set(CATALOGO_EXPORTS.map((item) => item.categoria))]
+  .map((categoria, indice) => ({ categoria, indice }))
+  .sort((a, b) => (
+    (prioridadPorCategoria.get(a.categoria) ?? Number.POSITIVE_INFINITY)
+    - (prioridadPorCategoria.get(b.categoria) ?? Number.POSITIVE_INFINITY)
+    || a.indice - b.indice
+  ))
+  .map(({ categoria }) => categoria)

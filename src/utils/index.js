@@ -32,7 +32,18 @@ export {
   normalizarMarcaPago,
   logoDeMedioPago,
   coberturaMediosPago,
+  sugerenciasDeMarcaPago,
 } from './mediosPago.js'
+export {
+  FECHA_VERIFICACION_RELACIONES_FINANCIERAS,
+  RELACIONES_FINANCIERAS,
+  MARCAS_CON_RELACION_FINANCIERA,
+  normalizarRelacionFinanciera,
+  relacionFinancieraDe,
+  buscarRelacionesFinancieras,
+  institucionesSugeridasPorMarca,
+  marcasRelacionadasConInstitucion,
+} from './relacionesFinancieras.js'
 export { TAMANOS_CAMPO, anchoParaLargo } from './tamanos.js'
 export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO } from './modal.js'
 export { GRILLA_DOS_COLUMNAS, GRILLA_DOS_COLUMNAS_COMPACTA, PIE_ACCIONES, PIE_ACCIONES_REVERSO } from './formulario.js'

@@ -1,3 +1,6 @@
+import { AUTORIZACION_ASSETS_FINANCIEROS } from './financialAssets.js'
+import { institucionesSugeridasPorMarca } from './relacionesFinancieras.js'
+
 // Catálogo financiero puro y apto para servidor. Solo declara procedencia,
 // estado, alias y nombres de archivo; los bytes visuales viven exclusivamente
 // en `owncoding-ui/financial` para no inflar `owncoding-ui/utils`.
@@ -39,7 +42,7 @@ export const COOPERATIVAS_PARAGUAY = [
 export const BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY]
 
 const EMPAQUETADO = (archivo, estado = 'oficial', presentacion = {}) => ({ tipo: 'archivo', archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion })
-const CONTENIDO = (archivo) => ({ ...EMPAQUETADO(archivo, 'fallback'), tipo: 'horizontal-contained' })
+const CONTENIDO = (archivo, estado = 'oficial', presentacion = {}) => ({ ...EMPAQUETADO(archivo, estado, presentacion), tipo: 'horizontal-contained' })
 const MONOGRAMA = (estado = 'fallback') => ({ tipo: 'monograma', estado })
 const TEXTO = (estado = 'fallback') => ({ tipo: 'texto', estado })
 
@@ -63,7 +66,7 @@ function entrada({ categoria, alias = [], monograma, color, fuenteOficial, estad
     verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS,
     estado: requierePermiso && !permiso ? 'permiso-pendiente' : estado,
     redistribucion: permiso
-      ? { permitida: true, evidencia: redistribucion.evidencia }
+      ? { ...redistribucion, permitida: true }
       : { permitida: false, evidencia: null },
     variantes: requierePermiso && !permiso
       ? variantesFallback('permiso-pendiente')
@@ -77,139 +80,126 @@ function entrada({ categoria, alias = [], monograma, color, fuenteOficial, estad
 // compatibles; `variantes` es el contrato nuevo y auditable.
 export const LOGOS_BANCOS = {
   'Banco Atlas': entrada({
-    categoria: 'banco', alias: ['atlas'], monograma: 'BA', color: '#174A7E',
-    fuenteOficial: 'https://www.bancoatlas.com.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', alias: ['atlas'], monograma: 'BA', color: '#174A7E', archivo: 'atlas-horizontal-negro.svg',
+    fuenteOficial: 'https://www.bancoatlas.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('atlas-horizontal-negro.svg'), horizontal: EMPAQUETADO('atlas-horizontal-negro.svg') },
   }),
   'Banco Basa': entrada({
-    categoria: 'banco', monograma: 'B', color: '#E94B35', archivo: 'banco-basa.svg',
-    fuenteOficial: 'https://www.bancobasa.com.py/', estado: 'verificado',
-    variantes: {
-      compacto: EMPAQUETADO('banco-basa-compacto.svg'),
-      horizontal: EMPAQUETADO('banco-basa.svg'),
-    },
+    categoria: 'banco', monograma: 'B', color: '#E94B35', archivo: 'basa-horizontal.svg',
+    fuenteOficial: 'https://www.bancobasa.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('basa-compacto.svg'), horizontal: EMPAQUETADO('basa-horizontal.svg') },
   }),
   'Banco Continental': entrada({
     categoria: 'banco', alias: ['continental'], monograma: 'BC', color: '#1C4480', marca: 'continental',
-    fuenteOficial: 'https://www.bancontinental.com.py/', estado: 'fallback', variantes: variantesFallback(),
+    fuenteOficial: 'https://www.bancontinental.com.py/', estado: 'parcial', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('continental-compacto.png'), horizontal: TEXTO('parcial') },
   }),
   'Banco de la Nación Argentina': entrada({
     categoria: 'banco', alias: ['banco nacion', 'banco nación', 'bna'], monograma: 'BNA', color: '#005F5B',
-    archivo: 'banco-nacion-argentina.svg', chip: true,
-    fuenteOficial: 'https://www.bna.com.ar/Downloads/Libro_Banco_Nacion.pdf', estado: 'verificado',
-    variantes: {
-      compacto: EMPAQUETADO('banco-nacion-argentina-compacto.png'),
-      horizontal: EMPAQUETADO('banco-nacion-argentina.svg'),
-    },
+    fuenteOficial: 'https://www.bna.com.ar/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('bna-compacto.ico'), horizontal: EMPAQUETADO('bna-horizontal.svg') },
   }),
   'Banco do Brasil': entrada({
     categoria: 'banco', alias: ['bb', 'brasil'], monograma: 'BB', color: '#173E91',
-    fuenteOficial: 'https://www.bb.com.br/docs/portal/dimac/CCBB-Manual-de-identidade-da-Marca.pdf', estado: 'parcial',
-    variantes: variantesFallback(),
+    fuenteOficial: 'https://www.bb.com.br/docs/portal/dimac/CCBB-Manual-de-identidade-da-Marca.pdf', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
   }),
   'Banco Familiar': entrada({
-    categoria: 'banco', alias: ['familiar'], monograma: 'BF', color: '#004B8D', marca: 'familiar',
-    fuenteOficial: 'https://www.familiar.com.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', alias: ['familiar'], monograma: 'BF', color: '#004B8D', marca: 'familiar', archivo: 'familiar-horizontal.webp',
+    fuenteOficial: 'https://www.familiar.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('familiar-compacto.png'), horizontal: EMPAQUETADO('familiar-horizontal.webp') },
   }),
   'Banco GNB Paraguay': entrada({
-    categoria: 'banco', alias: ['gnb', 'banco gnb'], monograma: 'GNB', color: '#00563F', archivo: 'banco-gnb.svg',
-    fuenteOficial: 'https://www.bancognb.com.py/', estado: 'parcial',
-    variantes: {
-      compacto: CONTENIDO('banco-gnb.svg'),
-      horizontal: EMPAQUETADO('banco-gnb.svg'),
-    },
+    categoria: 'banco', alias: ['gnb', 'banco gnb'], monograma: 'GNB', color: '#00563F',
+    fuenteOficial: 'https://www.bancognb.com.py/', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
   }),
   'Interfisa Banco': entrada({
-    categoria: 'banco', alias: ['interfisa', 'banco interfisa'], monograma: 'IB', color: '#00594C',
-    fuenteOficial: 'https://www.interfisa.com.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', alias: ['interfisa', 'banco interfisa'], monograma: 'IB', color: '#00594C', archivo: 'interfisa-horizontal.png',
+    fuenteOficial: 'https://www.interfisa.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('interfisa-horizontal.png'), horizontal: EMPAQUETADO('interfisa-horizontal.png') },
   }),
   'Itaú': entrada({
-    categoria: 'banco', alias: ['itau', 'banco itau', 'itau paraguay', 'banco itaú paraguay'], monograma: 'I', color: '#EC7000',
-    fuenteOficial: 'https://www.itau.com.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', alias: ['itau', 'banco itau', 'itau paraguay', 'banco itaú paraguay'], monograma: 'I', color: '#EC7000', archivo: 'itau-horizontal.png',
+    fuenteOficial: 'https://www.itau.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('itau-compacto.png'), horizontal: EMPAQUETADO('itau-horizontal.png') },
   }),
   'Banco Nacional de Fomento': entrada({
-    categoria: 'banco', alias: ['bnf', 'nacional de fomento'], monograma: 'BNF', color: '#006A44',
-    fuenteOficial: 'https://www.bnf.gov.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', alias: ['bnf', 'nacional de fomento'], monograma: 'BNF', color: '#006A44', archivo: 'bnf-horizontal.svg',
+    fuenteOficial: 'https://www.bnf.gov.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('bnf-horizontal.svg'), horizontal: EMPAQUETADO('bnf-horizontal.svg') },
   }),
   'Sudameris': entrada({
-    categoria: 'banco', alias: ['banco sudameris'], monograma: 'S', color: '#009A49', archivo: 'sudameris.svg',
-    fuenteOficial: 'https://www.sudameris.com.py/', estado: 'parcial',
+    categoria: 'banco', alias: ['banco sudameris'], monograma: 'S', color: '#FF0000', archivo: 'sudameris-horizontal.svg',
+    fuenteOficial: 'https://www.sudameris.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: { ...CONTENIDO('sudameris.svg'), fondo: '#00583F', padding: true },
-      horizontal: EMPAQUETADO('sudameris.svg', 'oficial', { fondo: '#00583F', padding: true }),
+      compacto: EMPAQUETADO('sudameris-compacto.png', 'oficial', { fondo: '#FF0000', padding: true }),
+      horizontal: EMPAQUETADO('sudameris-horizontal.svg', 'oficial', { fondo: '#FF0000', padding: true }),
     },
   }),
   'Bancop': entrada({
-    categoria: 'banco', monograma: 'B', color: '#006B3C', fuenteOficial: 'https://www.bancop.com.py/',
-    estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', monograma: 'B', color: '#006B3C', archivo: 'bancop-horizontal.png',
+    fuenteOficial: 'https://www.bancop.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('bancop-compacto.png'), horizontal: EMPAQUETADO('bancop-horizontal.png') },
   }),
   'Citi': entrada({
     categoria: 'banco', alias: ['citibank', 'citibank paraguay'], monograma: 'C', color: '#59636E',
     fuenteOficial: 'https://www.citigroup.com/citi/about/countries-and-jurisdictions/paraguay.html',
-    estado: 'permiso-pendiente', variantes: variantesFallback('permiso-pendiente'),
+    estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
   }),
   'Financiera FIC': entrada({
-    categoria: 'financiera', alias: ['fic'], monograma: 'FIC', color: '#C8102E', archivo: 'financiera-fic.png',
-    fuenteOficial: 'https://fic.com.py/', estado: 'parcial',
-    variantes: {
-      compacto: CONTENIDO('financiera-fic.png'),
-      horizontal: EMPAQUETADO('financiera-fic.png'),
-    },
+    categoria: 'financiera', alias: ['fic'], monograma: 'FIC', color: '#C8102E', archivo: 'fic-horizontal.png',
+    fuenteOficial: 'https://fic.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('fic-compacto.png'), horizontal: EMPAQUETADO('fic-horizontal.png') },
   }),
   'Financiera Paraguayo Japonesa': entrada({
-    categoria: 'financiera', alias: ['fpj', 'paraguayo japonesa'], monograma: 'FPJ', color: '#0066A4', archivo: 'financiera-paraguayo-japonesa.png',
-    fuenteOficial: 'https://www.fpj.com.py/', estado: 'verificado',
-    variantes: {
-      compacto: EMPAQUETADO('financiera-paraguayo-japonesa-compacto.png', 'oficial', { fondo: '#0066A4', padding: true }),
-      horizontal: EMPAQUETADO('financiera-paraguayo-japonesa.png', 'oficial', { fondo: '#0066A4', padding: true }),
-    },
+    categoria: 'financiera', alias: ['fpj', 'paraguayo japonesa'], monograma: 'FPJ', color: '#0066A4', archivo: 'fpj-horizontal.png',
+    fuenteOficial: 'https://www.fpj.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('fpj-compacto.png'), horizontal: EMPAQUETADO('fpj-horizontal.png') },
   }),
   'Finlatina': entrada({
-    categoria: 'financiera', alias: ['financiera finlatina'], monograma: 'FL', color: '#24537A',
-    fuenteOficial: 'https://www.finlatina.com.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'financiera', alias: ['financiera finlatina'], monograma: 'FL', color: '#24537A', archivo: 'finlatina-horizontal.png',
+    fuenteOficial: 'https://www.finlatina.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('finlatina-compacto.png'), horizontal: EMPAQUETADO('finlatina-horizontal.png') },
   }),
   'Solar Banco': entrada({
-    categoria: 'banco', alias: ['solar', 'solar ahorro y finanzas'], monograma: 'S', color: '#F36F21', archivo: 'solar-banco.svg',
-    fuenteOficial: 'https://solar.com.py/', estado: 'parcial',
-    variantes: {
-      compacto: CONTENIDO('solar-banco.svg'),
-      horizontal: EMPAQUETADO('solar-banco.svg'),
-    },
+    categoria: 'banco', alias: ['solar', 'solar ahorro y finanzas'], monograma: 'S', color: '#F36F21', archivo: 'solar-horizontal.svg',
+    fuenteOficial: 'https://solar.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('solar-horizontal.svg'), horizontal: EMPAQUETADO('solar-horizontal.svg') },
   }),
   'Tu Financiera': entrada({
-    categoria: 'financiera', alias: ['tu financiera'], monograma: 'TF', color: '#314255',
-    fuenteOficial: 'https://www.bcp.gov.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'financiera', alias: ['tu financiera'], monograma: 'TF', color: '#314255', archivo: 'tu-financiera-horizontal.svg',
+    fuenteOficial: 'https://tu.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('tu-financiera-horizontal.svg'), horizontal: EMPAQUETADO('tu-financiera-horizontal.svg') },
   }),
   'ueno bank': entrada({
-    categoria: 'banco', alias: ['ueno', 'ueno bank', 'Ueno Bank'], monograma: 'U', color: '#7B2CF5', marca: 'ueno', archivo: 'ueno-bank.svg',
-    fuenteOficial: 'https://www.ueno.com.py/', estado: 'verificado',
-    variantes: {
-      compacto: EMPAQUETADO('ueno-bank-compacto.svg'),
-      horizontal: EMPAQUETADO('ueno-bank.svg'),
-    },
+    categoria: 'banco', alias: ['ueno', 'ueno bank', 'Ueno Bank'], monograma: 'U', color: '#7B2CF5', marca: 'ueno', archivo: 'ueno-horizontal.svg',
+    fuenteOficial: 'https://www.ueno.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('ueno-compacto.svg'), horizontal: EMPAQUETADO('ueno-horizontal.svg') },
   }),
   'Zeta Banco': entrada({
-    categoria: 'banco', alias: ['zeta', 'finexpar', 'financiera finexpar'], monograma: 'Z', color: '#2D3340',
-    fuenteOficial: 'https://www.bcp.gov.py/', estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'banco', alias: ['zeta', 'finexpar', 'financiera finexpar'], monograma: 'Z', color: '#2D3340', archivo: 'zeta-horizontal.png',
+    fuenteOficial: 'https://www.zbanco.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('zeta-compacto.png'), horizontal: EMPAQUETADO('zeta-horizontal.png') },
   }),
   'Coomecipar': entrada({
-    categoria: 'cooperativa', monograma: 'CO', color: '#0B6E4F', fuenteOficial: 'https://www.coomecipar.coop.py/',
-    estado: 'fallback', variantes: variantesFallback(),
+    categoria: 'cooperativa', monograma: 'CO', color: '#0B6E4F', archivo: 'coomecipar-horizontal.png', fuenteOficial: 'https://www.coomecipar.coop.py/',
+    estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('coomecipar-compacto.png'), horizontal: EMPAQUETADO('coomecipar-horizontal.png') },
   }),
   'Medalla Milagrosa': entrada({
     categoria: 'cooperativa', alias: ['cooperativa medalla milagrosa'], monograma: 'MM', color: '#6C3FA0',
-    fuenteOficial: 'https://www.medallamilagrosa.coop.py/', estado: 'fallback', variantes: variantesFallback(),
+    fuenteOficial: 'https://www.medalla.coop.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('medalla-compacto.webp'), horizontal: EMPAQUETADO('medalla-horizontal.png') },
   }),
   'San Cristóbal': entrada({
     categoria: 'cooperativa', alias: ['cooperativa san cristobal', 'cooperativa san cristóbal'], monograma: 'SC', color: '#167A54',
-    fuenteOficial: 'https://www.sancristobal.coop.py/', estado: 'fallback', variantes: variantesFallback(),
+    fuenteOficial: 'https://www.sancristobal.coop.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('san-cristobal-compacto.ico'), horizontal: EMPAQUETADO('san-cristobal-horizontal.png') },
   }),
   'Universitaria': entrada({
     categoria: 'cooperativa', alias: ['cooperativa universitaria'], monograma: 'U', color: '#1D4E9E',
-    fuenteOficial: 'https://www.cu.coop.py/', estado: 'fallback', variantes: variantesFallback(),
+    fuenteOficial: 'https://www.universitaria.coop/', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
   }),
 
-  // Compatibilidad histórica: no aparecen en sugerencias y resuelven a la
-  // entidad sucesora en vez de fingir una marca que ya no está activa.
   'Financiera El Comercio': { redirigeA: 'ueno bank', alias: ['el comercio'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   'Visión Banco': { redirigeA: 'ueno bank', alias: ['vision', 'banco vision', 'visión'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   'Banco Río': { redirigeA: 'Banco Continental', alias: ['rio', 'banco rio', 'banco río'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
@@ -330,8 +320,9 @@ export function coberturaBancos(catalogo = BANCOS_PARAGUAY) {
 export function sugerenciasDeBanco(texto, catalogo = BANCOS_PARAGUAY) {
   const termino = normalizarBanco(texto)
   if (!termino) return catalogo
+  const relacionadas = new Set(institucionesSugeridasPorMarca(texto))
   return catalogo.filter((banco) => {
     const busquedas = BUSQUEDAS_POR_BANCO.get(banco) || new Set([normalizarBanco(banco)])
-    return [...busquedas].some((clave) => clave.includes(termino))
+    return relacionadas.has(banco) || [...busquedas].some((clave) => clave.includes(termino))
   })
 }

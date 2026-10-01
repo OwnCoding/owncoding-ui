@@ -12,7 +12,13 @@ import { formatGs } from 'owncoding-ui/utils'
 import { IAError, motorIA } from 'owncoding-ui/ia'
 import { PhoneField, telefonoE164 } from 'owncoding-ui/phone'
 import { BancoLogo, MedioPagoLogo } from 'owncoding-ui/financial'
-import { LOGOS_BANCOS, logoDeBanco } from 'owncoding-ui/financial-metadata'
+import {
+  LOGOS_BANCOS,
+  logoDeBanco,
+  relacionFinancieraDe,
+  sugerenciasDeMarcaPago,
+  type RelacionFinanciera,
+} from 'owncoding-ui/financial-metadata'
 import { compararVersiones } from 'owncoding-ui/app-identity'
 import { crearCorreoTransaccional, renderCorreoHtml } from 'owncoding-ui/email'
 
@@ -24,6 +30,9 @@ compararVersiones('1.0.0', '1.0.1')
 renderCorreoHtml(correo)
 logoDeBanco('ueno bank')
 LOGOS_BANCOS['ueno bank']
+const relacion: RelacionFinanciera | null = relacionFinancieraDe('Mango')
+relacion?.operador.nombreLegal
+sugerenciasDeMarcaPago('Banco Familiar')
 IAError
 motorIA({ esquema: { tipos: [] } })
 

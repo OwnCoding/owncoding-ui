@@ -1,16 +1,18 @@
 # Marcas financieras
 
-Catálogo compartido de instituciones financieras paraguayas y marcas de pago.
-La biblioteca distingue **entidad**, **red**, **procesador**, **producto** y
-**tipo genérico de cuenta**. Por eso `Bancard`, `Dinelco`, `upay` y `uPOS` no
-se guardan como si fueran `CARD` o `TRANSFER`.
+OwnCoding UI diferencia bancos, financieras, cooperativas, redes, procesadores,
+billeteras y productos. `BancoLogo` y `MedioPagoLogo` consumen el mismo
+catálogo puro, mientras `owncoding-ui/financial` adjunta los bytes visuales sin
+obligar a `financial-metadata` o `utils` a importar imágenes.
 
-## Variantes
+## Variantes auténticas
 
-`BancoLogo` y `MedioPagoLogo` aceptan:
-
-- `variante="compacto"`: caja cuadrada con monograma seguro.
-- `variante="horizontal"`: tratamiento textual para encabezados o tarjetas.
+- `compacto`: símbolo, app icon o favicon oficial cuando existe;
+- `horizontal`: wordmark o lockup oficial;
+- si la fuente oficial no ofrece un símbolo separado, el logo completo se
+  contiene dentro de la caja cuadrada con `object-fit: contain`;
+- nunca se recorta un wordmark para fabricar un símbolo ni se crea una letra
+  que aparente ser el logo.
 
 ```jsx
 import { BancoLogo, MedioPagoLogo } from 'owncoding-ui/financial'
@@ -18,70 +20,112 @@ import { BancoLogo, MedioPagoLogo } from 'owncoding-ui/financial'
 <BancoLogo banco="ueno bank" variante="compacto" alto="h-8" />
 <BancoLogo banco="ueno bank" variante="horizontal" alto="h-7" />
 <MedioPagoLogo marca="Bancard" variante="compacto" alto="h-8" />
-<MedioPagoLogo marca="Bancard" variante="horizontal" alto="h-7" />
+<MedioPagoLogo marca="Dinelco" variante="horizontal" alto="h-7" />
 ```
 
-La política de publicación es **fail-closed**. En v0.60.0 ninguna marca de
-terceros tiene una licencia o autorización de redistribución explícita y
-auditable dentro del repositorio. Por eso el paquete, `owncoding-ui/financial`
-y la galería no incluyen bytes de esos logos: todos se muestran mediante un
-monograma compacto o un tratamiento textual horizontal. `baseAssets` se
-conserva únicamente por compatibilidad y no habilita un asset bloqueado.
+Las imágenes usan `<img alt="">` dentro de un contenedor con nombre accesible.
+Con `decorativo`, todo el tratamiento se oculta del árbol de accesibilidad. Si
+un archivo falla al decodificar, el componente muestra el nombre completo, no
+una marca inventada.
 
-## Estados, procedencia y permiso
+## Autorización y procedencia
 
-Cada entrada de `LOGOS_BANCOS` y `MARCAS_MEDIOS_PAGO` declara:
+La publicación se basa en la autorización escrita proporcionada por el usuario
+el **2026-10-01** para estas superficies:
 
-- `categoria` y `alias`;
-- `fuenteOficial` y `verificadoEn`;
-- `estado` general;
-- `redistribucion.permitida` y `redistribucion.evidencia`;
-- `variantes.compacto` y `variantes.horizontal`, cada una con `tipo` y
-  `estado` (`fallback`, `permiso-pendiente` o `producto-padre`).
+1. repositorio público `dariodeoli/owncoding-ui`;
+2. sitio y galería de Own UI / OwnCoding.
 
-`texto` y `monograma` son fallbacks neutrales, no logos oficiales.
+No se describe como licencia abierta ni como permiso universal para terceros.
+Cada archivo de [`financial-assets-manifest.json`](financial-assets-manifest.json)
+registra URL oficial exacta, fecha de recuperación, SHA-256 y alcance. Los SVG
+se rechazan si contienen scripts, handlers, `foreignObject`, entidades, imports
+o referencias externas; se permiten únicamente fragmentos internos y datos de
+imagen embebidos por el propio archivo oficial.
 
 ```js
-import { coberturaBancos, coberturaMediosPago } from 'owncoding-ui/financial-metadata'
+import {
+  ASSET_KEYS_FINANCIEROS,
+  BLOQUEOS_ASSETS_FINANCIEROS,
+  obtenerAssetFinanciero,
+} from 'owncoding-ui/financial'
 
-const bancos = coberturaBancos()
-const pagos = coberturaMediosPago()
+const uenoCompacto = obtenerAssetFinanciero('bancos/ueno-compacto.svg')
 ```
 
-Esos diagnósticos permiten auditar qué variante necesita un kit de marca y una
-autorización antes de reemplazar el fallback. El único modo de publicar bytes
-es registrar `permitida: true` junto con una referencia concreta en
-`evidencia`; un estado `verificado` o una URL oficial no alcanzan.
+`npm run financial-assets:check` verifica manifiesto, hashes, firmas de archivo,
+seguridad SVG, cobertura de variantes y ausencia de assets huérfanos.
 
-`owncoding-ui/utils`, `owncoding-ui/financial-metadata` y
-`owncoding-ui/financial` no contienen data URLs ni bytes de marcas de terceros
-en v0.60.0. Las fuentes oficiales se conservan como procedencia y para una
-auditoría futura; no equivalen a licencia.
+## Instituciones y marcas conectadas
 
-El catálogo garantiza **cobertura de render** para las dos variantes. No afirma
-que todas las entidades tengan un par oficial disponible. Bancard, Dinelco,
-Procard, Citi y cualquier otra marca sin permiso demostrado se presentan con
-fallback neutral. Que un archivo sea auténtico y esté en el sitio oficial no
-autoriza por sí solo a redistribuirlo.
+`RELACIONES_FINANCIERAS` mantiene separados al banco o proveedor y a la marca
+que ve la persona usuaria. La relación no convierte la marca en entidad
+regulada ni permite que el logo de una parte sustituya al de la otra.
 
-## Compatibilidad histórica
+```js
+import {
+  institucionesSugeridasPorMarca,
+  relacionFinancieraDe,
+} from 'owncoding-ui/financial-metadata'
 
-- `Financiera Finexpar` resuelve a `Zeta Banco`.
-- `Financiera El Comercio` y `Visión Banco` resuelven a `ueno bank`.
-- `Banco Río` resuelve a `Banco Continental`.
-- `Pagopar` resuelve a `upay`.
+relacionFinancieraDe('Mango')
+// proveedor: Tu Financiera; operador: Mango Payment S.A.
 
-Los alias no aparecen en los catálogos activos. La resolución ignora acentos y
-mayúsculas. `uPOS` queda modelado como terminal/producto de `upay`, no como un
-procesador independiente.
+institucionesSugeridasPorMarca('App Vaquita')
+// ['Finlatina']
+```
 
-## Regla para agregar assets
+- **Mango**: billetera operada por Mango Payment S.A.; proveedor financiero
+  TU Financiera S.A.E.C.A. No se presenta como banco, financiera o EMPE.
+- **Vaquita**: aplicación operada por MUTECH S.R.L.; proveedor financiero
+  Finlatina S.A. de Finanzas. La relación no afirma propiedad de Finlatina.
+- **EKO**: producto de Banco Familiar S.A.E.C.A., que actúa como institución
+  padre y proveedor.
+- **eCLUB**: cuenta digital operada por ECLUB Paraguay S.A. y respaldada por
+  Interfisa Banco; no se afirma propiedad de Interfisa.
+- **Pik**: marca de cobros para comercios operada por Pont S.A. y asociada con
+  Itaú; no se clasifica como billetera de consumo.
 
-1. Usar una fuente oficial y registrar la URL y la fecha de verificación.
-2. Guardar la licencia o autorización explícita de redistribución como
-   evidencia auditable dentro del repositorio.
-3. Confirmar que el archivo corresponde a la variante declarada.
-4. No crear símbolos recortando wordmarks.
-5. Sin evidencia, usar `permiso-pendiente` y un fallback neutral.
-6. Verificar que SVG no incluya scripts, manejadores de eventos ni imágenes
-   remotas.
+Cada registro incluye fuente y fecha de relación, actividad vigente y operador
+legal. `marcaPadre` se reserva para jerarquías de producto de pago verificadas,
+como `Pagopar` → `upay`.
+
+## Cobertura y bloqueos explícitos
+
+El catálogo usa archivos auténticos para los bancos, financieras, cooperativas
+y medios cuya fuente directa pudo verificarse. Estos IDs permanecen bloqueados
+en esta versión; se muestra su nombre, no una inicial que pueda confundirse con
+una marca:
+
+- banco: `Banco Continental` (`horizontal`), `Banco do Brasil`, `Banco GNB Paraguay`, `Citi`, `Universitaria`;
+- pago: `Visa`, `Mastercard`, `Pix`, `Red Infonet`, `Panal`;
+- producto: `uPOS` no tiene una marca independiente verificada; se conserva
+  explícitamente como producto de `upay`.
+
+Los motivos exactos y el estado de cada variante viven en
+`BLOQUEOS_ASSETS_FINANCIEROS` y en el manifiesto. Un sitio bloqueado o un kit
+restringido nunca se reemplaza con un mirror de terceros.
+
+## Correcciones de catálogo
+
+- `Pagopar` está activo y modelado como producto de `upay`; no es un alias
+  histórico.
+- `uPOS` es un producto de `upay`, no un procesador con marca independiente.
+- Dinelco usa su identidad oficial púrpura/blanca actual.
+- Sudameris usa el campo rojo `#FF0000` definido en su
+  [guía oficial](https://www.sudameris.com.py/Descargar-arte-de-marca) para el
+  lockup blanco; no se infiere un color desde otros productos.
+- Las URLs oficiales son `https://www.medalla.coop.py/`,
+  `https://www.universitaria.coop/`, `https://tu.com.py/` y
+  `https://www.zbanco.com.py/`.
+- `Financiera Finexpar` resuelve a `Zeta Banco`; `Financiera El Comercio` y
+  `Visión Banco` a `ueno bank`; `Banco Río` a `Banco Continental`.
+
+## Regla para agregar o actualizar un asset
+
+1. Descargar solo del propietario oficial.
+2. Registrar URL exacta, fecha, SHA-256 y alcance de autorización.
+3. Conservar colores, geometría y `viewBox`; sanitizar sin redibujar.
+4. Referenciar el archivo desde al menos una variante real.
+5. Si no se puede verificar el archivo oficial, registrar el ID como bloqueo y
+   no usar mirrors, hotlinks, iniciales ni reconstrucciones.

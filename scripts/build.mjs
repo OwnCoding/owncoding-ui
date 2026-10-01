@@ -17,7 +17,7 @@ const opciones = {
   jsx: 'automatic',
   sourcemap: true,
   external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'qrcode', 'libphonenumber-js/min'],
-  loader: { '.svg': 'dataurl', '.png': 'dataurl' },
+  loader: { '.svg': 'dataurl', '.png': 'dataurl', '.webp': 'dataurl', '.ico': 'dataurl' },
   logLevel: 'info',
 }
 
