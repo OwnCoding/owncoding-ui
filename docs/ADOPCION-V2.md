@@ -155,6 +155,11 @@ verde y el inventario de duplicados en 0 (paso 8).
 - [ ] **Pase de compactación de escritorio** hecho (`REGLAS.md` §17): encabezado
       y barra de acciones de una fila, KPIs de 112–140 px, ritmo 12–16/16–20/16–24
       y capturas 1440×900 antes/después.
+- [ ] **«Carga con IA»** adoptada (`REGLAS.md` §18): `EsquemaIA` con los
+      tipos/campos de la app + callbacks `analizar`/`crear` (los registros se
+      crean con los endpoints existentes), endpoint `GET`/`POST` con las guardas
+      (el texto es dato, JSON estricto, no se persiste) y el proveedor de IA
+      registrado como encargado (Ley 7593/2025).
 - [ ] Bloque local v2 retirado; inventario de duplicados en 0.
 - [ ] Íconos: todo nombre usado existe en `ICONOS` (los desconocidos no dibujan).
 - [ ] Puentes sin lógica para lo migrado; lo divergente, publicado primero.

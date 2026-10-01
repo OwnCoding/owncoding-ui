@@ -4,6 +4,37 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.58.0 — 2026-10-01
+
+- **«Carga con IA» (#11):** asistente reutilizable para cargar datos desde
+  texto libre con **confirmación humana obligatoria**. `BotonCargaIA` (topbar,
+  ✨ con tooltip) y `DialogoCargaIA` (entrada con contador, estados
+  «sin configurar»/analizando/error, **preview editable por tarjetas con
+  avisos**, incluir/descartar, «Crear todo» y resumen creados/errores). El
+  preview se dibuja desde un **esquema declarativo** (`EsquemaIA`: tipos y
+  campos `texto | numero | moneda | fecha | select` con obligatorio/ayuda) y la
+  app inyecta `analizar(texto, tipos)` y `crear(registros)`; el paquete no hace
+  `fetch`, no conoce endpoints ni proveedores y **no persiste el texto pegado**.
+- **Contrato puro:** `utils/cargaIA.js` exporta los límites por defecto
+  **20.000** caracteres (`IA_TEXTO_MAX`) y **25** registros por tipo
+  (`IA_REGISTROS_MAX`), la referencia de rate-limit (`IA_RATE_LIMIT` = 10 / 15
+  min), tokens/timeout, los rótulos (`IA_BOTON`, `IA_TOOLTIP`, `IA_TITULO`) y
+  los normalizadores (`normalizarAnalisisIA`, `validarRegistrosIA`,
+  `registrosIncluidosIA`, `normalizarResultadoIA`, …), también por
+  `owncoding-ui/utils`.
+- **Reglas (`REGLAS.md` §18):** esquema y callbacks, contrato del endpoint
+  (`GET` estado/tipos, `POST` texto) con las guardas (el texto es **dato**, JSON
+  estricto, solo se manda el texto, **no se persiste**, el análisis no escribe),
+  privacidad (**Ley 7593/2025**: proveedor **encargado**, aviso y **rate-limit
+  por organización**) y permisos (mismas capacidades que crear cada tipo; si el
+  rol no puede ninguno, el asistente no se ofrece). Referencias sin duplicar:
+  §1 (fuente única por tipo de dato, #10) y `REGLAS-ECOSISTEMA.md` §12.
+  Checklist de adopción en `ADOPCION-V2.md` §10.
+- Tests: contrato puro, interacción (nada se crea sin confirmar, obligatorios,
+  descartar, sin configurar, errores, resultado sin conteo) y guardas de fuente;
+  tipos publicados en ambos subpaths.
+- Referencias: LedBox `#120` (rama `feat/plataforma`) y Scale OS `#117`/`#118`.
+
 ## v0.55.0 — 2026-09-30
 
 - **Fuente única por tipo de dato (#10):** `REGLAS.md` §1 suma «Un componente

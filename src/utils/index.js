@@ -236,6 +236,28 @@ export { rutaDeAviso, payloadPush, enHorarioSilencioso } from './avisos.js'
 export { partesVersion, compararVersiones, hayVersionNueva } from './version.js'
 export { QR_OPCIONES, qrDataUrl } from './qr.js'
 
+// ── «Carga con IA»: contrato puro (#11) ─────────────────────────────────────
+export {
+  IA_TEXTO_MAX,
+  IA_REGISTROS_MAX,
+  IA_RATE_LIMIT,
+  IA_TOKENS_MAX,
+  IA_TIMEOUT_MS,
+  IA_BOTON,
+  IA_TOOLTIP,
+  IA_TITULO,
+  CAMPOS_IA,
+  tipoDeEsquemaIA,
+  campoDeTipoIA,
+  opcionesDeCampoIA,
+  tituloDeRegistroIA,
+  valorVacioIA,
+  normalizarAnalisisIA,
+  registrosIncluidosIA,
+  validarRegistrosIA,
+  normalizarResultadoIA,
+} from './cargaIA.js'
+
 export {
   normalizarPersonaTexto,
   etiquetaPersona,

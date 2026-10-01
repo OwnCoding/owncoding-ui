@@ -2370,6 +2370,143 @@ async function qrDataUrl(valor, { ancho = QR_OPCIONES.ancho, nivel = QR_OPCIONES
   }
 }
 
+// src/utils/cargaIA.js
+var IA_TEXTO_MAX = 2e4;
+var IA_REGISTROS_MAX = 25;
+var IA_RATE_LIMIT = 10;
+var IA_TOKENS_MAX = 4e3;
+var IA_TIMEOUT_MS = 3e4;
+var IA_BOTON = "Carga con IA";
+var IA_TOOLTIP = "Carga con IA \xB7 peg\xE1 un texto y revis\xE1 antes de crear";
+var IA_TITULO = "Carga con IA";
+var CAMPOS_IA = ["texto", "numero", "moneda", "fecha", "select"];
+var textoDe = (valor) => (valor === null || valor === void 0 ? "" : String(valor)).trim();
+function tipoDeEsquemaIA(esquema, tipoId) {
+  return (esquema?.tipos ?? []).find((tipo) => tipo?.id === tipoId) ?? null;
+}
+function campoDeTipoIA(tipo, campoId) {
+  return (tipo?.campos ?? []).find((campo) => campo?.id === campoId) ?? null;
+}
+function campoPrincipal(tipo) {
+  const campos = tipo?.campos ?? [];
+  return campos.find((campo) => campo?.obligatorio) ?? campos[0] ?? null;
+}
+function valorVacioIA(valor) {
+  if (valor === null || valor === void 0) return true;
+  if (typeof valor === "number") return !Number.isFinite(valor);
+  return String(valor).trim() === "";
+}
+function tituloDeRegistroIA(registro, tipo) {
+  const propio = textoDe(registro?.titulo);
+  if (propio) return propio;
+  const principal = campoPrincipal(tipo);
+  if (principal) {
+    const valor = textoDe(registro?.valores?.[principal.id]);
+    if (valor) return valor;
+  }
+  return tipo?.label || textoDe(registro?.tipo) || "Registro";
+}
+function opcionesDeCampoIA(campo) {
+  return (campo?.opciones ?? []).map(
+    (opcion) => typeof opcion === "string" ? { value: opcion, label: opcion } : { value: String(opcion?.value ?? ""), label: textoDe(opcion?.label) || String(opcion?.value ?? "") }
+  );
+}
+function registrosCrudosIA(analisis, esquema) {
+  if (Array.isArray(analisis?.registros)) return analisis.registros;
+  return (esquema?.tipos ?? []).flatMap(
+    (tipo) => Array.isArray(analisis?.[tipo.id]) ? analisis[tipo.id].map((registro) => ({
+      ...registro,
+      tipo: registro?.tipo || tipo.id,
+      valores: registro?.valores && typeof registro.valores === "object" ? registro.valores : registro
+    })) : []
+  );
+}
+function normalizarAnalisisIA(analisis, esquema, opciones = {}) {
+  const maxRegistros = Number.isFinite(Number(opciones.maxRegistros)) && Number(opciones.maxRegistros) > 0 ? Math.floor(Number(opciones.maxRegistros)) : IA_REGISTROS_MAX;
+  const tipos = esquema?.tipos ?? [];
+  const idsValidos = new Set(tipos.map((tipo) => tipo?.id));
+  const registros = [];
+  const usados = /* @__PURE__ */ new Set();
+  const avisos = Array.isArray(analisis?.avisos) ? analisis.avisos.map(textoDe).filter(Boolean) : [];
+  const contador = /* @__PURE__ */ new Map();
+  let descartados = 0;
+  let recortados = false;
+  for (const crudo of registrosCrudosIA(analisis, esquema)) {
+    const tipoId = textoDe(crudo?.tipo);
+    if (!idsValidos.has(tipoId)) {
+      descartados += 1;
+      continue;
+    }
+    const tipo = tipoDeEsquemaIA(esquema, tipoId);
+    const cantidad = (contador.get(tipoId) ?? 0) + 1;
+    contador.set(tipoId, cantidad);
+    if (cantidad > maxRegistros) {
+      recortados = true;
+      continue;
+    }
+    const valores = {};
+    for (const campo of tipo?.campos ?? []) {
+      const valor = crudo?.valores?.[campo.id];
+      valores[campo.id] = valor === void 0 ? null : valor;
+    }
+    let id = textoDe(crudo?.id) || textoDe(crudo?.clave);
+    if (!id || usados.has(id)) {
+      let numero = cantidad;
+      id = `ia-${tipoId}-${numero}`;
+      while (usados.has(id)) {
+        numero += 1;
+        id = `ia-${tipoId}-${numero}`;
+      }
+    }
+    usados.add(id);
+    registros.push({
+      id,
+      tipo: tipoId,
+      valores,
+      incluir: crudo?.incluir === void 0 ? true : Boolean(crudo.incluir),
+      titulo: textoDe(crudo?.titulo) || void 0,
+      avisos: Array.isArray(crudo?.avisos) ? crudo.avisos.map(textoDe).filter(Boolean) : []
+    });
+  }
+  if (descartados > 0) {
+    avisos.push(`Descartamos ${descartados} registro${descartados === 1 ? "" : "s"} sin tipo conocido.`);
+  }
+  if (recortados) avisos.push(`Recortamos la vista previa a ${maxRegistros} registros por tipo.`);
+  return { registros, avisos };
+}
+function registrosIncluidosIA(registros) {
+  return (registros ?? []).filter((registro) => registro?.incluir);
+}
+function validarRegistrosIA(registros, esquema) {
+  const errores = /* @__PURE__ */ new Map();
+  for (const registro of registros ?? []) {
+    if (!registro?.incluir) continue;
+    const tipo = tipoDeEsquemaIA(esquema, registro.tipo);
+    const porCampo = {};
+    for (const campo of tipo?.campos ?? []) {
+      if (!campo?.obligatorio) continue;
+      if (valorVacioIA(registro.valores?.[campo.id])) {
+        porCampo[campo.id] = "Complet\xE1 este campo para crear el registro.";
+      }
+    }
+    if (Object.keys(porCampo).length > 0) errores.set(registro.id, porCampo);
+  }
+  return { valido: errores.size === 0, errores };
+}
+function normalizarResultadoIA(resultado, opciones = {}) {
+  const errores = Array.isArray(resultado?.errores) ? resultado.errores.map(textoDe).filter(Boolean) : [];
+  const advertencias = Array.isArray(resultado?.advertencias) ? resultado.advertencias.map(textoDe).filter(Boolean) : [];
+  const bruto = resultado?.creados;
+  const numero = bruto === void 0 || bruto === null || bruto === "" ? null : Number(bruto);
+  const total = Number.isFinite(Number(opciones.total)) ? Number(opciones.total) : null;
+  return {
+    creados: numero !== null && Number.isFinite(numero) ? Math.max(0, numero) : null,
+    total,
+    errores,
+    advertencias
+  };
+}
+
 // src/utils/personas.js
 function normalizarPersonaTexto(texto) {
   return String(texto ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -2426,6 +2563,7 @@ export {
   AVISO_REFRESCO,
   BANCOS_PARAGUAY,
   CAMPOS_DISPOSITIVO,
+  CAMPOS_IA,
   CAPACIDADES_IPHONE,
   CATEGORIAS_ACCESORIOS,
   CATEGORIAS_PRODUCTO,
@@ -2464,6 +2602,14 @@ export {
   GRADOS_CONDICION,
   GRILLA_DOS_COLUMNAS,
   GRILLA_DOS_COLUMNAS_COMPACTA,
+  IA_BOTON,
+  IA_RATE_LIMIT,
+  IA_REGISTROS_MAX,
+  IA_TEXTO_MAX,
+  IA_TIMEOUT_MS,
+  IA_TITULO,
+  IA_TOKENS_MAX,
+  IA_TOOLTIP,
   ICONO_CATEGORIA,
   INCIDENCIAS,
   LIMITE_MONTO_ALMACENABLE,
@@ -2513,6 +2659,7 @@ export {
   buscarCiudad,
   buscarDispositivo,
   buscarEnCatalogo,
+  campoDeTipoIA,
   caretTrasDigitos,
   categoriaDe,
   chipDeTono,
@@ -2625,15 +2772,18 @@ export {
   motivoDeDiagnostico,
   nombreDeDispositivo,
   nombrePartes,
+  normalizarAnalisisIA,
   normalizarBanco,
   normalizarBusqueda,
   normalizarCategoria,
   normalizarMontoInput,
   normalizarNombre,
   normalizarPersonaTexto,
+  normalizarResultadoIA,
   normalizarSeriales,
   normalizarTelefono,
   normalizeTaxId,
+  opcionesDeCampoIA,
   opcionesDependiente,
   ordenDePrioridad,
   ordenarPersonas,
@@ -2659,6 +2809,7 @@ export {
   rangoSemana,
   registrarUsoPersona,
   registroConsentimiento,
+  registrosIncluidosIA,
   repartirLinea,
   resumenPresencia,
   rutaDeAviso,
@@ -2676,6 +2827,8 @@ export {
   telefonoVisible,
   textoDeTono,
   textoVerificacion,
+  tipoDeEsquemaIA,
+  tituloDeRegistroIA,
   tonoBateria,
   tonoCanonico,
   tonoCompra,
@@ -2687,6 +2840,8 @@ export {
   tonoRevision,
   tonoVencimiento,
   ultimos4,
+  validarRegistrosIA,
+  valorVacioIA,
   whatsappUrl
 };
 //# sourceMappingURL=utils.js.map

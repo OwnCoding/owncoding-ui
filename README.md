@@ -249,6 +249,12 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   (casilla explícita con versión visible y **nunca pre-tildada**), más
   `registroConsentimiento` (registro de versión/fecha/canal para la aceptación
   y la revocación). Reglas por app en `docs/REGLAS-ECOSISTEMA.md` §12.
+- **Carga con IA (#11):** `BotonCargaIA` (topbar, ✨ y tooltip) y
+  `DialogoCargaIA` (pegado con contador, revisión editable por tarjetas con
+  avisos, incluir/descartar, «Crear todo» con confirmación y resumen). La app
+  pasa un **esquema declarativo** (`EsquemaIA` con tipos y campos) y los
+  callbacks `analizar`/`crear`; el paquete no hace `fetch`, no conoce
+  proveedores y no persiste el texto. Reglas: `docs/REGLAS.md` §18.
 - **Acciones y contenedores:** `Button`, `IconAction` (con `size="touch"` para
   el área táctil de móvil: 36 px de dibujo + 44 de toque con `.toque-44`),
   `Card`, `Stat`,
@@ -560,6 +566,59 @@ Props: `hechas`, `total`, `vencidas`, `riesgo`, `sustantivo`, `porcentaje`,
 **Qué NO hace:** no cuenta tareas ni conoce fechas; los números llegan
 calculados por la pantalla. Sin tareas no dibuja una barra en 0 %: dice «Sin
 datos».
+
+## «Carga con IA» — asistente declarativo (#11)
+
+**Para qué sirve:** cargar datos desde texto libre sin planillas: la persona
+pega un mensaje o una lista, la IA detecta los registros y el diálogo muestra
+una **vista previa editable por tarjetas con avisos**; **nada se crea sin la
+confirmación** («Crear todo»). La app describe sus tipos con un **esquema
+declarativo** e inyecta solo lo que conoce:
+
+```jsx
+const esquema = {
+  tipos: [
+    {
+      id: 'clientes', label: 'Clientes', singular: 'cliente', plural: 'clientes',
+      campos: [
+        { id: 'nombre', label: 'Nombre', tipo: 'texto', obligatorio: true },
+        { id: 'telefono', label: 'Teléfono', tipo: 'texto', ayuda: '0981 123 456' },
+        { id: 'saldo', label: 'Saldo', tipo: 'moneda' },
+        { id: 'alta', label: 'Alta', tipo: 'fecha' },
+        { id: 'tipo', label: 'Tipo', tipo: 'select', opciones: [{ value: 'FINAL', label: 'Cliente final' }] },
+      ],
+    },
+  ],
+}
+
+const [abierto, setAbierto] = useState(false)
+
+<>
+  <BotonCargaIA onAbrir={() => setAbierto(true)} />
+  <DialogoCargaIA
+    abierto={abierto}
+    onCerrar={() => setAbierto(false)}
+    esquema={esquema}
+    consultarConfig={() => api.get('/api/ia/carga')} // → { configurada, modelo, tipos }
+    analizar={(texto, tipos) => api.post('/api/ia/carga', { texto, tipos })} // → { registros, avisos }
+    crear={(registros) => api.post('/api/ia/crear', { registros })} // → { creados, errores }
+  />
+</>
+```
+
+Props del diálogo: `abierto`, `onCerrar`, `esquema`, `analizar`, `crear`,
+`consultarConfig` (opcional: sin él se asume configurado), `enlacePrivacidad`,
+`titulo`, `placeholder`, `maxTexto` (20.000) y `maxRegistros` (25).
+`BotonCargaIA` recibe `onAbrir`, `texto` y `tooltip`; el diálogo se monta recién
+al abrirlo.
+
+El contrato puro (`EsquemaIA`, `AnalisisIA`, `RegistroIA`,
+`normalizarAnalisisIA`, `validarRegistrosIA`, `IA_TEXTO_MAX`, `IA_REGISTROS_MAX`,
+`IA_RATE_LIMIT`, …) vive en `utils/cargaIA.js` y sale por `owncoding-ui` y por
+`owncoding-ui/utils`. **Qué NO hace:** no hace `fetch`, no conoce endpoints,
+permisos ni proveedores y no persiste el texto pegado; los registros se crean
+con los endpoints de la app (mismos permisos, aislamiento y auditoría). Reglas:
+`docs/REGLAS.md` §18.
 
 ## Formatos, estados, íconos y tipos (cierre del piloto de LedBox)
 
