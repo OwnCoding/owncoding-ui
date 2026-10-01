@@ -200,8 +200,9 @@ correo y demos; el encuadre legal de cada negocio lo valida su asesoría.
   y contrato; no hay transferencias sorpresa.
 - **Proveedores de IA:** cuando una app usa «Carga con IA», el proveedor entra
   al inventario como **encargado** (finalidad: interpretar el texto pegado; el
-  texto **no se persiste**); el aviso, el rate-limit por organización y el
-  contrato están en `docs/REGLAS.md` **§18**.
+  texto **no se persiste**); el aviso —con el recordatorio de **no pegar datos
+  sensibles**—, el rate-limit por organización y el contrato están en
+  `docs/REGLAS.md` **§18**.
 - **Retención por tipo con plazo definido** (comunicaciones hasta la
   revocación, operación mientras dure la relación, logs acotados…); al vencer
   se **elimina o anonimiza** de forma verificable, también en respaldos y en

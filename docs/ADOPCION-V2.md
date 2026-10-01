@@ -162,6 +162,12 @@ verde y el inventario de duplicados en 0 (paso 8).
       `IA_API_KEY`/`IA_MODELO`/`IA_BASE_URL`, las guardas (el texto es dato,
       JSON estricto, no se persiste), **rate-limit por organización** y el
       proveedor de IA registrado como encargado (Ley 7593/2025).
+- [ ] **Playbook de la Carga con IA** cubierto (`REGLAS.md` §18, #15): preview
+      **carrito editable** (agregar/editar/duplicar/quitar, sin reescribir el
+      maestro), errores esperables con su manejo (alucinaciones «no está en el
+      texto», moneda ajena, fechas resueltas, «a crédito» como plazo,
+      duplicados con %), matching con **preselección 90/60–89/<60**, imágenes
+      con fallback y cobros con **cuentas reales** (parcial/seña y división).
 - [ ] Bloque local v2 retirado; inventario de duplicados en 0.
 - [ ] Íconos: todo nombre usado existe en `ICONOS` (los desconocidos no dibujan).
 - [ ] Puentes sin lógica para lo migrado; lo divergente, publicado primero.

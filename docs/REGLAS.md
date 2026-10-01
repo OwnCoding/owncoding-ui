@@ -1013,7 +1013,7 @@ Esto es **densidad visual**, no rendimiento: §15.11 (listas acotadas o
 virtualizadas) sigue vigente y compactar no justifica recortar datos ni
 funciones.
 
-## 18. «Carga con IA» (#11/#12)
+## 18. «Carga con IA» (#11/#12/#15)
 
 Asistente **opcional** para cargar datos desde **texto libre**: la persona pega
 texto, la IA detecta registros y **nada se crea sin confirmación** suya. La
@@ -1022,7 +1022,9 @@ diferido), `BotonCargaIA` (topbar, ✨ con tooltip), `DialogoCargaIA` (entrada,
 revisión y resultado), el contrato puro en `utils/cargaIA.js` y el **motor
 server** en `owncoding-ui/ia`. No duplica reglas: los campos salen de la
 **fuente única por tipo de dato** (§1) y la privacidad se apoya en la **§12 de
-`docs/REGLAS-ECOSISTEMA.md`**.
+`docs/REGLAS-ECOSISTEMA.md`**. El **playbook** de abajo (#15) fija el carrito
+editable, los errores esperables y el matching, aprendidos en EventOS
+(`#120`–`#129`).
 
 ### Esquema y callbacks (lo que pasa la app)
 
@@ -1057,6 +1059,71 @@ server** en `owncoding-ui/ia`. No duplica reglas: los campos salen de la
   chequear»), entrada, analizando, error con reintento, **revisión editable por
   tarjetas con avisos** (incluir/descartar, obligatorios visibles) y resultado
   (creados/errores/advertencias). El diálogo se monta recién al abrirlo.
+
+### La persona confirma: carrito editable (#15)
+
+- El asistente **propone y la persona decide**: el preview es un **carrito
+  editable**, la misma idea que una venta. Se puede **agregar** un registro a
+  mano, **editar cualquier campo**, **duplicar** y **quitar**; nada se aplica
+  hasta la confirmación final («Crear todo» / «Aplicar»).
+- **Editar no reescribe el maestro:** cambiar un precio (o cualquier dato) en
+  el carrito ajusta **solo esa fila**; actualizar el producto o cliente
+  existente es una **acción explícita** («Actualizar el producto») y nunca un
+  efecto colateral de la revisión.
+- La IA **acelera** la carga, no la reemplaza: sin detecciones, la persona
+  sigue cargando a mano en el mismo carrito (paridad demo, §15.2).
+
+### Errores esperables y su manejo (#15)
+
+| Error esperable | Cómo lo maneja el asistente |
+| --- | --- |
+| Typos, espacios y mayúsculas («noe ces» ↔ «NoeCes») | Compara con la clave normalizada (sin acentos ni mayúsculas, espacios colapsados o quitados) y tolera 1–2 letras (distancia de edición) en nombres cortos; los umbrales no bajan. |
+| **Alucinaciones** (campos que no están en el texto) | Cada escalar se **verifica contra el texto pegado** y se marca «no está en el texto»; no se aplica hasta que la persona lo complete o lo confirme. |
+| Moneda extranjera (US$, R$, cotizaciones) | No se interpreta como moneda local ni se convierte sola: se muestra el monto con su moneda y se pide carga manual (o una cotización explícita de la app). |
+| Fechas relativas o sin año («mañana», «jueves», «3/10») | Se resuelven contra la fecha del análisis y **se muestran resueltas** («vie 3/10/2026»); la ambigüedad se avisa y se confirma. |
+| «A crédito N días» | Es un **plazo**, no un cobro: se convierte en vencimiento (+N días) y nunca en referencia ni fecha de pago. |
+| Duplicados y coincidencias ambiguas (dos «María») | Se listan los candidatos **con su porcentaje** y se elige; nunca se crea a ciegas ni se duplica un registro con candidato claro. |
+| Reintentos o doble clic | El alta es **idempotente**: la misma clave no se aplica dos veces y el guardado bloquea el doble envío (§2 ter). |
+| Proveedor caído o respuesta inválida | **Nada se aplica**: error claro con reintento y el texto pegado sigue en pantalla para volver a analizar. |
+| Texto largo o muchos registros | Límites con aviso (20.000 / 25) y recorte visible; nunca un análisis parcial silencioso. |
+| Texto con órdenes («ignorá tus reglas…») | Es **dato, no instrucción** (anti-inyección del motor): no cambia el esquema, los límites ni las acciones permitidas. |
+
+### Matching y preselección (#15)
+
+- **Vincular antes que crear:** cada registro detectado se compara primero con
+  la cartera de la empresa (clientes por nombre/empresa/RUC/teléfono; productos
+  por nombre/SKU/categoría) con normalización + fuzzy; el preview muestra
+  «Existente: … (N %) → Vincular» y «Crear nuevo».
+- **Preselección por confianza** (siempre cambiable, con «elegir otro»):
+  **≥90 %** deja elegido *Vincular*; **60–89 %** deja elegido el **mejor
+  candidato**; **<60 %** deja elegido *Crear nuevo*. Nunca un estado bloqueante
+  «— Elegí —»: el default es una propuesta y el porcentaje se muestra.
+- **Acciones encadenadas:** al resolver el cliente, las acciones que lo
+  referencian (cobro, evento, presupuesto) lo **adoptan sin volver a
+  preguntar**; si el cliente cambia, se actualizan. La confirmación final del
+  lote sigue existiendo.
+- Si la cartera está vacía, el preview **lo dice** («no hay productos
+  cargados») en vez de ofrecer «crear nuevo» a ciegas.
+
+### Imágenes para confirmar (#15)
+
+- El preview puede mostrar la **foto/miniatura del producto** y el
+  **logo/avatar del cliente** (caja uniforme, fallback al ícono del producto o
+  a las iniciales con `PersonaChip`/`Avatar`; nunca un cuadro roto).
+- La imagen **confirma el match de un vistazo**; no reemplaza el porcentaje ni
+  la posibilidad de cambiar el candidato.
+
+### Pagos: parciales, seña y división (#15)
+
+- Los cobros usan **métodos/cuentas reales de la empresa** (banco, número,
+  alias de tesorería); **nunca un selector vacío**: sin cuentas configuradas la
+  acción no se ofrece y la pantalla guía a cargarlas.
+- **Parcial/seña:** el monto cobrado puede ser menor al total y deja el saldo
+  pendiente con su vencimiento; el total no se marca «cobrado».
+- **Dividir un cobro** en N partes (montos y fechas) se aplica como pagos/plan
+  de la app, todo dentro del mismo carrito y con una sola confirmación.
+- Un cobro detectado («me pagó X») exige **cliente resuelto**: nunca se
+  registra contra un «pendiente de vincular».
 
 ### Contrato del endpoint de la app
 
@@ -1098,17 +1165,33 @@ server** en `owncoding-ui/ia`. No duplica reglas: los campos salen de la
 
 - **Ley 7593/2025:** el proveedor de IA es **encargado** —se registra en el
   inventario de la app (§12.5 de `REGLAS-ECOSISTEMA.md`) y se menciona en la
-  política—; el diálogo avisa que se envía el texto y enlaza la política
-  (`enlacePrivacidad`). **Rate-limit por organización** en el endpoint
-  (referencia: `IA_RATE_LIMIT` = 10 llamadas / 15 min) y auditoría de la
-  transferencia.
+  política—; el diálogo avisa que se envía el texto, **recuerda no pegar datos
+  sensibles** (salud, biometría, menores o financieros que no hagan falta) y
+  enlaza la política (`enlacePrivacidad`). **Rate-limit por organización** en
+  el endpoint (referencia: `IA_RATE_LIMIT` = 10 llamadas / 15 min) y auditoría
+  de la transferencia.
 - **Permisos:** los tipos que ofrece `GET` son los que el rol puede crear
   (mismas capacidades que los endpoints de alta). Si el rol no puede crear
   ninguno, **el asistente no se ofrece** (la app no monta el botón) y el
   diálogo tampoco deja confirmar.
 
-**Referencia real:** LedBox `#120` (rama `feat/plataforma`) y Scale OS
-`#117`/`#118`. Adopción: checklist de `docs/ADOPCION-V2.md` §10.
+**Checklist de adopción por app (#15):**
+
+- [ ] Preview **carrito editable**: agregar, editar, duplicar y quitar; editar
+      un precio no reescribe el maestro sin «actualizar el producto».
+- [ ] Errores esperables cubiertos (tabla de arriba): escalares «no está en el
+      texto», moneda extranjera, fechas resueltas, «a crédito» como plazo,
+      duplicados con % y elección, idempotencia y proveedor caído sin aplicar.
+- [ ] Matching con normalización + typos y **preselección** por umbrales
+      90 / 60–89 / <60, siempre cambiable.
+- [ ] Imágenes de confirmación (producto y cliente) con fallback.
+- [ ] Cobros con **cuentas reales**, parcial/seña y división; cliente resuelto
+      antes de registrar.
+- [ ] Proveedor encargado + aviso de datos sensibles; solo el texto pegado.
+
+**Referencia real:** LedBox `#120` y los aprendizajes de `#122`–`#129` (playbook
+#15); Scale OS `#117`/`#118`. Adopción: checklist de `docs/ADOPCION-V2.md` §10
+y el checklist de arriba.
 
 ## 19. Fronteras de paquete, control y compatibilidad
 

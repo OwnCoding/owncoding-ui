@@ -6,7 +6,20 @@ documenta acá y en el README).
 
 ## Sin publicar
 
-- Sin cambios todavía.
+- **«Carga con IA» — playbook de errores esperables y carrito editable (#15):**
+  `REGLAS.md` §18 suma el **carrito editable** (agregar/editar/duplicar/quitar;
+  editar un precio **no** reescribe el maestro sin «actualizar el producto»),
+  la tabla de **errores esperables con su manejo** (typos/espacios,
+  alucinaciones marcadas «no está en el texto», moneda extranjera, fechas
+  resueltas, «a crédito N días» como plazo, duplicados/ambiguos con %,
+  idempotencia y proveedor caído sin aplicar nada), **matching con
+  preselección** por umbrales ≥90 / 60–89 / <60 (siempre cambiable),
+  **imágenes de confirmación** (producto/cliente con fallback), **pagos**
+  parciales/seña y división con **cuentas reales de la empresa**, recordatorio
+  de **datos sensibles** (Ley 7593/2025) y el **checklist de adopción por
+  app**. `ADOPCION-V2.md` §10 suma el ítem del playbook y
+  `REGLAS-ECOSISTEMA.md` §12.5 el aviso de datos sensibles. Docs-only: sin
+  cambios de API ni de componentes.
 
 ## v0.60.0 — 2026-10-01 (preparada, no publicada)
 
