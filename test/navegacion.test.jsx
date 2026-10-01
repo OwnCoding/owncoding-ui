@@ -163,3 +163,42 @@ describe('BarraInferior', () => {
     expect(renderToStaticMarkup(<BarraInferior />)).toBe('')
   })
 })
+
+describe('NavLateral con subítems (#107)', () => {
+  const grupos = [
+    {
+      titulo: 'Configuración',
+      items: [
+        {
+          id: 'micrositio',
+          label: 'Mi página',
+          icono: 'image',
+          hijos: [
+            { id: 'personalizacion', label: 'Personalización', icono: 'sliders' },
+            { id: 'micrositio-contenido', label: 'Contenido', icono: 'image' },
+          ],
+        },
+      ],
+    },
+  ]
+
+  test('los hijos se renderizan indentados y el activo queda en el hijo', () => {
+    const html = renderToStaticMarkup(<NavLateral grupos={grupos} activeId="personalizacion" />)
+    expect(html).toContain('Personalización')
+    expect(html).toContain('Contenido')
+    expect(html).toContain('pl-7')
+    expect(html.match(/aria-current="page"/g)).toHaveLength(1)
+    // El `aria-current` va antes del rótulo del hijo activo (y después del padre).
+    const activo = html.indexOf('aria-current="page"')
+    const padre = html.indexOf('Mi página')
+    const hijo = html.indexOf('Personalización')
+    expect(activo).toBeGreaterThan(padre)
+    expect(activo).toBeLessThan(hijo)
+  })
+
+  test('al colapsar el riel no se dibujan los hijos', () => {
+    const html = renderToStaticMarkup(<NavLateral grupos={grupos} colapsado />)
+    expect(html).not.toContain('Personalización')
+    expect(html).not.toContain('Contenido')
+  })
+})

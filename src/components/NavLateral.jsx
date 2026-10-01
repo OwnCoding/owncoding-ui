@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import Icon from './Icon.jsx'
 import { cn } from '../utils/cn.js'
 
@@ -11,10 +11,12 @@ import { cn } from '../utils/cn.js'
 // plegable: `gruposPlegados` + `onToggleGrupo(titulo)` lo controlan (como
 // `colapsado`) y, sin ellos, el objeto recuerda el estado solo. Cuando el menú
 // está colapsado los rótulos no se dibujan y los ítems quedan siempre visibles.
+// Un ítem puede llevar `hijos` (subítems indentados, p. ej. «Mi página →
+// Personalización / Contenido»); se ocultan al colapsar el riel.
 // Dentro del scope `tema-v2` el activo usa el azul de acción AA y los rótulos
 // van en verde sólido (`styles.css`); la app no repite esas reglas.
 
-function ItemNav({ item, activo, colapsado, onSelect }) {
+function ItemNav({ item, activo, colapsado, onSelect, hijo = false }) {
   return (
     <li>
       <button
@@ -24,11 +26,12 @@ function ItemNav({ item, activo, colapsado, onSelect }) {
         title={colapsado ? item.label : undefined}
         className={cn(
           'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition',
+          hijo && 'px-2.5 py-1.5 text-[13px]',
           activo ? 'bg-fono/15 text-fono-text' : 'text-mute hover:bg-ink-700 hover:text-fore',
           colapsado && 'justify-center px-2',
         )}
       >
-        {item.icono && <Icon name={item.icono} className="h-4 w-4 shrink-0" />}
+        {item.icono && <Icon name={item.icono} className={cn('shrink-0', hijo ? 'h-3.5 w-3.5' : 'h-4 w-4')} />}
         {!colapsado && <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>}
         {!colapsado && item.contador != null && (
           <span className="shrink-0 rounded-full bg-ink-700 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-mute">{item.contador}</span>
@@ -64,7 +67,25 @@ export default function NavLateral({
   const lista = (listaItems) => (
     <ul className="space-y-1">
       {listaItems.map((item) => (
-        <ItemNav key={item.id} item={item} activo={item.id === activeId} colapsado={colapsado} onSelect={onSelect} />
+        <Fragment key={item.id}>
+          <ItemNav item={item} activo={item.id === activeId} colapsado={colapsado} onSelect={onSelect} />
+          {!colapsado && item.hijos?.length ? (
+            <li>
+              <ul className="mt-0.5 space-y-0.5 pl-7">
+                {item.hijos.map((hijo) => (
+                  <ItemNav
+                    key={hijo.id}
+                    item={hijo}
+                    activo={hijo.id === activeId}
+                    colapsado={false}
+                    onSelect={onSelect}
+                    hijo
+                  />
+                ))}
+              </ul>
+            </li>
+          ) : null}
+        </Fragment>
       ))}
     </ul>
   )

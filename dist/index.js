@@ -4805,9 +4805,9 @@ function PegarEnlaceToken({
 }
 
 // src/components/NavLateral.jsx
-import { useState as useState18 } from "react";
+import { Fragment as Fragment6, useState as useState18 } from "react";
 import { jsx as jsx43, jsxs as jsxs35 } from "react/jsx-runtime";
-function ItemNav({ item, activo, colapsado, onSelect }) {
+function ItemNav({ item, activo, colapsado, onSelect, hijo = false }) {
   return /* @__PURE__ */ jsx43("li", { children: /* @__PURE__ */ jsxs35(
     "button",
     {
@@ -4817,11 +4817,12 @@ function ItemNav({ item, activo, colapsado, onSelect }) {
       title: colapsado ? item.label : void 0,
       className: cn(
         "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition",
+        hijo && "px-2.5 py-1.5 text-[13px]",
         activo ? "bg-fono/15 text-fono-text" : "text-mute hover:bg-ink-700 hover:text-fore",
         colapsado && "justify-center px-2"
       ),
       children: [
-        item.icono && /* @__PURE__ */ jsx43(Icon, { name: item.icono, className: "h-4 w-4 shrink-0" }),
+        item.icono && /* @__PURE__ */ jsx43(Icon, { name: item.icono, className: cn("shrink-0", hijo ? "h-3.5 w-3.5" : "h-4 w-4") }),
         !colapsado && /* @__PURE__ */ jsx43("span", { className: "min-w-0 flex-1 truncate text-left", children: item.label }),
         !colapsado && item.contador != null && /* @__PURE__ */ jsx43("span", { className: "shrink-0 rounded-full bg-ink-700 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-mute", children: item.contador }),
         colapsado && item.contador != null && /* @__PURE__ */ jsx43("span", { className: "sr-only", children: item.contador })
@@ -4850,7 +4851,20 @@ function NavLateral({
     if (onToggleGrupo) onToggleGrupo(titulo2);
     else setPlegadosInterno((previos) => ({ ...previos, [titulo2]: !previos[titulo2] }));
   };
-  const lista = (listaItems) => /* @__PURE__ */ jsx43("ul", { className: "space-y-1", children: listaItems.map((item) => /* @__PURE__ */ jsx43(ItemNav, { item, activo: item.id === activeId, colapsado, onSelect }, item.id)) });
+  const lista = (listaItems) => /* @__PURE__ */ jsx43("ul", { className: "space-y-1", children: listaItems.map((item) => /* @__PURE__ */ jsxs35(Fragment6, { children: [
+    /* @__PURE__ */ jsx43(ItemNav, { item, activo: item.id === activeId, colapsado, onSelect }),
+    !colapsado && item.hijos?.length ? /* @__PURE__ */ jsx43("li", { children: /* @__PURE__ */ jsx43("ul", { className: "mt-0.5 space-y-0.5 pl-7", children: item.hijos.map((hijo) => /* @__PURE__ */ jsx43(
+      ItemNav,
+      {
+        item: hijo,
+        activo: hijo.id === activeId,
+        colapsado: false,
+        onSelect,
+        hijo: true
+      },
+      hijo.id
+    )) }) }) : null
+  ] }, item.id)) });
   return /* @__PURE__ */ jsxs35(
     "nav",
     {
@@ -6743,7 +6757,7 @@ function Vencimiento({ fecha, variante = "texto", diasAviso = 7, hoy, texto, vac
 }
 
 // src/components/TarjetaNecesidad.jsx
-import { Fragment as Fragment6, jsx as jsx69, jsxs as jsxs55 } from "react/jsx-runtime";
+import { Fragment as Fragment7, jsx as jsx69, jsxs as jsxs55 } from "react/jsx-runtime";
 function TarjetaNecesidad({
   producto,
   variante,
@@ -6765,7 +6779,7 @@ function TarjetaNecesidad({
   className
 }) {
   const est = estadoNecesidad(estado);
-  const titulo2 = /* @__PURE__ */ jsxs55(Fragment6, { children: [
+  const titulo2 = /* @__PURE__ */ jsxs55(Fragment7, { children: [
     /* @__PURE__ */ jsx69("span", { className: "block truncate font-semibold", children: producto || "Sin producto" }),
     variante ? /* @__PURE__ */ jsx69("span", { className: "block truncate text-xs text-mute", children: variante }) : null
   ] });
@@ -6801,7 +6815,7 @@ function TarjetaNecesidad({
 }
 
 // src/components/TarjetaCompra.jsx
-import { Fragment as Fragment7, jsx as jsx70, jsxs as jsxs56 } from "react/jsx-runtime";
+import { Fragment as Fragment8, jsx as jsx70, jsxs as jsxs56 } from "react/jsx-runtime";
 function TarjetaCompra({
   codigo,
   proveedor,
@@ -6820,7 +6834,7 @@ function TarjetaCompra({
   className
 }) {
   const est = estadoCompra(estado);
-  const titulo2 = /* @__PURE__ */ jsxs56(Fragment7, { children: [
+  const titulo2 = /* @__PURE__ */ jsxs56(Fragment8, { children: [
     /* @__PURE__ */ jsx70("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
     /* @__PURE__ */ jsx70("span", { className: "block truncate font-semibold", children: proveedor || "Sin proveedor" })
   ] });
@@ -6856,7 +6870,7 @@ function TarjetaCompra({
 }
 
 // src/components/TarjetaLote.jsx
-import { Fragment as Fragment8, jsx as jsx71, jsxs as jsxs57 } from "react/jsx-runtime";
+import { Fragment as Fragment9, jsx as jsx71, jsxs as jsxs57 } from "react/jsx-runtime";
 function TarjetaLote({
   codigo,
   estado,
@@ -6876,7 +6890,7 @@ function TarjetaLote({
 }) {
   const est = estadoEnvio(estado);
   const ruta = [origen, destino].filter(Boolean).join(" \u2192 ");
-  const titulo2 = /* @__PURE__ */ jsxs57(Fragment8, { children: [
+  const titulo2 = /* @__PURE__ */ jsxs57(Fragment9, { children: [
     /* @__PURE__ */ jsx71("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
     /* @__PURE__ */ jsx71("span", { className: "block truncate font-semibold", children: ruta || "Sin origen ni destino" })
   ] });
@@ -6909,7 +6923,7 @@ function TarjetaLote({
 }
 
 // src/components/TarjetaRecepcion.jsx
-import { Fragment as Fragment9, jsx as jsx72, jsxs as jsxs58 } from "react/jsx-runtime";
+import { Fragment as Fragment10, jsx as jsx72, jsxs as jsxs58 } from "react/jsx-runtime";
 function TarjetaRecepcion({
   codigo,
   estado,
@@ -6930,7 +6944,7 @@ function TarjetaRecepcion({
   const est = estadoEnvio(estado);
   const ruta = [origen, destino].filter(Boolean).join(" \u2192 ");
   const depositoTexto = deposito ?? depositoSugerido;
-  const titulo2 = /* @__PURE__ */ jsxs58(Fragment9, { children: [
+  const titulo2 = /* @__PURE__ */ jsxs58(Fragment10, { children: [
     /* @__PURE__ */ jsx72("span", { className: "block truncate font-mono text-xs font-bold text-fono-light", children: codigo || "Sin c\xF3digo" }),
     /* @__PURE__ */ jsx72("span", { className: "block truncate font-semibold", children: ruta || "Sin origen ni destino" })
   ] });
@@ -7329,7 +7343,7 @@ function GradoBadge({ grado, conDescripcion = false, className }) {
 }
 
 // src/components/TileEquipo.jsx
-import { Fragment as Fragment10, jsx as jsx82, jsxs as jsxs66 } from "react/jsx-runtime";
+import { Fragment as Fragment11, jsx as jsx82, jsxs as jsxs66 } from "react/jsx-runtime";
 function TileEquipo({
   modelo,
   imei,
@@ -7345,7 +7359,7 @@ function TileEquipo({
   className
 }) {
   const raiz = cn("w-full space-y-2.5 rounded-2xl border border-ink-600 bg-ink-800 p-3 text-left", onOpen && "transition hover:border-fono active:scale-[.995]", className);
-  const contenido = /* @__PURE__ */ jsxs66(Fragment10, { children: [
+  const contenido = /* @__PURE__ */ jsxs66(Fragment11, { children: [
     /* @__PURE__ */ jsxs66("div", { className: "flex items-start gap-3", children: [
       foto ? /* @__PURE__ */ jsx82("img", { src: foto, alt: modelo || "Equipo", className: "h-12 w-12 shrink-0 rounded-xl border border-ink-600 object-cover" }) : /* @__PURE__ */ jsx82("span", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-ink-600 bg-ink-700 text-mute", children: /* @__PURE__ */ jsx82(IconoCategoria, { categoria: modelo, className: "h-6 w-6" }) }),
       /* @__PURE__ */ jsxs66("div", { className: "min-w-0 flex-1", children: [
@@ -7424,9 +7438,9 @@ function ColumnaLote({ etiqueta, tono = "slate", contador, acciones, children, v
 }
 
 // src/components/TileRol.jsx
-import { Fragment as Fragment11, jsx as jsx85, jsxs as jsxs69 } from "react/jsx-runtime";
+import { Fragment as Fragment12, jsx as jsx85, jsxs as jsxs69 } from "react/jsx-runtime";
 function TileRol({ titulo: titulo2, descripcion, cantidad, total, dominios = [], onAbrir, className }) {
-  const contenido = /* @__PURE__ */ jsxs69(Fragment11, { children: [
+  const contenido = /* @__PURE__ */ jsxs69(Fragment12, { children: [
     /* @__PURE__ */ jsxs69("div", { className: "flex items-start justify-between gap-2", children: [
       /* @__PURE__ */ jsxs69("div", { className: "min-w-0", children: [
         /* @__PURE__ */ jsx85("b", { className: "block truncate text-sm", children: titulo2 }),
@@ -7712,7 +7726,7 @@ function claveUTC(fecha) {
 }
 
 // src/components/Calendario.jsx
-import { Fragment as Fragment12, jsx as jsx89, jsxs as jsxs72 } from "react/jsx-runtime";
+import { Fragment as Fragment13, jsx as jsx89, jsxs as jsxs72 } from "react/jsx-runtime";
 var TONO_ITEM = { info: TONOS.chip.info, ok: TONOS.chip.ok, warn: TONOS.chip.warn, bad: TONOS.chip.bad };
 function ItemCalendario({ item, contexto, onElegir }) {
   const tono = TONO_ITEM[item.tono] || TONOS.chip.mute;
@@ -7722,7 +7736,7 @@ function ItemCalendario({ item, contexto, onElegir }) {
     contexto.vista === "lista" ? "px-2.5 py-1.5 text-xs" : "px-1.5 py-0.5 text-[11px]",
     tono
   );
-  const contenido = /* @__PURE__ */ jsxs72(Fragment12, { children: [
+  const contenido = /* @__PURE__ */ jsxs72(Fragment13, { children: [
     item.hora && /* @__PURE__ */ jsx89("span", { className: "shrink-0 tabular-nums opacity-80", children: item.hora }),
     /* @__PURE__ */ jsxs72("span", { className: "min-w-0 flex-1", children: [
       /* @__PURE__ */ jsx89("span", { className: "block truncate font-medium", children: item.titulo }),
@@ -7848,7 +7862,7 @@ function Calendario({
         }
       )
     ] }),
-    cargando ? /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7 gap-1 p-1", "aria-busy": "true", children: Array.from({ length: 35 }, (_, indice) => /* @__PURE__ */ jsx89(Skeleton, { className: "h-20" }, indice)) }) : /* @__PURE__ */ jsxs72(Fragment12, { children: [
+    cargando ? /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7 gap-1 p-1", "aria-busy": "true", children: Array.from({ length: 35 }, (_, indice) => /* @__PURE__ */ jsx89(Skeleton, { className: "h-20" }, indice)) }) : /* @__PURE__ */ jsxs72(Fragment13, { children: [
       /* @__PURE__ */ jsxs72("div", { className: "hidden overflow-hidden rounded-xl border border-ink-600 md:block", children: [
         /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7 border-b border-ink-600 bg-ink-900/60", children: DIAS_SEMANA.map((dia) => /* @__PURE__ */ jsx89("span", { className: "px-2 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-mute", children: dia }, dia)) }),
         /* @__PURE__ */ jsx89("div", { className: "grid grid-cols-7", children: rango.dias.map((dia) => {
@@ -8084,7 +8098,7 @@ function RangoFecha({
 
 // src/components/PaletaComandos.jsx
 import { useEffect as useEffect16, useId as useId17, useMemo as useMemo11, useRef as useRef15, useState as useState28 } from "react";
-import { Fragment as Fragment13, jsx as jsx91, jsxs as jsxs74 } from "react/jsx-runtime";
+import { Fragment as Fragment14, jsx as jsx91, jsxs as jsxs74 } from "react/jsx-runtime";
 var CAPITALIZAR = (texto) => texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : texto;
 function agruparResultados(resultados = [], { etiquetasTipo = {}, iconosTipo = {} } = {}) {
   const grupos = [];
@@ -8267,7 +8281,7 @@ function PaletaComandos({
   }
   const textoContinuar = textoSeguir || `Segu\xED escribiendo: buscamos desde ${minimo} caracteres.`;
   const idOpcion = (posicion) => `${idLista}-opcion-${posicion}`;
-  return /* @__PURE__ */ jsxs74(Fragment13, { children: [
+  return /* @__PURE__ */ jsxs74(Fragment14, { children: [
     boton && /* @__PURE__ */ jsxs74(
       "button",
       {
@@ -8462,7 +8476,7 @@ function AyudaModulo({
 }
 
 // src/components/BarraInferior.jsx
-import { Fragment as Fragment14, jsx as jsx93, jsxs as jsxs76 } from "react/jsx-runtime";
+import { Fragment as Fragment15, jsx as jsx93, jsxs as jsxs76 } from "react/jsx-runtime";
 var ESPACIO_BARRA_INFERIOR = "pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0";
 function BarraInferior({
   items = [],
@@ -8494,7 +8508,7 @@ function BarraInferior({
       children: [
         visibles.map((item) => {
           const esActivo = item.id === activo;
-          const contenido = /* @__PURE__ */ jsxs76(Fragment14, { children: [
+          const contenido = /* @__PURE__ */ jsxs76(Fragment15, { children: [
             /* @__PURE__ */ jsxs76("span", { className: "relative", children: [
               item.icono && /* @__PURE__ */ jsx93(Icon, { name: item.icono, className: "h-[18px] w-[18px]" }),
               item.contador != null && item.contador !== 0 && /* @__PURE__ */ jsx93("span", { className: "absolute -right-2 -top-1.5 rounded-full bg-fono px-1 text-[9px] font-bold tabular-nums text-onbrand", children: item.contador })
@@ -8643,7 +8657,7 @@ function PersonaChip({
 }
 
 // src/components/PilaPersonas.jsx
-import { Fragment as Fragment15, jsx as jsx95, jsxs as jsxs78 } from "react/jsx-runtime";
+import { Fragment as Fragment16, jsx as jsx95, jsxs as jsxs78 } from "react/jsx-runtime";
 function PilaPersonas({
   personas = [],
   max = 4,
@@ -8659,7 +8673,7 @@ function PilaPersonas({
   const visibles = lista.slice(0, Math.max(0, max));
   const restantes = lista.length - visibles.length;
   const texto = title || resumenPresencia(lista);
-  const contenido = /* @__PURE__ */ jsxs78(Fragment15, { children: [
+  const contenido = /* @__PURE__ */ jsxs78(Fragment16, { children: [
     /* @__PURE__ */ jsxs78("span", { className: "flex -space-x-2", children: [
       visibles.map((persona, indice) => {
         const fuente = typeof persona === "string" ? { name: persona } : persona || {};
@@ -8824,7 +8838,7 @@ function IndicadorConexion({
 
 // src/components/CampanaAvisos.jsx
 import { useEffect as useEffect18, useRef as useRef16, useState as useState31 } from "react";
-import { Fragment as Fragment16, jsx as jsx98, jsxs as jsxs80 } from "react/jsx-runtime";
+import { Fragment as Fragment17, jsx as jsx98, jsxs as jsxs80 } from "react/jsx-runtime";
 function contarSinLeer(avisos = []) {
   const conEstado = avisos.filter((aviso) => aviso && typeof aviso.leido === "boolean");
   if (conEstado.length) return conEstado.filter((aviso) => !aviso.leido).length;
@@ -8909,7 +8923,7 @@ function CampanaAvisos({
           ] }),
           /* @__PURE__ */ jsx98("div", { className: "max-h-80 overflow-y-auto p-1", children: avisos.length === 0 ? /* @__PURE__ */ jsx98(EmptyState, { compact: true, icon: "bell", title: vacioTitulo, description: vacioDetalle, action: vacioAccion }) : avisos.map((aviso) => {
             const tono = TONOS.punto[aviso.tono] || TONOS.punto.mute;
-            const contenido = /* @__PURE__ */ jsxs80(Fragment16, { children: [
+            const contenido = /* @__PURE__ */ jsxs80(Fragment17, { children: [
               /* @__PURE__ */ jsx98("span", { className: cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full", tono), children: /* @__PURE__ */ jsx98(Icon, { name: aviso.icono || "bell", className: "h-3.5 w-3.5" }) }),
               /* @__PURE__ */ jsxs80("span", { className: "min-w-0 flex-1", children: [
                 /* @__PURE__ */ jsx98("span", { className: cn("block truncate text-sm", aviso.leido === false ? "font-semibold text-fore" : "font-medium text-fore"), children: aviso.titulo }),
@@ -9610,7 +9624,7 @@ function PlanPagos({
 }
 
 // src/components/DocumentoImpresion.jsx
-import { Fragment as Fragment17, jsx as jsx103, jsxs as jsxs85 } from "react/jsx-runtime";
+import { Fragment as Fragment18, jsx as jsx103, jsxs as jsxs85 } from "react/jsx-runtime";
 var CANTIDAD_FORMATTER = new Intl.NumberFormat("es-PY", { maximumFractionDigits: 3 });
 function cantidadTexto(cantidad) {
   if (cantidad === null || cantidad === void 0 || cantidad === "") return "";
@@ -9765,7 +9779,7 @@ function DocumentoImpresion({
           FilaLiquidacion,
           {
             etiqueta: `IVA ${iva.tasa}%`,
-            nota: iva.base !== void 0 ? /* @__PURE__ */ jsxs85(Fragment17, { children: [
+            nota: iva.base !== void 0 ? /* @__PURE__ */ jsxs85(Fragment18, { children: [
               "sobre ",
               /* @__PURE__ */ jsx103(Money, { value: iva.base, currency: moneda, simbolo })
             ] }) : null,
