@@ -57,6 +57,9 @@ export default function BuscadorPersonas({
   const lista = useRef(null)
   const raiz = useRef(null)
   const [abierto, setAbierto] = useState(false)
+  // #108: fuera de la edición, el input muestra el valor elegido (persona u
+  // opción fija) en vez de quedar vacío con el placeholder.
+  const [editando, setEditando] = useState(false)
 
   const opciones = useMemo(() => {
     const fijas = (Array.isArray(opcionesFijas) ? opcionesFijas : []).map((opcion) => ({ ...opcion, fija: true }))
@@ -76,6 +79,7 @@ export default function BuscadorPersonas({
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return
       setAbierto(false)
+      setEditando(false)
     }
     const cerrarEscape = (event) => {
       if (event.key === 'Escape') setAbierto(false)
@@ -88,28 +92,40 @@ export default function BuscadorPersonas({
     }
   }, [desplegable, abierto])
 
+  /** Etiqueta visible del valor elegido (persona, opción fija o «sin asignar»). */
+  const etiquetaSeleccion = useMemo(() => {
+    const fijas = Array.isArray(opcionesFijas) ? opcionesFijas : []
+    const fija = fijas.find((opcion) =>
+      opcion.valor !== undefined ? opcion.valor === valor : opcion.id === valor,
+    )
+    if (fija) return fija.nombre ?? fija.label ?? ''
+    if (opcionVacia && (valor === '' || valor == null)) return opcionVacia
+    const persona = (Array.isArray(personas) ? personas : []).find((p) => p.id === valor)
+    return persona?.nombre ?? ''
+  }, [opcionesFijas, opcionVacia, personas, valor])
+
   function elegir(opcion) {
     if (!opcion) return
     setAbierto(false)
+    setQuery('')
+    setEditando(false)
     if (opcion.fija) {
       onCambiar?.(opcion.valor !== undefined ? opcion.valor : opcion)
-      setQuery('')
       return
     }
     if (opcion.vacia) {
       onCambiar?.(null)
-      setQuery('')
       return
     }
     registrarUsoPersona(claveUso, opcion.id)
     setUso(leerUsoPersonas(claveUso))
     onCambiar?.(opcion)
-    setQuery('')
   }
 
   function alTeclear(event) {
     if (event.key === 'Escape') {
       setQuery('')
+      setEditando(false)
       setAbierto(false)
       return
     }
@@ -156,18 +172,23 @@ export default function BuscadorPersonas({
         autoComplete="off"
         enterKeyHint="done"
         disabled={disabled}
-        value={query}
+        value={editando ? query : etiquetaSeleccion}
         placeholder={placeholder}
-        onFocus={() => {
+        onFocus={(evento) => {
+          setEditando(true)
+          // Selección completa: escribir reemplaza el valor mostrado.
+          evento.target.select?.()
           if (!desplegable) return
           setAbierto(true)
           setResaltado(0)
         }}
         onChange={(event) => {
           setQuery(event.target.value)
+          setEditando(true)
           setResaltado(0)
           if (desplegable) setAbierto(true)
         }}
+        onBlur={() => setEditando(false)}
         onKeyDown={alTeclear}
       />
       {listaVisible ? (

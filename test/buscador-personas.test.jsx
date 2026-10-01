@@ -2,7 +2,7 @@
 // #104: en modo `desplegable` (toolbars/filtros) la lista es un menú: arranca
 // cerrada, abre al enfocar/escribir y cierra al elegir, con clic afuera o Esc.
 // La variante de formulario (lista debajo, #101) queda siempre visible.
-import { act } from 'react'
+import { act, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, test } from 'vitest'
 
@@ -86,5 +86,63 @@ describe('BuscadorPersonas (#104)', () => {
     act(() => document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })))
     expect(ui.lista()).not.toBeNull()
     ui.desmontar()
+  })
+})
+
+// #108: el input muestra el valor elegido (persona u opción fija) en vez de
+// quedar con el placeholder; al enfocar se selecciona para reemplazar.
+function Controlado({ inicial = '' }) {
+  const [valor, setValor] = useState(inicial)
+  return (
+    <BuscadorPersonas
+      personas={PERSONAS}
+      valor={valor}
+      onCambiar={(persona) => setValor(persona?.id ?? '')}
+      desplegable
+      opcionVacia="Todos"
+      ariaLabel="Persona"
+    />
+  )
+}
+
+describe('BuscadorPersonas · valor visible (#108)', () => {
+  test('muestra la selección y la repone tras escribir y con Escape', () => {
+    const contenedor = document.createElement('div')
+    document.body.appendChild(contenedor)
+    const root = createRoot(contenedor)
+    act(() => {
+      root.render(<Controlado />)
+    })
+    const input = contenedor.querySelector('input')
+    const escribir = (valor) =>
+      act(() => {
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
+        setter.call(input, valor)
+        input.dispatchEvent(new Event('input', { bubbles: true }))
+      })
+    const opcion = (texto) =>
+      [...contenedor.querySelectorAll('[role="option"]')].find((li) => li.textContent.includes(texto))
+
+    // Sin selección: se muestra el texto de la opción vacía.
+    expect(input.value).toBe('Todos')
+
+    // Escribir muestra la búsqueda…
+    act(() => input.focus())
+    escribir('bet')
+    expect(input.value).toBe('bet')
+
+    // …elegir por clic la reemplaza por el nombre.
+    act(() => opcion('Beto').dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    expect(input.value).toBe('Beto Ruiz')
+
+    // Escape repone el valor elegido.
+    act(() => input.focus())
+    escribir('ana')
+    act(() => {
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    })
+    expect(input.value).toBe('Beto Ruiz')
+
+    act(() => root.unmount())
   })
 })

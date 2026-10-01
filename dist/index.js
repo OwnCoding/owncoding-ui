@@ -3005,6 +3005,7 @@ function BuscadorPersonas({
   const lista = useRef8(null);
   const raiz = useRef8(null);
   const [abierto, setAbierto] = useState9(false);
+  const [editando, setEditando] = useState9(false);
   const opciones = useMemo5(() => {
     const fijas = (Array.isArray(opcionesFijas) ? opcionesFijas : []).map((opcion) => ({ ...opcion, fija: true }));
     const vacia = opcionVacia ? [{ id: "__vacia__", vacia: true, nombre: opcionVacia, icono: "user" }] : [];
@@ -3018,6 +3019,7 @@ function BuscadorPersonas({
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return;
       setAbierto(false);
+      setEditando(false);
     };
     const cerrarEscape = (event) => {
       if (event.key === "Escape") setAbierto(false);
@@ -3029,27 +3031,37 @@ function BuscadorPersonas({
       document.removeEventListener("keydown", cerrarEscape);
     };
   }, [desplegable, abierto]);
+  const etiquetaSeleccion = useMemo5(() => {
+    const fijas = Array.isArray(opcionesFijas) ? opcionesFijas : [];
+    const fija = fijas.find(
+      (opcion) => opcion.valor !== void 0 ? opcion.valor === valor : opcion.id === valor
+    );
+    if (fija) return fija.nombre ?? fija.label ?? "";
+    if (opcionVacia && (valor === "" || valor == null)) return opcionVacia;
+    const persona = (Array.isArray(personas) ? personas : []).find((p) => p.id === valor);
+    return persona?.nombre ?? "";
+  }, [opcionesFijas, opcionVacia, personas, valor]);
   function elegir(opcion) {
     if (!opcion) return;
     setAbierto(false);
+    setQuery("");
+    setEditando(false);
     if (opcion.fija) {
       onCambiar?.(opcion.valor !== void 0 ? opcion.valor : opcion);
-      setQuery("");
       return;
     }
     if (opcion.vacia) {
       onCambiar?.(null);
-      setQuery("");
       return;
     }
     registrarUsoPersona(claveUso, opcion.id);
     setUso(leerUsoPersonas(claveUso));
     onCambiar?.(opcion);
-    setQuery("");
   }
   function alTeclear(event) {
     if (event.key === "Escape") {
       setQuery("");
+      setEditando(false);
       setAbierto(false);
       return;
     }
@@ -3093,18 +3105,22 @@ function BuscadorPersonas({
         autoComplete: "off",
         enterKeyHint: "done",
         disabled,
-        value: query,
+        value: editando ? query : etiquetaSeleccion,
         placeholder,
-        onFocus: () => {
+        onFocus: (evento) => {
+          setEditando(true);
+          evento.target.select?.();
           if (!desplegable) return;
           setAbierto(true);
           setResaltado(0);
         },
         onChange: (event) => {
           setQuery(event.target.value);
+          setEditando(true);
           setResaltado(0);
           if (desplegable) setAbierto(true);
         },
+        onBlur: () => setEditando(false),
         onKeyDown: alTeclear
       }
     ),
