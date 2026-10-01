@@ -204,3 +204,27 @@ describe('BuscadorPersonas · reabrir con clic (#108)', () => {
     ui.desmontar()
   })
 })
+
+describe('BuscadorPersonas · Escape conserva el valor elegido (#108)', () => {
+  test('abrir y cerrar con Escape no borra la selección visible', () => {
+    const contenedor = document.createElement('div')
+    document.body.appendChild(contenedor)
+    const root = createRoot(contenedor)
+    act(() => {
+      root.render(<Controlado inicial="beto" />)
+    })
+    const input = contenedor.querySelector('input')
+    expect(input.value).toBe('Beto Ruiz')
+    act(() => input.focus())
+    act(() => {
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    })
+    expect(input.value).toBe('Beto Ruiz')
+    // Y al reabrir con clic, la opción sigue marcada para el valor elegido.
+    act(() => input.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    const marcada = contenedor.querySelector('[role="option"][aria-selected="true"]')
+    expect(marcada).not.toBeNull()
+    expect(marcada.textContent).toContain('Beto Ruiz')
+    act(() => root.unmount())
+  })
+})
