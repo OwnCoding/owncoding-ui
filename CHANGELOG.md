@@ -4,6 +4,53 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.58.0 — 2026-10-01
+
+- **«Carga con IA» (#11):** asistente reutilizable para cargar datos desde
+  texto libre con **confirmación humana obligatoria**. `CargaIA` (forma corta:
+  botón + diálogo con montaje diferido), `BotonCargaIA` (topbar, ✨ con
+  tooltip) y `DialogoCargaIA` (entrada con contador, estados
+  «sin configurar»/analizando/error, **preview editable por tarjetas con
+  avisos**, incluir/descartar, «Crear todo» y resumen creados/errores). El
+  preview se dibuja desde un **esquema declarativo** (`EsquemaIA`: tipos y
+  campos `texto | numero | moneda | fecha | select` con obligatorio/ayuda) y la
+  app inyecta `analizar(texto, tipos)` y `crear(registros)`; el componente no
+  hace `fetch`, no conoce endpoints ni proveedores y **no persiste el texto
+  pegado**.
+- **Contrato puro:** `utils/cargaIA.js` exporta los límites por defecto
+  **20.000** caracteres (`IA_TEXTO_MAX`) y **25** registros por tipo
+  (`IA_REGISTROS_MAX`), la referencia de rate-limit (`IA_RATE_LIMIT` = 10 / 15
+  min), tokens/timeout, los rótulos (`IA_BOTON`, `IA_TOOLTIP`, `IA_TITULO`) y
+  los normalizadores (`normalizarAnalisisIA`, `validarRegistrosIA`,
+  `registrosIncluidosIA`, `normalizarResultadoIA`, …), también por
+  `owncoding-ui/utils`.
+- **Motor server portable (#12):** nuevo subpath **`owncoding-ui/ia`** (sin
+  React y sin banner de cliente) con el motor del asistente:
+  `motorIA({ esquema })` lee `IA_API_KEY`/`IA_MODELO`/`IA_BASE_URL` (proveedor
+  **OpenAI-compatible**, JSON estricto) y expone `analizar(texto, tipos)`; sin
+  key queda **apagado con aviso claro** (`ia_no_configurada`). El prompt se
+  genera desde el esquema y marca el texto pegado como **dato, no instrucción**
+  (anti-inyección); `validarAnalisisIA` coacciona y valida contra el esquema
+  (obligatorios, `numero`/`moneda`, `fecha`, `select`, recortes) y
+  `crearLimitadorIA()` da el rate-limit por clave (`IA_RATE_LIMIT` / 15 min).
+  El `fetch` es **inyectable** (pruebas mockeadas, sin red); el motor **no
+  persiste** el texto ni escribe en la base.
+- **Reglas (`REGLAS.md` §18):** esquema y callbacks, contrato del endpoint
+  (`GET` estado/tipos, `POST` texto) con las guardas (el texto es **dato**, JSON
+  estricto, solo se manda el texto, **no se persiste**, el análisis no escribe),
+  el **motor server** y sus variables, privacidad (**Ley 7593/2025**: proveedor
+  **encargado**, aviso y **rate-limit por organización**) y permisos (mismas
+  capacidades que crear cada tipo; si el rol no puede ninguno, el asistente no
+  se ofrece). Referencias sin duplicar: §1 (fuente única por tipo de dato, #10)
+  y `REGLAS-ECOSISTEMA.md` §12. Checklist de adopción en `ADOPCION-V2.md` §10 y
+  ejemplo de adopción en 3 pasos en el README.
+- Tests: contrato puro, interacción (nada se crea sin confirmar, obligatorios,
+  descartar, sin configurar, errores, resultado sin conteo, montaje diferido de
+  `CargaIA`) y motor (config, prompt anti-inyección, proveedor mockeado, JSON,
+  fechas, validación/recortes, rate-limit y guardas del subpath); tipos
+  publicados en los tres subpaths.
+- Referencias: LedBox `#120` (rama `feat/plataforma`) y Scale OS `#117`/`#118`.
+
 ## v0.55.0 — 2026-09-30
 
 - **Fuente única por tipo de dato (#10):** `REGLAS.md` §1 suma «Un componente

@@ -1275,5 +1275,127 @@ export function partesVersion(valor?: string): number[]
 export function compararVersiones(a?: string, b?: string): -1 | 0 | 1
 export function hayVersionNueva(actual?: string, publicada?: string): boolean
 
+// ── «Carga con IA» (#11) ───────────────────────────────────────────────────
+
+/** Largo máximo del texto pegado, en caracteres. */
+export const IA_TEXTO_MAX: number
+/** Máximo de registros por tipo en una pasada. */
+export const IA_REGISTROS_MAX: number
+/** Llamadas por organización dentro de la ventana de rate-limit (15 min). */
+export const IA_RATE_LIMIT: number
+/** Tope de tokens de la respuesta del proveedor. */
+export const IA_TOKENS_MAX: number
+/** Timeout de la llamada al proveedor, en milisegundos. */
+export const IA_TIMEOUT_MS: number
+/** Rótulos por defecto del botón y del diálogo. */
+export const IA_BOTON: string
+export const IA_TOOLTIP: string
+export const IA_TITULO: string
+/** Tipos de campo que entiende el esquema. */
+export const CAMPOS_IA: readonly string[]
+
+/** Tipo de campo del esquema: texto, numero, moneda, fecha o select. */
+export type TipoCampoIA = 'texto' | 'numero' | 'moneda' | 'fecha' | 'select' | (string & {})
+/** Opción de un campo select (se toleran textos sueltos). */
+export type OpcionIA = { value: string; label: string }
+/** Campo declarado por la app para el preview editable. */
+export type CampoEsquemaIA = {
+  id: string
+  label: string
+  tipo: TipoCampoIA
+  obligatorio?: boolean
+  ayuda?: string
+  opciones?: Array<OpcionIA | string>
+  /** Moneda del campo `moneda` (por defecto `PYG`). */
+  moneda?: Moneda
+  maxLargo?: number
+}
+/** Tipo declarado por la app: agrupa las tarjetas y los campos del preview. */
+export type TipoEsquemaIA = {
+  id: string
+  label: string
+  singular?: string
+  plural?: string
+  icono?: string
+  campos: CampoEsquemaIA[]
+}
+/** Esquema declarativo que dibuja el diálogo. */
+export type EsquemaIA = { tipos: TipoEsquemaIA[] }
+/** Registro detectado por `analizar`; el diálogo completa id/incluir/avisos. */
+export type RegistroIA = {
+  id?: string
+  tipo: string
+  valores: Record<string, unknown>
+  incluir?: boolean
+  titulo?: string
+  avisos?: string[]
+}
+/** Registro normalizado: siempre con id, incluir y avisos. */
+export type RegistroNormalizadoIA = {
+  id: string
+  tipo: string
+  valores: Record<string, unknown>
+  incluir: boolean
+  titulo?: string
+  avisos: string[]
+}
+/** Respuesta de `analizar`: forma plana o por tipo (`{ clientes: [...] }`). */
+export type AnalisisIA = { registros?: RegistroIA[]; avisos?: string[] } & Record<string, unknown>
+/** Respuesta de `crear`: cuántos se crearon y qué falló. */
+export type ResultadoCreacionIA = { creados?: number | null; errores?: string[]; advertencias?: string[] }
+/** Estado del proveedor que informa la app (`GET` del endpoint). */
+export type ConfigIA = { configurada: boolean; modelo?: string | null; tipos?: string[] }
+/** Resultado normalizado que dibuja el diálogo (`creados: null` = sin detalle). */
+export type ResultadoIA = { creados: number | null; total: number | null; errores: string[]; advertencias: string[] }
+
+export function tipoDeEsquemaIA(esquema?: EsquemaIA | null, tipoId?: string): TipoEsquemaIA | null
+export function campoDeTipoIA(tipo?: TipoEsquemaIA | null, campoId?: string): CampoEsquemaIA | null
+export function opcionesDeCampoIA(campo?: CampoEsquemaIA | null): OpcionIA[]
+export function tituloDeRegistroIA(registro?: Partial<RegistroIA> | null, tipo?: TipoEsquemaIA | null): string
+export function valorVacioIA(valor?: unknown): boolean
+export function normalizarAnalisisIA(
+  analisis?: unknown,
+  esquema?: EsquemaIA | null,
+  opciones?: { maxRegistros?: number },
+): { registros: RegistroNormalizadoIA[]; avisos: string[] }
+export function registrosIncluidosIA(registros?: RegistroNormalizadoIA[] | null): RegistroNormalizadoIA[]
+export function validarRegistrosIA(
+  registros?: RegistroNormalizadoIA[] | null,
+  esquema?: EsquemaIA | null,
+): { valido: boolean; errores: Map<string, Record<string, string>> }
+export function normalizarResultadoIA(resultado?: ResultadoCreacionIA | null, opciones?: { total?: number }): ResultadoIA
+
+export type BotonCargaIAProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> & {
+  onAbrir?: () => void
+  texto?: string
+  tooltip?: string
+}
+export function BotonCargaIA(props: BotonCargaIAProps): ReactElement
+
+export type DialogoCargaIAProps = {
+  abierto: boolean
+  onCerrar: () => void
+  esquema: EsquemaIA
+  analizar: (texto: string, tipos: string[]) => AnalisisIA | Promise<AnalisisIA>
+  crear: (registros: RegistroNormalizadoIA[]) => ResultadoCreacionIA | void | Promise<ResultadoCreacionIA | void>
+  consultarConfig?: () => ConfigIA | Promise<ConfigIA>
+  enlacePrivacidad?: string
+  titulo?: string
+  placeholder?: string
+  maxTexto?: number
+  maxRegistros?: number
+  className?: string
+}
+export function DialogoCargaIA(props: DialogoCargaIAProps): ReactElement | null
+
+export type CargaIAProps = Omit<DialogoCargaIAProps, 'abierto' | 'onCerrar'> & {
+  /** Solo el botón: texto y tooltip propios. */
+  texto?: string
+  tooltip?: string
+  /** Clase del botón (la del diálogo va en `className`). */
+  classNameBoton?: string
+}
+export function CargaIA(props: CargaIAProps): ReactElement
+
 /** Props de los objetos con superficie abierta (se tipan al adoptarse). */
 export type PropsAbiertas = Record<string, any> & { className?: string; children?: ReactNode }

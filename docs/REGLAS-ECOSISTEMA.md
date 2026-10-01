@@ -198,6 +198,10 @@ correo y demos; el encuadre legal de cada negocio lo valida su asesoría.
 - **Encargados documentados:** cada tercero (WEEM, Hub/Coolify, pasarelas,
   analítica, soporte o proveedores) con finalidad, datos compartidos, ubicación
   y contrato; no hay transferencias sorpresa.
+- **Proveedores de IA:** cuando una app usa «Carga con IA», el proveedor entra
+  al inventario como **encargado** (finalidad: interpretar el texto pegado; el
+  texto **no se persiste**); el aviso, el rate-limit por organización y el
+  contrato están en `docs/REGLAS.md` **§18**.
 - **Retención por tipo con plazo definido** (comunicaciones hasta la
   revocación, operación mientras dure la relación, logs acotados…); al vencer
   se **elimina o anonimiza** de forma verificable, también en respaldos y en
@@ -260,5 +264,6 @@ apps.
 | UX: cuadrícula/lista con selector compacto y preferencia guardada; iconos con tooltip; búsqueda contextual | `ListGridToggle`, `IconAction`, `Switch`, `SearchField`/`PaletaComandos` y `docs/REGLAS.md` §1; el «último usado» es el patrón #209 |
 | Demos aisladas (sin correos, cobros ni datos reales) | **§15.2 Paridad demo** y los seeds/`demoStorage` de cada app |
 | Protección de datos (finalidad visible, consentimiento sin pre-tildar y revocable, política versionada, derechos del titular) | **§12** + `AvisoPrivacidad` y `ConsentimientoDatos` (`docs/REGLAS.md` §1 y §15); `registroConsentimiento` arma el registro, el backend lo persiste y responde |
+| IA sobre texto pegado (proveedor encargado, aviso, rate-limit por organización) | **§18 «Carga con IA»** (`BotonCargaIA`/`DialogoCargaIA`, `EsquemaIA`) + §12.5 de este anexo |
 | Seguridad de datos personales (auditoría, PII enmascarada, demos sin datos reales, brechas) | §2 y §4 (aislamiento y secretos), §11 (demos) y **§12.3** |
 | Reutilización antes de crear | Este paquete + `docs/ALIMENTAR.md` y `docs/PLANTILLA-OBJETOS.md` |

@@ -357,6 +357,31 @@ export {
 export { default as ProgresoChecklist, progresoChecklist } from './components/ProgresoChecklist.jsx'
 export { TONOS, TONOS_ALIAS, tonoCanonico, puntoDeTono, chipDeTono, textoDeTono } from './utils/tonos.js'
 
+// «Carga con IA» (#11): botón de topbar + diálogo declarativo. La app pasa el
+// esquema de tipos/campos y los callbacks `analizar`/`crear`; nada se crea sin
+// confirmación. Reglas: docs/REGLAS.md §18.
+export { BotonCargaIA, CargaIA, default as DialogoCargaIA } from './components/CargaIA.jsx'
+export {
+  IA_TEXTO_MAX,
+  IA_REGISTROS_MAX,
+  IA_RATE_LIMIT,
+  IA_TOKENS_MAX,
+  IA_TIMEOUT_MS,
+  IA_BOTON,
+  IA_TOOLTIP,
+  IA_TITULO,
+  CAMPOS_IA,
+  tipoDeEsquemaIA,
+  campoDeTipoIA,
+  opcionesDeCampoIA,
+  tituloDeRegistroIA,
+  valorVacioIA,
+  normalizarAnalisisIA,
+  registrosIncluidosIA,
+  validarRegistrosIA,
+  normalizarResultadoIA,
+} from './utils/cargaIA.js'
+
 // Lógica compartida
 export { cn, primerNombre } from './utils/cn.js'
 export { default as useDialogFocusTrap, destinoDeTab, SELECTOR_ENFOCABLES } from './hooks/useDialogFocusTrap.js'

@@ -371,3 +371,75 @@ export function ordenarPersonas(personas?: Array<Record<string, any>>, uso?: Rec
 export const CLAVE_USO_PERSONAS: string
 export function leerUsoPersonas(clave?: string, almacen?: Storage | null): Record<string, { usos: number; ultima: number }>
 export function registrarUsoPersona(clave?: string, id?: string, almacen?: Storage | null, ahora?: number): void
+
+// ── «Carga con IA»: contrato puro (#11) ─────────────────────────────────────
+
+export const IA_TEXTO_MAX: number
+export const IA_REGISTROS_MAX: number
+export const IA_RATE_LIMIT: number
+export const IA_TOKENS_MAX: number
+export const IA_TIMEOUT_MS: number
+export const IA_BOTON: string
+export const IA_TOOLTIP: string
+export const IA_TITULO: string
+export const CAMPOS_IA: readonly string[]
+
+export type TipoCampoIA = 'texto' | 'numero' | 'moneda' | 'fecha' | 'select' | (string & {})
+export type OpcionIA = { value: string; label: string }
+export type CampoEsquemaIA = {
+  id: string
+  label: string
+  tipo: TipoCampoIA
+  obligatorio?: boolean
+  ayuda?: string
+  opciones?: Array<OpcionIA | string>
+  /** Moneda del campo `moneda` (por defecto `PYG`). */
+  moneda?: string
+  maxLargo?: number
+}
+export type TipoEsquemaIA = {
+  id: string
+  label: string
+  singular?: string
+  plural?: string
+  icono?: string
+  campos: CampoEsquemaIA[]
+}
+export type EsquemaIA = { tipos: TipoEsquemaIA[] }
+export type RegistroIA = {
+  id?: string
+  tipo: string
+  valores: Record<string, unknown>
+  incluir?: boolean
+  titulo?: string
+  avisos?: string[]
+}
+export type RegistroNormalizadoIA = {
+  id: string
+  tipo: string
+  valores: Record<string, unknown>
+  incluir: boolean
+  titulo?: string
+  avisos: string[]
+}
+export type AnalisisIA = { registros?: RegistroIA[]; avisos?: string[] } & Record<string, unknown>
+export type ResultadoCreacionIA = { creados?: number | null; errores?: string[]; advertencias?: string[] }
+export type ConfigIA = { configurada: boolean; modelo?: string | null; tipos?: string[] }
+export type ResultadoIA = { creados: number | null; total: number | null; errores: string[]; advertencias: string[] }
+
+export function tipoDeEsquemaIA(esquema?: EsquemaIA | null, tipoId?: string): TipoEsquemaIA | null
+export function campoDeTipoIA(tipo?: TipoEsquemaIA | null, campoId?: string): CampoEsquemaIA | null
+export function opcionesDeCampoIA(campo?: CampoEsquemaIA | null): OpcionIA[]
+export function tituloDeRegistroIA(registro?: Partial<RegistroIA> | null, tipo?: TipoEsquemaIA | null): string
+export function valorVacioIA(valor?: unknown): boolean
+export function normalizarAnalisisIA(
+  analisis?: unknown,
+  esquema?: EsquemaIA | null,
+  opciones?: { maxRegistros?: number },
+): { registros: RegistroNormalizadoIA[]; avisos: string[] }
+export function registrosIncluidosIA(registros?: RegistroNormalizadoIA[] | null): RegistroNormalizadoIA[]
+export function validarRegistrosIA(
+  registros?: RegistroNormalizadoIA[] | null,
+  esquema?: EsquemaIA | null,
+): { valido: boolean; errores: Map<string, Record<string, string>> }
+export function normalizarResultadoIA(resultado?: ResultadoCreacionIA | null, opciones?: { total?: number }): ResultadoIA

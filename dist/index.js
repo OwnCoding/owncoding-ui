@@ -10185,8 +10185,638 @@ function ProgresoChecklist({
   ] });
 }
 
+// src/components/CargaIA.jsx
+import { useEffect as useEffect20, useId as useId19, useMemo as useMemo13, useRef as useRef19, useState as useState34 } from "react";
+
+// src/utils/cargaIA.js
+var IA_TEXTO_MAX = 2e4;
+var IA_REGISTROS_MAX = 25;
+var IA_RATE_LIMIT = 10;
+var IA_TOKENS_MAX = 4e3;
+var IA_TIMEOUT_MS = 3e4;
+var IA_BOTON = "Carga con IA";
+var IA_TOOLTIP = "Carga con IA \xB7 peg\xE1 un texto y revis\xE1 antes de crear";
+var IA_TITULO = "Carga con IA";
+var CAMPOS_IA = ["texto", "numero", "moneda", "fecha", "select"];
+var textoDe = (valor) => (valor === null || valor === void 0 ? "" : String(valor)).trim();
+function tipoDeEsquemaIA(esquema, tipoId) {
+  return (esquema?.tipos ?? []).find((tipo) => tipo?.id === tipoId) ?? null;
+}
+function campoDeTipoIA(tipo, campoId) {
+  return (tipo?.campos ?? []).find((campo) => campo?.id === campoId) ?? null;
+}
+function campoPrincipal(tipo) {
+  const campos = tipo?.campos ?? [];
+  return campos.find((campo) => campo?.obligatorio) ?? campos[0] ?? null;
+}
+function valorVacioIA(valor) {
+  if (valor === null || valor === void 0) return true;
+  if (typeof valor === "number") return !Number.isFinite(valor);
+  return String(valor).trim() === "";
+}
+function tituloDeRegistroIA(registro, tipo) {
+  const propio = textoDe(registro?.titulo);
+  if (propio) return propio;
+  const principal = campoPrincipal(tipo);
+  if (principal) {
+    const valor = textoDe(registro?.valores?.[principal.id]);
+    if (valor) return valor;
+  }
+  return tipo?.label || textoDe(registro?.tipo) || "Registro";
+}
+function opcionesDeCampoIA(campo) {
+  return (campo?.opciones ?? []).map(
+    (opcion) => typeof opcion === "string" ? { value: opcion, label: opcion } : { value: String(opcion?.value ?? ""), label: textoDe(opcion?.label) || String(opcion?.value ?? "") }
+  );
+}
+function registrosCrudosIA(analisis, esquema) {
+  if (Array.isArray(analisis?.registros)) return analisis.registros;
+  return (esquema?.tipos ?? []).flatMap(
+    (tipo) => Array.isArray(analisis?.[tipo.id]) ? analisis[tipo.id].map((registro) => ({
+      ...registro,
+      tipo: registro?.tipo || tipo.id,
+      valores: registro?.valores && typeof registro.valores === "object" ? registro.valores : registro
+    })) : []
+  );
+}
+function normalizarAnalisisIA(analisis, esquema, opciones = {}) {
+  const maxRegistros = Number.isFinite(Number(opciones.maxRegistros)) && Number(opciones.maxRegistros) > 0 ? Math.floor(Number(opciones.maxRegistros)) : IA_REGISTROS_MAX;
+  const tipos = esquema?.tipos ?? [];
+  const idsValidos = new Set(tipos.map((tipo) => tipo?.id));
+  const registros = [];
+  const usados = /* @__PURE__ */ new Set();
+  const avisos = Array.isArray(analisis?.avisos) ? analisis.avisos.map(textoDe).filter(Boolean) : [];
+  const contador = /* @__PURE__ */ new Map();
+  let descartados = 0;
+  let recortados = false;
+  for (const crudo of registrosCrudosIA(analisis, esquema)) {
+    const tipoId = textoDe(crudo?.tipo);
+    if (!idsValidos.has(tipoId)) {
+      descartados += 1;
+      continue;
+    }
+    const tipo = tipoDeEsquemaIA(esquema, tipoId);
+    const cantidad = (contador.get(tipoId) ?? 0) + 1;
+    contador.set(tipoId, cantidad);
+    if (cantidad > maxRegistros) {
+      recortados = true;
+      continue;
+    }
+    const valores = {};
+    for (const campo of tipo?.campos ?? []) {
+      const valor = crudo?.valores?.[campo.id];
+      valores[campo.id] = valor === void 0 ? null : valor;
+    }
+    let id = textoDe(crudo?.id) || textoDe(crudo?.clave);
+    if (!id || usados.has(id)) {
+      let numero = cantidad;
+      id = `ia-${tipoId}-${numero}`;
+      while (usados.has(id)) {
+        numero += 1;
+        id = `ia-${tipoId}-${numero}`;
+      }
+    }
+    usados.add(id);
+    registros.push({
+      id,
+      tipo: tipoId,
+      valores,
+      incluir: crudo?.incluir === void 0 ? true : Boolean(crudo.incluir),
+      titulo: textoDe(crudo?.titulo) || void 0,
+      avisos: Array.isArray(crudo?.avisos) ? crudo.avisos.map(textoDe).filter(Boolean) : []
+    });
+  }
+  if (descartados > 0) {
+    avisos.push(`Descartamos ${descartados} registro${descartados === 1 ? "" : "s"} sin tipo conocido.`);
+  }
+  if (recortados) avisos.push(`Recortamos la vista previa a ${maxRegistros} registros por tipo.`);
+  return { registros, avisos };
+}
+function registrosIncluidosIA(registros) {
+  return (registros ?? []).filter((registro) => registro?.incluir);
+}
+function validarRegistrosIA(registros, esquema) {
+  const errores = /* @__PURE__ */ new Map();
+  for (const registro of registros ?? []) {
+    if (!registro?.incluir) continue;
+    const tipo = tipoDeEsquemaIA(esquema, registro.tipo);
+    const porCampo = {};
+    for (const campo of tipo?.campos ?? []) {
+      if (!campo?.obligatorio) continue;
+      if (valorVacioIA(registro.valores?.[campo.id])) {
+        porCampo[campo.id] = "Complet\xE1 este campo para crear el registro.";
+      }
+    }
+    if (Object.keys(porCampo).length > 0) errores.set(registro.id, porCampo);
+  }
+  return { valido: errores.size === 0, errores };
+}
+function normalizarResultadoIA(resultado, opciones = {}) {
+  const errores = Array.isArray(resultado?.errores) ? resultado.errores.map(textoDe).filter(Boolean) : [];
+  const advertencias = Array.isArray(resultado?.advertencias) ? resultado.advertencias.map(textoDe).filter(Boolean) : [];
+  const bruto = resultado?.creados;
+  const numero = bruto === void 0 || bruto === null || bruto === "" ? null : Number(bruto);
+  const total = Number.isFinite(Number(opciones.total)) ? Number(opciones.total) : null;
+  return {
+    creados: numero !== null && Number.isFinite(numero) ? Math.max(0, numero) : null,
+    total,
+    errores,
+    advertencias
+  };
+}
+
+// src/components/CargaIA.jsx
+import { Fragment as Fragment19, jsx as jsx106, jsxs as jsxs88 } from "react/jsx-runtime";
+var PLACEHOLDER = "Ejemplo:\nNombre Apellido \u2014 0981 123 456, correo@ejemplo.com\nProducto: pantalla LED 3x2, cantidad 4, precio 1.500.000";
+var listar = (cantidad, singular, plural) => `${cantidad} ${cantidad === 1 ? singular : plural}`;
+function mensajeDeError(falla, respaldo) {
+  const texto = falla instanceof Error ? falla.message : typeof falla === "string" ? falla : "";
+  return texto.trim() || respaldo;
+}
+function BotonCargaIA({ onAbrir, texto = IA_BOTON, tooltip = IA_TOOLTIP, className, ...props }) {
+  return /* @__PURE__ */ jsxs88(
+    "button",
+    {
+      type: "button",
+      onClick: onAbrir,
+      "aria-label": texto,
+      "aria-haspopup": "dialog",
+      title: tooltip,
+      className: cn(
+        "inline-flex h-11 select-none items-center gap-2 rounded-lg border border-ink-500 px-3 text-sm text-mute transition md:h-9",
+        "hover:border-fono hover:bg-fono/10 hover:text-fore",
+        className
+      ),
+      ...props,
+      children: [
+        /* @__PURE__ */ jsx106(Icon, { name: "sparkles", className: "h-4 w-4" }),
+        /* @__PURE__ */ jsx106("span", { className: "hidden sm:inline", children: texto })
+      ]
+    }
+  );
+}
+function CargaIA({
+  esquema,
+  analizar,
+  crear,
+  consultarConfig,
+  enlacePrivacidad,
+  texto,
+  tooltip,
+  titulo: titulo2,
+  placeholder,
+  maxTexto,
+  maxRegistros,
+  className,
+  classNameBoton
+}) {
+  const [abierto, setAbierto] = useState34(false);
+  const [montado, setMontado] = useState34(false);
+  function abrir() {
+    setMontado(true);
+    setAbierto(true);
+  }
+  return /* @__PURE__ */ jsxs88(Fragment19, { children: [
+    /* @__PURE__ */ jsx106(BotonCargaIA, { onAbrir: abrir, texto, tooltip, className: classNameBoton }),
+    montado ? /* @__PURE__ */ jsx106(
+      DialogoCargaIA,
+      {
+        abierto,
+        onCerrar: () => setAbierto(false),
+        esquema,
+        analizar,
+        crear,
+        consultarConfig,
+        enlacePrivacidad,
+        titulo: titulo2,
+        placeholder,
+        maxTexto,
+        maxRegistros,
+        className
+      }
+    ) : null
+  ] });
+}
+function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
+  const id = useId19();
+  const htmlFor = `${id}-${campo.id}`;
+  const descripcionId = campo.ayuda || error ? `${htmlFor}-descripcion` : void 0;
+  const valor = registro.valores?.[campo.id];
+  const obligatorio = Boolean(campo.obligatorio);
+  const comunes = {
+    id: htmlFor,
+    disabled,
+    required: obligatorio,
+    "aria-describedby": descripcionId
+  };
+  let control;
+  if (campo.tipo === "moneda") {
+    control = /* @__PURE__ */ jsx106(
+      MoneyInput,
+      {
+        ...comunes,
+        currency: campo.moneda || "PYG",
+        value: valor ?? "",
+        onValueChange: (siguiente) => onCambiar(siguiente)
+      }
+    );
+  } else if (campo.tipo === "select") {
+    control = /* @__PURE__ */ jsxs88(
+      Select,
+      {
+        ...comunes,
+        value: valor === null || valor === void 0 ? "" : String(valor),
+        onChange: (evento) => onCambiar(evento.target.value),
+        children: [
+          /* @__PURE__ */ jsx106("option", { value: "", children: "\u2014 Eleg\xED \u2014" }),
+          opcionesDeCampoIA(campo).map((opcion) => /* @__PURE__ */ jsx106("option", { value: opcion.value, children: opcion.label }, opcion.value))
+        ]
+      }
+    );
+  } else if (campo.tipo === "fecha") {
+    control = /* @__PURE__ */ jsx106(Input, { ...comunes, type: "date", value: valor || "", onChange: (evento) => onCambiar(evento.target.value) });
+  } else if (campo.tipo === "numero") {
+    control = /* @__PURE__ */ jsx106(
+      Input,
+      {
+        ...comunes,
+        inputMode: "numeric",
+        value: valor ?? "",
+        maxLength: campo.maxLargo,
+        onChange: (evento) => onCambiar(evento.target.value.replace(/[^\d]/g, ""))
+      }
+    );
+  } else {
+    control = /* @__PURE__ */ jsx106(
+      Input,
+      {
+        ...comunes,
+        value: valor ?? "",
+        maxLength: campo.maxLargo,
+        onChange: (evento) => onCambiar(evento.target.value)
+      }
+    );
+  }
+  return /* @__PURE__ */ jsx106(
+    FormField,
+    {
+      label: /* @__PURE__ */ jsxs88(Fragment19, { children: [
+        campo.label,
+        obligatorio ? /* @__PURE__ */ jsxs88("span", { "aria-hidden": "true", className: "text-bad-text", children: [
+          " ",
+          "*"
+        ] }) : null
+      ] }),
+      hint: campo.ayuda,
+      error,
+      htmlFor,
+      descripcionId,
+      children: control
+    }
+  );
+}
+function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
+  const titulo2 = tituloDeRegistroIA(registro, tipo);
+  return /* @__PURE__ */ jsxs88(
+    "article",
+    {
+      "aria-label": titulo2,
+      className: cn("rounded-xl border border-ink-600 bg-ink-800/40 p-3 sm:p-4", !registro.incluir && "opacity-60"),
+      children: [
+        /* @__PURE__ */ jsxs88("header", { className: "mb-3 flex items-start justify-between gap-3", children: [
+          /* @__PURE__ */ jsx106("p", { className: "min-w-0 flex-1 break-words text-sm font-semibold text-fore", children: titulo2 }),
+          /* @__PURE__ */ jsxs88("label", { className: "flex shrink-0 cursor-pointer items-center gap-2 text-xs text-mute", children: [
+            /* @__PURE__ */ jsx106("span", { className: "hidden sm:inline", children: registro.incluir ? "Incluir" : "Descartado" }),
+            /* @__PURE__ */ jsx106(
+              Switch,
+              {
+                checked: Boolean(registro.incluir),
+                ariaLabel: `Incluir ${titulo2}`,
+                onChange: (evento) => onIncluir(evento.target.checked)
+              }
+            )
+          ] })
+        ] }),
+        registro.avisos?.length > 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "warn", compact: true, className: "mb-3", children: registro.avisos.join(" ") }) : null,
+        /* @__PURE__ */ jsx106("div", { className: "grid gap-3 sm:grid-cols-2", children: (tipo?.campos ?? []).map((campo) => /* @__PURE__ */ jsx106(
+          CampoRegistroIA,
+          {
+            campo,
+            registro,
+            error: errores?.[campo.id],
+            disabled: !registro.incluir,
+            onCambiar: (valor) => onCambiar(campo.id, valor)
+          },
+          campo.id
+        )) })
+      ]
+    }
+  );
+}
+function DialogoCargaIA({
+  abierto,
+  onCerrar,
+  esquema,
+  analizar,
+  crear,
+  consultarConfig,
+  enlacePrivacidad = "/privacidad",
+  titulo: titulo2 = IA_TITULO,
+  placeholder = PLACEHOLDER,
+  maxTexto = IA_TEXTO_MAX,
+  maxRegistros = IA_REGISTROS_MAX,
+  className
+}) {
+  const idTexto = useId19();
+  const consultarRef = useRef19(consultarConfig);
+  consultarRef.current = consultarConfig;
+  const [config, setConfig] = useState34(() => consultarConfig ? null : { configurada: true, modelo: null });
+  const [configError, setConfigError] = useState34("");
+  const [reintento, setReintento] = useState34(0);
+  const [entrada, setEntrada] = useState34("");
+  const [fase, setFase] = useState34("entrada");
+  const [analizando, setAnalizando] = useState34(false);
+  const [creando, setCreando] = useState34(false);
+  const [error, setError] = useState34("");
+  const [avisos, setAvisos] = useState34([]);
+  const [registros, setRegistros] = useState34([]);
+  const [resultado, setResultado] = useState34(null);
+  const [intento, setIntento] = useState34(false);
+  const topeTexto = Number.isFinite(Number(maxTexto)) && Number(maxTexto) > 0 ? Math.floor(Number(maxTexto)) : IA_TEXTO_MAX;
+  const topeRegistros = Number.isFinite(Number(maxRegistros)) && Number(maxRegistros) > 0 ? Math.floor(Number(maxRegistros)) : IA_REGISTROS_MAX;
+  const idsEsquema = (esquema?.tipos ?? []).map((tipo) => tipo?.id).filter(Boolean);
+  const permitidos = config?.tipos ? config.tipos.filter((id) => idsEsquema.includes(id)) : idsEsquema;
+  useEffect20(() => {
+    if (!abierto) return void 0;
+    setEntrada("");
+    setFase("entrada");
+    setAnalizando(false);
+    setCreando(false);
+    setError("");
+    setAvisos([]);
+    setRegistros([]);
+    setResultado(null);
+    setIntento(false);
+    setConfigError("");
+    const consultar = consultarRef.current;
+    if (!consultar) {
+      setConfig({ configurada: true, modelo: null });
+      return void 0;
+    }
+    setConfig(null);
+    let vigente = true;
+    Promise.resolve().then(() => consultar()).then((respuesta) => {
+      if (!vigente) return;
+      setConfig({
+        configurada: Boolean(respuesta?.configurada),
+        modelo: respuesta?.modelo ?? null,
+        tipos: Array.isArray(respuesta?.tipos) ? respuesta.tipos : void 0
+      });
+    }).catch((falla) => {
+      if (!vigente) return;
+      setConfigError(mensajeDeError(falla, "No pudimos consultar el estado del asistente."));
+    });
+    return () => {
+      vigente = false;
+    };
+  }, [abierto, reintento]);
+  const grupos = useMemo13(
+    () => (esquema?.tipos ?? []).map((tipo) => ({ tipo, registros: registros.filter((registro) => registro.tipo === tipo.id) })).filter((grupo) => grupo.registros.length > 0),
+    [esquema, registros]
+  );
+  const incluidos = registrosIncluidosIA(registros);
+  const totalIncluidos = incluidos.length;
+  const valido = useMemo13(() => validarRegistrosIA(registros, esquema), [registros, esquema]);
+  const partes = grupos.map(
+    ({ tipo, registros: delTipo }) => listar(delTipo.length, tipo.singular || tipo.label.toLowerCase(), tipo.plural || tipo.label.toLowerCase())
+  );
+  function cambiarValor(registroId, campoId, valor) {
+    setRegistros(
+      (actuales) => actuales.map(
+        (registro) => registro.id === registroId ? { ...registro, valores: { ...registro.valores, [campoId]: valor } } : registro
+      )
+    );
+  }
+  function cambiarInclusion(registroId, incluir) {
+    setRegistros((actuales) => actuales.map((registro) => registro.id === registroId ? { ...registro, incluir } : registro));
+  }
+  async function analizarTexto() {
+    const limpio = entrada.trim();
+    if (!limpio || analizando) return;
+    setAnalizando(true);
+    setError("");
+    try {
+      const respuesta = await analizar?.(limpio, permitidos);
+      const normalizado = normalizarAnalisisIA(respuesta, esquema, { maxRegistros: topeRegistros });
+      setAvisos(normalizado.avisos);
+      setRegistros(normalizado.registros);
+      setResultado(null);
+      setIntento(false);
+      setFase("revision");
+    } catch (falla) {
+      setError(mensajeDeError(falla, "No pudimos analizar el texto. Prob\xE1 de nuevo."));
+    } finally {
+      setAnalizando(false);
+    }
+  }
+  async function crearTodo() {
+    if (creando) return;
+    const mandados = registrosIncluidosIA(registros);
+    if (mandados.length === 0) return;
+    setIntento(true);
+    const revision = validarRegistrosIA(registros, esquema);
+    if (!revision.valido) {
+      setError("Complet\xE1 los campos obligatorios marcados.");
+      return;
+    }
+    setCreando(true);
+    setError("");
+    try {
+      const limpios = mandados.map((registro) => ({
+        id: registro.id,
+        tipo: registro.tipo,
+        valores: { ...registro.valores }
+      }));
+      const respuesta = await crear?.(limpios);
+      setResultado(normalizarResultadoIA(respuesta, { total: limpios.length }));
+      setFase("listo");
+    } catch (falla) {
+      setError(mensajeDeError(falla, "No pudimos crear los registros. Prob\xE1 de nuevo."));
+    } finally {
+      setCreando(false);
+    }
+  }
+  function cargarOtroTexto() {
+    setEntrada("");
+    setRegistros([]);
+    setAvisos([]);
+    setResultado(null);
+    setError("");
+    setIntento(false);
+    setFase("entrada");
+  }
+  const pista = [
+    "Peg\xE1 mensajes, listas o cat\xE1logos",
+    permitidos.length > 0 ? `(${permitidos.map((id) => tipoDeEsquemaIA(esquema, id)?.label?.toLowerCase()).filter(Boolean).join(", ")} a la vez).` : "",
+    `M\xE1ximo ${topeTexto.toLocaleString("es-PY")} caracteres.`
+  ].filter(Boolean).join(" ");
+  const resumen = resultado ? {
+    creados: resultado.creados,
+    total: resultado.total,
+    errores: resultado.errores,
+    advertencias: resultado.advertencias
+  } : null;
+  return /* @__PURE__ */ jsxs88(
+    Modal,
+    {
+      open: Boolean(abierto),
+      onClose: onCerrar,
+      title: titulo2,
+      size: "completo",
+      busy: analizando || creando,
+      className,
+      children: [
+        config === null && !configError ? /* @__PURE__ */ jsxs88("div", { className: "space-y-3", role: "status", "aria-busy": "true", children: [
+          /* @__PURE__ */ jsx106(Skeleton, { className: "h-4 w-40" }),
+          /* @__PURE__ */ jsx106(Skeleton, { className: "h-24 w-full" }),
+          /* @__PURE__ */ jsx106("p", { className: "text-sm text-mute", children: "Consultando la configuraci\xF3n\u2026" })
+        ] }) : null,
+        configError ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: configError }),
+          /* @__PURE__ */ jsxs88(FormActions, { children: [
+            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: onCerrar, children: "Cancelar" }),
+            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: () => setReintento((valor) => valor + 1), children: "Reintentar" })
+          ] })
+        ] }) : null,
+        config && !config.configurada ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: "La IA no est\xE1 configurada en este servidor. Mientras tanto, los registros se cargan a mano desde cada m\xF3dulo, sin perder nada." }),
+          /* @__PURE__ */ jsx106("p", { className: "text-sm text-mute", children: "Cuando la app tenga proveedor configurado, este asistente vuelve solo." }),
+          /* @__PURE__ */ jsxs88(FormActions, { children: [
+            consultarConfig ? /* @__PURE__ */ jsx106(Button, { type: "button", variant: "outline", onClick: () => setReintento((valor) => valor + 1), children: "Volver a chequear" }) : null,
+            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" })
+          ] })
+        ] }) : null,
+        config?.configurada && permitidos.length === 0 ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: "No ten\xE9s permiso para crear ninguno de los tipos de este asistente." }),
+          /* @__PURE__ */ jsx106(FormActions, { children: /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" }) })
+        ] }) : null,
+        config?.configurada && permitidos.length > 0 && fase === "entrada" ? /* @__PURE__ */ jsxs88(
+          "form",
+          {
+            className: "space-y-4",
+            onSubmit: (evento) => {
+              evento.preventDefault();
+              void analizarTexto();
+            },
+            children: [
+              /* @__PURE__ */ jsxs88("div", { children: [
+                /* @__PURE__ */ jsx106(FormField, { label: "Texto para cargar", htmlFor: idTexto, hint: pista, children: /* @__PURE__ */ jsx106(
+                  Textarea,
+                  {
+                    id: idTexto,
+                    rows: 10,
+                    maxLength: topeTexto,
+                    value: entrada,
+                    disabled: analizando,
+                    placeholder,
+                    "aria-describedby": `${idTexto}-descripcion`,
+                    onChange: (evento) => setEntrada(evento.target.value)
+                  }
+                ) }),
+                /* @__PURE__ */ jsxs88("p", { className: "mt-1.5 text-right text-xs text-mute", children: [
+                  entrada.length.toLocaleString("es-PY"),
+                  " / ",
+                  topeTexto.toLocaleString("es-PY")
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxs88("p", { className: "text-xs leading-5 text-mute", children: [
+                "Se manda solo este texto al proveedor de IA configurado",
+                config.modelo ? ` (${config.modelo})` : "",
+                " para armar la vista previa; no se guarda ni se toca la base.",
+                " ",
+                enlacePrivacidad ? /* @__PURE__ */ jsx106(
+                  "a",
+                  {
+                    className: "font-medium text-fono-light underline-offset-2 hover:underline",
+                    href: enlacePrivacidad,
+                    target: "_blank",
+                    rel: "noreferrer",
+                    children: "Pol\xEDtica de privacidad"
+                  }
+                ) : null
+              ] }),
+              error ? /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: error }) : null,
+              /* @__PURE__ */ jsxs88(FormActions, { children: [
+                /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: onCerrar, disabled: analizando, children: "Cancelar" }),
+                /* @__PURE__ */ jsx106(Button, { type: "submit", variant: "primary", disabled: !entrada.trim() || analizando, children: analizando ? "Analizando\u2026" : "Analizar con IA" })
+              ] })
+            ]
+          }
+        ) : null,
+        config?.configurada && permitidos.length > 0 && fase === "revision" ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsx106("p", { className: "text-sm text-mute", children: grupos.length > 0 ? /* @__PURE__ */ jsxs88(Fragment19, { children: [
+            "Detectamos ",
+            /* @__PURE__ */ jsx106("strong", { className: "text-fore", children: partes.join(", ") }),
+            ". Revis\xE1, correg\xED o descart\xE1: nada se crea sin tu confirmaci\xF3n."
+          ] }) : "No detectamos registros en el texto." }),
+          avisos.length > 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: avisos.join(" ") }) : null,
+          error ? /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: error }) : null,
+          grupos.length === 0 ? /* @__PURE__ */ jsx106(
+            EmptyState,
+            {
+              icon: "sparkles",
+              title: "No detectamos registros",
+              description: "Prob\xE1 con un texto m\xE1s completo (nombres, fechas o precios) o volv\xE9 a pegar."
+            }
+          ) : null,
+          grupos.map(({ tipo, registros: delTipo }) => /* @__PURE__ */ jsxs88("section", { "aria-label": `${tipo.label} detectados (${delTipo.length})`, className: "space-y-2.5", children: [
+            /* @__PURE__ */ jsxs88("h3", { className: "text-[10px] font-bold uppercase tracking-wider text-mute", children: [
+              tipo.label,
+              " ",
+              /* @__PURE__ */ jsx106("span", { className: "text-mute/80", children: delTipo.length })
+            ] }),
+            delTipo.map((registro) => /* @__PURE__ */ jsx106(
+              TarjetaRegistroIA,
+              {
+                registro,
+                tipo,
+                errores: intento ? valido.errores.get(registro.id) : void 0,
+                onCambiar: (campoId, valor) => cambiarValor(registro.id, campoId, valor),
+                onIncluir: (incluir) => cambiarInclusion(registro.id, incluir)
+              },
+              registro.id
+            ))
+          ] }, tipo.id)),
+          /* @__PURE__ */ jsxs88(FormActions, { children: [
+            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: () => setFase("entrada"), disabled: creando, children: "Volver" }),
+            /* @__PURE__ */ jsx106(
+              Button,
+              {
+                type: "button",
+                variant: "primary",
+                onClick: () => void crearTodo(),
+                disabled: creando || totalIncluidos === 0,
+                children: creando ? "Creando\u2026" : `Crear todo (${totalIncluidos})`
+              }
+            )
+          ] })
+        ] }) : null,
+        config?.configurada && permitidos.length > 0 && fase === "listo" && resumen ? /* @__PURE__ */ jsxs88("div", { className: "space-y-4", children: [
+          resumen.creados === null ? /* @__PURE__ */ jsx106(Nota, { tono: "info", children: "La app termin\xF3 el alta; el detalle queda en su m\xF3dulo." }) : resumen.creados > 0 ? /* @__PURE__ */ jsx106(Aviso, { tono: "ok", children: resumen.total !== null && resumen.creados < resumen.total ? `Creamos ${resumen.creados} de ${resumen.total} registros.` : `Creamos ${listar(resumen.creados, "registro", "registros")}.` }) : resumen.errores.length === 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "neutro", children: "No se cre\xF3 ning\xFAn registro." }) : null,
+          resumen.advertencias.length > 0 ? /* @__PURE__ */ jsx106(Nota, { tono: "warn", children: resumen.advertencias.join(" ") }) : null,
+          resumen.errores.length > 0 ? /* @__PURE__ */ jsx106(Aviso, { tono: "error", children: `No pudimos crear ${listar(resumen.errores.length, "registro", "registros")}: ${resumen.errores.join(" \xB7 ")}` }) : null,
+          /* @__PURE__ */ jsxs88(FormActions, { children: [
+            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "ghost", onClick: cargarOtroTexto, children: "Cargar otro texto" }),
+            /* @__PURE__ */ jsx106(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Listo" })
+          ] })
+        ] }) : null
+      ]
+    }
+  );
+}
+
 // src/hooks/useSingleFlightSubmit.js
-import { useCallback as useCallback5, useRef as useRef19, useState as useState34 } from "react";
+import { useCallback as useCallback5, useRef as useRef20, useState as useState35 } from "react";
 
 // src/utils/guardado.js
 var AVISO_REFRESCO = "Se guard\xF3 correctamente, pero no se pudo actualizar la lista. Recarg\xE1 la p\xE1gina para ver los cambios; no hace falta guardar otra vez.";
@@ -10220,10 +10850,10 @@ async function completeSave(cerrar, refrescar, { avisar: avisar2 } = {}) {
 
 // src/hooks/useSingleFlightSubmit.js
 function useSingleFlightSubmit(enviar) {
-  const [pendiente, setPendiente] = useState34(false);
-  const ultimoEnviar = useRef19(enviar);
+  const [pendiente, setPendiente] = useState35(false);
+  const ultimoEnviar = useRef20(enviar);
   ultimoEnviar.current = enviar;
-  const envio = useRef19(null);
+  const envio = useRef20(null);
   if (!envio.current) {
     envio.current = crearEnvioUnico(async (evento) => {
       setPendiente(true);
@@ -10753,6 +11383,7 @@ export {
   BarraLote,
   BarraProgreso,
   BloquePago,
+  BotonCargaIA,
   BotonDentroCampo,
   BotonImprimir,
   BuscadorCliente,
@@ -10761,6 +11392,7 @@ export {
   BuscadorProveedor,
   Button,
   CAMPOS_DISPOSITIVO,
+  CAMPOS_IA,
   CAPACIDADES_IPHONE,
   CATEGORIAS_ACCESORIOS,
   CATEGORIAS_FUSION,
@@ -10787,6 +11419,7 @@ export {
   CampanaAvisos,
   CampoSeriales,
   Card,
+  CargaIA,
   CeldaMoneda,
   Checkbox,
   ChipEstado,
@@ -10811,6 +11444,7 @@ export {
   DOMINIOS_EMAIL,
   DataTable,
   DestinoRecepcion,
+  DialogoCargaIA,
   DocumentoImpresion,
   Dot,
   Drawer,
@@ -10852,6 +11486,14 @@ export {
   GoogleMark,
   GradoBadge,
   GraficoBarras,
+  IA_BOTON,
+  IA_RATE_LIMIT,
+  IA_REGISTROS_MAX,
+  IA_TEXTO_MAX,
+  IA_TIMEOUT_MS,
+  IA_TITULO,
+  IA_TOKENS_MAX,
+  IA_TOOLTIP,
   ICONOS,
   ICONOS_HITO,
   ICONO_CATEGORIA,
@@ -10997,6 +11639,7 @@ export {
   buscarEnCatalogo,
   campoBuscableCliente,
   campoBuscableCuenta,
+  campoDeTipoIA,
   caretTrasDigitos,
   categoriaDe,
   categoriasFusion,
@@ -11136,6 +11779,7 @@ export {
   nombreDeDispositivo,
   nombrePartes,
   nombreProveedor,
+  normalizarAnalisisIA,
   normalizarBanco,
   normalizarBusqueda,
   normalizarCategoria,
@@ -11144,11 +11788,13 @@ export {
   normalizarNombre,
   normalizarPersonaTexto,
   normalizarProveedor,
+  normalizarResultadoIA,
   normalizarSerial,
   normalizarSeriales,
   normalizarTelefono,
   normalizeTaxId,
   numeroParcialCuenta,
+  opcionesDeCampoIA,
   opcionesDependiente,
   ordenDePrioridad,
   ordenarPersonas,
@@ -11179,6 +11825,7 @@ export {
   rangoSemana,
   registrarUsoPersona,
   registroConsentimiento,
+  registrosIncluidosIA,
   repartirLinea,
   resolverRecientes,
   resumenPresencia,
@@ -11200,6 +11847,8 @@ export {
   textoContador,
   textoDeTono,
   textoVerificacion,
+  tipoDeEsquemaIA,
+  tituloDeRegistroIA,
   tonoBateria,
   tonoCanonico,
   tonoCompra,
@@ -11219,6 +11868,8 @@ export {
   useTableroOptimista,
   useToast,
   validarImagen,
+  validarRegistrosIA,
+  valorVacioIA,
   ventanaDeLista,
   whatsappUrl
 };

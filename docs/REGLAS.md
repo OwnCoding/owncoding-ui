@@ -987,3 +987,100 @@ Inventario **−37 %** a 1440 px (453 → 285 px al primer equipo) y capturas
 Esto es **densidad visual**, no rendimiento: §15.11 (listas acotadas o
 virtualizadas) sigue vigente y compactar no justifica recortar datos ni
 funciones.
+
+## 18. «Carga con IA» (#11/#12)
+
+Asistente **opcional** para cargar datos desde **texto libre**: la persona pega
+texto, la IA detecta registros y **nada se crea sin confirmación** suya. La
+biblioteca lo da completo: `CargaIA` (botón + diálogo juntos, con montaje
+diferido), `BotonCargaIA` (topbar, ✨ con tooltip), `DialogoCargaIA` (entrada,
+revisión y resultado), el contrato puro en `utils/cargaIA.js` y el **motor
+server** en `owncoding-ui/ia`. No duplica reglas: los campos salen de la
+**fuente única por tipo de dato** (§1) y la privacidad se apoya en la **§12 de
+`docs/REGLAS-ECOSISTEMA.md`**.
+
+### Esquema y callbacks (lo que pasa la app)
+
+- La app define un **esquema declarativo** `EsquemaIA`:
+  `{ tipos: [{ id, label, singular?, plural?, campos: [{ id, label, tipo,
+  obligatorio?, ayuda?, opciones?, moneda?, maxLargo? }] }] }`, con `tipo` en
+  `texto | numero | moneda | fecha | select` (`CAMPOS_IA`). El diálogo dibuja
+  cada campo con el objeto publicado que corresponde (`Input`, `MoneyInput`,
+  `Select`; fechas con `input type="date"` y la lógica de `utils/fecha.js`).
+- La app inyecta `analizar(texto, tipos)` y `crear(registros)`: el
+  **componente** no hace `fetch`, no conoce endpoints, permisos ni proveedores
+  (el `fetch` al proveedor vive solo en el motor server, abajo). `analizar`
+  devuelve `AnalisisIA` (`{ registros, avisos }`, tolerando también la forma
+  por tipo `{ clientes: [...] }` con los campos planos); `crear` recibe
+  **solo los registros incluidos** (`RegistroIA[]`, en el orden del preview) y
+  devuelve `{ creados, errores?, advertencias? }`.
+- **Cero éxito falso (§15.1):** si `crear` no informa el conteo, el resultado
+  no inventa números; los creados salen de lo que devolvió la app.
+- **Nada se crea sin confirmación:** `crear` se llama **solo** desde
+  «Crear todo»; descartar una tarjeta la saca del alta y los obligatorios
+  vacíos bloquean la creación con el campo marcado.
+- **No se persiste el texto pegado:** la biblioteca no guarda el texto (ni en
+  logs ni en storage); la app tampoco lo persiste (el endpoint solo lo manda al
+  proveedor y lo descarta).
+
+### Límites y estados
+
+- Por defecto **20.000** caracteres (`IA_TEXTO_MAX`) y **25** registros por
+  tipo (`IA_REGISTROS_MAX`), configurables por props; contador visible,
+  `maxLength` al pegar y recorte con aviso.
+- Estados: consultando, **sin configurar** (avisa y no rompe; «Volver a
+  chequear»), entrada, analizando, error con reintento, **revisión editable por
+  tarjetas con avisos** (incluir/descartar, obligatorios visibles) y resultado
+  (creados/errores/advertencias). El diálogo se monta recién al abrirlo.
+
+### Contrato del endpoint de la app
+
+- `GET` → `{ configurada, modelo, tipos }`: `tipos` son los que el rol puede
+  crear; sin `tipos`, el diálogo usa todo el esquema. Sin proveedor
+  configurado `configurada: false`.
+- `POST { texto }` → análisis normalizado. Guardas: el texto es **dato, no
+  instrucción** (prompt anti-inyección), salida **JSON estricto** validada en
+  el servidor, **solo se manda el texto pegado** (nunca la base) y el análisis
+  **no escribe nada**: los registros los crea el panel con los endpoints
+  existentes (mismos permisos, aislamiento por empresa y auditoría).
+
+### Motor server (`owncoding-ui/ia`, #12)
+
+- **Opcional y sin dependencias:** `motorIA({ esquema, tipos })` lee
+  `IA_API_KEY`, `IA_MODELO` y `IA_BASE_URL` (proveedor **OpenAI-compatible**:
+  `POST <base>/chat/completions` con `response_format: json_object`,
+  temperatura 0.1 y `IA_TOKENS_MAX`). Sin `IA_API_KEY` queda **apagado con
+  aviso claro** (`ia_no_configurada`): la app sigue funcionando a mano.
+- **JSON estricto validado contra el esquema:** el prompt se arma solo con los
+  tipos habilitados; la respuesta se parsea (`parsearSalidaIA`) y se valida
+  campo por campo (`validarAnalisisIA`): los obligatorios vacíos descartan la
+  fila con aviso, los tipos se coaccionan (`numero`/`moneda` a número, `fecha`
+  a `YYYY-MM-DD`, `select` contra sus opciones), los campos y tipos
+  desconocidos se ignoran y se recorta a `IA_REGISTROS_MAX` por tipo. Un
+  registro roto no tumba la pasada.
+- **El texto es dato, no instrucción:** el prompt lo dice explícitamente
+  (anti-inyección); solo viaja el texto pegado, **no se persiste, no se
+  loguea** y el motor **no escribe en la base**: la creación sigue en los
+  endpoints de la app, después de la confirmación humana.
+- **`fetch` inyectable:** `motorIA({ fetchImpl })` o
+  `proveedorIA(config, fetch)` permiten probar con un proveedor mockeado, sin
+  red.
+- **Rate-limit:** `crearLimitadorIA()` da la ventana fija `IA_RATE_LIMIT` /
+  `IA_VENTANA_MS` por clave (la organización); con varias instancias del
+  servidor se respalda con un almacén compartido o el rate-limit del borde.
+
+### Privacidad y permisos
+
+- **Ley 7593/2025:** el proveedor de IA es **encargado** —se registra en el
+  inventario de la app (§12.5 de `REGLAS-ECOSISTEMA.md`) y se menciona en la
+  política—; el diálogo avisa que se envía el texto y enlaza la política
+  (`enlacePrivacidad`). **Rate-limit por organización** en el endpoint
+  (referencia: `IA_RATE_LIMIT` = 10 llamadas / 15 min) y auditoría de la
+  transferencia.
+- **Permisos:** los tipos que ofrece `GET` son los que el rol puede crear
+  (mismas capacidades que los endpoints de alta). Si el rol no puede crear
+  ninguno, **el asistente no se ofrece** (la app no monta el botón) y el
+  diálogo tampoco deja confirmar.
+
+**Referencia real:** LedBox `#120` (rama `feat/plataforma`) y Scale OS
+`#117`/`#118`. Adopción: checklist de `docs/ADOPCION-V2.md` §10.
