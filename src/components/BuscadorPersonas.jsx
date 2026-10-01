@@ -157,8 +157,11 @@ export default function BuscadorPersonas({
     return opcion.id === valor
   }
 
+  // #108: limpiar explícito solo donde el campo admite vacío (`opcionVacia`).
+  const limpiarVisible = Boolean(opcionVacia) && valor !== '' && valor != null && !disabled
+
   return (
-    <div ref={raiz} className={cn(desplegable ? 'relative' : '', className)}>
+    <div ref={raiz} className={cn('relative', className)}>
       <Input
         id={id}
         type="search"
@@ -188,9 +191,32 @@ export default function BuscadorPersonas({
           setResaltado(0)
           if (desplegable) setAbierto(true)
         }}
-        onBlur={() => setEditando(false)}
+        onBlur={(evento) => {
+          setEditando(false)
+          // Un solo desplegable a la vez: al salir del campo (Tab/clic fuera),
+          // se cierra la lista.
+          if (desplegable && !raiz.current?.contains(evento.relatedTarget)) setAbierto(false)
+        }}
         onKeyDown={alTeclear}
+        className={limpiarVisible ? 'pr-9' : undefined}
       />
+      {limpiarVisible ? (
+        <button
+          type="button"
+          aria-label={etiquetaLista ? `Limpiar ${etiquetaLista}` : 'Limpiar selección'}
+          title="Limpiar"
+          onMouseDown={(evento) => evento.preventDefault()}
+          onClick={() => {
+            onCambiar?.(null)
+            setQuery('')
+            setEditando(false)
+            setAbierto(false)
+          }}
+          className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-mute transition hover:bg-ink-700 hover:text-fore"
+        >
+          <Icon name="close" className="h-3.5 w-3.5" aria-hidden />
+        </button>
+      ) : null}
       {listaVisible ? (
         <ul
           id={listaId}

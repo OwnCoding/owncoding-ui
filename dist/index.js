@@ -3089,7 +3089,8 @@ function BuscadorPersonas({
     if (opcion.vacia) return valor === "" || valor == null;
     return opcion.id === valor;
   }
-  return /* @__PURE__ */ jsxs18("div", { ref: raiz, className: cn(desplegable ? "relative" : "", className), children: [
+  const limpiarVisible = Boolean(opcionVacia) && valor !== "" && valor != null && !disabled;
+  return /* @__PURE__ */ jsxs18("div", { ref: raiz, className: cn("relative", className), children: [
     /* @__PURE__ */ jsx25(
       Input,
       {
@@ -3120,10 +3121,31 @@ function BuscadorPersonas({
           setResaltado(0);
           if (desplegable) setAbierto(true);
         },
-        onBlur: () => setEditando(false),
-        onKeyDown: alTeclear
+        onBlur: (evento) => {
+          setEditando(false);
+          if (desplegable && !raiz.current?.contains(evento.relatedTarget)) setAbierto(false);
+        },
+        onKeyDown: alTeclear,
+        className: limpiarVisible ? "pr-9" : void 0
       }
     ),
+    limpiarVisible ? /* @__PURE__ */ jsx25(
+      "button",
+      {
+        type: "button",
+        "aria-label": etiquetaLista ? `Limpiar ${etiquetaLista}` : "Limpiar selecci\xF3n",
+        title: "Limpiar",
+        onMouseDown: (evento) => evento.preventDefault(),
+        onClick: () => {
+          onCambiar?.(null);
+          setQuery("");
+          setEditando(false);
+          setAbierto(false);
+        },
+        className: "absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-mute transition hover:bg-ink-700 hover:text-fore",
+        children: /* @__PURE__ */ jsx25(Icon, { name: "close", className: "h-3.5 w-3.5", "aria-hidden": true })
+      }
+    ) : null,
     listaVisible ? /* @__PURE__ */ jsxs18(
       "ul",
       {

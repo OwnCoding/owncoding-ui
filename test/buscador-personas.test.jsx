@@ -146,3 +146,33 @@ describe('BuscadorPersonas · valor visible (#108)', () => {
     act(() => root.unmount())
   })
 })
+
+describe('BuscadorPersonas · limpiar y un solo desplegable (#108)', () => {
+  test('con valor y opcionVacia aparece el limpiar y repone la opción vacía', () => {
+    const contenedor = document.createElement('div')
+    document.body.appendChild(contenedor)
+    const root = createRoot(contenedor)
+    act(() => {
+      root.render(<Controlado inicial="beto" />)
+    })
+    const input = contenedor.querySelector('input')
+    expect(input.value).toBe('Beto Ruiz')
+    const limpiar = contenedor.querySelector('button[aria-label^="Limpiar"]')
+    expect(limpiar).not.toBeNull()
+    act(() => limpiar.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    expect(input.value).toBe('Todos')
+    expect(contenedor.querySelector('button[aria-label^="Limpiar"]')).toBeNull()
+    act(() => root.unmount())
+  })
+
+  test('al salir del campo (focusout) se cierra la lista', () => {
+    const ui = montar({ desplegable: true })
+    ui.enfocar()
+    expect(ui.lista()).not.toBeNull()
+    act(() => {
+      ui.input.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: document.body }))
+    })
+    expect(ui.lista()).toBeNull()
+    ui.desmontar()
+  })
+})
