@@ -4,6 +4,37 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
+## v0.59.0 — 2026-10-01
+
+- **A11y ronda 13 (#13):** verificación de los hallazgos de `dariodeoli/scale-os#60`
+  sobre la versión actual y corrección de los que seguían bajo AA en la paleta
+  de la biblioteca:
+  - **`Button` lleno:** `primary` conserva el par `text-onbrand`/`--c-fono`
+    (7.02:1 claro / 11.69:1 oscuro) y su hover pasa a `brightness-110` (el
+    `bg-fono-light` daba **3.25:1** en claro); `success` y `danger` usan el par
+    nuevo `--c-on-ok`/`--c-on-bad` con `--c-ok`/`--c-bad` (7.13/8.91 y
+    6.47/8.18), definido también para el scope `consola` (antes 2.95:1 en claro
+    y 1.75:1 en oscuro).
+  - **`EnlaceLinea`** usa `text-fono-light` (el verde vivo daba **2.54:1** en
+    claro); `ProductFooter` ya usaba el rol AA.
+  - **`IconAction` por defecto:** target **real de 44 px en móvil** y 28 px en
+    escritorio (el hallazgo medía 28 px en mobile); `size="touch"` sigue igual
+    (36 px de dibujo + 44 de toque con `.toque-44`), sin solaparse con las
+    acciones vecinas.
+  - **Chips:** el `StateChip` warn de la paleta de la biblioteca **ya estaba en
+    AA** (6.07:1 claro / 8.48:1 oscuro; ok 6.12/7.22 y bad 5.46/6.69); el 3.65:1
+    era del mapeo de Scale OS. Se documenta el mapeo `--c-*-text` para paletas
+    propias (el `#8A6207` propuesto da 4.18:1 sobre el tinte real de OPS;
+    `#7E5A06` pasa 4.78:1) y la guarda se extiende a **todos los componentes**
+    (ningún tono base como texto: `BuscadorCliente`, `TarjetaCuentaCobro`,
+    `ConfirmarConPalabra` y `PreviewFusion` pasan a la familia `*-text`).
+  - **Pie del riel:** el slot `pie` de `NavLateral` no pintaba color (hallazgo de
+    la app); ahora hereda `text-fore` como default AA.
+- Tests: guardas nuevas en `contraste-tokens.test.js` (botones llenos y hover,
+  enlace, barrido de los 100+ componentes, chip de Scale OS medido sobre su
+  tinte) y actualización de `render`/`tactil` para el target del `IconAction`.
+- Docs: `REGLAS.md` §8 suma «Botones llenos, enlaces y paletas propias (#13)».
+
 ## v0.58.0 — 2026-10-01
 
 - **«Carga con IA» (#11):** asistente reutilizable para cargar datos desde

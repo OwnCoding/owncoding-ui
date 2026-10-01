@@ -87,7 +87,7 @@ export default function PreviewFusion({
                 <li key={categoria.id} className="flex items-center gap-2 text-sm">
                   <Icon
                     name={cantidad > 0 ? 'check' : 'close'}
-                    className={cn('h-4 w-4 shrink-0', cantidad > 0 ? 'text-ok' : 'text-mute')}
+                    className={cn('h-4 w-4 shrink-0', cantidad > 0 ? 'text-ok-text' : 'text-mute')}
                   />
                   <span className={cn('min-w-0 flex-1 truncate', cantidad > 0 ? 'text-fore' : 'text-mute')}>{categoria.etiqueta}</span>
                   {categoria.detalle ? <span className="min-w-0 truncate text-xs text-mute">{categoria.detalle}</span> : null}

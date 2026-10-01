@@ -259,8 +259,9 @@ export function Pantalla({ impresoras, onGuardar, onImprimir, ciudad, setCiudad 
   (`motorIA`, OpenAI-compatible por `IA_API_KEY`/`IA_MODELO`/`IA_BASE_URL`,
   JSON estricto, `fetch` inyectable y rate-limit). Reglas: `docs/REGLAS.md`
   §18.
-- **Acciones y contenedores:** `Button`, `IconAction` (con `size="touch"` para
-  el área táctil de móvil: 36 px de dibujo + 44 de toque con `.toque-44`),
+- **Acciones y contenedores:** `Button`, `IconAction` (el default mide **44 px
+  reales en móvil** y 28 px en escritorio desde #13; `size="touch"` deja 36 px
+  de dibujo + 44 de toque con `.toque-44`),
   `Card`, `Stat`,
   `Modal` (ancho por `size`: corto/formulario/amplio/completo),
   `ConfirmDialog`, `Drawer`, `ToastProvider`/`useToast`, `Subtabs`.

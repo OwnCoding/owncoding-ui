@@ -142,7 +142,7 @@ export default function NavLateral({
           : lista(items)}
       </div>
 
-      {pie && <div className="border-t border-ink-600 p-2">{pie}</div>}
+      {pie && <div className="border-t border-ink-600 p-2 text-fore">{pie}</div>}
     </nav>
   )
 }

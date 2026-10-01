@@ -57,7 +57,7 @@ export default function TarjetaCuentaCobro({
         {pendiente > 0 ? (
           <p className="text-xs text-mute" data-testid={`${testId}-saldo`}>
             Saldo pendiente de esta venta:{' '}
-            <b className="tabular-nums text-warn">{formatGs(pendiente)}</b>
+            <b className="tabular-nums text-warn-text">{formatGs(pendiente)}</b>
             {equivalente !== null ? (
               <span> · {moneda} {equivalente.toLocaleString('es-PY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             ) : null}

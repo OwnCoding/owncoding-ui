@@ -571,9 +571,9 @@ function Icon({ name, className, ...props }) {
 // src/components/ui.jsx
 import { Fragment, jsx as jsx2, jsxs } from "react/jsx-runtime";
 var VARIANTS = {
-  primary: "bg-fono text-onbrand hover:bg-fono-light",
-  success: "bg-ok text-black hover:brightness-110",
-  danger: "bg-bad text-fore hover:brightness-110",
+  primary: "bg-fono text-onbrand hover:brightness-110",
+  success: "bg-ok text-on-ok hover:brightness-110",
+  danger: "bg-bad text-on-bad hover:brightness-110",
   outline: "bg-transparent text-fore border border-interactivo hover:border-fono hover:bg-fono/10",
   ghost: "bg-transparent text-mute hover:bg-ink-700 hover:text-fore"
 };
@@ -925,7 +925,7 @@ function IconAction({ icon, label, tone = "mute", onClick, disabled = false, siz
       onClick,
       className: cn(
         "inline-flex items-center justify-center rounded-lg border transition active:scale-95 disabled:pointer-events-none disabled:opacity-40",
-        size === "touch" ? "toque-44 h-9 w-9" : "h-7 w-7",
+        size === "touch" ? "toque-44 h-9 w-9" : "h-11 w-11 md:h-7 md:w-7",
         ICON_ACTION_TONE[tone]
       ),
       children: /* @__PURE__ */ jsx2(Icon, { name: icon, className: "h-4 w-4" })
@@ -2786,7 +2786,7 @@ function BuscadorCliente({
                     listaMotivos.length > 0 ? /* @__PURE__ */ jsxs16(
                       "span",
                       {
-                        className: "inline-flex shrink-0 items-center gap-1 rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] font-bold text-warn",
+                        className: "inline-flex shrink-0 items-center gap-1 rounded border border-warn/40 bg-warn/10 px-1.5 py-0.5 text-[10px] font-bold text-warn-text",
                         title: `Coincide en ${listaMotivos.join(", ")}`,
                         children: [
                           /* @__PURE__ */ jsx23(Icon, { name: "alert", className: "h-3 w-3" }),
@@ -3269,7 +3269,7 @@ function PreviewFusion({
             Icon,
             {
               name: cantidad > 0 ? "check" : "close",
-              className: cn("h-4 w-4 shrink-0", cantidad > 0 ? "text-ok" : "text-mute")
+              className: cn("h-4 w-4 shrink-0", cantidad > 0 ? "text-ok-text" : "text-mute")
             }
           ),
           /* @__PURE__ */ jsx26("span", { className: cn("min-w-0 flex-1 truncate", cantidad > 0 ? "text-fore" : "text-mute"), children: categoria.etiqueta }),
@@ -3498,7 +3498,7 @@ function ConfirmarConPalabra({
       "data-testid": testId,
       children: [
         /* @__PURE__ */ jsxs21("div", { className: "rounded-xl border border-bad/30 bg-bad/5 p-3", children: [
-          /* @__PURE__ */ jsx28("p", { className: "text-sm font-semibold text-bad", children: titulo2 }),
+          /* @__PURE__ */ jsx28("p", { className: "text-sm font-semibold text-bad-text", children: titulo2 }),
           resumen ? /* @__PURE__ */ jsx28("div", { className: "mt-1 text-sm", children: resumen }) : null,
           /* @__PURE__ */ jsx28("p", { className: "mt-1 text-xs text-mute", children: advertencia })
         ] }),
@@ -3633,7 +3633,7 @@ function TarjetaCuentaCobro({
           pendiente > 0 ? /* @__PURE__ */ jsxs22("p", { className: "text-xs text-mute", "data-testid": `${testId}-saldo`, children: [
             "Saldo pendiente de esta venta:",
             " ",
-            /* @__PURE__ */ jsx29("b", { className: "tabular-nums text-warn", children: formatGs(pendiente) }),
+            /* @__PURE__ */ jsx29("b", { className: "tabular-nums text-warn-text", children: formatGs(pendiente) }),
             equivalente !== null ? /* @__PURE__ */ jsxs22("span", { children: [
               " \xB7 ",
               moneda,
@@ -4962,7 +4962,7 @@ function NavLateral({
             (!plegado || colapsado) && lista(itemsGrupo)
           ] }, titulo2);
         }) : lista(items) }),
-        pie && /* @__PURE__ */ jsx43("div", { className: "border-t border-ink-600 p-2", children: pie })
+        pie && /* @__PURE__ */ jsx43("div", { className: "border-t border-ink-600 p-2 text-fore", children: pie })
       ]
     }
   );
@@ -5049,7 +5049,7 @@ function EnlaceLinea({ href, onClick, children, className }) {
       href,
       onClick,
       className: cn(
-        "font-medium text-fono underline underline-offset-2 hover:no-underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fono/40",
+        "font-medium text-fono-light underline underline-offset-2 hover:no-underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fono/40",
         className
       ),
       children

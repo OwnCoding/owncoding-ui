@@ -84,6 +84,9 @@ export default {
         mute: 'rgb(var(--c-mute) / <alpha-value>)',
         // Texto sobre el color de marca (en ambos temas)
         onbrand: 'rgb(var(--c-onbrand) / <alpha-value>)',
+        // Texto sobre los rellenos llenos ok/bad (#13), par por tema
+        'on-ok': 'rgb(var(--c-on-ok) / <alpha-value>)',
+        'on-bad': 'rgb(var(--c-on-bad) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],

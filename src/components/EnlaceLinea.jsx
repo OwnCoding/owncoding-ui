@@ -11,7 +11,7 @@ export default function EnlaceLinea({ href, onClick, children, className }) {
       href={href}
       onClick={onClick}
       className={cn(
-        'font-medium text-fono underline underline-offset-2 hover:no-underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fono/40',
+        'font-medium text-fono-light underline underline-offset-2 hover:no-underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fono/40',
         className,
       )}
     >
