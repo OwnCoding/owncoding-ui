@@ -1,0 +1,77 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { describe, expect, test } from 'vitest'
+
+const SITE_URL = 'https://controlaria.online/'
+const PUBLIC_DIR = 'gallery/public'
+const INDEX = readFileSync('gallery/index.html', 'utf8')
+
+function attribute(tag, name) {
+  return tag.match(new RegExp(`${name}="([^"]+)"`))?.[1]
+}
+
+function metaBy(attributeName, value) {
+  return INDEX.match(new RegExp(`<meta[^>]+${attributeName}="${value}"[^>]*>`))?.[0]
+}
+
+describe('identidad publica y SEO de la galeria', () => {
+  test('publica metadata canonica, social y de indexacion coherente', () => {
+    expect(INDEX).toContain(`<link rel="canonical" href="${SITE_URL}" />`)
+    expect(attribute(metaBy('name', 'description'), 'content')?.length).toBeGreaterThanOrEqual(120)
+    expect(attribute(metaBy('name', 'robots'), 'content')).toContain('index, follow')
+    expect(attribute(metaBy('property', 'og:url'), 'content')).toBe(SITE_URL)
+    expect(attribute(metaBy('property', 'og:locale'), 'content')).toBe('es_PY')
+    expect(attribute(metaBy('property', 'og:image'), 'content')).toBe(`${SITE_URL}og-owncoding-ui.png`)
+    expect(attribute(metaBy('property', 'og:image:width'), 'content')).toBe('1200')
+    expect(attribute(metaBy('property', 'og:image:height'), 'content')).toBe('630')
+    expect(attribute(metaBy('name', 'twitter:card'), 'content')).toBe('summary_large_image')
+    expect(attribute(metaBy('name', 'twitter:image'), 'content')).toBe(`${SITE_URL}og-owncoding-ui.png`)
+  })
+
+  test('incluye favicons y manifest con todos sus archivos locales', () => {
+    const expectedAssets = [
+      'favicon.svg',
+      'favicon-16x16.png',
+      'favicon-32x32.png',
+      'apple-touch-icon.png',
+      'mask-icon.svg',
+      'app-icon-192.png',
+      'app-icon-512.png',
+      'app-icon-maskable-512.png',
+      'og-owncoding-ui.png',
+      'site.webmanifest',
+      'robots.txt',
+      'sitemap.xml',
+    ]
+
+    for (const asset of expectedAssets) {
+      expect(existsSync(`${PUBLIC_DIR}/${asset}`), asset).toBe(true)
+    }
+
+    expect(INDEX).toContain('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />')
+    expect(INDEX).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />')
+    expect(INDEX).toContain('<link rel="manifest" href="/site.webmanifest" />')
+
+    const manifest = JSON.parse(readFileSync(`${PUBLIC_DIR}/site.webmanifest`, 'utf8'))
+    expect(manifest.lang).toBe('es-PY')
+    expect(manifest.icons.map(({ src, sizes, purpose }) => ({ src, sizes, purpose }))).toEqual([
+      { src: '/app-icon-192.png', sizes: '192x192', purpose: 'any' },
+      { src: '/app-icon-512.png', sizes: '512x512', purpose: 'any' },
+      { src: '/app-icon-maskable-512.png', sizes: '512x512', purpose: 'maskable' },
+    ])
+  })
+
+  test('mantiene robots, sitemap y JSON-LD limitados a la galeria publica', () => {
+    const robots = readFileSync(`${PUBLIC_DIR}/robots.txt`, 'utf8')
+    const sitemap = readFileSync(`${PUBLIC_DIR}/sitemap.xml`, 'utf8')
+    expect(robots).toContain(`Sitemap: ${SITE_URL}sitemap.xml`)
+    expect(sitemap).toContain(`<loc>${SITE_URL}</loc>`)
+    expect(sitemap.match(/<url>/g)).toHaveLength(1)
+
+    const jsonLd = INDEX.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1]
+    expect(jsonLd).toBeTruthy()
+    const schema = JSON.parse(jsonLd)
+    expect(schema['@context']).toBe('https://schema.org')
+    expect(schema['@graph'].map((item) => item['@type'])).toEqual(['WebSite', 'SoftwareApplication'])
+    expect(JSON.stringify(schema)).not.toMatch(/aggregateRating|offers|address|sameAs/)
+  })
+})

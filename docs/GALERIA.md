@@ -34,6 +34,12 @@ incluye `/status.json` como archivo estático real —no como fallback del SPA�
 }
 ```
 
+La identidad pública se sirve desde `gallery/public/`: favicons, iconos para
+pantalla de inicio, imagen social de 1200×630, manifest, `robots.txt` y un
+`sitemap.xml` limitado a la portada. La URL canónica y las imágenes sociales
+usan `https://controlaria.online/`; funcionan igual cuando el documento se
+consulta desde `www` y evitan publicar rutas internas o privadas.
+
 ## Contrato para OwnCoding Hub / Coolify
 
 - Runtime de build: **Node 24** actualizado (24.15 o posterior).
