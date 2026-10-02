@@ -517,14 +517,14 @@ function VistaClienteDocumento() {
   )
 }
 
-function OtrosCamposInteligentes() {
+export function OtrosCamposInteligentes() {
   const [monto, setMonto] = useState(1250000)
   const [porcentaje, setPorcentaje] = useState('18')
   const [correo, setCorreo] = useState('ventas@')
   const [serial, setSerial] = useState('ABC123456')
 
   return (
-    <details className="smart-inputs">
+    <details open className="smart-inputs">
       <summary>
         <span>
           <strong>Otros campos inteligentes</strong>
