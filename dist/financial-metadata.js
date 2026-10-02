@@ -8,12 +8,10 @@ var AUTORIZACION_ASSETS_FINANCIEROS = Object.freeze({
 });
 var BLOQUEOS_ASSETS_FINANCIEROS = Object.freeze([
   { catalogo: "banco", id: "Banco do Brasil", motivo: "favicon-oficial-48px-bajo-minimo-64px-sin-lockup-horizontal-verificado" },
-  { catalogo: "pago", id: "Visa", motivo: "kit-oficial-requiere-acceso" },
-  { catalogo: "pago", id: "Mastercard", motivo: "endpoint-oficial-bloqueado" },
   { catalogo: "pago", id: "Pix", motivo: "kit-oficial-solo-participantes" },
-  { catalogo: "pago", id: "Red Infonet", motivo: "sin-marca-independiente-verificada" },
+  { catalogo: "pago", id: "Red Infonet", motivo: "original-bancard-canvas-transparente-excesivo-sin-derivado-autorizado" },
   { catalogo: "pago", id: "uPOS", variante: "horizontal", motivo: "producto-upay-sin-marca-independiente" },
-  { catalogo: "pago", id: "Panal", motivo: "sin-asset-directo-verificado" }
+  { catalogo: "pago", id: "Panal", motivo: "original-procesador-canvas-transparente-excesivo-sin-derivado-autorizado" }
 ]);
 
 // src/utils/relacionesFinancieras.js
@@ -136,7 +134,14 @@ var COOPERATIVAS_PARAGUAY = [
   "San Crist\xF3bal",
   "Universitaria",
   "Luque",
-  "Coopeduc"
+  "Coopeduc",
+  "Capiat\xE1",
+  "\xD1emby",
+  "Lambar\xE9",
+  "Coode\xF1e",
+  "Mburica\xF3",
+  "Mercado N\xBA 4",
+  "San Lorenzo"
 ];
 var BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY];
 var EMPAQUETADO = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion });
@@ -165,6 +170,22 @@ function entrada({ categoria, alias = [], monograma, color, fuenteOficial, estad
     variantes: requierePermiso && !permiso ? variantesFallback("permiso-pendiente") : variantes || variantesFallback(estado === "permiso-pendiente" ? "permiso-pendiente" : "fallback"),
     ...legacy
   };
+}
+function cooperativaOriginal(nombre, fuenteOficial, archivo, cuadrada = false, compacto) {
+  const presentacion = { fondo: "#ffffff", padding: true };
+  return entrada({
+    categoria: "cooperativa",
+    alias: [`cooperativa ${nombre}`, nombre.replace("N\xBA", "N\xB0")],
+    monograma: nombre.slice(0, 1),
+    color: "#15803d",
+    fuenteOficial,
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: compacto || cuadrada ? EMPAQUETADO(compacto || archivo, "oficial", presentacion) : CONTENIDO(archivo, "oficial", { ...presentacion, descripcion: "Marca horizontal oficial completa contenida en el espacio compacto; no es un s\xEDmbolo independiente." }),
+      horizontal: cuadrada ? MARCA_CONTENIDA(archivo, { ...presentacion, descripcion: "Marca oficial completa contenida en el espacio horizontal; no existe un lockup horizontal independiente verificado." }) : EMPAQUETADO(archivo, "oficial", presentacion)
+    }
+  });
 }
 var LOGOS_BANCOS = {
   "Banco Atlas": entrada({
@@ -469,6 +490,13 @@ var LOGOS_BANCOS = {
       horizontal: EMPAQUETADO("coopeduc-horizontal.png", "oficial", { fondo: "#ffffff", padding: true })
     }
   }),
+  "Capiat\xE1": cooperativaOriginal("Capiat\xE1", "https://www.capiata.coop.py/", "capiata-horizontal.png", false),
+  "\xD1emby": cooperativaOriginal("\xD1emby", "https://coopnemby.coop.py/", "nemby-horizontal.png", true, "nemby-compacto.png"),
+  "Lambar\xE9": cooperativaOriginal("Lambar\xE9", "https://www.lambare.coop.py/", "lambare-horizontal.gif", true),
+  "Coode\xF1e": cooperativaOriginal("Coode\xF1e", "https://coodene.coop.py/", "coodene-horizontal.png", false),
+  "Mburica\xF3": cooperativaOriginal("Mburica\xF3", "https://mburicao.coop.py/", "mburicao-horizontal.png", false),
+  "Mercado N\xBA 4": cooperativaOriginal("Mercado N\xBA 4", "https://coopmer4.coop.py/", "mercado-n4-horizontal.png", true),
+  "San Lorenzo": cooperativaOriginal("San Lorenzo", "https://www.sanlorenzo.coop.py/", "san-lorenzo-compacto.png", true),
   "Financiera El Comercio": { redirigeA: "ueno bank", alias: ["el comercio"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   "Visi\xF3n Banco": { redirigeA: "ueno bank", alias: ["vision", "banco vision", "visi\xF3n"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   "Banco R\xEDo": { redirigeA: "Banco Continental", alias: ["rio", "banco rio", "banco r\xEDo"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS }
@@ -611,18 +639,20 @@ var MARCAS_MEDIOS_PAGO = {
     categoria: "red-tarjeta",
     monograma: "V",
     color: "#1434CB",
-    fuenteOficial: "https://corporate.visa.com/en/about-visa/brand.html",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO2("asset-bloqueado"), horizontal: TEXTO2("asset-bloqueado") }
+    fuenteOficial: "https://www.visa.com.py/",
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO2("visa-marca.png", "oficial", { fondo: "#ffffff", padding: true, descripcion: "Wordmark oficial completo contenido en el espacio compacto; no es un s\xEDmbolo independiente." }), horizontal: EMPAQUETADO2("visa-marca.png", "oficial", { fondo: "#ffffff", padding: true }) }
   }),
   Mastercard: entrada2({
     categoria: "red-tarjeta",
     alias: ["master card"],
     monograma: "MC",
     color: "#EB001B",
-    fuenteOficial: "https://www.mastercard.com/brandcenter/us/en/download-artwork.html",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO2("asset-bloqueado"), horizontal: TEXTO2("asset-bloqueado") }
+    fuenteOficial: "https://newsroom.mastercard.com/",
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO2("mastercard-marca.svg"), horizontal: { ...EMPAQUETADO2("mastercard-marca.svg"), tipo: "marca-contained", descripcion: "S\xEDmbolo oficial completo contenido en el espacio horizontal; no es un wordmark independiente." } }
   }),
   "American Express": entrada2({
     categoria: "red-tarjeta",

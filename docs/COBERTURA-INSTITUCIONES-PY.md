@@ -15,13 +15,14 @@ Su exclusión del selector y de las tarjetas de galería es **curaduría del
 usuario**, no evidencia de inactividad ni revocación. El lookup histórico sigue
 resolviendo sus aliases y conserva el bloqueo de calidad del asset.
 
-La selección actual ofrece **19 entidades BCP + 6 cooperativas = 25**.
+La selección actual ofrece **19 entidades BCP + 13 cooperativas = 32**.
 
 ## Cooperativas: cobertura parcial
 
-Se ofrecen Coomecipar, Medalla Milagrosa, San Cristóbal, Universitaria, Luque y
-Coopeduc. Los originales de primera parte de las dos últimas se incorporan sin
-modificar; su procedencia no equivale a una licencia abierta.
+Se ofrecen Coomecipar, Medalla Milagrosa, San Cristóbal, Universitaria, Luque,
+Coopeduc, Capiatá, Ñemby, Lambaré, Coodeñe, Mburicaó, Mercado Nº 4 y San Lorenzo.
+La ampliación incorpora originales sin modificar y no equivale a una licencia
+abierta ni a un padrón financiero completo.
 El [registro de INCOOP](https://www.incoop.gov.py/?page_id=131) y su
 [informe de nómina de socios de 2025](https://www.incoop.gov.py/wp-content/uploads/2026/09/Informe-de-nomina-de-socios-2025.pdf)
 requieren reconciliación por sector y vigencia. Las 554 cooperativas del informe
@@ -31,45 +32,49 @@ obtuvo una lectura íntegra verificable, por lo que no se publica un porcentaje
 exhaustivo de cobertura.
 
 El [informe financiero CAC tipo A de diciembre de 2025](https://www.incoop.gov.py/wp-content/uploads/2026/07/Informe-financiero-de-las-CAC-Tipo-A-Diciembre-2025.pdf)
-permite identificar al menos 17 cooperativas ausentes de la selección actual:
-Credivill, Coopensa, Lambaré, Ñandutí, Ñemby, 8 de Marzo, 24 de Octubre,
-Judicial, Capiatá, Del Sur, Coodeñe, Mercado Nº 4, CACEC, Mburicaó,
-Tobatí, Reducto y San Lorenzo.
+permite identificar al menos 10 cooperativas ausentes de la selección actual:
+Credivill, Coopensa, Ñandutí, 8 de Marzo, 24 de Octubre, Judicial, Del Sur,
+CACEC, Tobatí y Reducto.
 
 Estos faltantes son evidencia para una futura ampliación, **no nuevas opciones
 implementadas**. Queda pendiente reconciliar el padrón vigente y obtener assets
 auténticos con procedencia y autorización de superficie documentadas. No se
 inventan logos ni se incluyen automáticamente cooperativas de otros sectores.
 
-## Candidatas pendientes de assets — 2026-10-02
+## Originales incorporados — 2026-10-02
 
-- Capiatá: original horizontal de 192.846 B; el compacto indicado devolvió 404.
-  El original horizontal excede el margen de los bundles inline.
-- Ñemby: originales de 85.936 B (logo) y 57.394 B (favicon); incluso el menor
-  excede el margen restante de los bundles inline.
-- Lambaré: GIF original de 7.928 B, 121 × 122; el build y el auditor actual no
-  admiten este formato con comprobación equivalente. Se requiere soporte
-  específico sin transformar ni recrear el archivo.
+El manifiesto registra URL exacta, dimensiones, SHA-256 y autorización de
+superficie para cada original. Se incorporan Capiatá (horizontal completo
+contenido en compacto), Ñemby (favicon y marca cuadrada contenida en horizontal),
+Lambaré (GIF estático original 121 × 122 contenido en horizontal), Coodeñe y
+Mburicaó (horizontales contenidos en compacto), Mercado Nº 4 (marca cuadrada
+contenida en horizontal) y San Lorenzo (compacto 192 × 192 contenido en horizontal).
 
-No se ofrecen estas tres nuevas opciones sin asset verificado y presupuesto.
-Sus límites son del empaquetado actual, no afirmaciones de inactividad ni falta
-de autorización. No se aumenta ningún presupuesto. Los siete bloqueos previos
-del manifiesto continúan separados de estas candidatas no incorporadas.
+El soporte GIF valida firmas GIF87a/GIF89a, tablas, raster LZW, dimensiones,
+transparencia y trailer; rechaza animación, extensiones no soportadas, truncados
+y expansión fuera del frame. Aplica los mismos mínimos raster y de cobertura
+que PNG, sin excepciones nuevas.
 
-### Procedencia de originales examinados, aún no empaquetados
+## Fuentes examinadas no empaquetadas
 
-Recuperados e inspeccionados el 2026-10-02; se conservaron los bytes originales
-para la evaluación. No se atribuye una licencia abierta a estas fuentes.
+- Capiatá: compacto indicado devolvió 404; se reutiliza honestamente el horizontal.
+- Mburicaó: favicon opcional devolvió 404; no se inventa otro símbolo.
+- 24 de Octubre: [original 512 × 512](https://cooperativa24.coop.py/wp-content/uploads/2025/11/cropped-cropped-cropped-cropped-Logo-compsinfondo.png)
+  y [favicon 192 × 192](https://cooperativa24.coop.py/wp-content/uploads/2025/11/cropped-cropped-Logo-compsinfondo-192x192.png)
+  conservan cobertura transparente 0,525169 y 0,522786: inferior al mínimo
+  vigente de 0,55. No se recortan ni se agrega una excepción.
+- Tobatí: [original 2551 × 800](https://www.cooptobati.com.py/assets/images/logo-cooperativa-nuestra-tobati-dark.png)
+  contiene un emblema y un rectángulo verde vacío, sin lockup utilizable completo.
+  No se recorta el emblema ni se reconstruye texto; no se ofrece esta nueva opción.
+- San Lorenzo: [horizontal original 2386 × 776](https://www.sanlorenzo.coop.py/wp-content/uploads/2026/01/LOGO-HORIZONTAL.png)
+  de 375.010 B superó el límite packed en el ensayo completo: 5.480.592 B frente
+  a 5.250.000 B. Su SHA-256 se conserva en el [registro de evaluación](financial-assets-evaluation.json);
+  se publica solo el compacto genuino y se identifica el horizontal como contenido,
+  no como lockup independiente.
 
-- [capiata-horizontal.png](https://www.capiata.coop.py/coop_capiata/assets/images/logo_horizontal.png), 192,846 B; SHA-256
-  `8874f1afe65493224d613967e0680e90eb6e1c0d987de4d6637326461048967c`.
-- [nemby.png](https://coopnemby.coop.py/img/logo.png), 85,936 B; SHA-256
-  `a6214c5ac7d199387bd23828be8e635771019635e91ebd6840c497d17db127b8`.
-- [nemby-compacto.png](https://coopnemby.coop.py/img/favicon.png), 57,394 B; SHA-256
-  `b8f263d6e746bf84ac6e8d69013318867780f77f96b62a70ac0db6874021fda0`.
-- [lambare.gif](https://www.lambare.coop.py/images/logo_07.gif), 7,928 B; SHA-256
-  `9098ce09992d48bb9e3547c5bbce2ca51a0a629bf2fc9dc0134d8addd6a2416e`.
+Estos límites no afirman inactividad regulatoria ni ausencia de autorización.
+La cobertura INCOOP permanece parcial. Las fuentes no incorporadas se mantienen
+fuera del tarball; sus hashes documentan la evaluación, no assets del runtime.
 
-La URL compacta indicada de Capiatá
-`https://www.capiata.coop.py/assets/images/logo.png` devolvió HTTP 404; no se
-supone un archivo alternativo ni se construye un símbolo.
+Los originales descartados conservan URL, fecha, tamaño, dimensiones y SHA-256
+en [financial-assets-evaluation.json](financial-assets-evaluation.json).

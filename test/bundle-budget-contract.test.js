@@ -4,14 +4,14 @@ import { expect, test } from 'vitest'
 const source = readFileSync('scripts/check-bundle.mjs', 'utf8')
 const budgets = Object.fromEntries([...source.matchAll(/'([^']+)': \{ raw: ([\d_]+), gzip: ([\d_]+) \}/g)].map(([, name, raw, gzip]) => [name, { raw: Number(raw.replaceAll('_', '')), gzip: Number(gzip.replaceAll('_', '')) }]))
 
-test('original PNG allowance changes only affected bounded bundle ceilings', () => {
+test('shared original artwork and pure metadata have finite measured closure ceilings', () => {
   expect(budgets).toEqual({
-    'dist/index.js': { raw: 2600000, gzip: 1500000 },
-    'dist/financial.js': { raw: 2010000, gzip: 1360000 },
-    'dist/utils.js': { raw: 165000, gzip: 42000 },
+    'dist/index.js': { raw: 3262000, gzip: 1981000 },
+    'dist/financial.js': { raw: 2669000, gzip: 1844000 },
+    'dist/utils.js': { raw: 168702, gzip: 40949 },
     'dist/ia.js': { raw: 20000, gzip: 6000 },
     'dist/phone.js': { raw: 35000, gzip: 11000 },
-    'dist/financial-metadata.js': { raw: 42000, gzip: 9000 },
+    'dist/financial-metadata.js': { raw: 43216, gzip: 8109 },
     'dist/app-identity.js': { raw: 3000, gzip: 1500 },
     'dist/email.js': { raw: 9000, gzip: 3500 },
   })

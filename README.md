@@ -456,7 +456,7 @@ Antes de incorporar un componente, confirma que no exista un patrón equivalente
 y sigue [`docs/ALIMENTAR.md`](docs/ALIMENTAR.md). La biblioteca debe resolver
 interfaz compartida; la lógica de negocio continúa en cada producto.
 
-El catálogo ofrecido contiene 25 instituciones: Banco do Brasil se excluye por
+El catálogo ofrecido contiene 32 instituciones: Banco do Brasil se excluye por
 curaduría del usuario; sus aliases y metadatos históricos siguen disponibles.
 Esta selección no representa el padrón completo de entidades supervisadas.
 
@@ -465,9 +465,15 @@ de impresión simulada, hoja y papel aislado, certificado, manifiesto, etiqueta,
 seriales, consentimiento, revisión y lotes. Ningún control envía trabajos de
 impresión, consulta dispositivos, sube datos o persiste cambios.
 
-El grupo de cooperativas incorpora Luque y Coopeduc con originales de primera
-parte y procedencia verificable; sus marcas horizontales completas se contienen
-en el slot compacto, sin fabricar símbolos. Son 6 cooperativas ofrecidas, no
-un padrón exhaustivo. Capiatá y Ñemby quedan pendientes del presupuesto finito
-de bytes, y Lambaré de soporte seguro del GIF original; no se modifican assets
-para forzar cobertura ni se elevan presupuestos.
+El grupo ofrece 13 cooperativas con originales verificables y variantes
+contenidas explícitas cuando no existe un símbolo o lockup independiente.
+Capiatá, Ñemby y Lambaré ya se incorporan; 24 de Octubre y Tobatí siguen
+bloqueadas por calidad sin recortar ni reconstruir imágenes. San Lorenzo usa
+su compacto oficial también como marca contenida horizontal. Visa y Mastercard
+usan originales públicos de primera parte; Pix, Red Infonet y Panal conservan
+sus bloqueos y uPOS su presentación de producto padre.
+
+El build visual comparte los data URLs en un único chunk ESM, conservando
+importación síncrona y SSR Node sin URLs de archivo. La deduplicación es física
+al empaquetar, no una promesa de menor tráfico al importar el barrel. Los límites
+totales del paquete permanecen sin cambios; consulte BUNDLE-BUDGETS.md.

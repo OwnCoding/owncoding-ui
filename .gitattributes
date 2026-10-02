@@ -1,0 +1,2 @@
+# Preserve the newly supplied first-party SVG bytes, including original CRLF.
+src/assets/financial/pagos/mastercard-marca.svg -text whitespace=cr-at-eol

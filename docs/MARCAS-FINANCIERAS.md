@@ -154,19 +154,26 @@ como `Pagopar` → `upay`.
 
 ## Cobertura y bloqueos explícitos
 
-El catálogo usa archivos auténticos para los bancos, financieras, cooperativas
-y medios cuya fuente directa pudo verificarse. Estos IDs permanecen bloqueados
-en esta versión; se muestra su nombre, no una inicial que pueda confundirse con
-una marca:
+El runtime conserva cinco registros de bloqueo: Banco do Brasil (calidad y
+exclusión del selector por curaduría), Pix (original BCB no obtenido), Red
+Infonet y Panal (canvas transparente de sus originales), y la variante horizontal
+de uPOS (producto padre, sin logo independiente). No equivale a cinco marcas
+`asset-bloqueado`: son tres marcas de pago completamente bloqueadas, un slot
+de producto y una institución fuera del selector.
 
-- banco: `Banco do Brasil` solo en lookup histórico; excluido del catálogo ofrecido por curaduría del usuario;
-- pago: `Visa`, `Mastercard`, `Pix`, `Red Infonet`, `Panal`;
-- producto: `uPOS` no tiene una marca independiente verificada; se conserva
-  explícitamente como producto de `upay`.
+Visa usa el wordmark PNG público enlazado desde Visa Paraguay; Mastercard usa
+el símbolo SVG público del newsroom, no un archivo de acceso al Brand Center.
+La variante horizontal de Mastercard contiene el símbolo original, sin afirmar
+un wordmark independiente. El manifiesto guarda URL/hash/fecha de estos dos
+archivos. No se afirma que el acceso público sea una licencia abierta.
 
-Los motivos exactos y el estado de cada variante viven en
-`BLOQUEOS_ASSETS_FINANCIEROS` y en el manifiesto. Un sitio bloqueado o un kit
-restringido nunca se reemplaza con un mirror de terceros.
+Red Infonet y Panal tienen originales publicados por Bancard, pero fallan el
+mínimo inalterado de cobertura 0,55 (0,389320 y 0,328436). Panal se identifica
+como tarjeta confirmada por Universitaria, no Panal Seguros; el archivo es del
+procesador, no del emisor. uPOS tiene una ilustración de terminal pública, no
+una identidad de marca certificada. No se recorta, reconstruye ni sustituye el
+logo de otra entidad. La evaluación no empaquetada conserva evidencia en
+[financial-assets-evaluation.json](financial-assets-evaluation.json).
 
 ## Correcciones de catálogo
 
@@ -206,9 +213,26 @@ Luque y Coopeduc incorporan originales de primera parte sin modificar bytes.
 Las URL exactas, dimensiones y SHA-256 están en el manifiesto; la autorización
 sigue limitada a las superficies OwnCoding documentadas arriba. Ambas marcas
 completas se presentan como **contenidas** en compacto, no como símbolos nuevos.
-La selección pasa de 4 a 6 cooperativas y de 23 a 25 instituciones ofrecidas.
+La selección actual ofrece 13 cooperativas y 32 instituciones; los primeros originales Luque/Coopeduc se conservan sin cambios.
 El catálogo continúa incompleto; consulta [la auditoría](COBERTURA-INSTITUCIONES-PY.md).
 
 Capiatá y Ñemby no se añaden: sus originales exceden los presupuestos inline
 restantes. Lambaré requiere soporte seguro del GIF original en build y auditor;
 no se convierte ni recrea su marca para evadir el contrato.
+
+
+## Ampliación con build compartido — 2026-10-02
+
+Se agregan Capiatá, Ñemby, Lambaré, Coodeñe, Mburicaó, Mercado Nº 4 y San Lorenzo,
+además de Visa y Mastercard: diez archivos originales nuevos, 84 en total.
+San Lorenzo publica su favicon 192 × 192 y lo contiene en horizontal: el original
+horizontal grande no cabe en el límite packed de la evaluación completa.
+24 de Octubre y Tobatí quedan fuera por calidad, no por situación regulatoria.
+El GIF estático de Lambaré conserva bytes y pasa firma, dimensiones, LZW,
+paleta/trailer y cobertura bajo los mismos límites raster; no se permite animación.
+
+Root y financial comparten físicamente un chunk ESM con data URLs, manteniendo
+SSR Node y exports síncronos. Las entradas puras no alcanzan bytes visuales.
+Los presupuestos suman cada archivo alcanzable una sola vez por entrada y gzip
+por archivo; el paquete incluye los chunks. Los límites packed/unpacked no se
+incrementan. Detalles y mediciones: [BUNDLE-BUDGETS.md](BUNDLE-BUDGETS.md).

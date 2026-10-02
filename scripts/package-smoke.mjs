@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+import { measureClosure } from './bundle-closure.mjs'
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -17,7 +19,7 @@ export function packageInstallArgs(tarball) {
   return ['install', tarball, ...PACKAGE_INSTALL_FLAGS]
 }
 
-export function runPackageSmoke() {
+export async function runPackageSmoke() {
   const temporal = mkdtempSync(join(tmpdir(), 'owncoding-ui-package-'))
   try {
     const salida = execNpmSync(['pack', '--json', '--ignore-scripts', '--pack-destination', temporal], { encoding: 'utf8' })
@@ -29,6 +31,8 @@ export function runPackageSmoke() {
     execNpmSync(packageInstallArgs(tarball), { cwd: app, stdio: 'pipe' })
 
     const smoke = `
+      import React from 'react'
+      import { renderToStaticMarkup } from 'react-dom/server'
       import * as root from 'owncoding-ui'
       import * as utils from 'owncoding-ui/utils'
       import * as ia from 'owncoding-ui/ia'
@@ -42,6 +46,9 @@ export function runPackageSmoke() {
       if (metadata.logoDeBanco('ueno bank')?.visual?.asset) throw new Error('financial-metadata no debe incluir bytes visuales')
       const ueno = financial.logoDeBanco('ueno bank', 'compacto')
       if (!ueno?.visual?.asset?.startsWith('data:image/') || !ueno?.redistribucion?.permitida) throw new Error('asset autorizado de ueno ausente')
+      const markup = renderToStaticMarkup(React.createElement(financial.BancoLogo, { banco: 'ueno bank', variante: 'compacto' }))
+      if (!markup.includes('<img') || !markup.includes('src="data:image/') || markup.includes('file://')) throw new Error('raw Node SSR logo must stay an inline data URL')
+      for (const key of financial.ASSET_KEYS_FINANCIEROS) if (!financial.obtenerAssetFinanciero(key)?.startsWith('data:image/')) throw new Error('asset URL contract changed: ' + key)
       if (financial.ASSET_KEYS_FINANCIEROS.length < 50 || financial.BLOQUEOS_ASSETS_FINANCIEROS.length < 1) throw new Error('manifest financiero incompleto')
     `
     writeFileSync(join(app, 'smoke.mjs'), smoke)
@@ -51,10 +58,15 @@ export function runPackageSmoke() {
     for (const archivo of ['dist/index.d.ts', 'dist/utils.d.ts', 'dist/ia.d.ts', 'dist/phone.d.ts', 'dist/financial.d.ts', 'dist/financial-metadata.d.ts', 'dist/app-identity.d.ts', 'dist/email.d.ts']) {
       readFileSync(join(paquete, archivo))
     }
-    const visualBundle = readFileSync(join(paquete, 'dist/financial.js'), 'utf8')
-    const metadataBundle = readFileSync(join(paquete, 'dist/financial-metadata.js'), 'utf8')
-    if (!visualBundle.includes('data:image/')) throw new Error('financial no contiene assets autorizados')
-    if (metadataBundle.includes('data:image/')) throw new Error('financial-metadata contiene bytes visuales')
+    const visualClosure = await measureClosure(join(paquete, 'dist/financial.js'), { distRoot: join(paquete, 'dist') })
+    await measureClosure(join(paquete, 'dist/index.js'), { distRoot: join(paquete, 'dist') })
+    await measureClosure(join(paquete, 'dist/financial-metadata.js'), { distRoot: join(paquete, 'dist'), pure: true })
+    if (!visualClosure.files.some(file => file.source.includes('data:image/'))) throw new Error('financial closure has no artwork')
+    const manifest = JSON.parse(readFileSync(join(paquete, 'docs/financial-assets-manifest.json'), 'utf8'))
+    for (const asset of manifest.assets) {
+      const bytes = readFileSync(join(paquete, 'src/assets/financial', asset.file))
+      if (createHash('sha256').update(bytes).digest('hex') !== asset.sha256) throw new Error('tarball asset hash changed: ' + asset.file)
+    }
     if (!existsSync(join(paquete, 'src/assets/financial')) || !existsSync(join(paquete, 'docs/financial-assets-manifest.json'))) {
       throw new Error('el tarball no contiene assets locales o su manifest')
     }
@@ -65,5 +77,5 @@ export function runPackageSmoke() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  runPackageSmoke()
+  await runPackageSmoke()
 }

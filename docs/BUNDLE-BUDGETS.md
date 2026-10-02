@@ -58,3 +58,76 @@ The documented project-surface authorization is not an unlimited/open license.
 Run `npm run gallery:check`, `npm test`, `npm run build`, **`npm run check:bundle`**,
 `npm run test:types`, `npm run test:package`, `npm run gallery:build`,
 `npm run readme:check`, `npm run financial-assets:check`, and `git diff --check`.
+
+## Accepted ADR: shared synchronous visual ESM graph (2026-10-02)
+
+Approved scope: root + financial in one esbuild multi-entry splitting build,
+with data URL loaders and `"use client"` on both entries and their shared chunks.
+Utils, metadata, IA, phone, identity and email retain separate builds. Emitted
+file URLs or async asset APIs were rejected: they would change the raw Node SSR
+contract. Recompression/cropping originals was rejected. Package includes chunks,
+maps and original asset files; no package guard excludes those bytes.
+
+The closure guard parses imports with es-module-lexer, sums unique reachable
+in-dist JS (cycles/shared nodes once), sums gzip per file rather than a combined
+stream, and rejects missing files, path/symlink escapes, ambiguous/encoded paths,
+nonliteral imports and undeclared externals. Pure closures reject client modules,
+React dependencies and data-image payloads. Pack smoke imports the actual tarball,
+SSR-renders data-URL logos in raw Node, traverses its closure and checks all
+shipped original hashes. Negative tests cover these boundaries.
+
+### Three measured stages
+
+Published baseline: `8607ac6`, unchanged 74 assets. Shared architecture measurement
+was taken **before** adding assets or metadata; package figures below are the
+observed snapshots before this expanded documentation (final figures are reported
+by the required check). This is physical packaging deduplication, **not** reduced
+traffic/cost of loading a financial/root closure.
+
+| Guard | Published raw / gzip B | Shared, no additions | Shared + eligible originals |
+| --- | ---: | ---: | ---: |
+| Root reachable closure | 2,587,421 / 1,491,404 | 2,589,576 / 1,491,223 | 3,197,592 / 1,941,745 |
+| Financial reachable closure | 2,006,529 / 1,356,434 | 2,008,581 / 1,357,019 | 2,616,597 / 1,807,543 |
+| Utils pure closure | 163,119 / 39,718 | 163,119 / 39,718 | 165,395 / 40,147 |
+| Financial metadata pure closure | 40,093 / 7,511 | 40,093 / 7,511 | 42,369 / 7,950 |
+| Package packed / unpacked | 5,226,791 / 9,952,341 | 3,857,890 / 7,861,564 | 4,760,628 / 8,952,028 |
+
+Ten unmodified originals add **453,383 B** source bytes. Root/financial closure
+raw delta is 608,016 B each versus the shared stage, including metadata/wiring.
+Gzip deltas are 450,522 B root and 450,524 B financial. Utils/metadata raw growth
+is exactly 2,276 B of canonical byte-free institution/payment metadata; gzip
+increases 429/439 B. Both retain the transitive purity guard.
+
+The new public Visa PNG + Mastercard SVG are 7,156 + 2,543 = 9,699 B original.
+Their two emitted asset modules contribute 12,628 raw B and 7,402 incremental
+gzip B to the shared chunk, measured by removing only those two module blocks
+in memory (not rewriting originals). This payload-only measurement excludes
+metadata/wiring changes and is not a separate whole-package baseline.
+
+A complete San Lorenzo horizontal-original trial measured 5,480,592 B packed,
+exceeding the unchanged 5,250,000 B total cap by 230,592 B. That file is not
+packaged; its genuine compact is used with explicit horizontal containment.
+
+### Finite rebaseline, only attributable closures
+
+| Guard | Previous cap raw / gzip B | New cap raw / gzip B |
+| --- | ---: | ---: |
+| Root | 2,600,000 / 1,500,000 | 3,262,000 / 1,981,000 |
+| Financial | 2,010,000 / 1,360,000 | 2,669,000 / 1,844,000 |
+| Utils | 165,000 / 42,000 | 168,702 / 40,949 |
+| Financial metadata | 42,000 / 9,000 | 43,216 / 8,109 |
+
+Visual caps round approximately 2% over actual reachable cost. Pure metadata
+caps use floor(actual × 1.02), no more than 2% headroom; the unrelated pure entry
+caps are unchanged. Package caps remain **5,250,000 packed / 10,010,000 unpacked**.
+The two pure gzip ceilings decrease rather than preserving unnecessary margin.
+Source permission remains project-surface authorization, not an open license.
+
+### Consequences and rollback
+
+Loading either visual closure still carries the inline artwork; importing both
+in one ESM graph shares the physical module. Chunk names are internal and may
+change per build. Consumers/tarballs must preserve all emitted relative chunks.
+Rollback the multi-entry build, closure guard/tests and this new asset/metadata
+batch together; keep previously published gallery fixtures and original assets.
+Before final proof, regenerate dist; after source freeze use check-only commands.

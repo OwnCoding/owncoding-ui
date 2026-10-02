@@ -1,0 +1,119 @@
+{
+  "evaluatedAt": "2026-10-02",
+  "note": "Evaluation evidence only; none of these original files is included in the package. Source provenance is separate from project-surface permission.",
+  "sources": [
+    {
+      "name": "24 de Octubre",
+      "sourceUrl": "https://cooperativa24.coop.py/wp-content/uploads/2025/11/cropped-cropped-cropped-cropped-Logo-compsinfondo.png",
+      "retrievedAt": "2026-10-02",
+      "bytes": 130444,
+      "sha256": "e1f5afdfebd7c67d4b8a31153f79194d5b7d822f58071ac74937232bd53c421e",
+      "dimensions": {
+        "width": 512,
+        "height": 512
+      },
+      "disposition": "not-packaged",
+      "reason": "transparent-canvas",
+      "transparentCoverage": 0.5251693725585938,
+      "minimumCoverage": 0.55
+    },
+    {
+      "name": "24 de Octubre",
+      "sourceUrl": "https://cooperativa24.coop.py/wp-content/uploads/2025/11/cropped-cropped-Logo-compsinfondo-192x192.png",
+      "retrievedAt": "2026-10-02",
+      "bytes": 35169,
+      "sha256": "47625be7a224617326470f1e91835c6895397cae56533ba474a170a48a4a8e6a",
+      "dimensions": {
+        "width": 192,
+        "height": 192
+      },
+      "disposition": "not-packaged",
+      "reason": "transparent-canvas",
+      "transparentCoverage": 0.5227864583333334,
+      "minimumCoverage": 0.55
+    },
+    {
+      "name": "Tobatí",
+      "sourceUrl": "https://www.cooptobati.com.py/assets/images/logo-cooperativa-nuestra-tobati-dark.png",
+      "retrievedAt": "2026-10-02",
+      "bytes": 295015,
+      "sha256": "cdc3e89cb041dfa7bddbaa29d5f5e370ccaf832efe74d17f276f6291ee5ffa22",
+      "dimensions": {
+        "width": 2551,
+        "height": 800
+      },
+      "disposition": "not-packaged",
+      "reason": "unusable-full-lockup"
+    },
+    {
+      "name": "San Lorenzo",
+      "sourceUrl": "https://www.sanlorenzo.coop.py/wp-content/uploads/2026/01/LOGO-HORIZONTAL.png",
+      "retrievedAt": "2026-10-02",
+      "bytes": 375010,
+      "sha256": "cef3c9e655cacdba8557a24f97783986ca770d9e8c9e90a50aa721e3d367e9ac",
+      "dimensions": {
+        "width": 2386,
+        "height": 776
+      },
+      "disposition": "not-packaged",
+      "reason": "packed-budget-full-lockup"
+    },
+    {
+      "name": "Red Infonet",
+      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Infonet.png",
+      "retrievedAt": "2026-10-02",
+      "bytes": 6576,
+      "sha256": "07c382d6254fb8dd24bc4d2e8deba08b4bbd18abc3fb7076eace5b7c41d88670",
+      "dimensions": {
+        "width": 480,
+        "height": 459
+      },
+      "disposition": "not-packaged",
+      "reason": "transparent-canvas",
+      "transparentCoverage": 0.38932007988380535,
+      "minimumCoverage": 0.55
+    },
+    {
+      "name": "Panal",
+      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Panal.png",
+      "retrievedAt": "2026-10-02",
+      "bytes": 7304,
+      "sha256": "218dbe3fa86dd7a244652b842104a9513dcfeb4e7214f8ec622a4c59ca3788ce",
+      "dimensions": {
+        "width": 480,
+        "height": 459
+      },
+      "disposition": "not-packaged",
+      "reason": "transparent-canvas",
+      "transparentCoverage": 0.32843591140159767,
+      "minimumCoverage": 0.55,
+      "sourceAuthority": "Official processor Bancard, not issuer-hosted; card mark, not Panal Seguros",
+      "issuerConfirmationUrl": "https://www.universitaria.coop/tarjetas/panal"
+    },
+    {
+      "name": "uPOS",
+      "sourceUrl": "https://upay.com.py/wp-content/uploads/sites/4/2025/07/upos-2.svg",
+      "retrievedAt": "2026-10-02",
+      "bytes": 10889,
+      "sha256": "71eceba954a9ac15ec879441edba442785eb005ba1cb2c7cadbcbb89b6b3e7fd",
+      "dimensions": {
+        "width": 191,
+        "height": 96
+      },
+      "disposition": "not-packaged",
+      "reason": "product-illustration-not-logo"
+    }
+  ],
+  "unavailable": [
+    {
+      "name": "Capiatá",
+      "sourceUrl": "https://www.capiata.coop.py/assets/images/logo.png",
+      "status": 404
+    },
+    {
+      "name": "Mburicaó",
+      "sourceUrl": "https://mburicao.coop.py/assets/fav-icon/icon.png",
+      "status": 404
+    }
+  ]
+}

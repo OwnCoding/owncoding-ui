@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { inflateSync } from 'node:zlib'
+import { pngMetrics, gifMetrics } from './financial-raster-audit.mjs'
 import { LOGOS_BANCOS } from '../src/utils/bancos.js'
 import { MARCAS_MEDIOS_PAGO } from '../src/utils/mediosPago.js'
 import { BLOQUEOS_ASSETS_FINANCIEROS } from '../src/utils/financialAssets.js'
@@ -72,78 +72,10 @@ for (const asset of manifest.assets) {
   if (asset.file.endsWith('.svg')) errors.push(...auditSvg(asset.file, source))
   if (asset.file.endsWith('.png') && !source.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) errors.push(`${asset.file}: firma PNG inválida`)
   if (asset.file.endsWith('.webp') && source.subarray(8, 12).toString() !== 'WEBP') errors.push(`${asset.file}: firma WebP inválida`)
+  if (asset.file.endsWith('.gif')) {
+    try { gifMetrics(source) } catch (error) { errors.push(`${asset.file}: GIF inválido: ${error.message}`) }
+  }
   if (asset.file.endsWith('.ico') && !source.subarray(0, 4).equals(Buffer.from([0, 0, 1, 0]))) errors.push(`${asset.file}: firma ICO inválida`)
-}
-
-function pngMetrics(source) {
-  let offset = 8
-  let width
-  let height
-  let bitDepth
-  let colorType
-  let interlace
-  let transparency = null
-  const chunks = []
-  while (offset < source.length) {
-    const length = source.readUInt32BE(offset)
-    const type = source.toString('ascii', offset + 4, offset + 8)
-    const data = source.subarray(offset + 8, offset + 8 + length)
-    offset += length + 12
-    if (type === 'IHDR') {
-      width = data.readUInt32BE(0)
-      height = data.readUInt32BE(4)
-      bitDepth = data[8]
-      colorType = data[9]
-      interlace = data[12]
-    } else if (type === 'tRNS') transparency = data
-    else if (type === 'IDAT') chunks.push(data)
-    else if (type === 'IEND') break
-  }
-  const metrics = { width, height, transparentCoverage: null }
-  if (bitDepth !== 8 || interlace !== 0 || ![3, 4, 6].includes(colorType)) return metrics
-
-  const channels = colorType === 6 ? 4 : colorType === 4 ? 2 : 1
-  const stride = width * channels
-  const raw = inflateSync(Buffer.concat(chunks))
-  const paeth = (left, up, upLeft) => {
-    const estimate = left + up - upLeft
-    const leftDistance = Math.abs(estimate - left)
-    const upDistance = Math.abs(estimate - up)
-    const diagonalDistance = Math.abs(estimate - upLeft)
-    return leftDistance <= upDistance && leftDistance <= diagonalDistance ? left : upDistance <= diagonalDistance ? up : upLeft
-  }
-  let previous = Buffer.alloc(stride)
-  let cursor = 0
-  let minX = width
-  let minY = height
-  let maxX = -1
-  let maxY = -1
-  for (let y = 0; y < height; y += 1) {
-    const filter = raw[cursor]
-    cursor += 1
-    const row = Buffer.alloc(stride)
-    for (let index = 0; index < stride; index += 1) {
-      const encoded = raw[cursor]
-      cursor += 1
-      const left = index >= channels ? row[index - channels] : 0
-      const up = previous[index] || 0
-      const upLeft = index >= channels ? previous[index - channels] : 0
-      const predictor = filter === 0 ? 0 : filter === 1 ? left : filter === 2 ? up : filter === 3 ? Math.floor((left + up) / 2) : paeth(left, up, upLeft)
-      row[index] = (encoded + predictor) & 255
-    }
-    for (let x = 0; x < width; x += 1) {
-      const alpha = colorType === 3 ? (transparency?.[row[x]] ?? 255) : row[x * channels + channels - 1]
-      if (alpha > 8) {
-        minX = Math.min(minX, x)
-        maxX = Math.max(maxX, x)
-        minY = Math.min(minY, y)
-        maxY = Math.max(maxY, y)
-      }
-    }
-    previous = row
-  }
-  if (maxX >= minX && maxY >= minY) metrics.transparentCoverage = ((maxX - minX + 1) * (maxY - minY + 1)) / (width * height)
-  return metrics
 }
 
 function svgMetrics(source) {
@@ -165,7 +97,7 @@ async function checkVariantQuality(catalogo, nombre, registro) {
   for (const [variante, visual] of Object.entries(registro.variantes)) {
     if (!visual?.empaquetado) continue
     const source = await readFile(path.join(assetsRoot, visual.empaquetado))
-    const metrics = visual.empaquetado.endsWith('.svg') ? svgMetrics(source) : visual.empaquetado.endsWith('.png') ? pngMetrics(source) : null
+    const metrics = visual.empaquetado.endsWith('.svg') ? svgMetrics(source) : visual.empaquetado.endsWith('.png') ? pngMetrics(source) : visual.empaquetado.endsWith('.gif') ? gifMetrics(source) : null
     if (catalogo === 'banco' && ['horizontal-contained', 'marca-contained'].includes(visual.tipo)) {
       if (!visual.descripcion || !visual.descripcion.includes('contenida')) errors.push(`${catalogo} ${nombre}: presentación contenida sin descripción honesta`)
       if ((visual.tipo === 'horizontal-contained' && (variante !== 'compacto' || metrics?.width / metrics?.height < 1.4)) || (visual.tipo === 'marca-contained' && (variante !== 'horizontal' || metrics?.width / metrics?.height >= 1.4))) errors.push(`${catalogo} ${nombre}: presentación contenida incompatible con su slot`)
@@ -176,7 +108,7 @@ async function checkVariantQuality(catalogo, nombre, registro) {
     const ratio = metrics.width / metrics.height
     if (variante === 'compacto' && !containedCompact && (ratio < 0.5 || ratio > 2)) errors.push(`${catalogo} ${nombre}: compacto fuera de proporción (${ratio.toFixed(2)})`)
     if (variante === 'horizontal' && !containedHorizontal && ratio < 1.4 && !qualityException(catalogo, nombre, variante, 'horizontal-ratio')) errors.push(`${catalogo} ${nombre}: horizontal fuera de proporción (${ratio.toFixed(2)})`)
-    if (visual.empaquetado.endsWith('.png')) {
+    if (/\.(png|gif)$/.test(visual.empaquetado)) {
       const minimum = variante === 'compacto' ? 64 : 56
       if (Math.min(metrics.width, metrics.height) < minimum && !qualityException(catalogo, nombre, variante, 'min-raster')) errors.push(`${catalogo} ${nombre}: ${variante} raster menor a ${minimum}px`)
       if (metrics.transparentCoverage !== null && metrics.transparentCoverage < 0.55 && !qualityException(catalogo, nombre, variante, 'transparent-canvas')) errors.push(`${catalogo} ${nombre}: ${variante} conserva canvas transparente excesivo`)

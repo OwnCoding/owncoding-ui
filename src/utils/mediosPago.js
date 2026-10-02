@@ -38,12 +38,14 @@ function entradaRelacionada(marca, datos) {
 
 export const MARCAS_MEDIOS_PAGO = {
   Visa: entrada({
-    categoria: 'red-tarjeta', monograma: 'V', color: '#1434CB', fuenteOficial: 'https://corporate.visa.com/en/about-visa/brand.html',
-    estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    categoria: 'red-tarjeta', monograma: 'V', color: '#1434CB', fuenteOficial: 'https://www.visa.com.py/',
+    estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('visa-marca.png', 'oficial', { fondo: '#ffffff', padding: true, descripcion: 'Wordmark oficial completo contenido en el espacio compacto; no es un símbolo independiente.' }), horizontal: EMPAQUETADO('visa-marca.png', 'oficial', { fondo: '#ffffff', padding: true }) },
   }),
   Mastercard: entrada({
     categoria: 'red-tarjeta', alias: ['master card'], monograma: 'MC', color: '#EB001B',
-    fuenteOficial: 'https://www.mastercard.com/brandcenter/us/en/download-artwork.html', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://newsroom.mastercard.com/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('mastercard-marca.svg'), horizontal: { ...EMPAQUETADO('mastercard-marca.svg'), tipo: 'marca-contained', descripcion: 'Símbolo oficial completo contenido en el espacio horizontal; no es un wordmark independiente.' } },
   }),
   'American Express': entrada({
     categoria: 'red-tarjeta', alias: ['amex', 'american express'], monograma: 'AX', color: '#006FCF',

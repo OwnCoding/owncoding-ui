@@ -92,7 +92,7 @@ describe('catálogo de instituciones financieras', () => {
   })
 
   test('el catálogo ofrecido excluye Banco do Brasil y conserva lookup histórico', () => {
-    expect(BANCOS_PARAGUAY).toHaveLength(25)
+    expect(BANCOS_PARAGUAY).toHaveLength(32)
     expect(BANCOS_PARAGUAY).not.toContain('Banco do Brasil')
     expect(BANCOS_PREVIEW).not.toContain('Banco do Brasil')
     expect(logoDeBanco('Banco do Brasil', 'compacto').banco).toBe('Banco do Brasil')
@@ -143,7 +143,7 @@ describe('catálogo de instituciones financieras', () => {
 
   test('mantiene metadatos, alias y URLs oficiales corregidas', async () => {
     expect(BANCOS_Y_FINANCIERAS_PARAGUAY).toContain('Zeta Banco')
-    expect(COOPERATIVAS_PARAGUAY).toEqual(['Coomecipar', 'Medalla Milagrosa', 'San Cristóbal', 'Universitaria', 'Luque', 'Coopeduc'])
+    expect(COOPERATIVAS_PARAGUAY).toEqual(['Coomecipar', 'Medalla Milagrosa', 'San Cristóbal', 'Universitaria', 'Luque', 'Coopeduc', 'Capiatá', 'Ñemby', 'Lambaré', 'Coodeñe', 'Mburicaó', 'Mercado Nº 4', 'San Lorenzo'])
     expect(logoDeBanco('FINANCIERA FINEXPAR')).toMatchObject({ banco: 'Zeta Banco' })
     expect(logoDeBanco('Visión Banco')).toMatchObject({ banco: 'ueno bank', aliasHistorico: 'Visión Banco' })
     expect(logoDeBanco('Banco Rio')).toMatchObject({ banco: 'Banco Continental', aliasHistorico: 'Banco Río' })
@@ -285,7 +285,7 @@ describe('marcas y productos de pago', () => {
 describe('manifest y bundles financieros', () => {
   test('el API visual coincide con el manifest autorizado y cada archivo tiene una variante', () => {
     expect([...ASSET_KEYS_FINANCIEROS].sort()).toEqual(manifest.assets.map((asset) => asset.file).sort())
-    expect(manifest.assets).toHaveLength(74)
+    expect(manifest.assets).toHaveLength(84)
     const referencias = new Set([
       ...coberturaBancos().flatMap(variantesEmpaquetadas),
       ...coberturaMediosPago().flatMap(variantesEmpaquetadas),
@@ -323,8 +323,8 @@ describe('ampliación acotada de cooperativas con originales', () => {
     expect(record.authorization.scope).toEqual(['Public GitHub repository dariodeoli/owncoding-ui', 'Own UI / OwnCoding website and gallery'])
   })
   test('las candidatas no incorporadas no se ofrecen ni fabrican nuevas marcas', () => {
-    expect(COOPERATIVAS_PARAGUAY).toHaveLength(6)
-    for (const name of ['Capiatá', 'Ñemby', 'Lambaré']) expect(BANCOS_PARAGUAY).not.toContain(name)
+    expect(COOPERATIVAS_PARAGUAY).toHaveLength(13)
+    for (const name of ['24 de Octubre', 'Tobatí']) expect(BANCOS_PARAGUAY).not.toContain(name)
     expect(BANCOS_PARAGUAY).not.toContain('Banco do Brasil')
   })
 })

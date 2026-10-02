@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
+import { measureClosure } from '../scripts/bundle-closure.mjs'
 import { describe, expect, test } from 'vitest'
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
@@ -25,13 +26,17 @@ describe('subpaths granulares publicados', () => {
     expect(readFileSync(js, 'utf8').startsWith('"use client"')).toBe(cliente)
   })
 
-  test('solo el subpath visual contiene bytes financieros autorizados', () => {
-    const utils = readFileSync(new URL('../dist/utils.js', import.meta.url), 'utf8')
-    const metadata = readFileSync(new URL('../dist/financial-metadata.js', import.meta.url), 'utf8')
-    const financiero = readFileSync(new URL('../dist/financial.js', import.meta.url), 'utf8')
-    expect(utils).not.toContain('data:image/')
-    expect(metadata).not.toContain('data:image/')
-    expect(financiero).toContain('data:image/')
+  test('only visual reachable closures carry authorized artwork, shared once physically', async () => {
+    const root = await measureClosure('dist/index.js')
+    const financial = await measureClosure('dist/financial.js')
+    for (const entry of ['utils', 'financial-metadata', 'ia', 'app-identity', 'email']) {
+      const closure = await measureClosure(`dist/${entry}.js`, { pure: true })
+      expect(closure.files.every(file => !file.source.includes('data:image/'))).toBe(true)
+    }
+    const artwork = financial.files.filter(file => file.source.includes('// src/assets/financial/'))
+    expect(artwork).toHaveLength(1)
+    expect(root.files.filter(file => file.source.includes('// src/assets/financial/')).map(file => file.file)).toEqual(artwork.map(file => file.file))
+    for (const file of [...root.files, ...financial.files]) expect(file.source.startsWith('"use client"')).toBe(true)
   })
 
   test('los módulos publicados exponen contratos representativos', async () => {

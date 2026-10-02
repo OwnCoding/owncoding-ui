@@ -1,3 +1,13 @@
+import asset_mastercard_marca from '../assets/financial/pagos/mastercard-marca.svg'
+import asset_visa_marca from '../assets/financial/pagos/visa-marca.png'
+import assetcapiata_horizontal from '../assets/financial/bancos/capiata-horizontal.png'
+import assetnemby_horizontal from '../assets/financial/bancos/nemby-horizontal.png'
+import assetnemby_compacto from '../assets/financial/bancos/nemby-compacto.png'
+import assetlambare_horizontal from '../assets/financial/bancos/lambare-horizontal.gif'
+import assetcoodene_horizontal from '../assets/financial/bancos/coodene-horizontal.png'
+import assetmburicao_horizontal from '../assets/financial/bancos/mburicao-horizontal.png'
+import assetmercado_n4_horizontal from '../assets/financial/bancos/mercado-n4-horizontal.png'
+import assetsan_lorenzo_compacto from '../assets/financial/bancos/san-lorenzo-compacto.png'
 import assetLuque from '../assets/financial/bancos/luque-horizontal.svg'
 import assetCoopeduc from '../assets/financial/bancos/coopeduc-horizontal.png'
 import assetSanCristobalCompact from '../assets/financial/bancos/san-cristobal-compacto.png'
@@ -75,6 +85,17 @@ import asset68 from '../assets/financial/bancos/universitaria-horizontal.svg'
 import asset69 from '../assets/financial/bancos/citi-horizontal.svg'
 
 export const ASSETS_FINANCIEROS = Object.freeze({
+  'pagos/mastercard-marca.svg': asset_mastercard_marca,
+  'pagos/visa-marca.png': asset_visa_marca,
+  'bancos/capiata-horizontal.png': assetcapiata_horizontal,
+  'bancos/nemby-horizontal.png': assetnemby_horizontal,
+  'bancos/nemby-compacto.png': assetnemby_compacto,
+  'bancos/lambare-horizontal.gif': assetlambare_horizontal,
+  'bancos/coodene-horizontal.png': assetcoodene_horizontal,
+  'bancos/mburicao-horizontal.png': assetmburicao_horizontal,
+  'bancos/mercado-n4-horizontal.png': assetmercado_n4_horizontal,
+  'bancos/san-lorenzo-compacto.png': assetsan_lorenzo_compacto,
+
   'bancos/atlas-compacto.svg': asset0,
   'bancos/atlas-horizontal-blanco.svg': asset1,
   'bancos/bancop-compacto.png': asset2,

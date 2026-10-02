@@ -37,6 +37,13 @@ export const COOPERATIVAS_PARAGUAY = [
   'Universitaria',
   'Luque',
   'Coopeduc',
+  'Capiatá',
+  'Ñemby',
+  'Lambaré',
+  'Coodeñe',
+  'Mburicaó',
+  'Mercado Nº 4',
+  'San Lorenzo',
 ]
 
 // Conserva el nombre histórico de la exportación. La categoría real de cada
@@ -76,6 +83,24 @@ function entrada({ categoria, alias = [], monograma, color, fuenteOficial, estad
       : variantes || variantesFallback(estado === 'permiso-pendiente' ? 'permiso-pendiente' : 'fallback'),
     ...legacy,
   }
+}
+
+// Verified original cooperative marks; contained variants reuse one physical
+// asset without claiming that a separate symbol/wordmark exists.
+function cooperativaOriginal(nombre, fuenteOficial, archivo, cuadrada = false, compacto) {
+  const presentacion = { fondo: '#ffffff', padding: true }
+  return entrada({
+    categoria: 'cooperativa', alias: [`cooperativa ${nombre}`, nombre.replace('Nº', 'N°')], monograma: nombre.slice(0, 1), color: '#15803d',
+    fuenteOficial, estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: compacto || cuadrada
+        ? EMPAQUETADO(compacto || archivo, 'oficial', presentacion)
+        : CONTENIDO(archivo, 'oficial', { ...presentacion, descripcion: 'Marca horizontal oficial completa contenida en el espacio compacto; no es un símbolo independiente.' }),
+      horizontal: cuadrada
+        ? MARCA_CONTENIDA(archivo, { ...presentacion, descripcion: 'Marca oficial completa contenida en el espacio horizontal; no existe un lockup horizontal independiente verificado.' })
+        : EMPAQUETADO(archivo, 'oficial', presentacion),
+    },
+  })
 }
 
 // El nombre canónico es la clave. `archivo`, `marca`, `monograma` y `color` se
@@ -240,6 +265,14 @@ export const LOGOS_BANCOS = {
       horizontal: EMPAQUETADO('coopeduc-horizontal.png', 'oficial', { fondo: '#ffffff', padding: true }),
     },
   }),
+
+  'Capiatá': cooperativaOriginal('Capiatá', 'https://www.capiata.coop.py/', 'capiata-horizontal.png', false),
+  'Ñemby': cooperativaOriginal('Ñemby', 'https://coopnemby.coop.py/', 'nemby-horizontal.png', true, 'nemby-compacto.png'),
+  'Lambaré': cooperativaOriginal('Lambaré', 'https://www.lambare.coop.py/', 'lambare-horizontal.gif', true),
+  'Coodeñe': cooperativaOriginal('Coodeñe', 'https://coodene.coop.py/', 'coodene-horizontal.png', false),
+  'Mburicaó': cooperativaOriginal('Mburicaó', 'https://mburicao.coop.py/', 'mburicao-horizontal.png', false),
+  'Mercado Nº 4': cooperativaOriginal('Mercado Nº 4', 'https://coopmer4.coop.py/', 'mercado-n4-horizontal.png', true),
+  'San Lorenzo': cooperativaOriginal('San Lorenzo', 'https://www.sanlorenzo.coop.py/', 'san-lorenzo-compacto.png', true),
 
   'Financiera El Comercio': { redirigeA: 'ueno bank', alias: ['el comercio'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   'Visión Banco': { redirigeA: 'ueno bank', alias: ['vision', 'banco vision', 'visión'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },

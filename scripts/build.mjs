@@ -2,12 +2,14 @@
 // declaraciones y CSS. Los `.d.ts` se mantienen en `types/`, se validan con un
 // consumidor TypeScript real y se copian al `dist/` publicado.
 import { build } from 'esbuild'
+import { DECLARED_EXTERNALS } from './bundle-closure.mjs'
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 
 // Los assets financieros solo podrían viajar en los bundles visuales si el
 // registro documenta permiso de redistribución explícito. Limpiamos outputs
 // viejos al pasar cualquier marca a fallback por falta de evidencia.
 rmSync('dist/assets/financial', { recursive: true, force: true })
+rmSync('dist/chunks', { recursive: true, force: true })
 
 const opciones = {
   bundle: true,
@@ -16,15 +18,20 @@ const opciones = {
   platform: 'neutral',
   jsx: 'automatic',
   sourcemap: true,
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'qrcode', 'libphonenumber-js/min'],
-  loader: { '.svg': 'dataurl', '.png': 'dataurl', '.webp': 'dataurl', '.ico': 'dataurl' },
+  external: DECLARED_EXTERNALS,
+  loader: { '.svg': 'dataurl', '.png': 'dataurl', '.webp': 'dataurl', '.ico': 'dataurl', '.gif': 'dataurl' },
   logLevel: 'info',
 }
 
+// One visual graph shares physical inline artwork while keeping synchronous
+// data URL strings usable in raw Node SSR. Every emitted visual module retains
+// the client boundary; pure entries below are independent, asset-free builds.
 await build({
   ...opciones,
-  entryPoints: ['src/index.js'],
-  outfile: 'dist/index.js',
+  entryPoints: { index: 'src/index.js', financial: 'src/financial/index.js' },
+  outdir: 'dist',
+  splitting: true,
+  chunkNames: 'chunks/[name]-[hash]',
   banner: { js: '"use client"' },
 })
 
@@ -32,13 +39,6 @@ await build({
   ...opciones,
   entryPoints: ['src/phone/index.js'],
   outfile: 'dist/phone.js',
-  banner: { js: '"use client"' },
-})
-
-await build({
-  ...opciones,
-  entryPoints: ['src/financial/index.js'],
-  outfile: 'dist/financial.js',
   banner: { js: '"use client"' },
 })
 

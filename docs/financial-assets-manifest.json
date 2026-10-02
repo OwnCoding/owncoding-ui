@@ -1372,6 +1372,216 @@
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
       }
+    },
+    {
+      "id": "bancos-capiata-horizontal",
+      "file": "bancos/capiata-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.capiata.coop.py/coop_capiata/assets/images/logo_horizontal.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "8874f1afe65493224d613967e0680e90eb6e1c0d987de4d6637326461048967c",
+      "dimensions": {
+        "width": 1152,
+        "height": 494
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-nemby-horizontal",
+      "file": "bancos/nemby-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://coopnemby.coop.py/img/logo.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "a6214c5ac7d199387bd23828be8e635771019635e91ebd6840c497d17db127b8",
+      "dimensions": {
+        "width": 661,
+        "height": 661
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-nemby-compacto",
+      "file": "bancos/nemby-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://coopnemby.coop.py/img/favicon.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "b8f263d6e746bf84ac6e8d69013318867780f77f96b62a70ac0db6874021fda0",
+      "dimensions": {
+        "width": 207,
+        "height": 202
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-lambare-horizontal",
+      "file": "bancos/lambare-horizontal.gif",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.lambare.coop.py/images/logo_07.gif",
+      "retrievedAt": "2026-10-02",
+      "sha256": "9098ce09992d48bb9e3547c5bbce2ca51a0a629bf2fc9dc0134d8addd6a2416e",
+      "dimensions": {
+        "width": 121,
+        "height": 122
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-coodene-horizontal",
+      "file": "bancos/coodene-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://coodene.coop.py/images/log_o_1.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "cd3377f969ab1493379159d95118a66881af63db4e97daf20e0eea5c216f59a2",
+      "dimensions": {
+        "width": 443,
+        "height": 95
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-mburicao-horizontal",
+      "file": "bancos/mburicao-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://mburicao.coop.py/assets/images/logo.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "8a8a31ae1f4d84a6f86f27857ceee145531656acb446344f4e201795fc93402e",
+      "dimensions": {
+        "width": 185,
+        "height": 77
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-mercado-n4-horizontal",
+      "file": "bancos/mercado-n4-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://coopmer4.coop.py/img/logo_trans.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "46b1bcbcc8122355c7217c5a2b33a49de544eb44a1ef68bd9bf36fcd396f3da5",
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-san-lorenzo-compacto",
+      "file": "bancos/san-lorenzo-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.sanlorenzo.coop.py/wp-content/uploads/2023/09/cropped-coop-sl-icon1-1-192x192.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "c7a6a6227cd3009961d877ffe42a243fed056a914d225badd6f11217dcb790c5",
+      "dimensions": {
+        "width": 192,
+        "height": 192
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-visa-marca",
+      "file": "pagos/visa-marca.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "0ebb1697ec9ed895955069d5aca347918d92cd59da740f98f772f468707e2361",
+      "dimensions": {
+        "width": 208,
+        "height": 68
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-mastercard-marca",
+      "file": "pagos/mastercard-marca.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://newsroom.mastercard.com/news/dist/assets/mc_symbol-is.svg",
+      "retrievedAt": "2026-10-02",
+      "sha256": "c3986f52cdd451a427593ab43cfec977f318dd30a908af300df86f555e9d413b",
+      "dimensions": {
+        "width": 116.5,
+        "height": 72.02
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
     }
   ],
   "blockers": [
@@ -1390,13 +1600,16 @@
     },
     {
       "catalog": "payment",
-      "id": "Mastercard",
-      "reason": "Official brand artwork endpoint blocked automated retrieval; no exact downloadable file was obtained."
-    },
-    {
-      "catalog": "payment",
       "id": "Panal",
-      "reason": "No current owner-issued direct artwork was verified from an official product surface."
+      "reason": "Processor-published original fails the unchanged 0.55 transparent-canvas quality minimum. No crop/recreation or exception applied. Panal is the card mark, not Panal Seguros; not claimed as issuer-hosted.",
+      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Panal.png",
+      "sourceSha256": "218dbe3fa86dd7a244652b842104a9513dcfeb4e7214f8ec622a4c59ca3788ce",
+      "dimensions": {
+        "width": 480,
+        "height": 459
+      },
+      "transparentCoverage": 0.32843591140159767,
+      "verifiedAt": "2026-10-02"
     },
     {
       "catalog": "payment",
@@ -1406,18 +1619,21 @@
     {
       "catalog": "payment",
       "id": "Red Infonet",
-      "reason": "No separate owner-issued mark was verified; Bancard is not substituted for it."
+      "reason": "Official Bancard-published independent Infonet original fails the unchanged 0.55 transparent-canvas quality minimum. No crop/recreation or exception applied.",
+      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Infonet.png",
+      "sourceSha256": "07c382d6254fb8dd24bc4d2e8deba08b4bbd18abc3fb7076eace5b7c41d88670",
+      "dimensions": {
+        "width": 480,
+        "height": 459
+      },
+      "transparentCoverage": 0.38932007988380535,
+      "verifiedAt": "2026-10-02"
     },
     {
       "catalog": "payment",
       "id": "uPOS",
       "variant": "horizontal",
       "reason": "uPOS is an upay product with no separately verified independent mark; the parent identity is not relabeled."
-    },
-    {
-      "catalog": "payment",
-      "id": "Visa",
-      "reason": "Official merchant artwork requires gated brand-asset access; no exact downloadable file was obtained."
     }
   ]
 }
