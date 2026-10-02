@@ -199,3 +199,16 @@ restringido nunca se reemplaza con un mirror de terceros.
 4. Referenciar el archivo desde al menos una variante real.
 5. Si no se puede verificar el archivo oficial, registrar el ID como bloqueo y
    no usar mirrors, hotlinks, iniciales ni reconstrucciones.
+
+## Ampliación acotada de cooperativas — 2026-10-02
+
+Luque y Coopeduc incorporan originales de primera parte sin modificar bytes.
+Las URL exactas, dimensiones y SHA-256 están en el manifiesto; la autorización
+sigue limitada a las superficies OwnCoding documentadas arriba. Ambas marcas
+completas se presentan como **contenidas** en compacto, no como símbolos nuevos.
+La selección pasa de 4 a 6 cooperativas y de 23 a 25 instituciones ofrecidas.
+El catálogo continúa incompleto; consulta [la auditoría](COBERTURA-INSTITUCIONES-PY.md).
+
+Capiatá y Ñemby no se añaden: sus originales exceden los presupuestos inline
+restantes. Lambaré requiere soporte seguro del GIF original en build y auditor;
+no se convierte ni recrea su marca para evadir el contrato.

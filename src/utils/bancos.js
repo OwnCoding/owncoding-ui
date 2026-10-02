@@ -35,6 +35,8 @@ export const COOPERATIVAS_PARAGUAY = [
   'Medalla Milagrosa',
   'San Cristóbal',
   'Universitaria',
+  'Luque',
+  'Coopeduc',
 ]
 
 // Conserva el nombre histórico de la exportación. La categoría real de cada
@@ -220,6 +222,23 @@ export const LOGOS_BANCOS = {
     categoria: 'cooperativa', alias: ['cooperativa universitaria'], monograma: 'U', color: '#1D4E9E',
     fuenteOficial: 'https://www.universitaria.coop/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: { compacto: EMPAQUETADO('universitaria-compacto.png'), horizontal: EMPAQUETADO('universitaria-horizontal.svg') },
+  }),
+
+  'Luque': entrada({
+    categoria: 'cooperativa', alias: ['cooperativa luque', 'coop luque'], monograma: 'L', color: '#17458F',
+    fuenteOficial: 'https://www.coopluque.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: CONTENIDO('luque-horizontal.svg', 'oficial', { fondo: '#ffffff', padding: true, descripcion: 'Marca horizontal oficial completa contenida en el espacio compacto; no es un símbolo independiente.' }),
+      horizontal: EMPAQUETADO('luque-horizontal.svg', 'oficial', { fondo: '#ffffff', padding: true }),
+    },
+  }),
+  'Coopeduc': entrada({
+    categoria: 'cooperativa', alias: ['cooperativa coopeduc', 'coopeduc ltda'], monograma: 'C', color: '#203866',
+    fuenteOficial: 'https://www.coopeduc.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: CONTENIDO('coopeduc-horizontal.png', 'oficial', { fondo: '#ffffff', padding: true, descripcion: 'Marca horizontal oficial completa contenida en el espacio compacto; no es un símbolo independiente.' }),
+      horizontal: EMPAQUETADO('coopeduc-horizontal.png', 'oficial', { fondo: '#ffffff', padding: true }),
+    },
   }),
 
   'Financiera El Comercio': { redirigeA: 'ueno bank', alias: ['el comercio'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },

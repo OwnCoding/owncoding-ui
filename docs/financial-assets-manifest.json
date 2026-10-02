@@ -1328,6 +1328,50 @@
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
       }
+    },
+    {
+      "id": "bancos-luque-horizontal",
+      "file": "bancos/luque-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.coopluque.com.py/images/logo.svg",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 1190.55,
+        "height": 741.75
+      },
+      "sha256": "7a6fc3f87c1f4fdb1bee8a2e764e2fc9cd58986f76b03e6c829bac9abff85379",
+      "transformation": "None. Original first-party file preserved byte-for-byte; compact slot contains the full horizontal mark without cropping or redrawing.",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-coopeduc-horizontal",
+      "file": "bancos/coopeduc-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.coopeduc.com.py/coope/images/Logo2.png",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 738,
+        "height": 335
+      },
+      "sha256": "75f138da6c5969f263c9fabdbd9bda3b9b478de3b95d056b300a4c74058cd647",
+      "transformation": "None. Original first-party file preserved byte-for-byte; compact slot contains the full horizontal mark without cropping or redrawing.",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
     }
   ],
   "blockers": [

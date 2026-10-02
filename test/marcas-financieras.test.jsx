@@ -92,7 +92,7 @@ describe('catálogo de instituciones financieras', () => {
   })
 
   test('el catálogo ofrecido excluye Banco do Brasil y conserva lookup histórico', () => {
-    expect(BANCOS_PARAGUAY).toHaveLength(23)
+    expect(BANCOS_PARAGUAY).toHaveLength(25)
     expect(BANCOS_PARAGUAY).not.toContain('Banco do Brasil')
     expect(BANCOS_PREVIEW).not.toContain('Banco do Brasil')
     expect(logoDeBanco('Banco do Brasil', 'compacto').banco).toBe('Banco do Brasil')
@@ -143,7 +143,7 @@ describe('catálogo de instituciones financieras', () => {
 
   test('mantiene metadatos, alias y URLs oficiales corregidas', async () => {
     expect(BANCOS_Y_FINANCIERAS_PARAGUAY).toContain('Zeta Banco')
-    expect(COOPERATIVAS_PARAGUAY).toEqual(['Coomecipar', 'Medalla Milagrosa', 'San Cristóbal', 'Universitaria'])
+    expect(COOPERATIVAS_PARAGUAY).toEqual(['Coomecipar', 'Medalla Milagrosa', 'San Cristóbal', 'Universitaria', 'Luque', 'Coopeduc'])
     expect(logoDeBanco('FINANCIERA FINEXPAR')).toMatchObject({ banco: 'Zeta Banco' })
     expect(logoDeBanco('Visión Banco')).toMatchObject({ banco: 'ueno bank', aliasHistorico: 'Visión Banco' })
     expect(logoDeBanco('Banco Rio')).toMatchObject({ banco: 'Banco Continental', aliasHistorico: 'Banco Río' })
@@ -285,7 +285,7 @@ describe('marcas y productos de pago', () => {
 describe('manifest y bundles financieros', () => {
   test('el API visual coincide con el manifest autorizado y cada archivo tiene una variante', () => {
     expect([...ASSET_KEYS_FINANCIEROS].sort()).toEqual(manifest.assets.map((asset) => asset.file).sort())
-    expect(manifest.assets).toHaveLength(72)
+    expect(manifest.assets).toHaveLength(74)
     const referencias = new Set([
       ...coberturaBancos().flatMap(variantesEmpaquetadas),
       ...coberturaMediosPago().flatMap(variantesEmpaquetadas),
@@ -301,5 +301,30 @@ describe('manifest y bundles financieros', () => {
     expect(html).toContain('src="data:image/')
     const metadataBundle = readFileSync(join(process.cwd(), 'dist/financial-metadata.js'), 'utf8')
     expect(metadataBundle).not.toMatch(/data:image\//)
+  })
+})
+
+describe('ampliación acotada de cooperativas con originales', () => {
+  test.each([
+    ['Luque', 'cooperativa luque', 'bancos/luque-horizontal.svg', 'https://www.coopluque.com.py/images/logo.svg'],
+    ['Coopeduc', 'cooperativa coopeduc', 'bancos/coopeduc-horizontal.png', 'https://www.coopeduc.com.py/coope/images/Logo2.png'],
+  ])('%s conserva procedencia, autorización y presentación contenida honestas', (name, alias, file, sourceUrl) => {
+    expect(COOPERATIVAS_PARAGUAY).toContain(name)
+    expect(BANCOS_PREVIEW).toContain(name)
+    expect(logoDeBanco(alias, 'horizontal').banco).toBe(name)
+    expect(logoDeBanco(name, 'compacto').visual).toMatchObject({
+      tipo: 'horizontal-contained', empaquetado: file, descripcion: expect.stringContaining('contenida'),
+    })
+    expect(logoDeBanco(name, 'horizontal').visual).toMatchObject({ tipo: 'archivo', empaquetado: file })
+    const record = manifest.assets.find(asset => asset.file === file)
+    expect(record).toMatchObject({ sourceKind: 'official-first-party', sourceUrl, retrievedAt: '2026-10-02' })
+    expect(createHash('sha256').update(readFileSync(join('src/assets/financial', file))).digest('hex')).toBe(record.sha256)
+    expect(record.transformation).toContain('preserved byte-for-byte')
+    expect(record.authorization.scope).toEqual(['Public GitHub repository dariodeoli/owncoding-ui', 'Own UI / OwnCoding website and gallery'])
+  })
+  test('las candidatas no incorporadas no se ofrecen ni fabrican nuevas marcas', () => {
+    expect(COOPERATIVAS_PARAGUAY).toHaveLength(6)
+    for (const name of ['Capiatá', 'Ñemby', 'Lambaré']) expect(BANCOS_PARAGUAY).not.toContain(name)
+    expect(BANCOS_PARAGUAY).not.toContain('Banco do Brasil')
   })
 })

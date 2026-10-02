@@ -134,7 +134,9 @@ var COOPERATIVAS_PARAGUAY = [
   "Coomecipar",
   "Medalla Milagrosa",
   "San Crist\xF3bal",
-  "Universitaria"
+  "Universitaria",
+  "Luque",
+  "Coopeduc"
 ];
 var BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY];
 var EMPAQUETADO = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion });
@@ -440,6 +442,32 @@ var LOGOS_BANCOS = {
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: { compacto: EMPAQUETADO("universitaria-compacto.png"), horizontal: EMPAQUETADO("universitaria-horizontal.svg") }
+  }),
+  "Luque": entrada({
+    categoria: "cooperativa",
+    alias: ["cooperativa luque", "coop luque"],
+    monograma: "L",
+    color: "#17458F",
+    fuenteOficial: "https://www.coopluque.com.py/",
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: CONTENIDO("luque-horizontal.svg", "oficial", { fondo: "#ffffff", padding: true, descripcion: "Marca horizontal oficial completa contenida en el espacio compacto; no es un s\xEDmbolo independiente." }),
+      horizontal: EMPAQUETADO("luque-horizontal.svg", "oficial", { fondo: "#ffffff", padding: true })
+    }
+  }),
+  "Coopeduc": entrada({
+    categoria: "cooperativa",
+    alias: ["cooperativa coopeduc", "coopeduc ltda"],
+    monograma: "C",
+    color: "#203866",
+    fuenteOficial: "https://www.coopeduc.com.py/",
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: CONTENIDO("coopeduc-horizontal.png", "oficial", { fondo: "#ffffff", padding: true, descripcion: "Marca horizontal oficial completa contenida en el espacio compacto; no es un s\xEDmbolo independiente." }),
+      horizontal: EMPAQUETADO("coopeduc-horizontal.png", "oficial", { fondo: "#ffffff", padding: true })
+    }
   }),
   "Financiera El Comercio": { redirigeA: "ueno bank", alias: ["el comercio"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   "Visi\xF3n Banco": { redirigeA: "ueno bank", alias: ["vision", "banco vision", "visi\xF3n"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
