@@ -1111,8 +1111,8 @@ function Drawer({ open, onClose, title, children, side = "right", className, bus
 }
 var ToastContext = createContext(null);
 var toastCounter = 0;
-var TOAST_ICON = { success: "check", error: "alert", info: "info" };
-var TOAST_TONE = { success: "text-ok-text", error: "text-bad-text", info: "text-fono-light" };
+var TOAST_ICON = { success: "check", error: "alert", info: "info", loading: "clock" };
+var TOAST_TONE = { success: "text-ok-text", error: "text-bad-text", info: "text-fono-light", loading: "text-mute" };
 function ToastItem({ toast, dismiss, demo }) {
   const timer = useRef2(null);
   const startedAt = useRef2(0);
@@ -1129,11 +1129,14 @@ function ToastItem({ toast, dismiss, demo }) {
     timer.current = setTimeout(() => dismiss(toast.id), remaining.current);
   }, [dismiss, toast.id, toast.persistent]);
   useEffect2(() => {
+    remaining.current = toast.duration;
+    timer.current = null;
     resume();
     return () => {
       if (timer.current) clearTimeout(timer.current);
+      timer.current = null;
     };
-  }, [resume]);
+  }, [resume, toast.duration, toast.variant]);
   return /* @__PURE__ */ jsxs(
     "div",
     {
@@ -1151,6 +1154,10 @@ function ToastItem({ toast, dismiss, demo }) {
         /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
           /* @__PURE__ */ jsx2("p", { className: "text-sm font-semibold text-fore", children: toast.title }),
           toast.description && /* @__PURE__ */ jsx2("p", { className: "mt-0.5 text-xs text-mute", children: toast.description }),
+          toast.action && /* @__PURE__ */ jsx2("button", { type: "button", className: "toque-44 mt-2 min-h-11 rounded-lg px-2 font-semibold text-fono-dark dark:text-fono-light", onClick: () => {
+            dismiss(toast.id);
+            toast.action.onClick?.();
+          }, children: toast.action.label }),
           demo && /* @__PURE__ */ jsx2("p", { className: "mt-1 inline-flex rounded border border-fono/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-light", children: "Demo \xB7 no se guard\xF3 en la tienda" })
         ] }),
         /* @__PURE__ */ jsx2("button", { type: "button", onClick: () => dismiss(toast.id), className: "toque-44 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-mute transition hover:bg-ink-600 hover:text-fore", "aria-label": "Cerrar aviso", children: "\xD7" })
@@ -1168,10 +1175,23 @@ function ToastProvider({ children, demo = false }) {
     const texto = detalles === description ? void 0 : description;
     const id = `toast-${++toastCounter}`;
     const variantResolved = TOAST_ICON[variant] ? variant : "info";
-    const persistent = detalles?.persistent ?? variantResolved === "error";
+    const persistent = detalles?.persistent ?? (variantResolved === "error" || variantResolved === "loading");
     const duration = Math.max(0, Number(detalles?.duration ?? 4e3));
-    setToasts((current) => [...current, { id, variant: variantResolved, title, description: texto, persistent, duration }]);
+    setToasts((current) => [...current, { id, variant: variantResolved, title, description: texto, persistent, duration, action: detalles?.action ?? detalles?.undo }]);
+    return id;
   }, []);
+  const update = useCallback2((id, details) => setToasts((current) => current.map((item) => item.id === id ? { ...item, ...details } : item)), []);
+  const promise = useCallback2(async (operation, messages) => {
+    const id = toast("loading", messages.loading ?? "Procesando\u2026");
+    try {
+      const result = await (typeof operation === "function" ? operation() : operation);
+      update(id, { variant: "success", title: typeof messages.success === "function" ? messages.success(result) : messages.success ?? "Completado", persistent: false });
+      return result;
+    } catch (error) {
+      update(id, { variant: "error", title: typeof messages.error === "function" ? messages.error(error) : messages.error ?? "No se pudo completar la operaci\xF3n.", persistent: true });
+      throw error;
+    }
+  }, [toast, update]);
   useEffect2(() => {
     if (!demo) return void 0;
     let ultimo = 0;
@@ -1187,8 +1207,12 @@ function ToastProvider({ children, demo = false }) {
   const value = useMemo(() => ({
     success: (title, description, options) => toast("success", title, description, options),
     error: (title, description, options) => toast("error", title, description, options),
-    info: (title, description, options) => toast("info", title, description, options)
-  }), [toast]);
+    info: (title, description, options) => toast("info", title, description, options),
+    loading: (title, description, options) => toast("loading", title, description, options),
+    dismiss,
+    update,
+    promise
+  }), [toast, dismiss, update, promise]);
   if (!mounted) return children;
   return /* @__PURE__ */ jsxs(ToastContext.Provider, { value, children: [
     children,
@@ -1200,7 +1224,10 @@ function useToast() {
   if (!context) return { success: () => {
   }, error: () => {
   }, info: () => {
-  } };
+  }, loading: () => {
+  }, dismiss: () => {
+  }, update: () => {
+  }, promise: async (operation) => typeof operation === "function" ? operation() : operation };
   return context;
 }
 function useResultado() {
@@ -1368,13 +1395,13 @@ function relacionarControl(children, { htmlFor, mensajeId, error }, estado = { a
 }
 function FormField({ label, hint, error, children, htmlFor, descripcionId, accion, className }) {
   const mensajeId = descripcionId || (htmlFor ? `${htmlFor}-descripcion` : void 0);
-  const control = (error || hint) && mensajeId ? relacionarControl(children, { htmlFor, mensajeId, error }) : children;
+  const control2 = (error || hint) && mensajeId ? relacionarControl(children, { htmlFor, mensajeId, error }) : children;
   return /* @__PURE__ */ jsxs("div", { className, children: [
     label && /* @__PURE__ */ jsx2(Label, { htmlFor, children: label }),
     accion ? /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-stretch gap-2", children: [
-      /* @__PURE__ */ jsx2("div", { className: "min-w-0 flex-1", children: control }),
+      /* @__PURE__ */ jsx2("div", { className: "min-w-0 flex-1", children: control2 }),
       /* @__PURE__ */ jsx2("div", { className: "flex shrink-0 items-stretch", children: accion })
-    ] }) : control,
+    ] }) : control2,
     error ? /* @__PURE__ */ jsx2("p", { id: mensajeId, role: "alert", className: "mt-1.5 text-xs text-bad-text", children: error }) : hint ? /* @__PURE__ */ jsx2("p", { id: mensajeId, className: "mt-1.5 text-xs text-mute", children: hint }) : null
   ] });
 }
@@ -1676,7 +1703,7 @@ function Checkbox({
 }) {
   const generado = useId3();
   const campoId = id || generado;
-  const control = /* @__PURE__ */ jsx4(
+  const control2 = /* @__PURE__ */ jsx4(
     "input",
     {
       id: campoId,
@@ -1692,7 +1719,7 @@ function Checkbox({
       ...props
     }
   );
-  if (!label) return /* @__PURE__ */ jsx4("span", { className: cn("inline-flex items-center", className), children: control });
+  if (!label) return /* @__PURE__ */ jsx4("span", { className: cn("inline-flex items-center", className), children: control2 });
   if (variante === "tarjeta") {
     return /* @__PURE__ */ jsxs3(
       "label",
@@ -1704,7 +1731,7 @@ function Checkbox({
           className
         ),
         children: [
-          /* @__PURE__ */ jsx4("span", { className: "mt-0.5 flex shrink-0", children: control }),
+          /* @__PURE__ */ jsx4("span", { className: "mt-0.5 flex shrink-0", children: control2 }),
           /* @__PURE__ */ jsxs3("span", { className: "min-w-0", children: [
             /* @__PURE__ */ jsx4("span", { className: "block text-sm font-semibold", children: label }),
             descripcion && /* @__PURE__ */ jsx4("span", { className: "mt-0.5 block text-xs text-mute", children: descripcion })
@@ -1723,7 +1750,7 @@ function Checkbox({
         className
       ),
       children: [
-        control,
+        control2,
         /* @__PURE__ */ jsx4("span", { className: "min-w-0", children: label })
       ]
     }
@@ -5718,7 +5745,7 @@ function ProductPrefooter({
       "data-testid": "product-prefooter",
       "data-modelo": modelo,
       className: cn("border-t border-fore/10 bg-ink-800 px-4 py-8 text-fore sm:px-6", className),
-      children: /* @__PURE__ */ jsxs34("div", { className: "mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)]", children: [
+      children: /* @__PURE__ */ jsxs34("div", { className: cn("mx-auto grid w-full max-w-6xl gap-8", mostrarAccion && accion && "lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)]"), children: [
         /* @__PURE__ */ jsxs34("div", { className: "min-w-0", children: [
           /* @__PURE__ */ jsx42("h2", { className: "text-xl font-bold text-fore", children: titulo2 }),
           descripcion ? /* @__PURE__ */ jsx42("p", { className: "mt-2 max-w-2xl text-sm leading-6 text-mute", children: descripcion }) : null,
@@ -5967,7 +5994,7 @@ function NavLateral(props) {
 // src/components/MenuDesplegable.jsx
 import { useEffect as useEffect15, useRef as useRef14, useState as useState21 } from "react";
 import { jsx as jsx46, jsxs as jsxs38 } from "react/jsx-runtime";
-function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel = "Men\xFA", className }) {
+function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel = "Men\xFA", disabled = false, className }) {
   const [abierto, setAbierto] = useState21(false);
   const [activo, setActivo] = useState21(0);
   const raiz = useRef14(null);
@@ -5986,7 +6013,7 @@ function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel 
     if (devolverFoco) requestAnimationFrame(() => disparador.current?.focus());
   }
   function abrir(indice = 0) {
-    if (!acciones.length) return;
+    if (disabled || !acciones.length) return;
     setAbierto(true);
     requestAnimationFrame(() => enfocar(indice));
   }
@@ -6025,6 +6052,7 @@ function MenuDesplegable({ trigger, items = [], alineacion = "right", ariaLabel 
       {
         ref: disparador,
         type: "button",
+        disabled,
         "aria-haspopup": "menu",
         "aria-expanded": abierto,
         onClick: () => {
@@ -11453,9 +11481,9 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
     required: obligatorio2,
     "aria-describedby": descripcionId
   };
-  let control;
+  let control2;
   if (campo.tipo === "moneda") {
-    control = /* @__PURE__ */ jsx107(
+    control2 = /* @__PURE__ */ jsx107(
       MoneyInput,
       {
         ...comunes,
@@ -11465,7 +11493,7 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       }
     );
   } else if (campo.tipo === "select") {
-    control = /* @__PURE__ */ jsxs90(
+    control2 = /* @__PURE__ */ jsxs90(
       Select,
       {
         ...comunes,
@@ -11478,9 +11506,9 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       }
     );
   } else if (campo.tipo === "fecha") {
-    control = /* @__PURE__ */ jsx107(Input, { ...comunes, type: "date", value: valor || "", onChange: (evento) => onCambiar(evento.target.value) });
+    control2 = /* @__PURE__ */ jsx107(Input, { ...comunes, type: "date", value: valor || "", onChange: (evento) => onCambiar(evento.target.value) });
   } else if (campo.tipo === "numero") {
-    control = /* @__PURE__ */ jsx107(
+    control2 = /* @__PURE__ */ jsx107(
       Input,
       {
         ...comunes,
@@ -11491,7 +11519,7 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       }
     );
   } else {
-    control = /* @__PURE__ */ jsx107(
+    control2 = /* @__PURE__ */ jsx107(
       Input,
       {
         ...comunes,
@@ -11515,7 +11543,7 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
       error,
       htmlFor,
       descripcionId,
-      children: control
+      children: control2
     }
   );
 }
@@ -12527,12 +12555,221 @@ function paginaDePrueba({
 function paginaDePruebaSimple(opciones = {}) {
   return paginaDePrueba({ ...opciones, tipo: "caracteres" });
 }
+
+// src/components/ReusableUI.jsx
+import { useEffect as useEffect26, useId as useId24, useRef as useRef26, useState as useState38 } from "react";
+import { Popover as BasePopover } from "@base-ui/react/popover";
+import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
+import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
+import { Fragment as Fragment19, jsx as jsx108, jsxs as jsxs91 } from "react/jsx-runtime";
+var surface = "rounded-xl border border-interactivo bg-ink p-3 text-fore shadow-float";
+var control = "min-h-11 rounded-lg border border-interactivo bg-ink px-3 text-fore focus-visible:outline focus-visible:outline-2 focus-visible:outline-fono disabled:opacity-40";
+function CloseButton({ label = "Cerrar", onClick, disabled = false, className, ...props }) {
+  const requestClose = useDialogClose();
+  return /* @__PURE__ */ jsx108("button", { ...props, type: "button", disabled, "aria-label": label, className: cn("toque-44 inline-grid h-11 w-11 shrink-0 place-items-center rounded-lg text-mute hover:bg-ink-700 focus-visible:outline focus-visible:outline-fono", className), onClick: (event) => {
+    if (requestClose) requestClose();
+    else onClick?.(event);
+  }, children: /* @__PURE__ */ jsx108(Icon, { name: "close", className: "h-5 w-5" }) });
+}
+function Popover({ trigger, label, children, side = "bottom", align = "center", open, onOpenChange, disabled, className }) {
+  return /* @__PURE__ */ jsxs91(BasePopover.Root, { open, onOpenChange, children: [
+    /* @__PURE__ */ jsx108(BasePopover.Trigger, { disabled, className: control, children: trigger }),
+    /* @__PURE__ */ jsx108(BasePopover.Portal, { children: /* @__PURE__ */ jsx108(BasePopover.Positioner, { side, align, sideOffset: 8, className: "z-[70] max-w-[calc(100vw-2rem)]", children: /* @__PURE__ */ jsx108(BasePopover.Popup, { "aria-label": label, className: cn(surface, "max-h-[var(--available-height)] overflow-y-auto", className), children }) }) })
+  ] });
+}
+function Tooltip({ trigger, children, label, side = "top", disabled = false }) {
+  const [touchOpen, setTouchOpen] = useState38(false);
+  const triggerId = useId24();
+  return /* @__PURE__ */ jsx108(BaseTooltip.Provider, { children: /* @__PURE__ */ jsxs91(BaseTooltip.Root, { open: touchOpen, triggerId, onOpenChange: setTouchOpen, disabled, children: [
+    /* @__PURE__ */ jsx108(BaseTooltip.Trigger, { disabled, id: triggerId, "aria-describedby": touchOpen ? `${triggerId}-tip` : void 0, className: control, "aria-label": label, closeOnClick: false, onClick: () => {
+      if (!disabled) setTouchOpen((value) => !value);
+    }, children: trigger }),
+    /* @__PURE__ */ jsx108(BaseTooltip.Portal, { children: /* @__PURE__ */ jsx108(BaseTooltip.Positioner, { side, sideOffset: 6, className: "z-[70] max-w-[calc(100vw-2rem)]", children: /* @__PURE__ */ jsx108(BaseTooltip.Popup, { role: "tooltip", id: `${triggerId}-tip`, className: cn(surface, "max-w-xs text-sm"), children }) }) })
+  ] }) });
+}
+function Combobox({ items = [], value, onChange, multiple = false, label = "Seleccionar", placeholder = "Buscar\u2026", loading = false, error, disabled = false, onQueryChange, renderItem, className }) {
+  const selected = multiple ? items.filter((item) => (value || []).includes(item.id)) : items.find((item) => item.id === value) ?? null;
+  return /* @__PURE__ */ jsxs91("div", { className: cn("min-w-0 space-y-2", className), children: [
+    /* @__PURE__ */ jsxs91(BaseCombobox.Root, { items, multiple, value: selected, onValueChange: (next) => {
+      if (!loading && !error) onChange?.(multiple ? next.map((item) => item.id) : next?.id ?? null);
+    }, onInputValueChange: onQueryChange, itemToStringLabel: (item) => item?.label ?? "", isItemEqualToValue: (a, b) => a?.id === b?.id, disabled, autoHighlight: true, children: [
+      /* @__PURE__ */ jsxs91("label", { className: "block text-sm font-medium", children: [
+        label,
+        /* @__PURE__ */ jsx108(BaseCombobox.Input, { placeholder, "aria-label": label, "aria-busy": loading, "aria-invalid": !!error, className: cn(control, "mt-1 w-full") })
+      ] }),
+      /* @__PURE__ */ jsx108(BaseCombobox.Portal, { children: /* @__PURE__ */ jsx108(BaseCombobox.Positioner, { sideOffset: 4, className: "z-[70] w-[var(--anchor-width)] max-w-[calc(100vw-2rem)]", children: /* @__PURE__ */ jsx108(BaseCombobox.Popup, { className: cn(surface, "max-h-72 overflow-y-auto"), children: loading ? /* @__PURE__ */ jsx108("p", { role: "status", children: "Cargando opciones\u2026" }) : error ? /* @__PURE__ */ jsx108("p", { role: "alert", children: error }) : /* @__PURE__ */ jsxs91(Fragment19, { children: [
+        /* @__PURE__ */ jsx108(BaseCombobox.Empty, { children: "Sin resultados" }),
+        /* @__PURE__ */ jsx108(BaseCombobox.List, { children: (item) => /* @__PURE__ */ jsxs91(BaseCombobox.Item, { value: item, disabled: item.disabled, className: "flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-3 data-[highlighted]:bg-ink-700 data-[disabled]:opacity-40", children: [
+          /* @__PURE__ */ jsx108(BaseCombobox.ItemIndicator, { children: "\u2713" }),
+          renderItem ? renderItem(item) : item.label
+        ] }, item.id) })
+      ] }) }) }) })
+    ] }),
+    multiple && selected.length > 0 && /* @__PURE__ */ jsxs91("p", { className: "text-xs text-mute", children: [
+      "Seleccionados: ",
+      selected.map((item) => item.label).join(", ")
+    ] }),
+    error && /* @__PURE__ */ jsx108("p", { role: "alert", className: "text-sm text-bad-text", children: error })
+  ] });
+}
+function Header({ title, logo, items = [], actions, children, className, publicMode = false }) {
+  const [open, setOpen] = useState38(false);
+  const trigger = useRef26(null);
+  useEffect26(() => {
+    if (!open) return void 0;
+    const escape = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        trigger.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
+  }, [open]);
+  return /* @__PURE__ */ jsxs91("header", { className: cn("min-w-0 border-b border-interactivo bg-ink px-4 py-3 text-fore", className), children: [
+    /* @__PURE__ */ jsxs91("div", { className: "flex flex-wrap items-center gap-3", children: [
+      /* @__PURE__ */ jsxs91("div", { className: "flex min-w-0 flex-1 items-center gap-2", children: [
+        logo,
+        /* @__PURE__ */ jsx108("span", { className: "truncate font-bold", children: title })
+      ] }),
+      /* @__PURE__ */ jsxs91("div", { className: "flex flex-wrap items-center gap-2", children: [
+        actions,
+        /* @__PURE__ */ jsx108("button", { ref: trigger, type: "button", className: cn(control, "md:hidden"), "aria-label": "Abrir navegaci\xF3n", "aria-expanded": open, onClick: () => setOpen(!open), children: /* @__PURE__ */ jsx108(Icon, { name: "menu", className: "h-5 w-5" }) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsx108("nav", { "aria-label": publicMode ? "Navegaci\xF3n p\xFAblica" : "Navegaci\xF3n de aplicaci\xF3n", className: cn("mt-3 flex-wrap gap-2 md:flex", open ? "flex" : "hidden"), children: items.map((item) => /* @__PURE__ */ jsx108("a", { href: item.href, "aria-current": item.active ? "page" : void 0, className: cn("inline-flex min-h-11 items-center rounded-lg px-3 text-sm hover:bg-ink-700", item.active && "bg-fono/10 text-fono-dark dark:text-fono-light"), onClick: () => setOpen(false), children: item.label }, item.href)) }),
+    children
+  ] });
+}
+function AppHeader(props) {
+  return /* @__PURE__ */ jsx108(Header, { ...props });
+}
+function PublicHeader(props) {
+  return /* @__PURE__ */ jsx108(Header, { ...props, publicMode: true });
+}
+function ProfileCard({ name, email, role, image, actions, className }) {
+  return /* @__PURE__ */ jsxs91("section", { "aria-label": `Perfil de ${name}`, className: cn(surface, "space-y-3", className), children: [
+    /* @__PURE__ */ jsxs91("div", { className: "flex min-w-0 items-center gap-3", children: [
+      /* @__PURE__ */ jsx108(Avatar, { nombre: name, src: image }),
+      /* @__PURE__ */ jsxs91("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsx108("h3", { className: "break-words font-bold", children: name }),
+        email && /* @__PURE__ */ jsx108("p", { className: "break-all text-sm text-mute", children: email }),
+        role && /* @__PURE__ */ jsx108("p", { className: "text-xs text-mute", children: role })
+      ] })
+    ] }),
+    actions
+  ] });
+}
+function UserMenu({ name, image, items = [] }) {
+  return /* @__PURE__ */ jsx108(MenuDesplegable, { ariaLabel: "Men\xFA de usuario", trigger: /* @__PURE__ */ jsxs91(Fragment19, { children: [
+    /* @__PURE__ */ jsx108(Avatar, { nombre: name, src: image }),
+    /* @__PURE__ */ jsx108("span", { children: name })
+  ] }), items });
+}
+function AccountSwitcher({ accounts = [], value, onChange, disabled = false }) {
+  return /* @__PURE__ */ jsx108(MenuDesplegable, { disabled, ariaLabel: "Cuentas", trigger: /* @__PURE__ */ jsxs91("span", { children: [
+    "Cambiar cuenta",
+    value ? `: ${accounts.find((item) => item.id === value)?.label ?? ""}` : ""
+  ] }), items: accounts.map((item) => ({ ...item, disabled: disabled || item.disabled, onClick: () => onChange?.(item.id) })) });
+}
+function NotificationCenter({ items = [], onSelect, onMarkAllRead, onLoadMore, hasMore = false, loading = false, error, types = [], label = "Notificaciones", className }) {
+  const [unread, setUnread] = useState38(false);
+  const [type, setType] = useState38("");
+  const visible = items.filter((item) => (!unread || !item.read) && (!type || item.type === type));
+  return /* @__PURE__ */ jsxs91("section", { "aria-label": label, className: cn(surface, "space-y-3", className), children: [
+    /* @__PURE__ */ jsx108("h3", { className: "font-bold", children: label }),
+    /* @__PURE__ */ jsxs91("div", { className: "flex flex-wrap gap-2", children: [
+      /* @__PURE__ */ jsx108(Button, { variant: "outline", "aria-pressed": !unread, onClick: () => setUnread(false), children: "Todas" }),
+      /* @__PURE__ */ jsx108(Button, { variant: "outline", "aria-pressed": unread, onClick: () => setUnread(true), children: "Sin leer" }),
+      onMarkAllRead && /* @__PURE__ */ jsx108(Button, { variant: "ghost", disabled: loading || !items.some((item) => !item.read), onClick: onMarkAllRead, children: "Marcar todas como le\xEDdas" }),
+      types.length > 0 && /* @__PURE__ */ jsxs91("label", { children: [
+        "Tipo",
+        /* @__PURE__ */ jsxs91("select", { className: control, value: type, onChange: (event) => setType(event.target.value), children: [
+          /* @__PURE__ */ jsx108("option", { value: "", children: "Todos" }),
+          types.map((item) => /* @__PURE__ */ jsx108("option", { value: item.id, children: item.label }, item.id))
+        ] })
+      ] })
+    ] }),
+    error && /* @__PURE__ */ jsx108("p", { role: "alert", children: error }),
+    /* @__PURE__ */ jsxs91("div", { className: "max-h-80 overflow-y-auto", children: [
+      visible.map((item, index) => /* @__PURE__ */ jsxs91("div", { children: [
+        item.group && item.group !== visible[index - 1]?.group && /* @__PURE__ */ jsx108("h4", { className: "py-2 text-xs font-semibold text-mute", children: item.group }),
+        /* @__PURE__ */ jsxs91("button", { type: "button", disabled: loading, onClick: () => onSelect?.(item), className: "block min-h-11 w-full rounded-lg p-3 text-left hover:bg-ink-700", children: [
+          /* @__PURE__ */ jsx108("span", { className: item.read ? "font-normal" : "font-bold", children: item.title }),
+          item.description && /* @__PURE__ */ jsx108("span", { className: "block text-sm text-mute", children: item.description })
+        ] })
+      ] }, item.id)),
+      !visible.length && !loading && /* @__PURE__ */ jsx108("p", { className: "p-4 text-sm text-mute", children: "Sin notificaciones" })
+    ] }),
+    loading && /* @__PURE__ */ jsx108("p", { role: "status", children: "Cargando notificaciones\u2026" }),
+    hasMore && /* @__PURE__ */ jsx108(Button, { variant: "outline", disabled: loading || !onLoadMore, onClick: onLoadMore, children: "Cargar m\xE1s" })
+  ] });
+}
+function AsyncButton({ action, onSuccess, onError, children, pendingLabel = "Procesando\u2026", successLabel = "Completado", disabled, className, ...props }) {
+  const [state, setState] = useState38("idle");
+  const [error, setError] = useState38("");
+  const locked = useRef26(false);
+  const mounted = useRef26(true);
+  useEffect26(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  async function run() {
+    if (locked.current || disabled) return;
+    locked.current = true;
+    setState("pending");
+    setError("");
+    try {
+      const result = await action?.();
+      if (mounted.current) setState("success");
+      onSuccess?.(result);
+    } catch (reason) {
+      if (mounted.current) {
+        setState("error");
+        setError(reason instanceof Error ? reason.message : "No se pudo completar la acci\xF3n.");
+      }
+      onError?.(reason);
+    } finally {
+      locked.current = false;
+    }
+  }
+  return /* @__PURE__ */ jsxs91("span", { className: cn("inline-flex flex-col gap-1", className), children: [
+    /* @__PURE__ */ jsx108(Button, { ...props, type: "button", disabled: disabled || state === "pending", "aria-busy": state === "pending", onClick: run, children: state === "pending" ? pendingLabel : state === "success" ? successLabel : children }),
+    error && /* @__PURE__ */ jsx108("span", { role: "alert", className: "text-sm text-bad-text", children: error })
+  ] });
+}
+function CopyButton({ text, copy, onCopied, label = "Copiar", ...props }) {
+  return /* @__PURE__ */ jsx108(AsyncButton, { ...props, action: async () => {
+    if (copy) await copy(text);
+    else {
+      if (!globalThis.navigator?.clipboard?.writeText) throw new Error("Portapapeles no disponible.");
+      await navigator.clipboard.writeText(text);
+    }
+    onCopied?.(text);
+  }, successLabel: "Copiado", children: label });
+}
+function ActionToolbar({ label = "Acciones", children, className }) {
+  return /* @__PURE__ */ jsx108("div", { role: "group", "aria-label": label, className: cn("flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-interactivo bg-ink p-2", className), children });
+}
+function FooterPreset({ variant = "app", name, version, links = [], columns = [], callToAction, children, className }) {
+  return /* @__PURE__ */ jsxs91("div", { className, children: [
+    variant === "public" && /* @__PURE__ */ jsx108(ProductPrefooter, { modelo: callToAction ? "completo" : "enlaces", titulo: "Conoc\xE9 m\xE1s", columnas: columns, accion: callToAction }),
+    children,
+    /* @__PURE__ */ jsx108(ProductFooter, { nombre: name, version, enlaces: links, modelo: variant === "auth" ? "apilado" : "distribuido" })
+  ] });
+}
 export {
   ANCHOS_PAPEL,
   ANCHOS_PRUEBA,
   AVANCES_FIRMA,
   AVISO_REFRESCO,
+  AccountSwitcher,
+  ActionToolbar,
   AjustesImpresion,
+  AppHeader,
+  AsyncButton,
   AuthLayout,
   Avatar,
   Aviso,
@@ -12594,14 +12831,17 @@ export {
   ChipPrioridad,
   ChipsLocks,
   CityAutocomplete,
+  CloseButton,
   CodigoQr,
   ColumnaLote,
+  Combobox,
   ConfirmDialog,
   ConfirmarConPalabra,
   ConsentimientoDatos,
   ContadorLote,
   ContadoresCompra,
   ConteoChecklist,
+  CopyButton,
   CountryPhoneSelect,
   Cronologia,
   CurrencySelect,
@@ -12646,6 +12886,7 @@ export {
   FilaChecklist,
   FilaDato,
   FilaRevision,
+  FooterPreset,
   FormActions,
   FormField,
   GLIFOS_CATEGORIA,
@@ -12711,6 +12952,7 @@ export {
   NavLateral,
   NavegacionSeccion,
   Nota,
+  NotificationCenter,
   NumericKeypad,
   OAuthDivider,
   ORIGENES_NECESIDAD,
@@ -12738,11 +12980,14 @@ export {
   PilaPersonas,
   PinInput,
   PlanPagos,
+  Popover,
   PreviewFusion,
   ProductCombobox,
   ProductFooter,
   ProductPrefooter,
+  ProfileCard,
   ProgresoChecklist,
+  PublicHeader,
   QR_OPCIONES,
   RELACIONES_FINANCIERAS,
   RESULTADOS_VALIDOS,
@@ -12802,8 +13047,10 @@ export {
   TileEquipo,
   TileRol,
   ToastProvider,
+  Tooltip,
   UMBRAL_BATERIA_ATENCION,
   UMBRAL_BATERIA_OK,
+  UserMenu,
   VARIANTES_CORTE,
   VERSION_APP_RE,
   Vencimiento,

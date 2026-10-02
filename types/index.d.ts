@@ -133,13 +133,14 @@ export function Badge(props: HTMLAttributes<HTMLSpanElement> & { color?: 'blue' 
 export function Dot(props: { color?: 'green' | 'red' | 'blue' | 'slate' | 'orange'; pulse?: boolean; className?: string }): ReactElement
 export function IconAction(props: { icon: string; label: string; tone?: Tono; onClick?: () => void; disabled?: boolean; size?: 'sm' | 'touch' }): ReactElement
 export function Drawer(props: { open: boolean; onClose?: () => void; title?: ReactNode; children?: ReactNode; side?: 'left' | 'right'; className?: string; busy?: boolean; dirty?: boolean; descarte?: TextosDescarte }): ReactElement | null
-export type ToastOptions = { duration?: number; persistent?: boolean }
+export type ToastAction = { label: string; onClick: () => void }
+export type ToastOptions = { duration?: number; persistent?: boolean; action?: ToastAction; undo?: ToastAction }
 export type ToastMethod = {
-  (title: string, description?: string, options?: ToastOptions): void
-  (title: string, options?: ToastOptions): void
+  (title: string, description?: string, options?: ToastOptions): string | undefined
+  (title: string, options?: ToastOptions): string | undefined
 }
 export function ToastProvider(props: { children?: ReactNode; demo?: boolean }): ReactElement
-export function useToast(): { success: ToastMethod; error: ToastMethod; info: ToastMethod }
+export function useToast(): { success: ToastMethod; error: ToastMethod; info: ToastMethod; loading: ToastMethod; dismiss: (id: string) => void; update: (id: string, details: { title?: string; description?: string; variant?: 'loading' | 'success' | 'error' | 'info'; persistent?: boolean; duration?: number; action?: ToastAction }) => void; promise: <T>(operation: Promise<T> | (() => Promise<T>), messages: { loading?: string; success?: string | ((result: T) => string); error?: string | ((error: unknown) => string) }) => Promise<T> }
 export function useResultado(): {
   guardado: (sujeto?: string, descripcion?: string) => void
   copiado: (sujeto?: string, descripcion?: string) => void
@@ -1749,3 +1750,28 @@ export function CargaIA(props: CargaIAProps): ReactElement
 
 /** Props de los objetos con superficie abierta (se tipan al adoptarse). */
 export type PropsAbiertas = Record<string, any> & { className?: string; children?: ReactNode }
+
+/** UI controlada; sin proveedor de autenticación, red ni persistencia implícita. */
+export type ComboboxItem = { id: string; label: string; disabled?: boolean }
+export type ComboboxProps = {
+  items?: ComboboxItem[]; label?: string; placeholder?: string; loading?: boolean; error?: string; disabled?: boolean
+  onQueryChange?: (query: string) => void; renderItem?: (item: ComboboxItem) => ReactNode; className?: string
+} & ({ multiple?: false; value?: string | null; onChange?: (value: string | null) => void } | { multiple: true; value?: string[]; onChange?: (value: string[]) => void })
+export function Combobox(props: ComboboxProps): ReactElement
+export type PopoverProps = { trigger: ReactNode; label: string; children?: ReactNode; side?: 'top' | 'bottom' | 'left' | 'right'; align?: 'start' | 'center' | 'end'; open?: boolean; onOpenChange?: (open: boolean) => void; disabled?: boolean; className?: string }
+export function Popover(props: PopoverProps): ReactElement
+export function Tooltip(props: { trigger: ReactNode; children?: ReactNode; label?: string; side?: PopoverProps['side']; disabled?: boolean }): ReactElement
+export function CloseButton(props: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> & { label?: string }): ReactElement
+export type HeaderProps = { title?: string; logo?: ReactNode; items?: { label: string; href: string; active?: boolean }[]; actions?: ReactNode; children?: ReactNode; className?: string }
+export function AppHeader(props: HeaderProps): ReactElement
+export function PublicHeader(props: HeaderProps): ReactElement
+export function ProfileCard(props: { name: string; email?: string; role?: string; image?: string; actions?: ReactNode; className?: string }): ReactElement
+export function UserMenu(props: { name: string; image?: string; items?: Parameters<typeof MenuDesplegable>[0]['items'] }): ReactElement
+export function AccountSwitcher(props: { accounts?: ComboboxItem[]; value?: string; onChange?: (id: string) => void; disabled?: boolean }): ReactElement
+export type NotificationItem = { id: string; title: string; description?: string; read?: boolean; group?: string; type?: string }
+export function NotificationCenter(props: { items?: NotificationItem[]; onSelect?: (item: NotificationItem) => void; onMarkAllRead?: () => void; onLoadMore?: () => void; hasMore?: boolean; loading?: boolean; error?: string; types?: { id: string; label: string }[]; label?: string; className?: string }): ReactElement
+export type AsyncButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> & { action: () => unknown | Promise<unknown>; onSuccess?: (result: unknown) => void; onError?: (error: unknown) => void; pendingLabel?: string; successLabel?: string; variant?: 'primary' | 'success' | 'danger' | 'outline' | 'ghost' }
+export function AsyncButton(props: AsyncButtonProps): ReactElement
+export function CopyButton(props: Omit<AsyncButtonProps, 'action' | 'children'> & { text: string; copy?: (text: string) => void | Promise<void>; onCopied?: (text: string) => void; label?: string }): ReactElement
+export function ActionToolbar(props: { label?: string; children?: ReactNode; className?: string }): ReactElement
+export function FooterPreset(props: { variant?: 'app' | 'auth' | 'public'; name?: string; version?: string; links?: Parameters<typeof ProductFooter>[0]['enlaces']; columns?: Parameters<typeof ProductPrefooter>[0]['columnas']; callToAction?: Parameters<typeof ProductPrefooter>[0]['accion']; children?: ReactNode; className?: string }): ReactElement

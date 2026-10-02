@@ -632,8 +632,8 @@ export function Drawer({ open, onClose, title, children, side = 'right', classNa
 // ── Toasts globales ─────────────────────────────────────────────────
 const ToastContext = createContext(null)
 let toastCounter = 0
-const TOAST_ICON = { success: 'check', error: 'alert', info: 'info' }
-const TOAST_TONE = { success: 'text-ok-text', error: 'text-bad-text', info: 'text-fono-light' }
+const TOAST_ICON = { success: 'check', error: 'alert', info: 'info', loading: 'clock' }
+const TOAST_TONE = { success: 'text-ok-text', error: 'text-bad-text', info: 'text-fono-light', loading: 'text-mute' }
 
 function ToastItem({ toast, dismiss, demo }) {
   const timer = useRef(null)
@@ -654,9 +654,11 @@ function ToastItem({ toast, dismiss, demo }) {
   }, [dismiss, toast.id, toast.persistent])
 
   useEffect(() => {
+    remaining.current = toast.duration
+    timer.current = null
     resume()
-    return () => { if (timer.current) clearTimeout(timer.current) }
-  }, [resume])
+    return () => { if (timer.current) clearTimeout(timer.current); timer.current = null }
+  }, [resume, toast.duration, toast.variant])
 
   return (
     <div
@@ -672,6 +674,7 @@ function ToastItem({ toast, dismiss, demo }) {
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-fore">{toast.title}</p>
         {toast.description && <p className="mt-0.5 text-xs text-mute">{toast.description}</p>}
+        {toast.action && <button type="button" className="toque-44 mt-2 min-h-11 rounded-lg px-2 font-semibold text-fono-dark dark:text-fono-light" onClick={() => { dismiss(toast.id); toast.action.onClick?.() }}>{toast.action.label}</button>}
         {demo && (
           <p className="mt-1 inline-flex rounded border border-fono/40 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fono-light">
             Demo · no se guardó en la tienda
@@ -693,10 +696,23 @@ export function ToastProvider({ children, demo = false }) {
     const texto = detalles === description ? undefined : description
     const id = `toast-${++toastCounter}`
     const variantResolved = TOAST_ICON[variant] ? variant : 'info'
-    const persistent = detalles?.persistent ?? variantResolved === 'error'
+    const persistent = detalles?.persistent ?? (variantResolved === 'error' || variantResolved === 'loading')
     const duration = Math.max(0, Number(detalles?.duration ?? 4000))
-    setToasts(current => [...current, { id, variant: variantResolved, title, description: texto, persistent, duration }])
+    setToasts(current => [...current, { id, variant: variantResolved, title, description: texto, persistent, duration, action: detalles?.action ?? detalles?.undo }])
+    return id
   }, [])
+  const update = useCallback((id, details) => setToasts(current => current.map(item => item.id === id ? { ...item, ...details } : item)), [])
+  const promise = useCallback(async (operation, messages) => {
+    const id = toast('loading', messages.loading ?? 'Procesando…')
+    try {
+      const result = await (typeof operation === 'function' ? operation() : operation)
+      update(id, { variant: 'success', title: typeof messages.success === 'function' ? messages.success(result) : messages.success ?? 'Completado', persistent: false })
+      return result
+    } catch (error) {
+      update(id, { variant: 'error', title: typeof messages.error === 'function' ? messages.error(error) : messages.error ?? 'No se pudo completar la operación.', persistent: true })
+      throw error
+    }
+  }, [toast, update])
   // En la demo pública, cada guardado avisa que quedó simulado (#192).
   useEffect(() => {
     if (!demo) return undefined
@@ -714,7 +730,9 @@ export function ToastProvider({ children, demo = false }) {
     success: (title, description, options) => toast('success', title, description, options),
     error: (title, description, options) => toast('error', title, description, options),
     info: (title, description, options) => toast('info', title, description, options),
-  }), [toast])
+    loading: (title, description, options) => toast('loading', title, description, options),
+    dismiss, update, promise,
+  }), [toast, dismiss, update, promise])
   if (!mounted) return children
   return (
     <ToastContext.Provider value={value}>
@@ -728,7 +746,7 @@ export function ToastProvider({ children, demo = false }) {
 
 export function useToast() {
   const context = useContext(ToastContext)
-  if (!context) return { success: () => {}, error: () => {}, info: () => {} }
+  if (!context) return { success: () => {}, error: () => {}, info: () => {}, loading: () => {}, dismiss: () => {}, update: () => {}, promise: async (operation) => typeof operation === 'function' ? operation() : operation }
   return context
 }
 

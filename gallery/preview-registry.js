@@ -1,5 +1,6 @@
 // Names only: never import demo modules from this eagerly loaded registry.
 export const PREVIEW_GROUPS = {
+  "reusable": ["Combobox", "Popover", "Tooltip", "CloseButton", "AppHeader", "PublicHeader", "ProfileCard", "UserMenu", "AccountSwitcher", "NotificationCenter", "AsyncButton", "FooterPreset", "CopyButton", "ActionToolbar"],
   "specialized": [
     "BuscadorDispositivo",
     "Calendario",

@@ -53,3 +53,25 @@ export function ConsumerFixture() {
     </>
   )
 }
+
+// Controlled reusable patterns: selection setters must remain type-safe.
+import { Combobox, AsyncButton, Popover, Tooltip, NotificationCenter, FooterPreset, CopyButton, ActionToolbar, CloseButton, AppHeader, PublicHeader, ProfileCard, UserMenu, AccountSwitcher, useToast } from 'owncoding-ui'
+export function ReusableConsumer() {
+  const [team, setTeam] = useState<string | null>(null)
+  const [teams, setTeams] = useState<string[]>([])
+  const toast = useToast()
+  const items = [{ id: 'demo', label: 'Demo' }]
+  return <>
+    <Combobox items={items} value={team} onChange={setTeam} />
+    <Combobox multiple items={items} value={teams} onChange={setTeams} />
+    <AsyncButton action={async () => toast.promise(Promise.resolve('demo'), { success: result => result })}>Guardar</AsyncButton>
+    <Popover label="Ayuda" trigger="Abrir"><CloseButton /></Popover>
+    <Tooltip trigger="Info">Ayuda</Tooltip>
+    <NotificationCenter items={[{ id: '1', title: 'Demo', read: false }]} onMarkAllRead={() => {}} />
+    <FooterPreset name="Demo" variant="public" links={[{ href: '/help', etiqueta: 'Ayuda' }]} />
+    <ActionToolbar><CopyButton text="demo" /></ActionToolbar>
+    <AppHeader title="Demo" /><PublicHeader title="Demo" />
+    <ProfileCard name="Demo" /><UserMenu name="Demo" items={[{ label: 'Perfil', onClick: () => {} }]} />
+    <AccountSwitcher accounts={items} value={team ?? undefined} onChange={setTeam} />
+  </>
+}

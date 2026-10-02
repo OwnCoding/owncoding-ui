@@ -107,10 +107,10 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **563** |
-| Exports visuales | **146** |
+| Exports de la entrada raíz | **577** |
+| Exports visuales | **160** |
 | API, modelos y utilidades | **417** |
-| Vistas curadas con fixtures controlados | **146** |
+| Vistas curadas con fixtures controlados | **160** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -482,3 +482,7 @@ El build visual comparte los data URLs en un único chunk ESM, conservando
 importación síncrona y SSR Node sin URLs de archivo. La deduplicación es física
 al empaquetar, no una promesa de menor tráfico al importar el barrel. Los límites
 totales del paquete permanecen sin cambios; consulte BUNDLE-BUDGETS.md.
+
+## Componentes reutilizables ampliados
+
+Headers públicos y administrativos, perfiles y cambio de cuenta, Combobox simple/múltiple, Popover/Tooltip accesibles, cierre protegido, centro de notificaciones, acciones asíncronas, copia, barra de acciones y modelos de pie. [Contratos y ejemplos](docs/REUSABLE-UI.md). Son UI controlada: no implementan autenticación ni servicios externos.

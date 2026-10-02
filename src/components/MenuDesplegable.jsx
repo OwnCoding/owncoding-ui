@@ -6,7 +6,7 @@ import { cn } from '../utils/cn.js'
 //   items: [{ id?, label, icono?, onClick?, peligro?, disabled?, separador? }]
 // Cierra con clic afuera y con Esc; `trigger` es el botón visible.
 
-export default function MenuDesplegable({ trigger, items = [], alineacion = 'right', ariaLabel = 'Menú', className }) {
+export default function MenuDesplegable({ trigger, items = [], alineacion = 'right', ariaLabel = 'Menú', disabled = false, className }) {
   const [abierto, setAbierto] = useState(false)
   const [activo, setActivo] = useState(0)
   const raiz = useRef(null)
@@ -28,7 +28,7 @@ export default function MenuDesplegable({ trigger, items = [], alineacion = 'rig
   }
 
   function abrir(indice = 0) {
-    if (!acciones.length) return
+    if (disabled || !acciones.length) return
     setAbierto(true)
     requestAnimationFrame(() => enfocar(indice))
   }
@@ -69,6 +69,7 @@ export default function MenuDesplegable({ trigger, items = [], alineacion = 'rig
       <button
         ref={disparador}
         type="button"
+        disabled={disabled}
         aria-haspopup="menu"
         aria-expanded={abierto}
         onClick={() => { if (abierto) cerrar(); else abrir(0) }}

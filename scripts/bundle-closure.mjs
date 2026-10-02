@@ -3,7 +3,7 @@ import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { init, parse } from 'es-module-lexer'
 
-export const DECLARED_EXTERNALS = Object.freeze(['react', 'react-dom', 'clsx', 'tailwind-merge', 'qrcode', 'libphonenumber-js/min'])
+export const DECLARED_EXTERNALS = Object.freeze(['@base-ui/react', 'react', 'react-dom', 'clsx', 'tailwind-merge', 'qrcode', 'libphonenumber-js/min'])
 const contained = (root, file) => { const path = relative(root, file); return path !== '..' && !path.startsWith(`..${sep}`) && !isAbsolute(path) }
 const externalAllowed = (specifier, externals) => externals.some(name => specifier === name || specifier.startsWith(`${name}/`))
 

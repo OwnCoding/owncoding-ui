@@ -38,7 +38,7 @@ export default function ProductPrefooter({
       data-modelo={modelo}
       className={cn('border-t border-fore/10 bg-ink-800 px-4 py-8 text-fore sm:px-6', className)}
     >
-      <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)]">
+      <div className={cn("mx-auto grid w-full max-w-6xl gap-8", mostrarAccion && accion && "lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)]")}>
         <div className="min-w-0">
           <h2 className="text-xl font-bold text-fore">{titulo}</h2>
           {descripcion ? <p className="mt-2 max-w-2xl text-sm leading-6 text-mute">{descripcion}</p> : null}

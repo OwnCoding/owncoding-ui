@@ -3,6 +3,20 @@
 // aprobados se renderizan en la galería. scripts/gallery-check.mjs exige paridad.
 
 export const CATALOGO_EXPORTS = [
+{"nombre": "Combobox", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "Popover", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "Tooltip", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "CloseButton", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "AppHeader", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "PublicHeader", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "ProfileCard", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "UserMenu", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "AccountSwitcher", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "NotificationCenter", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "AsyncButton", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "FooterPreset", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "CopyButton", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "ActionToolbar", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
   {
     "nombre": "agregarEstado",
     "tipo": "api",
