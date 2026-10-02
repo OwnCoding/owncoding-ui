@@ -223,7 +223,7 @@ function TarjetaBancoRevision({ nombre, seleccionado, onSelect }) {
   )
 }
 
-function VistaBancosPagos() {
+export function VistaBancosPagos() {
   const [banco, setBanco] = useState(BANCO_DESTACADO)
   const registro = logoDeBanco(banco, 'horizontal')
 
@@ -268,7 +268,8 @@ function VistaBancosPagos() {
           </div>
           <span>Compacto + horizontal</span>
         </div>
-        <div className="bank-review-grid" aria-labelledby="gallery-bancos-todos">
+        <p className="bank-review-scroll-hint" id="gallery-bancos-scroll-ayuda">Desliza dentro de la lista para revisar todas las instituciones. Con teclado, enfoca la lista y usa las flechas.</p>
+        <div className="bank-review-grid" role="region" tabIndex={0} aria-labelledby="gallery-bancos-todos" aria-describedby="gallery-bancos-scroll-ayuda">
           {BANCOS_PREVIEW.map((nombre) => (
             <TarjetaBancoRevision key={nombre} nombre={nombre} seleccionado={banco === nombre} onSelect={setBanco} />
           ))}
@@ -617,6 +618,19 @@ function Destacado({ item }) {
   )
 }
 
+export function PriorityPreviews() {
+  return (
+    <div className="priority-grid">
+      <div className="priority-column priority-column--financial">
+        {DESTACADOS_CATALOGO.slice(0, 1).map((item) => <Destacado key={item.destacado.id} item={item} />)}
+      </div>
+      <div className="priority-column priority-column--inputs">
+        {DESTACADOS_CATALOGO.slice(1).map((item) => <Destacado key={item.destacado.id} item={item} />)}
+      </div>
+    </div>
+  )
+}
+
 function Ficha({ item, onAbrir }) {
   return (
     <article className="gallery-card min-w-0 rounded-2xl border border-ink-600 bg-ink p-4 shadow-card">
@@ -717,9 +731,7 @@ function App() {
             </div>
             <span>Fixtures locales · sin llamadas externas</span>
           </div>
-          <div className="priority-grid">
-            {DESTACADOS_CATALOGO.map((item) => <Destacado key={item.destacado.id} item={item} />)}
-          </div>
+          <PriorityPreviews />
           <OtrosCamposInteligentes />
         </section>
 

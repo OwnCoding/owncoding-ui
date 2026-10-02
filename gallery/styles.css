@@ -140,9 +140,11 @@
 .priority-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   gap: 1rem;
   margin-top: 1.5rem;
 }
+.priority-column { display: grid; min-width: 0; align-content: start; gap: 1rem; }
 .priority-card {
   min-width: 0;
   scroll-margin-top: 9rem;
@@ -366,7 +368,17 @@
   grid-template-columns: minmax(0, 1fr);
   gap: .75rem;
   margin-top: .75rem;
+  max-height: min(36rem, 65vh);
+  max-height: min(36rem, 65svh);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--c-fono) / .65) rgb(var(--c-ink-800));
+  border-radius: .5rem;
+  padding: .2rem;
 }
+.bank-review-grid:focus-visible { outline: 2px solid rgb(var(--c-fono)); outline-offset: 3px; }
+.bank-review-scroll-hint { margin: .65rem 0 0; color: rgb(var(--c-mute)); font-size: .68rem; line-height: 1.45; }
 .bank-review-card {
   min-width: 0;
   border: 1px solid rgb(var(--c-ink-600));
@@ -663,11 +675,7 @@
 
 @media (min-width: 1024px) {
   .gallery-hero { grid-template-columns: minmax(0, 1fr) minmax(20rem, .46fr); }
-  .priority-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-  .priority-card--1 { grid-column: span 7; }
-  .priority-card--2 { grid-column: span 5; }
-  .priority-card--3 { grid-column: span 5; }
-  .priority-card--4 { grid-column: span 7; }
+  .priority-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
   .preview-layout--financial { grid-template-columns: minmax(0, 1fr); }
   .preview-layout--customer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .smart-inputs__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
