@@ -722,3 +722,9 @@
 .gallery-side-scene { height: 18rem; flex-shrink: 0; border-radius: .75rem; }
 .gallery-mobile-scene { position: relative; isolation: isolate; min-height: 15rem; padding-bottom: 5rem; }
 .gallery-bottom-nav { position: absolute; display: flex; border-radius: .75rem; }
+
+/* Contain the actual provider's fixed toast stack within its demo scene. */
+.gallery-toast-scene > .fixed {
+  width: calc(100% - 2rem);
+  max-width: 24rem;
+}

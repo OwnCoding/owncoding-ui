@@ -1,3 +1,6 @@
+import { SPECIALIZED_DEMOS, SpecializedPreview } from './specialized-previews.jsx'
+import { SEARCH_BOARD_DEMOS, SearchBoardPreview } from './search-board-previews.jsx'
+import { RECEIVING_DEMOS, ReceivingPreview } from './receiving-previews.jsx'
 import React, { useId, useMemo, useState } from 'react'
 import {
   PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState, Nota, Input,
@@ -28,6 +31,9 @@ export function ComponentPreview({ name }) {
   const [cambios, setCambios] = useState(false)
   const [muestra, setMuestra] = useState('')
   const field = (label, element) => <div><Label htmlFor={id}>{label}</Label>{element}</div>
+  if (SPECIALIZED_DEMOS[name]) return <SpecializedPreview key={name} name={name} />
+  if (SEARCH_BOARD_DEMOS[name]) return <SearchBoardPreview key={name} name={name} />
+  if (RECEIVING_DEMOS[name]) return <ReceivingPreview key={name} name={name} />
   if (DOCUMENT_DEMOS[name]) return <DocumentPreview key={name} name={name} />
   if (REVIEW_DEMOS[name]) return <ReviewPreview key={name} name={name} />
   if (SHELL_DEMOS[name]) return <ShellPreview key={name} name={name} />

@@ -170,13 +170,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BloquePago",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BotonCargaIA",
     "tipo": "visual",
     "categoria": "Carga con IA",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BotonDentroCampo",
@@ -200,19 +200,19 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BuscadorDispositivo",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BuscadorPersonas",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BuscadorProveedor",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "buscarCiudad",
@@ -254,7 +254,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Calendario",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "CampanaAvisos",
@@ -392,7 +392,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "CeldaMoneda",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "Checkbox",
@@ -561,7 +561,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "CodigoQr",
     "tipo": "visual",
     "categoria": "Documentos e impresión",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "CODIGOS_PAIS",
@@ -843,7 +843,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "DestinoRecepcion",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "destinosDeTarjeta",
@@ -873,7 +873,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "DialogoCargaIA",
     "tipo": "visual",
     "categoria": "Carga con IA",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "DIAS_SEMANA",
@@ -1341,7 +1341,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Eyebrow",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "FECHA_VERIFICACION_MARCAS_FINANCIERAS",
@@ -1641,7 +1641,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Icon",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "IconAction",
@@ -1659,7 +1659,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "IconoCategoria",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "iconoDeCategoria",
@@ -2355,7 +2355,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PanelDerecho",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "parseGsInput",
@@ -2451,7 +2451,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PegarEnlaceToken",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PercentField",
@@ -2530,7 +2530,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PlanPagos",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PLANTILLA_PRUEBA",
@@ -2566,7 +2566,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PreviewFusion",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "primerNombre",
@@ -2590,7 +2590,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ProductCombobox",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ProductFooter",
@@ -2716,13 +2716,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ResumenDestinos",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ResumenIncidencias",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "resumenPresencia",
@@ -2734,7 +2734,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ResumenRecepcion",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ROTULO_DATO",
@@ -2795,7 +2795,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SectionState",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SegmentedField",
@@ -2819,13 +2819,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SelectorCuentaCobro",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SelectorIncidencia",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SemaforoItem",
@@ -2915,7 +2915,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SubidaImagen",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "Subtabs",
@@ -2963,7 +2963,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TableroKanban",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TAMANO_MAXIMO_IMAGEN",
@@ -3011,37 +3011,37 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TarjetaAjuste",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TarjetaCompra",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TarjetaCuentaCobro",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TarjetaLote",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TarjetaNecesidad",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TarjetaRecepcion",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TaxIdField",
@@ -3137,13 +3137,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TileEquipo",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TileRol",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "tipoDeEsquemaIA",
@@ -3173,7 +3173,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ToastProvider",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TONO_ESTADO",

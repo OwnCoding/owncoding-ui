@@ -69,23 +69,58 @@ El dominio, DNS, HTTPS y el recurso de Coolify se configuran fuera de este
 repositorio. Un webhook aceptado no confirma un deploy: hay que comprobar el
 estado final, el healthcheck y un smoke del catálogo.
 
-## Cobertura curada local (0.61.1)
+## Cobertura curada local (0.62.0)
 
-48 de 146 exports visuales tienen una presentación curada (antes: 30).
-La ficha ampliada renderiza los componentes seleccionados y evita repetir
-una misma familia pesada en cada tarjeta. Las cuatro prioridades originales
-se conservan. PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState
-y Nota ya no se presentan mediante una demo de otro componente.
+146 de 146 exports visuales tienen una presentación curada (563 exports totales,
+417 API). Los dos lotes agregan 35 vistas reales a las 111 anteriores. La ficha
+individual monta una sola familia con estado local reiniciado al cambiar de
+componente; no se repiten controles pesados en las tarjetas del catálogo.
+Las cuatro prioridades originales, los activos financieros y el correo aislado
+se conservan.
 
-Se exponen los campos inteligentes existentes, una familia de tabla/filtros/vista,
-diálogos confirmables, progreso y guardado simulado, modelos de footer/prefooter
-y versión editable. El correo HTML/texto usa el renderer existente de
-`owncoding-ui/email`, aislado mediante iframe sandbox sin permisos; no envía.
-Los fixtures no representan APIs reales, DNIT ni datos persistidos.
+Las nuevas familias `receiving-previews.jsx` y `search-board-previews.jsx`
+permiten elegir personas/proveedores/productos ficticios, mover y revertir
+una tarjeta Kanban, seleccionar una ficha principal sin fusionarla, quitar y
+restaurar un bloque de pago, simular una recepción, alternar incidencias y
+explorar tarjetas operativas. Los botones de detalle solo actualizan un estado
+local: no abren registros de negocio. El buscador de personas tiene `claveUso=""`
+para no registrar uso en almacenamiento. Las pruebas instrumentan cada export
+real y verifican selección, reversión y ausencia de solicitudes/persistencia.
 
-Pendiente: 98 exports visuales todavía sin presentación curada (shell, acceso,
-operación, documentos, impresión y otros objetos especializados). Un export
-catalogado no equivale a un preview visual completo. Los originales bloqueados
-de BB, Visa/Mastercard, Pix, Red Infonet, Panal y uPOS siguen pendientes de
-fuente/autorización; no se inventan reemplazos. Deploy y QA live son etapas
-separadas de este parche local.
+Selectores para QA: `[data-demo-family="receiving"]`,
+`[data-demo-family="search-board"]`, `[data-demo-export="TableroKanban"] select`,
+`[data-demo-export="PreviewFusion"] input[type="radio"]` y
+`[data-demo-export="BloquePago"] [data-testid="bloque-pago"]`.
+
+El último módulo `specialized-previews.jsx` agrega BuscadorDispositivo,
+Calendario, CodigoQr, BotonCargaIA, DialogoCargaIA, PegarEnlaceToken,
+SelectorCuentaCobro, TarjetaCuentaCobro, SubidaImagen y ToastProvider.
+El calendario usa octubre de 2026 como fixture fijo (incluido “hoy”), con
+navegación y elección local. El QR codifica texto ficticio sin enlaces ni pagos;
+se genera con `qrcode` y su efecto ignora resultados tras desmontarse.
+
+Los dos exports IA abren un diálogo real con proveedor determinista en memoria:
+el análisis no crea nada y la creación requiere revisar y confirmar. No hay
+proveedor remoto, consulta de identidad ni escritura real. El código del enlace
+es una secuencia ficticia sin validez y solo se extrae localmente. Las cuentas y
+cotizaciones son fixtures; elegir o alternar no cobra ni transfiere.
+
+La imagen es un pixel PNG de muestra: sus botones inyectan un File local al
+campo real, ejercitan validación de tamaño y limpieza, y no permiten elegir o
+arrastrar archivos personales. No se usan URLs de objeto, fotos ni canvas.
+ToastProvider usa `demo=false` para no instalar el listener global de guardado,
+un solo aviso persistente sin temporizador y cierre manual. La escena transformada
+contiene su posición fixed y permite reiniciar/desmontar el provider sin avisos
+residuales. Los tests comprueban estos contratos y la generación/limpieza QR.
+
+Selectores especializados: `[data-demo-family="specialized"]`,
+`[data-demo-export="Calendario"]`, `[data-demo-export="SelectorCuentaCobro"]`,
+`[data-demo-export="SubidaImagen"] input[type="file"]`, `.gallery-toast-scene`
+y `[role="dialog"]` tras abrir una simulación IA. Pruebe teclado en modelo,
+cuenta y días del calendario; cambie de ficha para verificar limpieza del diálogo
+y los avisos.
+
+Sin exports visuales pendientes de mapping. Esto acredita fixtures curados y
+pruebas locales, no todas las combinaciones de props, QA live ni despliegue.
+Las limitaciones financieras y de procedencia están documentadas en
+MARCAS-FINANCIERAS.md.
