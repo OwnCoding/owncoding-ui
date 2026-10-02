@@ -96,12 +96,12 @@ describe('identidad publica y SEO de la galeria', () => {
     })
   })
 
-  test('mantiene robots, sitemap y JSON-LD limitados a la galeria publica', () => {
+  test('mantiene robots, sitemap y JSON-LD limitados al sitio publico y sus guías', () => {
     const robots = readFileSync(`${PUBLIC_DIR}/robots.txt`, 'utf8')
     const sitemap = readFileSync(`${PUBLIC_DIR}/sitemap.xml`, 'utf8')
     expect(robots).toContain(`Sitemap: ${SITE_URL}sitemap.xml`)
     expect(sitemap).toContain(`<loc>${SITE_URL}</loc>`)
-    expect(sitemap.match(/<url>/g)).toHaveLength(1)
+    expect(sitemap.match(/<url>/g)).toHaveLength(12)
 
     const jsonLd = INDEX.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1]
     expect(jsonLd).toBeTruthy()

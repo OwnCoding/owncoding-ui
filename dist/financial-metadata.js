@@ -198,7 +198,7 @@ var LOGOS_BANCOS = {
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: EMPAQUETADO("atlas-compacto.svg", "oficial", { fondo: "#B20933", padding: true }),
+      compacto: EMPAQUETADO("atlas-compacto.png", "oficial"),
       horizontal: EMPAQUETADO("atlas-horizontal-blanco.svg", "oficial", { fondo: "#B20933", padding: true })
     }
   }),

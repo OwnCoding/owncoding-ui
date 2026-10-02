@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://controlaria.online/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://controlaria.online/</loc></url>
+  <url><loc>https://controlaria.online/blog/</loc></url>
+  <url><loc>https://controlaria.online/blog/sistema-diseno-react-compartido/</loc></url>
+  <url><loc>https://controlaria.online/blog/logos-bancos-compacto-horizontal/</loc></url>
+  <url><loc>https://controlaria.online/blog/pagos-billeteras-marcas/</loc></url>
+  <url><loc>https://controlaria.online/blog/telefono-paraguay-595/</loc></url>
+  <url><loc>https://controlaria.online/blog/ciudad-departamento-paraguay/</loc></url>
+  <url><loc>https://controlaria.online/blog/ruc-extraccion-confirmable/</loc></url>
+  <url><loc>https://controlaria.online/blog/formularios-validacion-accesibilidad/</loc></url>
+  <url><loc>https://controlaria.online/blog/estados-vacio-carga-error/</loc></url>
+  <url><loc>https://controlaria.online/blog/footers-prefooters-version-app/</loc></url>
+  <url><loc>https://controlaria.online/blog/galeria-componentes-adopcion-pruebas/</loc></url>
 </urlset>

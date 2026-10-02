@@ -5,12 +5,11 @@
   "assets": [
     {
       "id": "bancos-atlas-compacto",
-      "file": "bancos/atlas-compacto.svg",
-      "sourceKind": "official-first-party",
-      "sourceUrl": "https://www.bancoatlas.com.py/img/logoBlanco-letraBlanca.svg",
-      "retrievedAt": "2026-10-01",
-      "transformation": "Cropped to the genuine compact symbol without redrawing.",
-      "sha256": "4c29ee2a2d311c7b054823547467c6e9e7071f7cf4456c84417831f9bb07b776",
+      "file": "bancos/atlas-compacto.png",
+      "sourceKind": "user-provided-reference",
+      "retrievedAt": "2026-10-02",
+      "transformation": "None. Original user-provided PNG copied byte-for-byte; no crop, redraw or image editing.",
+      "sha256": "6c05be7036f398184fc8761b9d634d057970062fc38c3c3ab64e05b9b76f9bb5",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -19,6 +18,11 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceRef": "codex-clipboard-d80103e5-64fa-47fc-8a60-3bf5d7207947.png",
+      "dimensions": {
+        "width": 512,
+        "height": 512
       }
     },
     {

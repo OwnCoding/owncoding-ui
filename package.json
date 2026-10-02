@@ -73,8 +73,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "gallery:dev": "node scripts/gallery-status.mjs && vite --config vite.gallery.config.js",
-    "gallery:check": "node scripts/gallery-check.mjs",
-    "gallery:build": "node scripts/gallery-status.mjs && vite build --config vite.gallery.config.js",
+    "gallery:check": "node scripts/gallery-check.mjs && node scripts/blog-check.mjs",
+    "gallery:build": "node scripts/gallery-status.mjs && vite build --config vite.gallery.config.js && node scripts/blog-build.mjs",
     "readme:check": "node scripts/readme-check.mjs",
     "prepare": "npm run build",
     "test": "vitest run",
@@ -82,7 +82,8 @@
     "test:types": "tsc --noEmit -p test/consumer/tsconfig.json",
     "test:package": "node scripts/package-smoke.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "financial-assets:check": "node scripts/financial-assets-check.mjs"
+    "financial-assets:check": "node scripts/financial-assets-check.mjs",
+    "blog:check": "node scripts/blog-check.mjs"
   },
   "peerDependencies": {
     "qrcode": ">=1.5",

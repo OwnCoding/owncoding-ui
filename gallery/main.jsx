@@ -1,6 +1,7 @@
 import React, { Component, useDeferredValue, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import packageJson from '../package.json'
+import { BLOG_POSTS, articlePath } from './blog/metadata.js'
 import '../src/styles/tokens.css'
 import '../src/styles/base.css'
 import './styles.css'
@@ -589,7 +590,7 @@ function Presentacion({ id }) {
     case 'telefono':
       return <PhoneField country={pais} phone={telefono} onCountryChange={setPais} onChange={setTelefono} onInternationalChange={() => {}} />
     case 'footer':
-      return <ProductFooter identidad={IDENTIDAD} modelo="apilado" enlaces={[{ href: '/status.json', etiqueta: 'Estado' }]} anio={2026} />
+      return <ProductFooter identidad={IDENTIDAD} modelo="apilado" enlaces={[{ href: '/blog/', etiqueta: 'Blog' }, { href: '/status.json', etiqueta: 'Estado' }]} anio={2026} />
     case 'prefooter':
       return <ProductPrefooter className="rounded-2xl" modelo="completo" titulo="Construí con una base común" descripcion="Componentes, identidad y contratos verificables." columnas={[{ titulo: 'Recursos', enlaces: [{ href: '#catalogo', etiqueta: 'Catálogo' }] }]} accion={{ titulo: '¿Necesitás integrar?', enlace: { href: '#catalogo', etiqueta: 'Explorar objetos' } }} />
     case 'ia':
@@ -696,6 +697,7 @@ function App() {
           </div>
           <nav aria-label="Acciones de la galería" className="flex items-center gap-2">
             <a className="toque-44 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" href="/status.json">Estado</a>
+            <a className="toque-44 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" href="/blog/">Blog</a>
             <ThemeToggle clave="owncoding-gallery-theme" />
           </nav>
         </div>
@@ -735,6 +737,11 @@ function App() {
           <OtrosCamposInteligentes />
         </section>
 
+        <section className="gallery-blog" aria-labelledby="titulo-blog">
+          <div className="section-heading"><div><p>Del componente al producto</p><h2 id="titulo-blog">Guías para construir mejor</h2></div><a href="/blog/">Ver las 10 guías →</a></div>
+          <div className="gallery-blog__grid">{BLOG_POSTS.slice(0, 3).map((article) => <article key={article.slug}><span>{article.category}</span><h3><a href={articlePath(article)}>{article.title}</a></h3><p>{article.description}</p><a href={articlePath(article)} className="gallery-blog__read">Leer guía <span aria-hidden="true">↗</span></a></article>)}</div>
+        </section>
+
         <section aria-label="Controles del catálogo" className="sticky top-0 z-20 -mx-4 mt-10 border-y border-fore/10 bg-paper/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center">
             <SearchField className="min-w-0 flex-1" value={consulta} onChange={(event) => { setConsulta(event.target.value); setLimite(60) }} placeholder="Buscar componente, automatización o API" />
@@ -763,8 +770,8 @@ function App() {
         </section>
       </main>
 
-      <ProductPrefooter modelo="completo" titulo="Adopción sin copias locales" descripcion="Usá el export compartido y extendé su contrato por props." columnas={[{ titulo: 'Biblioteca', enlaces: [{ href: '#catalogo', etiqueta: 'Todos los exports' }, { href: '/status.json', etiqueta: 'Estado del build' }] }, { titulo: 'Calidad', enlaces: [{ href: '#contenido', etiqueta: 'Volver arriba' }] }]} accion={{ titulo: 'Estado verificable', descripcion: `${visuales} exports visuales y ${api} exports de API catalogados.`, enlace: { href: '/status.json', etiqueta: 'Abrir status.json' } }} />
-      <ProductFooter identidad={IDENTIDAD} modelo="distribuido" enlaces={[{ href: '/status.json', etiqueta: 'Estado' }]} />
+      <ProductPrefooter modelo="completo" titulo="Adopción sin copias locales" descripcion="Usá el export compartido y extendé su contrato por props." columnas={[{ titulo: 'Biblioteca', enlaces: [{ href: '#catalogo', etiqueta: 'Todos los exports' }, { href: '/status.json', etiqueta: 'Estado del build' }, { href: '/blog/', etiqueta: 'Blog y guías' }] }, { titulo: 'Calidad', enlaces: [{ href: '#contenido', etiqueta: 'Volver arriba' }] }]} accion={{ titulo: 'Estado verificable', descripcion: `${visuales} exports visuales y ${api} exports de API catalogados.`, enlace: { href: '/status.json', etiqueta: 'Abrir status.json' } }} />
+      <ProductFooter identidad={IDENTIDAD} modelo="distribuido" enlaces={[{ href: '/blog/', etiqueta: 'Blog' }, { href: '/status.json', etiqueta: 'Estado' }]} />
     </div>
   )
 }

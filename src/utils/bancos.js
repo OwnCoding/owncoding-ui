@@ -111,7 +111,7 @@ export const LOGOS_BANCOS = {
     categoria: 'banco', alias: ['atlas'], monograma: 'BA', color: '#B20933', archivo: 'atlas-horizontal-blanco.svg',
     fuenteOficial: 'https://www.bancoatlas.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: EMPAQUETADO('atlas-compacto.svg', 'oficial', { fondo: '#B20933', padding: true }),
+      compacto: EMPAQUETADO('atlas-compacto.png', 'oficial'),
       horizontal: EMPAQUETADO('atlas-horizontal-blanco.svg', 'oficial', { fondo: '#B20933', padding: true }),
     },
   }),

@@ -30,7 +30,7 @@ import {
   relacionFinancieraDe,
   sugerenciasDeBanco,
   sugerenciasDeMarcaPago
-} from "./chunks/chunk-Z5ZO4D3O.js";
+} from "./chunks/chunk-2FNWLEUI.js";
 
 // src/components/ui.jsx
 import { Children, cloneElement, createContext, forwardRef, isValidElement, useCallback as useCallback2, useContext, useEffect as useEffect2, useId, useLayoutEffect, useMemo, useRef as useRef2, useState as useState2 } from "react";

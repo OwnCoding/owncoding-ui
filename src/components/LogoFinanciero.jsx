@@ -72,8 +72,8 @@ export default function LogoFinanciero({
       <span
         {...semantica}
         className={cn(
-          'inline-flex items-center',
-          compacto && 'aspect-square shrink-0 justify-center rounded-[5px]',
+          'inline-flex min-w-0 max-w-full max-h-full items-center justify-center',
+          compacto && 'aspect-square shrink-0 rounded-[5px]',
           visual.fondo && visual.padding && (compacto ? 'rounded-md p-[2px]' : 'rounded-md p-1.5'),
           alto,
           className,
@@ -91,8 +91,8 @@ export default function LogoFinanciero({
           decoding="async"
           onError={() => setAssetFallido(fuente)}
           className={cn(
-            'object-contain',
-            compacto ? 'h-full w-full' : 'h-full w-auto max-w-[11rem]',
+            'block max-h-full max-w-full object-contain',
+            compacto ? 'h-full w-full' : 'h-full w-auto max-w-[min(100%,11rem)]',
             registro.chip && 'rounded-[4px] bg-white px-1 py-[1px]',
           )}
         />
