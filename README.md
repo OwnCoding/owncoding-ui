@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.61.0" src="https://img.shields.io/badge/versi%C3%B3n-0.61.0-05a36f" />
+  <img alt="Versión 0.61.1" src="https://img.shields.io/badge/versi%C3%B3n-0.61.1-05a36f" />
   <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
   <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
 </p>
@@ -68,9 +68,12 @@ de validación.
 
 `CityAutocomplete` deriva el departamento desde el catálogo local de Paraguay.
 `BuscadorCliente` encuentra fixtures por nombre, contacto, CI o RUC, y
-`RucField` demuestra una extracción **simulada y confirmable**. La galería no
-consulta un proveedor real ni afirma que una CI se convierta universalmente en
-RUC.
+`RucField` admite escritura y pegado numéricos: elimina letras y separadores
+ajenos al formato y coloca el guion antes del noveno dígito cuando no se ingresó.
+La extracción sigue siendo **simulada y confirmable**, con tres empresas demo
+y resolución determinista por RUC; los resultados se rotulan como ficticios.
+La galería no consulta un proveedor real ni afirma que una CI se convierta
+universalmente en RUC.
 
 | Orden estable de la galería | Export principal | Preview ID |
 | ---: | --- | --- |
@@ -136,9 +139,15 @@ estados, navegación e identidad.
 </p>
 
 Las marcas financieras declaran procedencia, fecha, SHA-256, estado y cobertura.
-Los assets verificados se empaquetan localmente; los casos cuyo origen oficial
-quedó bloqueado se registran por ID y nunca se sustituyen por iniciales que
-puedan confundirse con una marca. Consulta el manifiesto y el contrato en
+Los assets verificados se empaquetan localmente. `v0.61.1` completa ambas
+presentaciones de Continental, Citi, Itaú, Tu Financiera, GNB, Universitaria y
+San Cristóbal: las marcas reutilizadas se describen como **contenidas**, no
+como símbolos o lockups independientes. Banco do Brasil conserva el bloqueo
+explícito: su favicon oficial de 48px no alcanza el mínimo de 64px y no se
+verificó un lockup horizontal bancario. No se amplía ni inventa un logo para
+completarlo. La autorización documentada se limita al repositorio y web/galería
+OwnCoding; no se presenta como licencia abierta. Consulta el manifiesto y el
+contrato en
 [`docs/MARCAS-FINANCIERAS.md`](docs/MARCAS-FINANCIERAS.md) y
 [`docs/financial-assets-manifest.json`](docs/financial-assets-manifest.json).
 
@@ -146,11 +155,10 @@ puedan confundirse con una marca. Consulta el manifiesto y el contrato en
 
 ### 1. Instalar una versión fija
 
-El paquete publicado es `v0.61.0` —incluye las candidatas de la galería
-(`v0.60.0`) y del catálogo financiero (`v0.60.1`)—. La instalación fija:
+La versión del paquete es `v0.61.1`. Al publicar su tag, la instalación fija es:
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.61.0
+npm install github:dariodeoli/owncoding-ui#v0.61.1
 ```
 
 Para probar la rama principal sin fijar un release:

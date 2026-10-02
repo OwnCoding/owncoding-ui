@@ -22,7 +22,7 @@ import asset19 from '../assets/financial/bancos/fpj-compacto.png'
 import asset20 from '../assets/financial/bancos/fpj-horizontal.png'
 import asset21 from '../assets/financial/bancos/interfisa-compacto.png'
 import asset22 from '../assets/financial/bancos/interfisa-horizontal.png'
-import asset23 from '../assets/financial/bancos/itau-compacto.png'
+import asset23 from '../assets/financial/bancos/itau-compacto.svg'
 import asset24 from '../assets/financial/bancos/medalla-compacto.webp'
 import asset25 from '../assets/financial/bancos/medalla-horizontal.png'
 import asset26 from '../assets/financial/bancos/san-cristobal-horizontal.png'
@@ -64,6 +64,11 @@ import asset61 from '../assets/financial/pagos/wally-compacto.ico'
 import asset62 from '../assets/financial/pagos/wally-horizontal.svg'
 import asset63 from '../assets/financial/pagos/zimple-compacto.ico'
 import asset64 from '../assets/financial/pagos/zimple-horizontal.png'
+import asset65 from '../assets/financial/bancos/continental-horizontal.svg'
+import asset66 from '../assets/financial/bancos/gnb-horizontal.svg'
+import asset67 from '../assets/financial/bancos/universitaria-compacto.png'
+import asset68 from '../assets/financial/bancos/universitaria-horizontal.svg'
+import asset69 from '../assets/financial/bancos/citi-horizontal.svg'
 
 export const ASSETS_FINANCIEROS = Object.freeze({
   'bancos/atlas-compacto.svg': asset0,
@@ -89,7 +94,7 @@ export const ASSETS_FINANCIEROS = Object.freeze({
   'bancos/fpj-horizontal.png': asset20,
   'bancos/interfisa-compacto.png': asset21,
   'bancos/interfisa-horizontal.png': asset22,
-  'bancos/itau-compacto.png': asset23,
+  'bancos/itau-compacto.svg': asset23,
   'bancos/medalla-compacto.webp': asset24,
   'bancos/medalla-horizontal.png': asset25,
   'bancos/san-cristobal-horizontal.png': asset26,
@@ -131,6 +136,11 @@ export const ASSETS_FINANCIEROS = Object.freeze({
   'pagos/wally-horizontal.svg': asset62,
   'pagos/zimple-compacto.ico': asset63,
   'pagos/zimple-horizontal.png': asset64,
+  'bancos/continental-horizontal.svg': asset65,
+  'bancos/gnb-horizontal.svg': asset66,
+  'bancos/universitaria-compacto.png': asset67,
+  'bancos/universitaria-horizontal.svg': asset68,
+  'bancos/citi-horizontal.svg': asset69,
 })
 
 export const ASSET_KEYS_FINANCIEROS = Object.freeze(Object.keys(ASSETS_FINANCIEROS))

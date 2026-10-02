@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-01",
+  "generatedAt": "2026-10-02",
   "authorizationStatement": "User-provided written authorization for the public dariodeoli/owncoding-ui repository and Own UI / OwnCoding website/gallery. This is not described as an open license or universal grant.",
   "assets": [
     {
@@ -185,12 +185,60 @@
       "transformation": "Extracted the official gold-and-white horizontal lockup from the primary embedded image in the first-party SVG, trimmed transparent canvas, and downsampled to a 512 x 167 runtime payload; alpha preserved and no upscaling."
     },
     {
+      "id": "bancos-citi-horizontal",
+      "file": "bancos/citi-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.citigroup.com/global/about-us/global-presence/paraguay",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 204.0,
+        "height": 118.0
+      },
+      "sha256": "d59510191316c0c2ed8f7965fec5d5beea45627fe7d26fd1445892c8a290a581",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant. Citi terms reserve rights and require prior written consent; the previously documented user authorization is limited to these project surfaces, not an open license."
+      },
+      "termsUrl": "https://www.citigroup.com/global/terms",
+      "extraction": "Decoded the first 204x118 SVG data URL in the official Paraguay page; artwork unchanged.",
+      "presentation": {
+        "compacto": "Entire horizontal wordmark contained in the compact slot; not a separate compact symbol.",
+        "horizontal": "Published horizontal wordmark, unchanged."
+      }
+    },
+    {
       "id": "bancos-continental-compacto",
       "file": "bancos/continental-compacto.png",
       "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bancontinental.com.py/assets/images/logos/favicon.png",
       "retrievedAt": "2026-10-01",
       "sha256": "85f220cb291da25059a9dd92e01431537befe5ca1972047dbc8283797031c1ab",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-continental-horizontal",
+      "file": "bancos/continental-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://ayuda.bancontinental.com.py/help-center-front/_next/static/media/help-center-conti.f94755ee.svg",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 201.0,
+        "height": 40.0
+      },
+      "sha256": "ddc881c018681775ce8f9a4bd8030dcf799d64ffe06e8b1106abf3853c321e25",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -374,6 +422,33 @@
       }
     },
     {
+      "id": "bancos-gnb-horizontal",
+      "file": "bancos/gnb-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bancognb.com.py/img/fusion/logo-gnb.svg",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 318.0,
+        "height": 66.0
+      },
+      "sha256": "9c2802e92aa42649cd9e422f136e646aaad0af3a15fe16b55fa5b35f9e20cb56",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "presentation": {
+        "compacto": "Entire horizontal wordmark contained in the compact slot; not a separate compact symbol.",
+        "horizontal": "Published horizontal wordmark, unchanged."
+      },
+      "sourceSha256": "34e7b71b6a213db423ed962a8c4cfed75bb31262bd41439e686f59fd5ddb4cbf",
+      "transformation": "Normalized line endings to LF and removed trailing whitespace only; geometry, paint and viewBox unchanged."
+    },
+    {
       "id": "bancos-interfisa-compacto",
       "file": "bancos/interfisa-compacto.png",
       "sourceKind": "user-provided-reference",
@@ -421,11 +496,15 @@
     },
     {
       "id": "bancos-itau-compacto",
-      "file": "bancos/itau-compacto.png",
+      "file": "bancos/itau-compacto.svg",
       "sourceKind": "official-first-party",
-      "sourceUrl": "https://www.itau.com.py/images/favicon/android-icon-192x192.png",
-      "retrievedAt": "2026-10-01",
-      "sha256": "f32533a0f8b7a71be92db579429fb88d348151814d15c89add044e075459f67c",
+      "sourceUrl": "https://www.itau.com.py/images/redis/logo.svg",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 340.0,
+        "height": 340.0
+      },
+      "sha256": "68f4a9b8a8dc1c0ee15906c3f309d6261b73eb4e05f9a5da34fe59fc73f22f85",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -434,6 +513,10 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "presentation": {
+        "compacto": "Published square mark, unchanged, on a contrasting orange surface.",
+        "horizontal": "The same square mark contained in the horizontal slot; not an independent horizontal lockup."
       }
     },
     {
@@ -475,7 +558,7 @@
       "file": "bancos/san-cristobal-horizontal.png",
       "sourceKind": "official-first-party",
       "sourceUrl": "https://www.sancristobal.coop.py/images/logo1.png",
-      "retrievedAt": "2026-10-01",
+      "retrievedAt": "2026-10-02",
       "sha256": "4de863118aff9f037b86f0541d8fcb30b99b128b831489b543ba0ecefbd79478",
       "authorization": {
         "basis": "User-provided written authorization",
@@ -485,6 +568,14 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "dimensions": {
+        "width": 370,
+        "height": 64
+      },
+      "presentation": {
+        "compacto": "Entire horizontal wordmark contained in the compact slot; not a separate compact symbol.",
+        "horizontal": "Published horizontal wordmark, unchanged."
       }
     },
     {
@@ -562,9 +653,8 @@
       "file": "bancos/tu-financiera-compacto.svg",
       "sourceKind": "official-first-party",
       "sourceUrl": "https://tu.com.py/wp-content/uploads/2025/02/logo_tufi.svg",
-      "retrievedAt": "2026-10-01",
-      "transformation": "Retained as the published vertical compact mark; not mislabeled as a horizontal lockup.",
-      "sha256": "81b071006b70566c5233df076a44589585ca8c05f0e76e4a595bcd8441e4dafb",
+      "retrievedAt": "2026-10-02",
+      "sha256": "1f0fa5cb5c6960efda44466b0c24249454d497db3f2e3ddda6117ef7c8899531",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -573,6 +663,14 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "dimensions": {
+        "width": 51,
+        "height": 64
+      },
+      "presentation": {
+        "compacto": "Published vertical mark, unchanged.",
+        "horizontal": "The same vertical mark contained in the horizontal slot; not an independent horizontal lockup."
       }
     },
     {
@@ -608,6 +706,50 @@
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
       }
+    },
+    {
+      "id": "bancos-universitaria-compacto",
+      "file": "bancos/universitaria-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.universitaria.coop/assets_front/img/favicon/apple-touch-icon.png",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 180,
+        "height": 180
+      },
+      "sha256": "fefbcb9cecd6cd924431f217b938c5e987dc709a5408dcd525ccb0ef47dc045b",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-universitaria-horizontal",
+      "file": "bancos/universitaria-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.universitaria.coop/assets_front/img/logo.svg",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 208.28,
+        "height": 45.674
+      },
+      "sha256": "9f2f716b1ded96248c05a0695e9e6ab24110f788aa5898626bc0671e4a8d7d27",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceSha256": "c4e8722b4d9cd9e2502ee436d3d22d5351a6eb4e514acb5dc02051fc11e76f53",
+      "transformation": "Removed the external DOCTYPE declaration, normalized line endings to LF and removed trailing whitespace only; geometry, paint and viewBox unchanged."
     },
     {
       "id": "bancos-zeta-compacto",
@@ -1147,47 +1289,16 @@
   "blockers": [
     {
       "catalog": "bank",
-      "id": "Banco Continental",
-      "variant": "horizontal",
-      "reason": "Official horizontal asset host did not resolve; the verified compact icon remains available."
-    },
-    {
-      "catalog": "bank",
       "id": "Banco do Brasil",
-      "reason": "Official site blocked automated retrieval; no verified local owner-issued asset."
-    },
-    {
-      "catalog": "bank",
-      "id": "Banco GNB Paraguay",
-      "reason": "Official site returned HTTP 403; no verified local owner-issued asset."
-    },
-    {
-      "catalog": "bank",
-      "id": "Citi",
-      "reason": "No Paraguay-specific owner-issued asset was verified for this release."
-    },
-    {
-      "catalog": "bank",
-      "id": "Itaú",
-      "variant": "horizontal",
-      "reason": "The first-party site only publishes a square app mark; it is not relabeled as a horizontal logo."
-    },
-    {
-      "catalog": "bank",
-      "id": "San Cristóbal",
-      "variant": "compacto",
-      "reason": "The only direct first-party compact asset is 16px; it is not upscaled or presented as production quality."
-    },
-    {
-      "catalog": "bank",
-      "id": "Tu Financiera",
-      "variant": "horizontal",
-      "reason": "The first-party site only publishes a vertical mark; it is not mislabeled as a horizontal logo."
-    },
-    {
-      "catalog": "bank",
-      "id": "Universitaria",
-      "reason": "Official site returned HTTP 403; no direct owner-issued asset was verified."
+      "reason": "The official ICO contains 16x16, 32x32 and 48x48 images only: below the 64px compact minimum. No verified independent banking horizontal lockup. Neither slot upscales or invents artwork.",
+      "sourceUrl": "https://www.bb.com.br/site/wp-content/themes/portal40/img/icn-am.ico",
+      "sourceSha256": "78a71d92fe04d9c9f4d21554f8bba882137f21d3461c233012932424055d6f48",
+      "dimensions": {
+        "width": 48,
+        "height": 48
+      },
+      "minimumRasterPixels": 64,
+      "verifiedAt": "2026-10-02"
     },
     {
       "catalog": "payment",

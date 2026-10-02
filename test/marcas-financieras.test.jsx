@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -61,6 +62,77 @@ describe('catálogo de instituciones financieras', () => {
     }
   })
 
+  test('completa siete instituciones con marcas oficiales y declara las presentaciones contenidas', () => {
+    const contained = {
+      'Banco GNB Paraguay': ['compacto', 'horizontal-contained'],
+      Citi: ['compacto', 'horizontal-contained'],
+      'San Cristóbal': ['compacto', 'horizontal-contained'],
+      'Itaú': ['horizontal', 'marca-contained'],
+      'Tu Financiera': ['horizontal', 'marca-contained'],
+    }
+    for (const nombre of ['Banco Continental', 'Banco GNB Paraguay', 'Citi', 'Itaú', 'Tu Financiera', 'Universitaria', 'San Cristóbal']) {
+      for (const variante of ['compacto', 'horizontal']) {
+        const registro = logoDeBanco(nombre, variante)
+        expect(registro.estado).toBe('verificado')
+        expect(registro.visual.empaquetado).toBeTruthy()
+        expect(htmlLogo(BancoLogo, 'banco', nombre, variante)).toContain('<img')
+      }
+      expect(BLOQUEOS_ASSETS_FINANCIEROS.some((item) => item.catalogo === 'banco' && item.id === nombre)).toBe(false)
+    }
+    for (const [nombre, [variante, tipo]] of Object.entries(contained)) {
+      const visual = logoDeBanco(nombre, variante).visual
+      expect(visual).toMatchObject({ tipo, estado: 'oficial', descripcion: expect.stringContaining('contenida') })
+      const html = htmlLogo(BancoLogo, 'banco', nombre, variante)
+      expect(html).toContain(`data-logo-tipo="${tipo}"`)
+      expect(html).toContain(visual.descripcion)
+      expect(html).not.toContain(`aria-label="${nombre}, logo ${variante}"`)
+    }
+    expect(logoDeBanco('Itaú', 'horizontal').visual).toMatchObject({ fondo: '#EC7000', padding: true })
+  })
+
+  test('Banco do Brasil conserva el bloqueo de calidad sin ampliar el favicon oficial', () => {
+    for (const variante of ['compacto', 'horizontal']) {
+      expect(logoDeBanco('Banco do Brasil', variante).visual).toMatchObject({ tipo: 'texto', estado: 'asset-bloqueado' })
+    }
+    const blocker = manifest.blockers.find((item) => item.id === 'Banco do Brasil')
+    expect(blocker).toMatchObject({
+      sourceUrl: 'https://www.bb.com.br/site/wp-content/themes/portal40/img/icn-am.ico',
+      verifiedAt: '2026-10-02',
+      dimensions: { width: 48, height: 48 },
+      minimumRasterPixels: 64,
+      sourceSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+    })
+    expect(manifest.assets.some((asset) => /brasil/.test(asset.file))).toBe(false)
+  })
+
+  test('los nuevos assets tienen fecha, dimensiones, hash y permiso limitado verificables', () => {
+    for (const file of ['continental-horizontal.svg', 'citi-horizontal.svg', 'gnb-horizontal.svg', 'itau-compacto.svg', 'universitaria-compacto.png', 'universitaria-horizontal.svg']) {
+      const asset = manifest.assets.find((item) => item.file === `bancos/${file}`)
+      expect(asset).toMatchObject({
+        sourceKind: 'official-first-party', retrievedAt: '2026-10-02',
+        dimensions: { width: expect.any(Number), height: expect.any(Number) },
+        authorization: { confirmedAt: '2026-10-01', note: expect.stringContaining('not represented as an open license') },
+      })
+      expect(asset.sha256).toBe(createHash('sha256').update(readFileSync(join(process.cwd(), 'src/assets/financial', asset.file))).digest('hex'))
+    }
+    const citi = manifest.assets.find((item) => item.file === 'bancos/citi-horizontal.svg')
+    expect(citi).toMatchObject({ sourceUrl: 'https://www.citigroup.com/global/about-us/global-presence/paraguay', termsUrl: 'https://www.citigroup.com/global/terms', extraction: 'Decoded the first 204x118 SVG data URL in the official Paraguay page; artwork unchanged.' })
+    const universitaria = manifest.assets.find((item) => item.file === 'bancos/universitaria-horizontal.svg')
+    expect(universitaria).toMatchObject({ sourceSha256: expect.stringMatching(/^[a-f0-9]{64}$/), transformation: 'Removed the external DOCTYPE declaration, normalized line endings to LF and removed trailing whitespace only; geometry, paint and viewBox unchanged.' })
+    expect(universitaria.sourceSha256).not.toBe(universitaria.sha256)
+    const gnb = manifest.assets.find((item) => item.file === 'bancos/gnb-horizontal.svg')
+    expect(gnb).toMatchObject({
+      sourceSha256: '34e7b71b6a213db423ed962a8c4cfed75bb31262bd41439e686f59fd5ddb4cbf',
+      transformation: 'Normalized line endings to LF and removed trailing whitespace only; geometry, paint and viewBox unchanged.',
+    })
+    expect(gnb.sourceSha256).not.toBe(gnb.sha256)
+    for (const asset of [gnb, universitaria]) {
+      const svg = readFileSync(join(process.cwd(), 'src/assets/financial', asset.file), 'utf8')
+      expect(svg).not.toContain('\r')
+      expect(svg).not.toMatch(/[ \t]+$/m)
+    }
+  })
+
   test('mantiene metadatos, alias y URLs oficiales corregidas', async () => {
     expect(BANCOS_Y_FINANCIERAS_PARAGUAY).toContain('Zeta Banco')
     expect(COOPERATIVAS_PARAGUAY).toEqual(['Coomecipar', 'Medalla Milagrosa', 'San Cristóbal', 'Universitaria'])
@@ -101,7 +173,7 @@ describe('catálogo de instituciones financieras', () => {
     const bloqueados = new Set(BLOQUEOS_ASSETS_FINANCIEROS.filter((item) => item.catalogo === 'banco').map((item) => item.id))
     for (const entrada of coberturaBancos()) {
       expect(entrada.fuenteOficial).toMatch(/^https:\/\//)
-      expect(entrada.verificadoEn).toBe('2026-10-01')
+      expect(entrada.verificadoEn).toBe('2026-10-02')
       for (const [variante, visual] of Object.entries(entrada.variantes)) {
         expect(visual.tipo).not.toBe('monograma')
         if (!visual.empaquetado) {
@@ -205,7 +277,7 @@ describe('marcas y productos de pago', () => {
 describe('manifest y bundles financieros', () => {
   test('el API visual coincide con el manifest autorizado y cada archivo tiene una variante', () => {
     expect([...ASSET_KEYS_FINANCIEROS].sort()).toEqual(manifest.assets.map((asset) => asset.file).sort())
-    expect(manifest.assets).toHaveLength(65)
+    expect(manifest.assets).toHaveLength(70)
     const referencias = new Set([
       ...coberturaBancos().flatMap(variantesEmpaquetadas),
       ...coberturaMediosPago().flatMap(variantesEmpaquetadas),

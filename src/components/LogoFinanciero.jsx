@@ -50,7 +50,7 @@ export default function LogoFinanciero({
   const etiqueta = registro.banco || registro.marca || nombre
   const semantica = decorativo
     ? { 'aria-hidden': true }
-    : { role: 'img', 'aria-label': `${etiqueta}, logo ${compacto ? 'compacto' : 'horizontal'}` }
+    : { role: 'img', 'aria-label': `${etiqueta}, ${visual.descripcion || `logo ${compacto ? 'compacto' : 'horizontal'}`}` }
 
   const marcaPersonalizada = registro.marca && marcas[registro.marca]
   if (marcaPersonalizada) {
@@ -67,7 +67,7 @@ export default function LogoFinanciero({
     )
   }
 
-  if (fuente && !fallo && (visual.tipo === 'archivo' || visual.tipo === 'horizontal-contained')) {
+  if (fuente && !fallo && ['archivo', 'horizontal-contained', 'marca-contained'].includes(visual.tipo)) {
     return (
       <span
         {...semantica}
@@ -82,6 +82,7 @@ export default function LogoFinanciero({
         data-logo-estado={visual.estado || registro.estado}
         data-logo-variante={registro.variante}
         data-logo-tipo={visual.tipo}
+        title={visual.descripcion}
       >
         <img
           src={fuente}

@@ -66,14 +66,7 @@ var AUTORIZACION_ASSETS_FINANCIEROS = Object.freeze({
   alcance: Object.freeze(["github:dariodeoli/owncoding-ui", "web:Own UI/OwnCoding"])
 });
 var BLOQUEOS_ASSETS_FINANCIEROS = Object.freeze([
-  { catalogo: "banco", id: "Banco Continental", variante: "horizontal", motivo: "host-oficial-no-resuelve" },
-  { catalogo: "banco", id: "Banco do Brasil", motivo: "sitio-oficial-bloquea-descarga" },
-  { catalogo: "banco", id: "Banco GNB Paraguay", motivo: "sitio-oficial-http-403" },
-  { catalogo: "banco", id: "Citi", motivo: "sin-asset-paraguay-verificado" },
-  { catalogo: "banco", id: "Ita\xFA", variante: "horizontal", motivo: "variante-horizontal-oficial-no-publicada" },
-  { catalogo: "banco", id: "San Crist\xF3bal", variante: "compacto", motivo: "asset-oficial-solo-16px" },
-  { catalogo: "banco", id: "Tu Financiera", variante: "horizontal", motivo: "fuente-oficial-solo-publica-version-vertical" },
-  { catalogo: "banco", id: "Universitaria", motivo: "sitio-oficial-http-403" },
+  { catalogo: "banco", id: "Banco do Brasil", motivo: "favicon-oficial-48px-bajo-minimo-64px-sin-lockup-horizontal-verificado" },
   { catalogo: "pago", id: "Visa", motivo: "kit-oficial-requiere-acceso" },
   { catalogo: "pago", id: "Mastercard", motivo: "endpoint-oficial-bloqueado" },
   { catalogo: "pago", id: "Pix", motivo: "kit-oficial-solo-participantes" },
@@ -174,7 +167,7 @@ function marcasRelacionadasConInstitucion(institucion) {
 }
 
 // src/utils/bancos.js
-var FECHA_VERIFICACION_MARCAS_FINANCIERAS = "2026-10-01";
+var FECHA_VERIFICACION_MARCAS_FINANCIERAS = "2026-10-02";
 var BANCOS_Y_FINANCIERAS_PARAGUAY = [
   "Banco Atlas",
   "Banco Basa",
@@ -205,6 +198,8 @@ var COOPERATIVAS_PARAGUAY = [
 ];
 var BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY];
 var EMPAQUETADO = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion });
+var CONTENIDO = (archivo, estado = "oficial", presentacion = {}) => ({ ...EMPAQUETADO(archivo, estado, presentacion), tipo: "horizontal-contained" });
+var MARCA_CONTENIDA = (archivo, presentacion) => ({ ...EMPAQUETADO(archivo, "oficial", presentacion), tipo: "marca-contained" });
 var MONOGRAMA = (estado = "fallback") => ({ tipo: "monograma", estado });
 var TEXTO = (estado = "fallback") => ({ tipo: "texto", estado });
 function variantesFallback(estado = "fallback") {
@@ -261,9 +256,9 @@ var LOGOS_BANCOS = {
     color: "#1C4480",
     marca: "continental",
     fuenteOficial: "https://www.bancontinental.com.py/",
-    estado: "parcial",
+    estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("continental-compacto.png"), horizontal: TEXTO("asset-bloqueado") }
+    variantes: { compacto: EMPAQUETADO("continental-compacto.png"), horizontal: EMPAQUETADO("continental-horizontal.svg") }
   }),
   "Banco de la Naci\xF3n Argentina": entrada({
     categoria: "banco",
@@ -305,8 +300,9 @@ var LOGOS_BANCOS = {
     monograma: "GNB",
     color: "#00563F",
     fuenteOficial: "https://www.bancognb.com.py/",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO("asset-bloqueado"), horizontal: TEXTO("asset-bloqueado") }
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO("gnb-horizontal.svg", "oficial", { descripcion: "Marca horizontal oficial contenida en el espacio compacto; no es un s\xEDmbolo independiente." }), horizontal: EMPAQUETADO("gnb-horizontal.svg") }
   }),
   "Interfisa Banco": entrada({
     categoria: "banco",
@@ -324,11 +320,14 @@ var LOGOS_BANCOS = {
     alias: ["itau", "banco itau", "itau paraguay", "banco ita\xFA paraguay"],
     monograma: "I",
     color: "#EC7000",
-    archivo: "itau-compacto.png",
+    archivo: "itau-compacto.svg",
     fuenteOficial: "https://www.itau.com.py/",
-    estado: "parcial",
+    estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("itau-compacto.png"), horizontal: TEXTO("asset-bloqueado") }
+    variantes: {
+      compacto: EMPAQUETADO("itau-compacto.svg", "oficial", { fondo: "#EC7000", padding: true }),
+      horizontal: MARCA_CONTENIDA("itau-compacto.svg", { fondo: "#EC7000", padding: true, descripcion: "Marca cuadrada oficial contenida en el espacio horizontal; no es un lockup horizontal independiente." })
+    }
   }),
   "Banco Nacional de Fomento": entrada({
     categoria: "banco",
@@ -370,9 +369,10 @@ var LOGOS_BANCOS = {
     alias: ["citibank", "citibank paraguay"],
     monograma: "C",
     color: "#59636E",
-    fuenteOficial: "https://www.citigroup.com/citi/about/countries-and-jurisdictions/paraguay.html",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO("asset-bloqueado"), horizontal: TEXTO("asset-bloqueado") }
+    fuenteOficial: "https://www.citigroup.com/global/about-us/global-presence/paraguay",
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO("citi-horizontal.svg", "oficial", { descripcion: "Marca horizontal oficial contenida en el espacio compacto; no es un s\xEDmbolo independiente." }), horizontal: EMPAQUETADO("citi-horizontal.svg") }
   }),
   "Financiera FIC": entrada({
     categoria: "financiera",
@@ -428,9 +428,9 @@ var LOGOS_BANCOS = {
     color: "#314255",
     archivo: "tu-financiera-compacto.svg",
     fuenteOficial: "https://tu.com.py/",
-    estado: "parcial",
+    estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("tu-financiera-compacto.svg"), horizontal: TEXTO("asset-bloqueado") }
+    variantes: { compacto: EMPAQUETADO("tu-financiera-compacto.svg"), horizontal: MARCA_CONTENIDA("tu-financiera-compacto.svg", { descripcion: "Marca vertical oficial contenida en el espacio horizontal; no es un lockup horizontal independiente." }) }
   }),
   "ueno bank": entrada({
     categoria: "banco",
@@ -484,10 +484,10 @@ var LOGOS_BANCOS = {
     monograma: "SC",
     color: "#167A54",
     fuenteOficial: "https://www.sancristobal.coop.py/",
-    estado: "parcial",
+    estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: TEXTO("asset-bloqueado"),
+      compacto: CONTENIDO("san-cristobal-horizontal.png", "oficial", { fondo: "#5FAD3E", padding: true, descripcion: "Marca horizontal oficial contenida en el espacio compacto; no es un s\xEDmbolo independiente." }),
       horizontal: EMPAQUETADO("san-cristobal-horizontal.png", "oficial", { fondo: "#5FAD3E", padding: true })
     }
   }),
@@ -497,8 +497,9 @@ var LOGOS_BANCOS = {
     monograma: "U",
     color: "#1D4E9E",
     fuenteOficial: "https://www.universitaria.coop/",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO("asset-bloqueado"), horizontal: TEXTO("asset-bloqueado") }
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO("universitaria-compacto.png"), horizontal: EMPAQUETADO("universitaria-horizontal.svg") }
   }),
   "Financiera El Comercio": { redirigeA: "ueno bank", alias: ["el comercio"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   "Visi\xF3n Banco": { redirigeA: "ueno bank", alias: ["vision", "banco vision", "visi\xF3n"], categoria: "legado", estado: "legado", verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
@@ -613,7 +614,7 @@ function sugerenciasDeBanco(texto, catalogo = BANCOS_PARAGUAY) {
 
 // src/utils/mediosPago.js
 var EMPAQUETADO2 = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `pagos/${archivo}`, ...presentacion });
-var CONTENIDO = (archivo, estado = "oficial", presentacion = {}) => ({ ...EMPAQUETADO2(archivo, estado, presentacion), tipo: "horizontal-contained" });
+var CONTENIDO2 = (archivo, estado = "oficial", presentacion = {}) => ({ ...EMPAQUETADO2(archivo, estado, presentacion), tipo: "horizontal-contained" });
 var MONOGRAMA2 = (estado = "fallback") => ({ tipo: "monograma", estado });
 var TEXTO2 = (estado = "fallback") => ({ tipo: "texto", estado });
 var FALLBACK = (estado = "fallback") => ({ compacto: MONOGRAMA2(estado), horizontal: TEXTO2(estado) });
@@ -733,7 +734,7 @@ var MARCAS_MEDIOS_PAGO = {
     estado: "verificado",
     marcaPadre: "upay",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }), horizontal: EMPAQUETADO2("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }) }
+    variantes: { compacto: CONTENIDO2("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }), horizontal: EMPAQUETADO2("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }) }
   }),
   Procard: entrada2({
     categoria: "procesador",
@@ -754,7 +755,7 @@ var MARCAS_MEDIOS_PAGO = {
     fuenteOficial: "https://www.procard.com.py/procard_institucional/paypro/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("paypro-horizontal.png"), horizontal: EMPAQUETADO2("paypro-horizontal.png") }
+    variantes: { compacto: CONTENIDO2("paypro-horizontal.png"), horizontal: EMPAQUETADO2("paypro-horizontal.png") }
   }),
   Wally: entrada2({
     categoria: "billetera",
@@ -847,7 +848,7 @@ var MARCAS_MEDIOS_PAGO = {
     fuenteOficial: "https://www.cabal.coop/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("cabal-horizontal.png"), horizontal: EMPAQUETADO2("cabal-horizontal.png") }
+    variantes: { compacto: CONTENIDO2("cabal-horizontal.png"), horizontal: EMPAQUETADO2("cabal-horizontal.png") }
   }),
   Panal: entrada2({
     categoria: "red-tarjeta",

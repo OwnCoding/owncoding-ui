@@ -5,7 +5,7 @@ import { institucionesSugeridasPorMarca } from './relacionesFinancieras.js'
 // estado, alias y nombres de archivo; los bytes visuales viven exclusivamente
 // en `owncoding-ui/financial` para no inflar `owncoding-ui/utils`.
 
-export const FECHA_VERIFICACION_MARCAS_FINANCIERAS = '2026-10-01'
+export const FECHA_VERIFICACION_MARCAS_FINANCIERAS = '2026-10-02'
 
 export const BANCOS_Y_FINANCIERAS_PARAGUAY = [
   'Banco Atlas',
@@ -43,6 +43,7 @@ export const BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVA
 
 const EMPAQUETADO = (archivo, estado = 'oficial', presentacion = {}) => ({ tipo: 'archivo', archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion })
 const CONTENIDO = (archivo, estado = 'oficial', presentacion = {}) => ({ ...EMPAQUETADO(archivo, estado, presentacion), tipo: 'horizontal-contained' })
+const MARCA_CONTENIDA = (archivo, presentacion) => ({ ...EMPAQUETADO(archivo, 'oficial', presentacion), tipo: 'marca-contained' })
 const MONOGRAMA = (estado = 'fallback') => ({ tipo: 'monograma', estado })
 const TEXTO = (estado = 'fallback') => ({ tipo: 'texto', estado })
 
@@ -94,8 +95,8 @@ export const LOGOS_BANCOS = {
   }),
   'Banco Continental': entrada({
     categoria: 'banco', alias: ['continental'], monograma: 'BC', color: '#1C4480', marca: 'continental',
-    fuenteOficial: 'https://www.bancontinental.com.py/', estado: 'parcial', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO('continental-compacto.png'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://www.bancontinental.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('continental-compacto.png'), horizontal: EMPAQUETADO('continental-horizontal.svg') },
   }),
   'Banco de la Nación Argentina': entrada({
     categoria: 'banco', alias: ['banco nacion', 'banco nación', 'bna'], monograma: 'BNA', color: '#007894',
@@ -116,7 +117,8 @@ export const LOGOS_BANCOS = {
   }),
   'Banco GNB Paraguay': entrada({
     categoria: 'banco', alias: ['gnb', 'banco gnb'], monograma: 'GNB', color: '#00563F',
-    fuenteOficial: 'https://www.bancognb.com.py/', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://www.bancognb.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('gnb-horizontal.svg', 'oficial', { descripcion: 'Marca horizontal oficial contenida en el espacio compacto; no es un símbolo independiente.' }), horizontal: EMPAQUETADO('gnb-horizontal.svg') },
   }),
   'Interfisa Banco': entrada({
     categoria: 'banco', alias: ['interfisa', 'banco interfisa'], monograma: 'IB', color: '#00594C', archivo: 'interfisa-horizontal.png',
@@ -124,9 +126,12 @@ export const LOGOS_BANCOS = {
     variantes: { compacto: EMPAQUETADO('interfisa-compacto.png'), horizontal: EMPAQUETADO('interfisa-horizontal.png') },
   }),
   'Itaú': entrada({
-    categoria: 'banco', alias: ['itau', 'banco itau', 'itau paraguay', 'banco itaú paraguay'], monograma: 'I', color: '#EC7000', archivo: 'itau-compacto.png',
-    fuenteOficial: 'https://www.itau.com.py/', estado: 'parcial', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO('itau-compacto.png'), horizontal: TEXTO('asset-bloqueado') },
+    categoria: 'banco', alias: ['itau', 'banco itau', 'itau paraguay', 'banco itaú paraguay'], monograma: 'I', color: '#EC7000', archivo: 'itau-compacto.svg',
+    fuenteOficial: 'https://www.itau.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: {
+      compacto: EMPAQUETADO('itau-compacto.svg', 'oficial', { fondo: '#EC7000', padding: true }),
+      horizontal: MARCA_CONTENIDA('itau-compacto.svg', { fondo: '#EC7000', padding: true, descripcion: 'Marca cuadrada oficial contenida en el espacio horizontal; no es un lockup horizontal independiente.' }),
+    },
   }),
   'Banco Nacional de Fomento': entrada({
     categoria: 'banco', alias: ['bnf', 'nacional de fomento'], monograma: 'BNF', color: '#006A44', archivo: 'bnf-horizontal.svg',
@@ -148,8 +153,9 @@ export const LOGOS_BANCOS = {
   }),
   'Citi': entrada({
     categoria: 'banco', alias: ['citibank', 'citibank paraguay'], monograma: 'C', color: '#59636E',
-    fuenteOficial: 'https://www.citigroup.com/citi/about/countries-and-jurisdictions/paraguay.html',
-    estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://www.citigroup.com/global/about-us/global-presence/paraguay',
+    estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('citi-horizontal.svg', 'oficial', { descripcion: 'Marca horizontal oficial contenida en el espacio compacto; no es un símbolo independiente.' }), horizontal: EMPAQUETADO('citi-horizontal.svg') },
   }),
   'Financiera FIC': entrada({
     categoria: 'financiera', alias: ['fic'], monograma: 'FIC', color: '#C8102E', archivo: 'fic-horizontal.png',
@@ -176,8 +182,8 @@ export const LOGOS_BANCOS = {
   }),
   'Tu Financiera': entrada({
     categoria: 'financiera', alias: ['tu financiera'], monograma: 'TF', color: '#314255', archivo: 'tu-financiera-compacto.svg',
-    fuenteOficial: 'https://tu.com.py/', estado: 'parcial', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO('tu-financiera-compacto.svg'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://tu.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('tu-financiera-compacto.svg'), horizontal: MARCA_CONTENIDA('tu-financiera-compacto.svg', { descripcion: 'Marca vertical oficial contenida en el espacio horizontal; no es un lockup horizontal independiente.' }) },
   }),
   'ueno bank': entrada({
     categoria: 'banco', alias: ['ueno', 'ueno bank', 'Ueno Bank'], monograma: 'U', color: '#7B2CF5', marca: 'ueno', archivo: 'ueno-horizontal.svg',
@@ -204,15 +210,16 @@ export const LOGOS_BANCOS = {
   }),
   'San Cristóbal': entrada({
     categoria: 'cooperativa', alias: ['cooperativa san cristobal', 'cooperativa san cristóbal'], monograma: 'SC', color: '#167A54',
-    fuenteOficial: 'https://www.sancristobal.coop.py/', estado: 'parcial', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    fuenteOficial: 'https://www.sancristobal.coop.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: TEXTO('asset-bloqueado'),
+      compacto: CONTENIDO('san-cristobal-horizontal.png', 'oficial', { fondo: '#5FAD3E', padding: true, descripcion: 'Marca horizontal oficial contenida en el espacio compacto; no es un símbolo independiente.' }),
       horizontal: EMPAQUETADO('san-cristobal-horizontal.png', 'oficial', { fondo: '#5FAD3E', padding: true }),
     },
   }),
   'Universitaria': entrada({
     categoria: 'cooperativa', alias: ['cooperativa universitaria'], monograma: 'U', color: '#1D4E9E',
-    fuenteOficial: 'https://www.universitaria.coop/', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://www.universitaria.coop/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('universitaria-compacto.png'), horizontal: EMPAQUETADO('universitaria-horizontal.svg') },
   }),
 
   'Financiera El Comercio': { redirigeA: 'ueno bank', alias: ['el comercio'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },

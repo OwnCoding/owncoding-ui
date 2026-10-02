@@ -1269,11 +1269,12 @@ export function esRazonSocial(nombre: string): boolean
 
 /** Tratamiento visual verificable de una marca financiera. */
 export type VisualFinanciero = {
-  tipo: 'archivo' | 'horizontal-contained' | 'monograma' | 'texto'
+  tipo: 'archivo' | 'horizontal-contained' | 'marca-contained' | 'monograma' | 'texto'
   estado: 'oficial' | 'fallback' | 'permiso-pendiente' | 'producto-padre' | string
   archivo?: string
   asset?: string
   empaquetado?: string
+  descripcion?: string
   marcaPadre?: string
   fondo?: string
   padding?: boolean

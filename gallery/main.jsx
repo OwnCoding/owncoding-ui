@@ -102,6 +102,35 @@ const CLIENTES_DEMO = Object.freeze([
   },
 ])
 
+export const RUC_FIXTURES_DEMO = Object.freeze([
+  Object.freeze({
+    ruc: '80012345-6',
+    name: 'Comercial Horizonte Demo S.A.',
+    phone: '+595 981 000 101',
+    email: 'facturacion@horizonte-demo.test',
+  }),
+  Object.freeze({
+    ruc: '80054321-2',
+    name: 'Distribuidora Guaraní Demo S.R.L.',
+    phone: '+595 971 000 202',
+    email: 'administracion@guarani-demo.test',
+  }),
+  Object.freeze({
+    ruc: '80123456-7',
+    name: 'Servicios Ñandutí Demo E.A.S.',
+    phone: '+595 991 000 303',
+    email: 'clientes@nanduti-demo.test',
+  }),
+])
+
+export async function consultarRucDemo(valor) {
+  const ruc = String(valor ?? '').trim()
+  const exacto = RUC_FIXTURES_DEMO.find((fixture) => fixture.ruc === ruc)
+  const indiceDeterminista = [...ruc].reduce((total, caracter) => total + (Number(caracter) || 0), 0) % RUC_FIXTURES_DEMO.length
+  const fixture = exacto || RUC_FIXTURES_DEMO[indiceDeterminista]
+  return { ...fixture, fullRuc: ruc, simulado: true }
+}
+
 const MARCAS_PAGO_DEMO = MARCAS_PAGO_RESTO_PREVIEW
 
 const ETIQUETA_ESTADO_MARCA = Object.freeze({
@@ -471,15 +500,9 @@ function VistaClienteDocumento() {
           id="gallery-ruc"
           value={ruc}
           onChange={setRuc}
-          consultar={async (valor) => ({
-            name: 'Comercial Demo S.A.',
-            fullRuc: valor,
-            phone: '+595 981 000 000',
-            email: 'facturacion@ejemplo.com.py',
-            simulado: true,
-          })}
+          consultar={consultarRucDemo}
           onAplicar={setExtraido}
-          textoAyuda="Fixture local: revisá el resultado antes de aplicarlo."
+          textoAyuda="Fixture local: probá 80012345-6, 80054321-2 o 80123456-7. Revisá el resultado antes de aplicarlo."
         />
         <ResumenCliente cliente={extraido} titulo="Datos aplicados con confirmación" />
         <p className="preview-note">CI y RUC son búsquedas independientes: la demo nunca afirma que una CI se convierta universalmente en RUC.</p>
@@ -726,4 +749,5 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root')).render(<App />)
+const galleryRoot = typeof document !== 'undefined' ? document.getElementById('root') : null
+if (galleryRoot) createRoot(galleryRoot).render(<App />)

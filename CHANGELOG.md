@@ -8,6 +8,32 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.61.1 — 2026-10-02
+
+- **RUC numérico y confirmable:** `RucField` elimina letras y separadores ajenos
+  al formato al escribir, pegar o recibir un valor controlado; conserva hasta
+  ocho dígitos de base y un verificador, e inserta el guion antes del noveno
+  dígito cuando llega sin separador. Usa `inputMode="numeric"` sin convertir el
+  RUC en un número. La extracción y aplicación siguen requiriendo las acciones
+  explícitas del usuario.
+- **Fixtures de RUC:** la galería resuelve tres empresas demo de forma
+  determinista por RUC. El resultado se identifica como simulado y ficticio;
+  no consulta registros reales ni afirma una conversión universal de CI a RUC.
+- **Cobertura bancaria auténtica:** Continental, Citi, Itaú, Tu Financiera, GNB,
+  Universitaria y San Cristóbal completan sus dos espacios de presentación con
+  assets oficiales locales. Citi, GNB y San Cristóbal contienen el wordmark
+  horizontal completo en el espacio compacto; Itaú y Tu Financiera contienen
+  su marca cuadrada/vertical en el espacio horizontal. Registro, nombre
+  accesible y tooltip lo describen sin afirmar variantes independientes.
+- **Calidad y procedencia:** se registran fuentes, SHA-256, dimensiones y
+  verificación del 2026-10-02. Itaú mantiene contraste para su SVG blanco y
+  Universitaria conserva geometría y pintura al retirar solo el DOCTYPE externo.
+  Banco do Brasil sigue bloqueado: el favicon oficial máximo de 48px no cumple
+  el mínimo compacto de 64px y no hay un lockup horizontal bancario verificado.
+  No se amplía ni inventa un logo. Citi conserva la autorización escrita
+  documentada del usuario, limitada al repositorio y web/galería OwnCoding;
+  no se presenta como licencia abierta. Sin cambios en marcas de pago.
+
 ## v0.61.0 — 2026-10-01
 
 Primera versión publicada de la línea: incluye las candidatas `v0.60.0`

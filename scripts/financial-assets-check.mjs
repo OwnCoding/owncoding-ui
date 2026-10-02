@@ -56,6 +56,8 @@ for (const asset of manifest.assets) {
   } else {
     errors.push(`${asset.file}: sourceKind inválido`)
   }
+  if (asset.retrievedAt === '2026-10-02' && (!Number.isFinite(asset.dimensions?.width) || asset.dimensions.width <= 0 || !Number.isFinite(asset.dimensions?.height) || asset.dimensions.height <= 0)) errors.push(`${asset.file}: dimensiones verificadas ausentes o inválidas`)
+  if (asset.sourceSha256 && (!/^[a-f0-9]{64}$/.test(asset.sourceSha256) || !asset.transformation || asset.sourceSha256 === asset.sha256)) errors.push(`${asset.file}: fuente original o transformación SVG incorrecta`)
   if (asset.sourceIdentity) {
     if (!/^[a-f0-9]{64}$/.test(asset.sourceIdentity.sha256 || '')) errors.push(`${asset.file}: sha256 de fuente original inválido`)
     if (!Number.isInteger(asset.sourceIdentity.pixelWidth) || asset.sourceIdentity.pixelWidth < 1) errors.push(`${asset.file}: ancho de fuente original inválido`)
@@ -63,7 +65,7 @@ for (const asset of manifest.assets) {
     if (asset.sourceIdentity.sha256 === asset.sha256) errors.push(`${asset.file}: fuente original y derivado runtime no están diferenciados`)
     if (!asset.transformation) errors.push(`${asset.file}: derivado runtime sin transformación documentada`)
   }
-  if (asset.retrievedAt !== '2026-10-01' || asset.authorization?.confirmedAt !== '2026-10-01') errors.push(`${asset.file}: fecha de evidencia incorrecta`)
+  if (!['2026-10-01', '2026-10-02'].includes(asset.retrievedAt) || asset.authorization?.confirmedAt !== '2026-10-01') errors.push(`${asset.file}: fecha de evidencia incorrecta`)
   if (asset.authorization?.basis !== 'User-provided written authorization') errors.push(`${asset.file}: base de autorización ausente`)
   if (!asset.authorization?.scope?.includes('Public GitHub repository dariodeoli/owncoding-ui') || !asset.authorization?.scope?.includes('Own UI / OwnCoding website and gallery')) errors.push(`${asset.file}: alcance incompleto`)
   if (!referenced.has(asset.file)) errors.push(`${asset.file}: asset sin variante real referenciada`)
@@ -158,15 +160,22 @@ async function checkVariantQuality(catalogo, nombre, registro) {
   const compacto = registro.variantes.compacto
   const horizontal = registro.variantes.horizontal
   const containedCompact = compacto?.tipo === 'horizontal-contained'
-  if (!containedCompact && compacto?.empaquetado && compacto.empaquetado === horizontal?.empaquetado) errors.push(`${catalogo} ${nombre}: variantes reutilizan el mismo asset`)
+  const containedHorizontal = horizontal?.tipo === 'marca-contained'
+  if (!containedCompact && !containedHorizontal && compacto?.empaquetado && compacto.empaquetado === horizontal?.empaquetado) errors.push(`${catalogo} ${nombre}: variantes reutilizan el mismo asset`)
   for (const [variante, visual] of Object.entries(registro.variantes)) {
     if (!visual?.empaquetado) continue
     const source = await readFile(path.join(assetsRoot, visual.empaquetado))
     const metrics = visual.empaquetado.endsWith('.svg') ? svgMetrics(source) : visual.empaquetado.endsWith('.png') ? pngMetrics(source) : null
+    if (catalogo === 'banco' && ['horizontal-contained', 'marca-contained'].includes(visual.tipo)) {
+      if (!visual.descripcion || !visual.descripcion.includes('contenida')) errors.push(`${catalogo} ${nombre}: presentación contenida sin descripción honesta`)
+      if ((visual.tipo === 'horizontal-contained' && (variante !== 'compacto' || metrics?.width / metrics?.height < 1.4)) || (visual.tipo === 'marca-contained' && (variante !== 'horizontal' || metrics?.width / metrics?.height >= 1.4))) errors.push(`${catalogo} ${nombre}: presentación contenida incompatible con su slot`)
+    }
     if (!metrics?.width || !metrics?.height) continue
+    const assetMetadata = manifest.assets.find((item) => item.file === visual.empaquetado)
+    if (assetMetadata?.dimensions && (assetMetadata.dimensions.width !== metrics.width || assetMetadata.dimensions.height !== metrics.height)) errors.push(`${catalogo} ${nombre}: dimensiones del manifest no coinciden`)
     const ratio = metrics.width / metrics.height
     if (variante === 'compacto' && !containedCompact && (ratio < 0.5 || ratio > 2)) errors.push(`${catalogo} ${nombre}: compacto fuera de proporción (${ratio.toFixed(2)})`)
-    if (variante === 'horizontal' && ratio < 1.4 && !qualityException(catalogo, nombre, variante, 'horizontal-ratio')) errors.push(`${catalogo} ${nombre}: horizontal fuera de proporción (${ratio.toFixed(2)})`)
+    if (variante === 'horizontal' && !containedHorizontal && ratio < 1.4 && !qualityException(catalogo, nombre, variante, 'horizontal-ratio')) errors.push(`${catalogo} ${nombre}: horizontal fuera de proporción (${ratio.toFixed(2)})`)
     if (visual.empaquetado.endsWith('.png')) {
       const minimum = variante === 'compacto' ? 64 : 56
       if (Math.min(metrics.width, metrics.height) < minimum && !qualityException(catalogo, nombre, variante, 'min-raster')) errors.push(`${catalogo} ${nombre}: ${variante} raster menor a ${minimum}px`)

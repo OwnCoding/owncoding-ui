@@ -9,9 +9,12 @@ obligar a `financial-metadata` o `utils` a importar imágenes.
 
 - `compacto`: símbolo, app icon o favicon oficial cuando existe;
 - `horizontal`: wordmark o lockup oficial;
-- si la fuente oficial no ofrece un símbolo separado, se usa una aplicación
-  vertical auténtica dentro de la caja cuadrada o se declara la variante como
-  pendiente; nunca se reutiliza un wordmark horizontal como falso ícono;
+- `horizontal-contained`: wordmark horizontal oficial completo contenido en el
+  espacio compacto, explícitamente identificado como marca contenida, no como
+  símbolo independiente (Citi, GNB y San Cristóbal);
+- `marca-contained`: marca cuadrada o vertical oficial completa contenida en el
+  espacio horizontal, sin afirmar que exista un lockup horizontal independiente
+  (Itaú y Tu Financiera);
 - nunca se recorta un wordmark para fabricar un símbolo ni se crea una letra
   que aparente ser el logo.
 
@@ -23,6 +26,9 @@ import { BancoLogo, MedioPagoLogo } from 'owncoding-ui/financial'
 <MedioPagoLogo marca="Bancard" variante="compacto" alto="h-8" />
 <MedioPagoLogo marca="Dinelco" variante="horizontal" alto="h-7" />
 ```
+
+Las presentaciones contenidas incluyen una descripción explícita en el registro,
+el nombre accesible y el tooltip de la UI. No se recortan ni reconstruyen.
 
 Las imágenes usan `<img alt="">` dentro de un contenedor con nombre accesible.
 Con `decorativo`, todo el tratamiento se oculta del árbol de accesibilidad. Si
@@ -64,6 +70,28 @@ resolución mínima, canvas transparente excesivo y reutilización accidental de
 mismo archivo en ambas variantes. Las limitaciones históricas de primera parte
 se declaran como excepciones específicas, sin debilitar la validación de assets
 nuevos.
+
+## Revisión bancaria del 2026-10-02
+
+Continental y Universitaria incorporan variantes oficiales independientes. Citi,
+GNB y San Cristóbal conservan el wordmark completo en ambos espacios; Itaú y Tu
+Financiera conservan la marca cuadrada/vertical en ambos espacios. No se inventan
+símbolos ni tipografías. El SVG blanco de Itaú usa una superficie naranja de
+contraste. Universitaria conserva toda su geometría y pintura: solo se retiró
+el DOCTYPE externo del SVG, con el hash original registrado en el manifest.
+
+Banco do Brasil sigue bloqueado: el ICO oficial descargado contiene tamaños
+16/32/48px, inferiores al mínimo compacto de 64px. Tampoco se verificó un lockup
+horizontal bancario independiente. No se amplía el favicon ni se permite una
+excepción de calidad para llenar el catálogo. El bloqueo registra URL, hash y
+fecha de la evidencia aunque ese archivo no se empaquete.
+
+Los [términos de Citi](https://www.citigroup.com/global/terms) reservan derechos y
+exigen consentimiento escrito previo. Su inclusión se apoya en la autorización
+escrita ya documentada del usuario para el repositorio y web/galería OwnCoding;
+no se afirma una licencia abierta ni un permiso universal de redistribución.
+La fecha de verificación de estos assets es 2026-10-02; no se altera la fecha
+histórica de la autorización del 2026-10-01 ni la evidencia previa de pagos.
 
 ## Soluciones de aceptación para comercios
 

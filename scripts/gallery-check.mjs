@@ -93,7 +93,7 @@ for (const [grupo, nombres, resolver] of [
   for (const nombre of nombres) {
     for (const variante of ['compacto', 'horizontal']) {
       const visual = resolver(nombre, variante)?.visual
-      if (!visual?.empaquetado || !['archivo', 'horizontal-contained'].includes(visual.tipo)) {
+      if (!visual?.empaquetado || !['archivo', 'horizontal-contained', 'marca-contained'].includes(visual.tipo)) {
         const bloqueo = BLOQUEOS_ASSETS_FINANCIEROS.some((item) => item.catalogo === grupo && item.id === nombre && (!item.variante || item.variante === variante))
         if (grupo !== 'banco' || visual?.tipo !== 'texto' || !bloqueo) erroresFinancieros.push(`${grupo}:${nombre}:${variante} no resuelve un asset local ni un bloqueo explícito`)
       }

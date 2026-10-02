@@ -3,6 +3,26 @@ import { Badge, Input } from './ui.jsx'
 import BotonDentroCampo from './BotonDentroCampo.jsx'
 import { cn } from '../utils/cn.js'
 
+const LARGO_MAXIMO_RUC = 10
+
+// RUC paraguayo editable: hasta 8 dígitos de base y, opcionalmente, un
+// verificador. Si llega un noveno dígito sin guion (teclado numérico o pegado),
+// lo formatea como verificador para que la UX móvil no dependa de una tecla "-".
+function sanitizarRuc(value) {
+  const entrada = String(value ?? '')
+  const indiceGuion = entrada.indexOf('-')
+
+  if (indiceGuion >= 0) {
+    const base = entrada.slice(0, indiceGuion).replace(/\D/g, '').slice(0, 8)
+    if (!base) return entrada.replace(/\D/g, '').slice(0, 8)
+    const verificador = entrada.slice(indiceGuion + 1).replace(/\D/g, '').slice(0, 1)
+    return `${base}-${verificador}`
+  }
+
+  const digitos = entrada.replace(/\D/g, '').slice(0, 9)
+  return digitos.length > 8 ? `${digitos.slice(0, 8)}-${digitos[8]}` : digitos
+}
+
 // Campo RUC único del grupo: input con el botón **Extraer** adentro (trailing,
 // con tooltip y estado «Consultando…») contra la consulta que pasa la app
 // (`consultar` async → `{ name, fullRuc, simulado? }`). El resultado se ofrece
@@ -18,7 +38,7 @@ export default function RucField({
   disabled = false,
   consultarDisabled = false,
   mostrarExtractor = true,
-  maxLength = 100,
+  maxLength = LARGO_MAXIMO_RUC,
   placeholder = '80012345-6',
   autoComplete = 'off',
   ariaLabel,
@@ -33,11 +53,12 @@ export default function RucField({
   const [resultado, setResultado] = useState(null)
   const [consultando, setConsultando] = useState(false)
   const [error, setError] = useState('')
-  const hayRuc = Boolean(String(value || '').trim())
+  const rucSanitizado = sanitizarRuc(value).slice(0, Math.min(LARGO_MAXIMO_RUC, Math.max(1, Number(maxLength) || LARGO_MAXIMO_RUC)))
+  const hayRuc = Boolean(rucSanitizado)
   const puedeExtraer = mostrarExtractor && typeof consultar === 'function'
 
   async function extraer() {
-    const ruc = String(value || '').trim()
+    const ruc = rucSanitizado
     if (!ruc || consultando || !puedeExtraer) return
     setConsultando(true); setError(''); setResultado(null)
     try {
@@ -59,11 +80,15 @@ export default function RucField({
           aria-describedby={[inputProps['aria-describedby'], puedeExtraer && textoAyuda ? ayudaId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined}
           aria-invalid={inputProps['aria-invalid'] ?? (error ? true : undefined)}
           className={puedeExtraer ? (consultando ? 'pr-32' : 'pr-11') : undefined}
-          maxLength={maxLength}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]{0,8}(-[0-9]?)?"
+          spellCheck={false}
+          maxLength={Math.min(LARGO_MAXIMO_RUC, Math.max(1, Number(maxLength) || LARGO_MAXIMO_RUC))}
           autoComplete={autoComplete}
           disabled={disabled}
-          value={value}
-          onChange={(event) => { onChange(event.target.value); setResultado(null); setError('') }}
+          value={rucSanitizado}
+          onChange={(event) => { onChange?.(sanitizarRuc(event.target.value)); setResultado(null); setError('') }}
           placeholder={placeholder}
         />
         {puedeExtraer && (
