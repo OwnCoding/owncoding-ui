@@ -1,3 +1,5 @@
+import assetSanCristobalCompact from '../assets/financial/bancos/san-cristobal-compacto.png'
+import assetGnbCompact from '../assets/financial/bancos/gnb-compacto.png'
 // Canonical visual asset registry. Metadata stays pure and byte-free.
 import asset0 from '../assets/financial/bancos/atlas-compacto.svg'
 import asset1 from '../assets/financial/bancos/atlas-horizontal-blanco.svg'
@@ -137,6 +139,8 @@ export const ASSETS_FINANCIEROS = Object.freeze({
   'pagos/zimple-compacto.ico': asset63,
   'pagos/zimple-horizontal.png': asset64,
   'bancos/continental-horizontal.svg': asset65,
+  'bancos/gnb-compacto.png': assetGnbCompact,
+  'bancos/san-cristobal-compacto.png': assetSanCristobalCompact,
   'bancos/gnb-horizontal.svg': asset66,
   'bancos/universitaria-compacto.png': asset67,
   'bancos/universitaria-horizontal.svg': asset68,

@@ -67,7 +67,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "AuthLayout",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "AVANCES_FIRMA",
@@ -79,7 +79,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Avatar",
     "tipo": "visual",
     "categoria": "Identidad y privacidad",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "Aviso",
@@ -103,7 +103,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "AyudaModulo",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "Badge",
@@ -146,7 +146,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BarraInferior",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BarraLote",
@@ -260,7 +260,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "CampanaAvisos",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "campoBuscableCliente",
@@ -410,7 +410,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ChipEstado",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ChipFusion",
@@ -422,13 +422,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ChipOrigen",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ChipPrioridad",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ChipsLocks",
@@ -693,7 +693,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ConfirmarConPalabra",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ConfirmDialog",
@@ -723,7 +723,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ContadorLote",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "contarSinLeer",
@@ -735,7 +735,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ConteoChecklist",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "COOPERATIVAS_PARAGUAY",
@@ -801,7 +801,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Cronologia",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "CurrencySelect",
@@ -1023,7 +1023,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "EstadoBadge",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "estadoChip",
@@ -1419,7 +1419,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "FilaDato",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "FilaRevision",
@@ -1455,7 +1455,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "FormActions",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "formatGs",
@@ -1503,7 +1503,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "FormField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "GLIFOS_CATEGORIA",
@@ -1515,19 +1515,19 @@ export const CATALOGO_EXPORTS = [
     "nombre": "GoogleButton",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "GoogleMark",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "GradoBadge",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "gradoCondicion",
@@ -1545,7 +1545,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "GraficoBarras",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "GRILLA_DOS_COLUMNAS",
@@ -1755,7 +1755,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "InstagramField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "institucionesSugeridasPorMarca",
@@ -1863,7 +1863,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "LoadingScreen",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "LOCKS_DISPOSITIVO",
@@ -1947,7 +1947,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "MedidorStock",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "MedioPagoLogo",
@@ -2013,7 +2013,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "MenuDesplegable",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "metodoEnvio",
@@ -2115,13 +2115,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "NavegacionSeccion",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "NavLateral",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "nombreDeDispositivo",
@@ -2247,7 +2247,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "NumericKeypad",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "numeroParcialCuenta",
@@ -2259,7 +2259,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "OAuthDivider",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "obligatorio",
@@ -2349,7 +2349,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PaletaComandos",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PanelDerecho",
@@ -2481,13 +2481,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PeriodoTabs",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PersonaChip",
     "tipo": "visual",
     "categoria": "Identidad y privacidad",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PhoneField",
@@ -2518,7 +2518,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PilaPersonas",
     "tipo": "visual",
     "categoria": "Identidad y privacidad",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PinInput",
@@ -2777,7 +2777,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SaveActions",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SearchField",
@@ -2789,7 +2789,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SeccionColapsable",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SectionState",
@@ -2909,7 +2909,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Stepper",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SubidaImagen",
@@ -2921,7 +2921,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Subtabs",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "sugerenciasDe",
@@ -3047,7 +3047,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TaxIdField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "taxIdGenericoValid",
@@ -3383,7 +3383,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Vencimiento",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ventanaDeLista",

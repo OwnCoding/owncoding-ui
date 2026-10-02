@@ -187,7 +187,7 @@ function VistaVarianteBanco({ nombre, variante }) {
         style={registro?.visual?.fondo ? { backgroundColor: registro.visual.fondo } : undefined}
       >
         {disponible ? (
-          <BancoLogo banco={nombre} variante={variante} alto={variante === 'compacto' ? 'h-12' : 'h-10'} />
+          <BancoLogo banco={nombre} variante={variante} alto={nombre === 'Itaú' && variante === 'horizontal' && contenida ? 'h-16' : variante === 'compacto' ? 'h-12' : 'h-10'} />
         ) : (
           <span className="bank-variant__pending" role="status">Sin asset redistribuible</span>
         )}

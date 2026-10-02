@@ -64,9 +64,7 @@ describe('catálogo de instituciones financieras', () => {
 
   test('completa siete instituciones con marcas oficiales y declara las presentaciones contenidas', () => {
     const contained = {
-      'Banco GNB Paraguay': ['compacto', 'horizontal-contained'],
       Citi: ['compacto', 'horizontal-contained'],
-      'San Cristóbal': ['compacto', 'horizontal-contained'],
       'Itaú': ['horizontal', 'marca-contained'],
       'Tu Financiera': ['horizontal', 'marca-contained'],
     }
@@ -87,7 +85,17 @@ describe('catálogo de instituciones financieras', () => {
       expect(html).toContain(visual.descripcion)
       expect(html).not.toContain(`aria-label="${nombre}, logo ${variante}"`)
     }
+    for (const [name, file] of [['Banco GNB Paraguay', 'gnb-compacto.png'], ['San Cristóbal', 'san-cristobal-compacto.png']]) {
+      expect(logoDeBanco(name, 'compacto').visual).toMatchObject({ tipo: 'archivo', estado: 'aportado-usuario', empaquetado: `bancos/${file}` })
+    }
     expect(logoDeBanco('Itaú', 'horizontal').visual).toMatchObject({ fondo: '#EC7000', padding: true })
+  })
+
+  test('el catálogo ofrecido excluye Banco do Brasil y conserva lookup histórico', () => {
+    expect(BANCOS_PARAGUAY).toHaveLength(23)
+    expect(BANCOS_PARAGUAY).not.toContain('Banco do Brasil')
+    expect(BANCOS_PREVIEW).not.toContain('Banco do Brasil')
+    expect(logoDeBanco('Banco do Brasil', 'compacto').banco).toBe('Banco do Brasil')
   })
 
   test('Banco do Brasil conserva el bloqueo de calidad sin ampliar el favicon oficial', () => {
@@ -277,7 +285,7 @@ describe('marcas y productos de pago', () => {
 describe('manifest y bundles financieros', () => {
   test('el API visual coincide con el manifest autorizado y cada archivo tiene una variante', () => {
     expect([...ASSET_KEYS_FINANCIEROS].sort()).toEqual(manifest.assets.map((asset) => asset.file).sort())
-    expect(manifest.assets).toHaveLength(70)
+    expect(manifest.assets).toHaveLength(72)
     const referencias = new Set([
       ...coberturaBancos().flatMap(variantesEmpaquetadas),
       ...coberturaMediosPago().flatMap(variantesEmpaquetadas),

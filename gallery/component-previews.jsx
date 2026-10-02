@@ -8,6 +8,8 @@ import {
 } from '../src/index.js'
 import { crearCorreoTransaccional, renderCorreoHtml, renderCorreoTexto } from '../src/email/index.js'
 import packageJson from '../package.json'
+import { SHELL_DEMOS, ShellPreview } from './shell-previews.jsx'
+import { OPERATION_DEMOS, OperationPreview } from './operation-previews.jsx'
 
 const identity = crearIdentidadApp({ nombre: 'OwnCoding UI', version: packageJson.version })
 const rows = [{ id: 'a', nombre: 'Pedido Demo A', estado: 'Pendiente' }, { id: 'b', nombre: 'Pedido Demo B', estado: 'Completo' }]
@@ -24,6 +26,8 @@ export function ComponentPreview({ name }) {
   const [cambios, setCambios] = useState(false)
   const [muestra, setMuestra] = useState('')
   const field = (label, element) => <div><Label htmlFor={id}>{label}</Label>{element}</div>
+  if (SHELL_DEMOS[name]) return <ShellPreview key={name} name={name} />
+  if (OPERATION_DEMOS[name]) return <OperationPreview key={name} name={name} />
   switch (name) {
     case 'PasswordInput': return field('Contraseña de muestra', <PasswordInput id={id} defaultValue="demo-only" />)
     case 'PinInput': return field('PIN de muestra', <PinInput id={id} ariaLabel="PIN de muestra" value={value} onChange={setValue} />)

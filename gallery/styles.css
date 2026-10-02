@@ -715,3 +715,10 @@
     animation: none !important;
   }
 }
+
+/* Bounded scenes keep full-screen exports inside their selected preview. */
+.gallery-auth-scene { min-height: 0; border-radius: 1rem; }
+.gallery-loading-scene { min-height: 20rem; border-radius: 1rem; }
+.gallery-side-scene { height: 18rem; flex-shrink: 0; border-radius: .75rem; }
+.gallery-mobile-scene { position: relative; isolation: isolate; min-height: 15rem; padding-bottom: 5rem; }
+.gallery-bottom-nav { position: absolute; display: flex; border-radius: .75rem; }

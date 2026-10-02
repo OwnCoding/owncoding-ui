@@ -70,7 +70,7 @@ const ordenCategoriasInvalido = categoriasPrioritarias.every((categoria, indice)
 const erroresFinancieros = []
 if (BANCO_DESTACADO !== 'ueno bank' || BANCOS_PREVIEW[0] !== BANCO_DESTACADO) erroresFinancieros.push('ueno bank debe liderar bancos-pagos')
 if (BANCOS_PREVIEW.length !== BANCOS_PARAGUAY.length || BANCOS_PARAGUAY.some((nombre) => !BANCOS_PREVIEW.includes(nombre))) {
-  erroresFinancieros.push('la revisión bancaria debe incluir las 24 instituciones del catálogo')
+  erroresFinancieros.push('la revisión bancaria debe incluir todas las instituciones del catálogo seleccionable')
 }
 if (JSON.stringify(MARCAS_CONECTADAS_PREVIEW) !== JSON.stringify(['Mango', 'Vaquita', 'EKO', 'eCLUB', 'Pik'])) {
   erroresFinancieros.push('el orden de marcas conectadas debe ser Mango > Vaquita > EKO > eCLUB > Pik')

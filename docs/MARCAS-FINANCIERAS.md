@@ -11,7 +11,7 @@ obligar a `financial-metadata` o `utils` a importar imágenes.
 - `horizontal`: wordmark o lockup oficial;
 - `horizontal-contained`: wordmark horizontal oficial completo contenido en el
   espacio compacto, explícitamente identificado como marca contenida, no como
-  símbolo independiente (Citi, GNB y San Cristóbal);
+  símbolo independiente (Citi);
 - `marca-contained`: marca cuadrada o vertical oficial completa contenida en el
   espacio horizontal, sin afirmar que exista un lockup horizontal independiente
   (Itaú y Tu Financiera);
@@ -73,14 +73,18 @@ nuevos.
 
 ## Revisión bancaria del 2026-10-02
 
-Continental y Universitaria incorporan variantes oficiales independientes. Citi,
-GNB y San Cristóbal conservan el wordmark completo en ambos espacios; Itaú y Tu
-Financiera conservan la marca cuadrada/vertical en ambos espacios. No se inventan
-símbolos ni tipografías. El SVG blanco de Itaú usa una superficie naranja de
-contraste. Universitaria conserva toda su geometría y pintura: solo se retiró
-el DOCTYPE externo del SVG, con el hash original registrado en el manifest.
+Continental y Universitaria incorporan variantes oficiales independientes. Citi
+conserva el wordmark completo en ambos espacios. GNB y San Cristóbal incorporan
+los PNG compactos originales proporcionados por el usuario, sin edición, con
+procedencia de usuario y SHA-256 en el manifiesto; sus horizontales no cambian.
+Itaú y Tu Financiera conservan la marca cuadrada/vertical en ambos espacios.
+No se inventan símbolos ni tipografías. El SVG blanco de Itaú usa una superficie
+naranja de contraste. Universitaria conserva toda su geometría y pintura:
+solo se retiró el DOCTYPE externo, con el hash original registrado.
 
-Banco do Brasil sigue bloqueado: el ICO oficial descargado contiene tamaños
+Banco do Brasil no se ofrece en el selector ni en la galería por curaduría del
+usuario, sin afirmar inactividad ni revocación. Se conserva el lookup histórico
+y su bloqueo de calidad: el ICO oficial descargado contiene tamaños
 16/32/48px, inferiores al mínimo compacto de 64px. Tampoco se verificó un lockup
 horizontal bancario independiente. No se amplía el favicon ni se permite una
 excepción de calidad para llenar el catálogo. El bloqueo registra URL, hash y
@@ -155,7 +159,7 @@ y medios cuya fuente directa pudo verificarse. Estos IDs permanecen bloqueados
 en esta versión; se muestra su nombre, no una inicial que pueda confundirse con
 una marca:
 
-- banco: `Banco Continental` (`horizontal`), `Banco do Brasil`, `Banco GNB Paraguay`, `Citi`, `Itaú` (`horizontal`), `San Cristóbal` (`compacto`), `Tu Financiera` (`horizontal`), `Universitaria`;
+- banco: `Banco do Brasil` solo en lookup histórico; excluido del catálogo ofrecido por curaduría del usuario;
 - pago: `Visa`, `Mastercard`, `Pix`, `Red Infonet`, `Panal`;
 - producto: `uPOS` no tiene una marca independiente verificada; se conserva
   explícitamente como producto de `upay`.

@@ -1284,6 +1284,50 @@
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
       }
+    },
+    {
+      "id": "bancos-gnb-compacto",
+      "file": "bancos/gnb-compacto.png",
+      "sourceKind": "user-provided-reference",
+      "sourceRef": "codex-clipboard-d549953d-6671-476b-8582-e8813d16f607.png",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 920,
+        "height": 920
+      },
+      "sha256": "cf652c79268aeb719b033cd5ce84d26a57a0e45d31828a55913b4eaa9d262db6",
+      "transformation": "None. Original user-provided PNG copied byte-for-byte; no crop, redraw or image editing.",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-san-cristobal-compacto",
+      "file": "bancos/san-cristobal-compacto.png",
+      "sourceKind": "user-provided-reference",
+      "sourceRef": "codex-clipboard-1f11a95a-7cec-4469-a2e3-83b9d7797550.png",
+      "retrievedAt": "2026-10-02",
+      "dimensions": {
+        "width": 512,
+        "height": 512
+      },
+      "sha256": "91c1f82e91adf268bdc22507331d0525cb4204b7485eb3aa82f8b5397219ed5b",
+      "transformation": "None. Original user-provided PNG copied byte-for-byte; no crop, redraw or image editing.",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
     }
   ],
   "blockers": [

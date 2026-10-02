@@ -114,7 +114,6 @@ var BANCOS_Y_FINANCIERAS_PARAGUAY = [
   "Banco Basa",
   "Banco Continental",
   "Banco de la Naci\xF3n Argentina",
-  "Banco do Brasil",
   "Banco Familiar",
   "Banco GNB Paraguay",
   "Interfisa Banco",
@@ -243,7 +242,7 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.bancognb.com.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("gnb-horizontal.svg", "oficial", { descripcion: "Marca horizontal oficial contenida en el espacio compacto; no es un s\xEDmbolo independiente." }), horizontal: EMPAQUETADO("gnb-horizontal.svg") }
+    variantes: { compacto: EMPAQUETADO("gnb-compacto.png", "aportado-usuario", { descripcion: "Marca compacta proporcionada por el usuario; imagen original sin modificaciones." }), horizontal: EMPAQUETADO("gnb-horizontal.svg") }
   }),
   "Interfisa Banco": entrada({
     categoria: "banco",
@@ -428,7 +427,7 @@ var LOGOS_BANCOS = {
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: CONTENIDO("san-cristobal-horizontal.png", "oficial", { fondo: "#5FAD3E", padding: true, descripcion: "Marca horizontal oficial contenida en el espacio compacto; no es un s\xEDmbolo independiente." }),
+      compacto: EMPAQUETADO("san-cristobal-compacto.png", "aportado-usuario", { descripcion: "Marca compacta proporcionada por el usuario; imagen original sin modificaciones." }),
       horizontal: EMPAQUETADO("san-cristobal-horizontal.png", "oficial", { fondo: "#5FAD3E", padding: true })
     }
   }),

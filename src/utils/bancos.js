@@ -7,12 +7,12 @@ import { institucionesSugeridasPorMarca } from './relacionesFinancieras.js'
 
 export const FECHA_VERIFICACION_MARCAS_FINANCIERAS = '2026-10-02'
 
+// User-curated selectable catalog; legacy metadata remains available separately.
 export const BANCOS_Y_FINANCIERAS_PARAGUAY = [
   'Banco Atlas',
   'Banco Basa',
   'Banco Continental',
   'Banco de la Nación Argentina',
-  'Banco do Brasil',
   'Banco Familiar',
   'Banco GNB Paraguay',
   'Interfisa Banco',
@@ -118,7 +118,7 @@ export const LOGOS_BANCOS = {
   'Banco GNB Paraguay': entrada({
     categoria: 'banco', alias: ['gnb', 'banco gnb'], monograma: 'GNB', color: '#00563F',
     fuenteOficial: 'https://www.bancognb.com.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO('gnb-horizontal.svg', 'oficial', { descripcion: 'Marca horizontal oficial contenida en el espacio compacto; no es un símbolo independiente.' }), horizontal: EMPAQUETADO('gnb-horizontal.svg') },
+    variantes: { compacto: EMPAQUETADO('gnb-compacto.png', 'aportado-usuario', { descripcion: 'Marca compacta proporcionada por el usuario; imagen original sin modificaciones.' }), horizontal: EMPAQUETADO('gnb-horizontal.svg') },
   }),
   'Interfisa Banco': entrada({
     categoria: 'banco', alias: ['interfisa', 'banco interfisa'], monograma: 'IB', color: '#00594C', archivo: 'interfisa-horizontal.png',
@@ -212,7 +212,7 @@ export const LOGOS_BANCOS = {
     categoria: 'cooperativa', alias: ['cooperativa san cristobal', 'cooperativa san cristóbal'], monograma: 'SC', color: '#167A54',
     fuenteOficial: 'https://www.sancristobal.coop.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: CONTENIDO('san-cristobal-horizontal.png', 'oficial', { fondo: '#5FAD3E', padding: true, descripcion: 'Marca horizontal oficial contenida en el espacio compacto; no es un símbolo independiente.' }),
+      compacto: EMPAQUETADO('san-cristobal-compacto.png', 'aportado-usuario', { descripcion: 'Marca compacta proporcionada por el usuario; imagen original sin modificaciones.' }),
       horizontal: EMPAQUETADO('san-cristobal-horizontal.png', 'oficial', { fondo: '#5FAD3E', padding: true }),
     },
   }),

@@ -108,7 +108,7 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 | Exports de la entrada raíz | **563** |
 | Exports visuales | **146** |
 | API, modelos y utilidades | **417** |
-| Vistas curadas con fixtures controlados | **48** |
+| Vistas curadas con fixtures controlados | **86** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -132,7 +132,9 @@ ficha consultable.
 
 Los previews prioritarios no ocultan el catálogo completo. Después aparecen
 moneda, porcentaje, correo, fechas, seriales y el resto de primitivas, datos,
-estados, navegación e identidad.
+estados, navegación e identidad. Las fichas individuales incorporan 38 demos
+adicionales de acceso, navegación, personas y operación: estado local, bandejas
+vacías, formularios y confirmación explícita, sin servicios ni persistencia.
 
 <p align="center">
   <img src="docs/assets/readme-components.svg" width="1200" alt="Muestra editorial de campos, acciones, datos, navegación, estados y métricas de OwnCoding UI" />
@@ -142,8 +144,10 @@ Las marcas financieras declaran procedencia, fecha, SHA-256, estado y cobertura.
 Los assets verificados se empaquetan localmente. `v0.61.1` completa ambas
 presentaciones de Continental, Citi, Itaú, Tu Financiera, GNB, Universitaria y
 San Cristóbal: las marcas reutilizadas se describen como **contenidas**, no
-como símbolos o lockups independientes. Banco do Brasil conserva el bloqueo
-explícito: su favicon oficial de 48px no alcanza el mínimo de 64px y no se
+como símbolos o lockups independientes. GNB y San Cristóbal incorporan además los compactos originales
+proporcionados por el usuario, sin editar sus bytes ni atribuirles una URL oficial. Banco do Brasil queda excluido del catálogo seleccionable por decisión del
+usuario (no por una afirmación de licencia revocada). Su lookup histórico
+conserva el bloqueo de calidad: su favicon oficial de 48px no alcanza el mínimo de 64px y no se
 verificó un lockup horizontal bancario. No se amplía ni inventa un logo para
 completarlo. La autorización documentada se limita al repositorio y web/galería
 OwnCoding; no se presenta como licencia abierta. Consulta el manifiesto y el
@@ -451,3 +455,7 @@ dist/              artefactos versionados de distribución
 Antes de incorporar un componente, confirma que no exista un patrón equivalente
 y sigue [`docs/ALIMENTAR.md`](docs/ALIMENTAR.md). La biblioteca debe resolver
 interfaz compartida; la lógica de negocio continúa en cada producto.
+
+El catálogo ofrecido contiene 23 instituciones: Banco do Brasil se excluye por
+curaduría del usuario; sus aliases y metadatos históricos siguen disponibles.
+Esta selección no representa el padrón completo de entidades supervisadas.
