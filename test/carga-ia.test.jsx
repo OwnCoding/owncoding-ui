@@ -467,6 +467,8 @@ describe('guardas de fuente y reglas', () => {
     expect(reglas).toContain('Ley 7593/2025')
     expect(reglas).toContain('IA_RATE_LIMIT')
     expect(reglas).toContain('IA_DIALOGO_COMPLETO_REGISTROS')
+    expect(reglas).toContain('confianza')
+    expect(reglas).toContain('#131')
     expect(adopcion).toContain('Carga con IA')
     expect(changelog).toContain('«Carga con IA» (#11)')
     expect(changelog).toContain('#16')

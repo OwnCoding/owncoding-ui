@@ -30,8 +30,11 @@ documenta acá y en el README).
   parciales/seña y división con **cuentas reales de la empresa**, recordatorio
   de **datos sensibles** (Ley 7593/2025) y el **checklist de adopción por
   app**. `ADOPCION-V2.md` §10 suma el ítem del playbook y
-  `REGLAS-ECOSISTEMA.md` §12.5 el aviso de datos sensibles. Docs-only: sin
-  cambios de API ni de componentes.
+  `REGLAS-ECOSISTEMA.md` §12.5 el aviso de datos sensibles. **Verificado
+  contra la implementación ya probada de Scale OS `#131`–`#133`**: contrato de
+  `confianza` 0–100 con distancia de edición, contador **N por crear/vincular**
+  y validaciones de pago sin efectos. Docs-only: sin cambios de API ni de
+  componentes.
 
 ## v0.60.1 — 2026-10-01 (preparada, no publicada)
 
