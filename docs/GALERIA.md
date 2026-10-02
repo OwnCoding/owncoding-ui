@@ -68,3 +68,24 @@ activo `/manifest.json` responde con `application/json` y no con el fallback HTM
 El dominio, DNS, HTTPS y el recurso de Coolify se configuran fuera de este
 repositorio. Un webhook aceptado no confirma un deploy: hay que comprobar el
 estado final, el healthcheck y un smoke del catálogo.
+
+## Cobertura curada local (0.61.1)
+
+48 de 146 exports visuales tienen una presentación curada (antes: 30).
+La ficha ampliada renderiza los componentes seleccionados y evita repetir
+una misma familia pesada en cada tarjeta. Las cuatro prioridades originales
+se conservan. PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState
+y Nota ya no se presentan mediante una demo de otro componente.
+
+Se exponen los campos inteligentes existentes, una familia de tabla/filtros/vista,
+diálogos confirmables, progreso y guardado simulado, modelos de footer/prefooter
+y versión editable. El correo HTML/texto usa el renderer existente de
+`owncoding-ui/email`, aislado mediante iframe sandbox sin permisos; no envía.
+Los fixtures no representan APIs reales, DNIT ni datos persistidos.
+
+Pendiente: 98 exports visuales todavía sin presentación curada (shell, acceso,
+operación, documentos, impresión y otros objetos especializados). Un export
+catalogado no equivale a un preview visual completo. Los originales bloqueados
+de BB, Visa/Mastercard, Pix, Red Infonet, Panal y uPOS siguen pendientes de
+fuente/autorización; no se inventan reemplazos. Deploy y QA live son etapas
+separadas de este parche local.

@@ -108,7 +108,7 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 | Exports de la entrada raíz | **543** |
 | Exports visuales | **146** |
 | API, modelos y utilidades | **397** |
-| Vistas curadas con fixtures controlados | **30** |
+| Vistas curadas con fixtures controlados | **48** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual

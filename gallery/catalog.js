@@ -158,7 +158,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BarraProgreso",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "bloqueFirma",
@@ -194,7 +194,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BuscadorCliente",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BuscadorDispositivo",
@@ -302,7 +302,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Card",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": "datos"
+    "presentacion": "individual"
   },
   {
     "nombre": "caretTrasDigitos",
@@ -681,7 +681,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ConfirmDialog",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "conFormulario",
@@ -795,7 +795,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "DataTable",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "departamentoDe",
@@ -903,13 +903,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Drawer",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "EmailField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "EmptyState",
@@ -939,7 +939,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ErrorState",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": "estados"
+    "presentacion": "individual"
   },
   {
     "nombre": "esApellidosPrimero",
@@ -1023,7 +1023,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "EstadoGuardado",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "estadoItem",
@@ -1611,7 +1611,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "IconAction",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": "acciones"
+    "presentacion": "individual"
   },
   {
     "nombre": "ICONO_CATEGORIA",
@@ -1731,7 +1731,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Label",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "largoMaximoMonto",
@@ -1797,7 +1797,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ListGridToggle",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "LoadingScreen",
@@ -1953,7 +1953,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Modal",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "MODELOS_IPHONE",
@@ -1965,13 +1965,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Money",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "MoneyInput",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "montoConSigno",
@@ -2133,7 +2133,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "Nota",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": "estados"
+    "presentacion": "individual"
   },
   {
     "nombre": "NumericKeypad",
@@ -2199,7 +2199,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PageHeader",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "paginaDePrueba",
@@ -2307,7 +2307,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PasswordInput",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": "campos"
+    "presentacion": "individual"
   },
   {
     "nombre": "PATRON_RUC",
@@ -2404,7 +2404,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PinInput",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": "campos"
+    "presentacion": "individual"
   },
   {
     "nombre": "PlanPagos",
@@ -2476,13 +2476,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ProductFooter",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": "footer"
+    "presentacion": "individual"
   },
   {
     "nombre": "ProductPrefooter",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": "prefooter"
+    "presentacion": "individual"
   },
   {
     "nombre": "progresoChecklist",
@@ -2494,7 +2494,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ProgresoChecklist",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "puntoDeTono",
@@ -2524,7 +2524,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "RangoFecha",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "rangoInvertido",
@@ -2645,7 +2645,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SearchField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": "campos"
+    "presentacion": "individual"
   },
   {
     "nombre": "SeccionColapsable",
@@ -2663,7 +2663,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SegmentedField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "Select",
@@ -2711,7 +2711,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SerialField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "SerialTexto",
@@ -2987,7 +2987,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ThemeToggle",
     "tipo": "visual",
     "categoria": "Shell y acceso",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "TileEquipo",

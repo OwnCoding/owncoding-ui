@@ -22,6 +22,7 @@ const faltantes = exportados.filter((nombre) => !catalogadosUnicos.includes(nomb
 const sobrantes = catalogadosUnicos.filter((nombre) => !exportados.includes(nombre))
 const duplicados = catalogados.filter((nombre, indice) => catalogados.indexOf(nombre) !== indice)
 const PRESENTACIONES = new Set([
+  'individual',
   'acciones',
   'campos',
   'datos',

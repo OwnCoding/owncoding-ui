@@ -7698,7 +7698,7 @@ function LogoFinanciero({
         className: cn(
           "inline-flex items-center",
           compacto && "aspect-square shrink-0 justify-center rounded-[5px]",
-          visual.fondo && visual.padding && "rounded-md p-1.5",
+          visual.fondo && visual.padding && (compacto ? "rounded-md p-[2px]" : "rounded-md p-1.5"),
           alto,
           className
         ),
@@ -7868,7 +7868,7 @@ function BancoCombobox({
               indice === navegacion.activeIndex ? "bg-ink-700 text-fore" : "text-mute hover:bg-ink-700 hover:text-fore"
             ),
             children: [
-              /* @__PURE__ */ jsx58(BancoLogo, { banco, variante: "compacto", alto: "h-4", decorativo: true, ...logoProps }),
+              /* @__PURE__ */ jsx58(BancoLogo, { banco, variante: "compacto", alto: "h-6", decorativo: true, ...logoProps }),
               /* @__PURE__ */ jsx58("span", { className: "min-w-0 flex-1 truncate", children: banco })
             ]
           },

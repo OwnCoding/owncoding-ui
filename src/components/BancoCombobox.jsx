@@ -84,7 +84,7 @@ export default function BancoCombobox({
                 indice === navegacion.activeIndex ? 'bg-ink-700 text-fore' : 'text-mute hover:bg-ink-700 hover:text-fore',
               )}
             >
-              <BancoLogo banco={banco} variante="compacto" alto="h-4" decorativo {...logoProps} />
+              <BancoLogo banco={banco} variante="compacto" alto="h-6" decorativo {...logoProps} />
               <span className="min-w-0 flex-1 truncate">{banco}</span>
             </li>
           ))}

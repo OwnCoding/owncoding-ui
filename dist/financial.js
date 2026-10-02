@@ -1284,7 +1284,7 @@ function LogoFinanciero({
         className: cn(
           "inline-flex items-center",
           compacto && "aspect-square shrink-0 justify-center rounded-[5px]",
-          visual.fondo && visual.padding && "rounded-md p-1.5",
+          visual.fondo && visual.padding && (compacto ? "rounded-md p-[2px]" : "rounded-md p-1.5"),
           alto,
           className
         ),

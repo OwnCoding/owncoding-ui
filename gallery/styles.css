@@ -702,3 +702,16 @@
   .preview-actions button,
   .smart-inputs__toggle { transition: none; }
 }
+
+/* Expanded previews retain visible focus and fit the narrowest gallery viewport. */
+#ficha-export input { max-width: 100%; }
+#ficha-export :is(button, input, select, summary):focus-visible {
+  outline: 2px solid rgb(var(--c-fono));
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  #ficha-export *, #ficha-export *::before, #ficha-export *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

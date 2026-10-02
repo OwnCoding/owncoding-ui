@@ -47,6 +47,7 @@ import {
   telefonoE164,
   telefonoInternacionalValido,
 } from '../src/index.js'
+import { ComponentPreview, EmailPreview } from './component-previews.jsx'
 import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from './catalog.js'
 import {
   BANCO_DESTACADO,
@@ -175,7 +176,8 @@ function EtiquetaFixture({ children = 'Fixture local' }) {
 function VistaVarianteBanco({ nombre, variante }) {
   const registro = logoDeBanco(nombre, variante)
   const disponible = Boolean(registro?.visual?.empaquetado)
-  const etiqueta = variante === 'compacto' ? 'Logo compacto' : 'Logo horizontal'
+  const contenida = ['horizontal-contained', 'marca-contained'].includes(registro?.visual?.tipo)
+  const etiqueta = contenida ? 'Marca contenida' : variante === 'compacto' ? 'Logo compacto' : 'Logo horizontal'
 
   return (
     <div className={`bank-variant bank-variant--${variante}`}>
@@ -628,6 +630,8 @@ function Ficha({ item, onAbrir }) {
           <span>Preview profesional #{item.destacado.prioridad}</span>
           <strong>{item.destacado.titulo}</strong>
         </a>
+      ) : item.presentacion === 'individual' ? (
+        <p className="mt-3 text-sm text-mute">Demo interactiva en la ficha ampliada.</p>
       ) : item.presentacion ? (
         <div className="mt-4 min-w-0 overflow-hidden rounded-xl border border-ink-600 bg-ink-800 p-3"><ErrorBoundary><Presentacion id={item.presentacion} /></ErrorBoundary></div>
       ) : null}
@@ -732,9 +736,11 @@ function App() {
         {seleccionado ? (
           <section id="ficha-export" tabIndex="-1" aria-live="polite" className="mt-6 rounded-2xl border border-fono/30 bg-fono/10 p-5 outline-none">
             <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.14em] text-fono-text">Ficha seleccionada</p><h2 className="mt-1 text-xl font-bold">{seleccionado.nombre}</h2><p className="mt-2 text-sm text-mute">{seleccionado.categoria} · {seleccionado.tipo === 'visual' ? 'export visual disponible en la entrada raíz' : 'API documentada sin render visual'}.</p></div><button type="button" className="min-h-11 rounded-lg px-3 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" onClick={() => setSeleccionado(null)}>Cerrar ficha</button></div>
+            {seleccionado.presentacion ? <div key={seleccionado.nombre} className="mt-4 min-w-0"><ErrorBoundary>{seleccionado.presentacion === 'individual' ? <ComponentPreview name={seleccionado.nombre} /> : <Presentacion id={seleccionado.presentacion} />}</ErrorBoundary></div> : <p className="mt-3 text-sm text-mute">Sin preview curado todavía.</p>}
           </section>
         ) : null}
 
+        <div className="mt-6"><EmailPreview /></div>
         <section id="catalogo" aria-labelledby="titulo-catalogo" className="mt-8">
           <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 id="titulo-catalogo" className="text-2xl font-bold">Catálogo completo</h2><p className="text-sm text-mute" role="status">{resultados.length} resultados</p></div>
           {resultados.length > 0 ? (
