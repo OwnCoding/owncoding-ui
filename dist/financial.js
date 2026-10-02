@@ -63,7 +63,7 @@ var RELACIONES_FINANCIERAS = Object.freeze({
   eCLUB: relacion("eCLUB", {
     alias: ["eClub", "ECLUB"],
     financialProvider: "Interfisa Banco",
-    fuenteRelacion: "https://eclub.com.py/wp-content/uploads/2026/02/TyC-Google-Pay.pdf",
+    fuenteRelacion: "https://eclub.com.py/",
     fuenteActividad: "https://eclub.com.py/",
     operador: operador("ECLUB Paraguay S.A.", "https://eclub.com.py/")
   }),

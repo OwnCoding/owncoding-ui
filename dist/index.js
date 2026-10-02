@@ -6478,7 +6478,7 @@ var RELACIONES_FINANCIERAS = Object.freeze({
   eCLUB: relacion("eCLUB", {
     alias: ["eClub", "ECLUB"],
     financialProvider: "Interfisa Banco",
-    fuenteRelacion: "https://eclub.com.py/wp-content/uploads/2026/02/TyC-Google-Pay.pdf",
+    fuenteRelacion: "https://eclub.com.py/",
     fuenteActividad: "https://eclub.com.py/",
     operador: operador("ECLUB Paraguay S.A.", "https://eclub.com.py/")
   }),
@@ -12333,6 +12333,14 @@ var IA_BOTON = "Carga con IA";
 var IA_TOOLTIP = "Carga con IA \xB7 peg\xE1 un texto y revis\xE1 antes de crear";
 var IA_TITULO = "Carga con IA";
 var CAMPOS_IA = ["texto", "numero", "moneda", "fecha", "select"];
+var IA_DIALOGO_COMPLETO_REGISTROS = 6;
+var IA_DIALOGO_COMPLETO_CAMPOS = 6;
+function tamanoDialogoIA(fase, { registros = [], esquema } = {}) {
+  if (fase !== "revision") return "amplio";
+  const variasTarjetas = (registros?.length ?? 0) >= IA_DIALOGO_COMPLETO_REGISTROS;
+  const tipoDenso = (esquema?.tipos ?? []).some((tipo) => (tipo?.campos?.length ?? 0) >= IA_DIALOGO_COMPLETO_CAMPOS);
+  return variasTarjetas || tipoDenso ? "completo" : "amplio";
+}
 var textoDe = (valor) => (valor === null || valor === void 0 ? "" : String(valor)).trim();
 function tipoDeEsquemaIA(esquema, tipoId) {
   return (esquema?.tipos ?? []).find((tipo) => tipo?.id === tipoId) ?? null;
@@ -12502,6 +12510,7 @@ function CargaIA({
   placeholder,
   maxTexto,
   maxRegistros,
+  size,
   className,
   classNameBoton
 }) {
@@ -12527,6 +12536,7 @@ function CargaIA({
         placeholder,
         maxTexto,
         maxRegistros,
+        size,
         className
       }
     ) : null
@@ -12618,7 +12628,7 @@ function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
       "aria-label": titulo2,
       className: cn("rounded-xl border border-ink-600 bg-ink-800/40 p-3 sm:p-4", !registro.incluir && "opacity-60"),
       children: [
-        /* @__PURE__ */ jsxs90("header", { className: "mb-3 flex items-start justify-between gap-3", children: [
+        /* @__PURE__ */ jsxs90("header", { className: "mb-2.5 flex items-start justify-between gap-3", children: [
           /* @__PURE__ */ jsx110("p", { className: "min-w-0 flex-1 break-words text-sm font-semibold text-fore", children: titulo2 }),
           /* @__PURE__ */ jsxs90("label", { className: "flex shrink-0 cursor-pointer items-center gap-2 text-xs text-mute", children: [
             /* @__PURE__ */ jsx110("span", { className: "hidden sm:inline", children: registro.incluir ? "Incluir" : "Descartado" }),
@@ -12632,8 +12642,8 @@ function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
             )
           ] })
         ] }),
-        registro.avisos?.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", compact: true, className: "mb-3", children: registro.avisos.join(" ") }) : null,
-        /* @__PURE__ */ jsx110("div", { className: "grid gap-3 sm:grid-cols-2", children: (tipo?.campos ?? []).map((campo) => /* @__PURE__ */ jsx110(
+        registro.avisos?.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", compact: true, className: "mb-2.5", children: registro.avisos.join(" ") }) : null,
+        /* @__PURE__ */ jsx110("div", { className: "grid gap-x-4 gap-y-3 sm:grid-cols-2", children: (tipo?.campos ?? []).map((campo) => /* @__PURE__ */ jsx110(
           CampoRegistroIA,
           {
             campo,
@@ -12660,6 +12670,7 @@ function DialogoCargaIA({
   placeholder = PLACEHOLDER,
   maxTexto = IA_TEXTO_MAX,
   maxRegistros = IA_REGISTROS_MAX,
+  size = "auto",
   className
 }) {
   const idTexto = useId23();
@@ -12792,8 +12803,7 @@ function DialogoCargaIA({
   }
   const pista = [
     "Peg\xE1 mensajes, listas o cat\xE1logos",
-    permitidos.length > 0 ? `(${permitidos.map((id) => tipoDeEsquemaIA(esquema, id)?.label?.toLowerCase()).filter(Boolean).join(", ")} a la vez).` : "",
-    `M\xE1ximo ${topeTexto.toLocaleString("es-PY")} caracteres.`
+    permitidos.length > 0 ? `(${permitidos.map((id) => tipoDeEsquemaIA(esquema, id)?.label?.toLowerCase()).filter(Boolean).join(", ")} a la vez).` : ""
   ].filter(Boolean).join(" ");
   const resumen = resultado ? {
     creados: resultado.creados,
@@ -12801,13 +12811,17 @@ function DialogoCargaIA({
     errores: resultado.errores,
     advertencias: resultado.advertencias
   } : null;
+  const tamano = size === "auto" ? tamanoDialogoIA(fase, { registros, esquema }) : size;
   return /* @__PURE__ */ jsxs90(
     Modal,
     {
       open: Boolean(abierto),
       onClose: onCerrar,
-      title: titulo2,
-      size: "completo",
+      title: /* @__PURE__ */ jsxs90("span", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsx110("span", { "aria-hidden": "true", className: "grid h-6 w-6 shrink-0 place-items-center rounded-md bg-fono/10 text-fono-light", children: /* @__PURE__ */ jsx110(Icon, { name: "sparkles", className: "h-3.5 w-3.5" }) }),
+        titulo2
+      ] }),
+      size: tamano,
       busy: analizando || creando,
       className,
       children: [
@@ -12816,14 +12830,14 @@ function DialogoCargaIA({
           /* @__PURE__ */ jsx110(Skeleton, { className: "h-24 w-full" }),
           /* @__PURE__ */ jsx110("p", { className: "text-sm text-mute", children: "Consultando la configuraci\xF3n\u2026" })
         ] }) : null,
-        configError ? /* @__PURE__ */ jsxs90("div", { className: "space-y-4", children: [
+        configError ? /* @__PURE__ */ jsxs90("div", { className: "space-y-3", children: [
           /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: configError }),
           /* @__PURE__ */ jsxs90(FormActions, { children: [
             /* @__PURE__ */ jsx110(Button, { type: "button", variant: "ghost", onClick: onCerrar, children: "Cancelar" }),
             /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: () => setReintento((valor) => valor + 1), children: "Reintentar" })
           ] })
         ] }) : null,
-        config && !config.configurada ? /* @__PURE__ */ jsxs90("div", { className: "space-y-4", children: [
+        config && !config.configurada ? /* @__PURE__ */ jsxs90("div", { className: "space-y-3", children: [
           /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: "La IA no est\xE1 configurada en este servidor. Mientras tanto, los registros se cargan a mano desde cada m\xF3dulo, sin perder nada." }),
           /* @__PURE__ */ jsx110("p", { className: "text-sm text-mute", children: "Cuando la app tenga proveedor configurado, este asistente vuelve solo." }),
           /* @__PURE__ */ jsxs90(FormActions, { children: [
@@ -12831,54 +12845,66 @@ function DialogoCargaIA({
             /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" })
           ] })
         ] }) : null,
-        config?.configurada && permitidos.length === 0 ? /* @__PURE__ */ jsxs90("div", { className: "space-y-4", children: [
+        config?.configurada && permitidos.length === 0 ? /* @__PURE__ */ jsxs90("div", { className: "space-y-3", children: [
           /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: "No ten\xE9s permiso para crear ninguno de los tipos de este asistente." }),
           /* @__PURE__ */ jsx110(FormActions, { children: /* @__PURE__ */ jsx110(Button, { type: "button", variant: "primary", onClick: onCerrar, children: "Entendido" }) })
         ] }) : null,
         config?.configurada && permitidos.length > 0 && fase === "entrada" ? /* @__PURE__ */ jsxs90(
           "form",
           {
-            className: "space-y-4",
+            className: "space-y-3",
             onSubmit: (evento) => {
               evento.preventDefault();
               void analizarTexto();
             },
             children: [
-              /* @__PURE__ */ jsxs90("div", { children: [
-                /* @__PURE__ */ jsx110(FormField, { label: "Texto para cargar", htmlFor: idTexto, hint: pista, children: /* @__PURE__ */ jsx110(
-                  Textarea,
-                  {
-                    id: idTexto,
-                    rows: 10,
-                    maxLength: topeTexto,
-                    value: entrada3,
-                    disabled: analizando,
-                    placeholder,
-                    "aria-describedby": `${idTexto}-descripcion`,
-                    onChange: (evento) => setEntrada(evento.target.value)
-                  }
-                ) }),
-                /* @__PURE__ */ jsxs90("p", { className: "mt-1.5 text-right text-xs text-mute", children: [
-                  entrada3.length.toLocaleString("es-PY"),
-                  " / ",
-                  topeTexto.toLocaleString("es-PY")
+              /* @__PURE__ */ jsx110(FormField, { label: "Texto para cargar", htmlFor: idTexto, children: /* @__PURE__ */ jsx110(
+                Textarea,
+                {
+                  id: idTexto,
+                  rows: 5,
+                  maxLength: topeTexto,
+                  value: entrada3,
+                  disabled: analizando,
+                  placeholder,
+                  "aria-describedby": `${idTexto}-descripcion`,
+                  onChange: (evento) => setEntrada(evento.target.value),
+                  className: "min-h-28 max-h-56 resize-y"
+                }
+              ) }),
+              /* @__PURE__ */ jsxs90(
+                "div",
+                {
+                  id: `${idTexto}-descripcion`,
+                  className: "flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-xs text-mute",
+                  children: [
+                    /* @__PURE__ */ jsx110("p", { children: pista }),
+                    /* @__PURE__ */ jsxs90("p", { className: "ml-auto tabular-nums", children: [
+                      entrada3.length.toLocaleString("es-PY"),
+                      " / ",
+                      topeTexto.toLocaleString("es-PY")
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxs90("p", { className: "flex items-start gap-1.5 text-xs leading-5 text-mute", children: [
+                /* @__PURE__ */ jsx110(Icon, { name: "shield", className: "mt-0.5 h-3.5 w-3.5 shrink-0", "aria-hidden": "true" }),
+                /* @__PURE__ */ jsxs90("span", { children: [
+                  "Se manda solo este texto al proveedor de IA configurado",
+                  config.modelo ? ` (${config.modelo})` : "",
+                  " para armar la vista previa; no se guarda ni se toca la base.",
+                  " ",
+                  enlacePrivacidad ? /* @__PURE__ */ jsx110(
+                    "a",
+                    {
+                      className: "font-medium text-fono-light underline-offset-2 hover:underline",
+                      href: enlacePrivacidad,
+                      target: "_blank",
+                      rel: "noreferrer",
+                      children: "Pol\xEDtica de privacidad"
+                    }
+                  ) : null
                 ] })
-              ] }),
-              /* @__PURE__ */ jsxs90("p", { className: "text-xs leading-5 text-mute", children: [
-                "Se manda solo este texto al proveedor de IA configurado",
-                config.modelo ? ` (${config.modelo})` : "",
-                " para armar la vista previa; no se guarda ni se toca la base.",
-                " ",
-                enlacePrivacidad ? /* @__PURE__ */ jsx110(
-                  "a",
-                  {
-                    className: "font-medium text-fono-light underline-offset-2 hover:underline",
-                    href: enlacePrivacidad,
-                    target: "_blank",
-                    rel: "noreferrer",
-                    children: "Pol\xEDtica de privacidad"
-                  }
-                ) : null
               ] }),
               error ? /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: error }) : null,
               /* @__PURE__ */ jsxs90(FormActions, { children: [
@@ -12888,23 +12914,24 @@ function DialogoCargaIA({
             ]
           }
         ) : null,
-        config?.configurada && permitidos.length > 0 && fase === "revision" ? /* @__PURE__ */ jsxs90("div", { className: "space-y-4", children: [
+        config?.configurada && permitidos.length > 0 && fase === "revision" ? /* @__PURE__ */ jsxs90("div", { className: "space-y-3", children: [
           /* @__PURE__ */ jsx110("p", { className: "text-sm text-mute", children: grupos.length > 0 ? /* @__PURE__ */ jsxs90(Fragment18, { children: [
             "Detectamos ",
             /* @__PURE__ */ jsx110("strong", { className: "text-fore", children: partes.join(", ") }),
             ". Revis\xE1, correg\xED o descart\xE1: nada se crea sin tu confirmaci\xF3n."
           ] }) : "No detectamos registros en el texto." }),
-          avisos.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: avisos.join(" ") }) : null,
+          avisos.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", compact: true, children: avisos.join(" ") }) : null,
           error ? /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: error }) : null,
           grupos.length === 0 ? /* @__PURE__ */ jsx110(
             EmptyState,
             {
+              compact: true,
               icon: "sparkles",
               title: "No detectamos registros",
               description: "Prob\xE1 con un texto m\xE1s completo (nombres, fechas o precios) o volv\xE9 a pegar."
             }
           ) : null,
-          grupos.map(({ tipo, registros: delTipo }) => /* @__PURE__ */ jsxs90("section", { "aria-label": `${tipo.label} detectados (${delTipo.length})`, className: "space-y-2.5", children: [
+          grupos.map(({ tipo, registros: delTipo }) => /* @__PURE__ */ jsxs90("section", { "aria-label": `${tipo.label} detectados (${delTipo.length})`, className: "space-y-2", children: [
             /* @__PURE__ */ jsxs90("h3", { className: "text-[10px] font-bold uppercase tracking-wider text-mute", children: [
               tipo.label,
               " ",
@@ -12936,8 +12963,11 @@ function DialogoCargaIA({
             )
           ] })
         ] }) : null,
-        config?.configurada && permitidos.length > 0 && fase === "listo" && resumen ? /* @__PURE__ */ jsxs90("div", { className: "space-y-4", children: [
-          resumen.creados === null ? /* @__PURE__ */ jsx110(Nota, { tono: "info", children: "La app termin\xF3 el alta; el detalle queda en su m\xF3dulo." }) : resumen.creados > 0 ? /* @__PURE__ */ jsx110(Aviso, { tono: "ok", children: resumen.total !== null && resumen.creados < resumen.total ? `Creamos ${resumen.creados} de ${resumen.total} registros.` : `Creamos ${listar(resumen.creados, "registro", "registros")}.` }) : resumen.errores.length === 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "neutro", children: "No se cre\xF3 ning\xFAn registro." }) : null,
+        config?.configurada && permitidos.length > 0 && fase === "listo" && resumen ? /* @__PURE__ */ jsxs90("div", { className: "space-y-3", children: [
+          resumen.creados === null ? /* @__PURE__ */ jsx110(Nota, { tono: "info", children: "La app termin\xF3 el alta; el detalle queda en su m\xF3dulo." }) : resumen.creados > 0 ? /* @__PURE__ */ jsxs90(Aviso, { tono: "ok", className: "flex items-start gap-2", children: [
+            /* @__PURE__ */ jsx110(Icon, { name: "check", className: "mt-0.5 h-4 w-4 shrink-0", "aria-hidden": "true" }),
+            /* @__PURE__ */ jsx110("span", { children: resumen.total !== null && resumen.creados < resumen.total ? `Creamos ${resumen.creados} de ${resumen.total} registros.` : `Creamos ${listar(resumen.creados, "registro", "registros")}.` })
+          ] }) : resumen.errores.length === 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "neutro", children: "No se cre\xF3 ning\xFAn registro." }) : null,
           resumen.advertencias.length > 0 ? /* @__PURE__ */ jsx110(Nota, { tono: "warn", children: resumen.advertencias.join(" ") }) : null,
           resumen.errores.length > 0 ? /* @__PURE__ */ jsx110(Aviso, { tono: "error", children: `No pudimos crear ${listar(resumen.errores.length, "registro", "registros")}: ${resumen.errores.join(" \xB7 ")}` }) : null,
           /* @__PURE__ */ jsxs90(FormActions, { children: [
@@ -13627,6 +13657,8 @@ export {
   GradoBadge,
   GraficoBarras,
   IA_BOTON,
+  IA_DIALOGO_COMPLETO_CAMPOS,
+  IA_DIALOGO_COMPLETO_REGISTROS,
   IA_RATE_LIMIT,
   IA_REGISTROS_MAX,
   IA_TEXTO_MAX,
@@ -14004,6 +14036,7 @@ export {
   sugerenciasDeMarcaPago,
   sumarDias,
   sumarMeses,
+  tamanoDialogoIA,
   taxIdGenericoValid,
   taxIdValid,
   taxIdValidoParaPais,

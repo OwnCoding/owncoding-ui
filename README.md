@@ -260,6 +260,11 @@ estricta, prompt anti-inyección, validación contra el esquema y rate-limit. Si
 el aislamiento por empresa ni la auditoría de la app. Contrato completo:
 [`docs/REGLAS.md` §18](docs/REGLAS.md#18-carga-con-ia-1112).
 
+El diálogo se adapta al contenido (#16): entrada y resultado abren en `amplio`
+(`max-w-3xl`) y la revisión pide `completo` recién con varias tarjetas o tipos
+densos; la prop aditiva `size` fija el ancho. El textarea tiene alto acotado y
+el contador va en la fila del hint, así el popup no deja espacio muerto.
+
 ## Identidad, footer y correo
 
 La versión visible debe provenir de una sola fuente de la aplicación. No se

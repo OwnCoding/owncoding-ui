@@ -6,6 +6,18 @@ documenta acá y en el README).
 
 ## Sin publicar
 
+- **«Carga con IA» — diálogo compacto y premium (#16):** feedback real de PagaYa
+  (popup gigante y con espacio muerto). El diálogo deja el `max-w-5xl` fijo:
+  **entrada** y **resultado** abren en `amplio` (`max-w-3xl`), la **revisión**
+  pide `completo` solo con varias tarjetas (≥6) o tipos densos (≥6 campos)
+  —`tamanoDialogoIA` en el contrato puro— y la prop aditiva `size` fija el
+  ancho. Textarea con alto acotado (5 filas, `min-h-28`/`max-h-56`,
+  redimensionable), contador en la fila del hint, cabecera con ícono, avisos
+  globales compactos y ritmo §17; mobile conserva el bottom-sheet. Sin cambios
+  de contrato ni de comportamiento. Las capturas de QA dejan de viajar en el
+  paquete npm (`files` suma `!docs/qa`): son evidencia del repo y el tarball
+  vuelve al presupuesto. **Tag propuesto: `v0.61.0`** (el bump y el tag los
+  hace el integrador).
 - **«Carga con IA» — playbook de errores esperables y carrito editable (#15):**
   `REGLAS.md` §18 suma el **carrito editable** (agregar/editar/duplicar/quitar;
   editar un precio **no** reescribe el maestro sin «actualizar el producto»),
@@ -18,8 +30,11 @@ documenta acá y en el README).
   parciales/seña y división con **cuentas reales de la empresa**, recordatorio
   de **datos sensibles** (Ley 7593/2025) y el **checklist de adopción por
   app**. `ADOPCION-V2.md` §10 suma el ítem del playbook y
-  `REGLAS-ECOSISTEMA.md` §12.5 el aviso de datos sensibles. Docs-only: sin
-  cambios de API ni de componentes.
+  `REGLAS-ECOSISTEMA.md` §12.5 el aviso de datos sensibles. **Verificado
+  contra la implementación ya probada de Scale OS `#131`–`#133`**: contrato de
+  `confianza` 0–100 con distancia de edición, contador **N por crear/vincular**
+  y validaciones de pago sin efectos. Docs-only: sin cambios de API ni de
+  componentes.
 
 ## v0.60.1 — 2026-10-01 (preparada, no publicada)
 

@@ -120,7 +120,7 @@ var RELACIONES_FINANCIERAS = Object.freeze({
   eCLUB: relacion("eCLUB", {
     alias: ["eClub", "ECLUB"],
     financialProvider: "Interfisa Banco",
-    fuenteRelacion: "https://eclub.com.py/wp-content/uploads/2026/02/TyC-Google-Pay.pdf",
+    fuenteRelacion: "https://eclub.com.py/",
     fuenteActividad: "https://eclub.com.py/",
     operador: operador("ECLUB Paraguay S.A.", "https://eclub.com.py/")
   }),
@@ -3359,6 +3359,14 @@ var IA_BOTON = "Carga con IA";
 var IA_TOOLTIP = "Carga con IA \xB7 peg\xE1 un texto y revis\xE1 antes de crear";
 var IA_TITULO = "Carga con IA";
 var CAMPOS_IA = ["texto", "numero", "moneda", "fecha", "select"];
+var IA_DIALOGO_COMPLETO_REGISTROS = 6;
+var IA_DIALOGO_COMPLETO_CAMPOS = 6;
+function tamanoDialogoIA(fase, { registros = [], esquema } = {}) {
+  if (fase !== "revision") return "amplio";
+  const variasTarjetas = (registros?.length ?? 0) >= IA_DIALOGO_COMPLETO_REGISTROS;
+  const tipoDenso = (esquema?.tipos ?? []).some((tipo) => (tipo?.campos?.length ?? 0) >= IA_DIALOGO_COMPLETO_CAMPOS);
+  return variasTarjetas || tipoDenso ? "completo" : "amplio";
+}
 var textoDe = (valor) => (valor === null || valor === void 0 ? "" : String(valor)).trim();
 function tipoDeEsquemaIA(esquema, tipoId) {
   return (esquema?.tipos ?? []).find((tipo) => tipo?.id === tipoId) ?? null;
@@ -3586,6 +3594,8 @@ export {
   GRILLA_DOS_COLUMNAS,
   GRILLA_DOS_COLUMNAS_COMPACTA,
   IA_BOTON,
+  IA_DIALOGO_COMPLETO_CAMPOS,
+  IA_DIALOGO_COMPLETO_REGISTROS,
   IA_RATE_LIMIT,
   IA_REGISTROS_MAX,
   IA_TEXTO_MAX,
@@ -3826,6 +3836,7 @@ export {
   sugerenciasDeMarcaPago,
   sumarDias,
   sumarMeses,
+  tamanoDialogoIA,
   taxIdGenericoValid,
   taxIdValid,
   taxIdValidoParaPais,

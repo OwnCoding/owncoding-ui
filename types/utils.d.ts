@@ -560,6 +560,9 @@ export const IA_BOTON: string
 export const IA_TOOLTIP: string
 export const IA_TITULO: string
 export const CAMPOS_IA: readonly string[]
+/** Umbrales del ancho adaptativo del diálogo (#16). */
+export const IA_DIALOGO_COMPLETO_REGISTROS: number
+export const IA_DIALOGO_COMPLETO_CAMPOS: number
 
 export type TipoCampoIA = 'texto' | 'numero' | 'moneda' | 'fecha' | 'select' | (string & {})
 export type OpcionIA = { value: string; label: string }
@@ -609,6 +612,10 @@ export function campoDeTipoIA(tipo?: TipoEsquemaIA | null, campoId?: string): Ca
 export function opcionesDeCampoIA(campo?: CampoEsquemaIA | null): OpcionIA[]
 export function tituloDeRegistroIA(registro?: Partial<RegistroIA> | null, tipo?: TipoEsquemaIA | null): string
 export function valorVacioIA(valor?: unknown): boolean
+export function tamanoDialogoIA(
+  fase?: string,
+  opciones?: { registros?: unknown[]; esquema?: EsquemaIA | null },
+): 'amplio' | 'completo'
 export function normalizarAnalisisIA(
   analisis?: unknown,
   esquema?: EsquemaIA | null,

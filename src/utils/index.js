@@ -279,6 +279,8 @@ export {
   IA_TOOLTIP,
   IA_TITULO,
   CAMPOS_IA,
+  IA_DIALOGO_COMPLETO_REGISTROS,
+  IA_DIALOGO_COMPLETO_CAMPOS,
   tipoDeEsquemaIA,
   campoDeTipoIA,
   opcionesDeCampoIA,
@@ -288,6 +290,7 @@ export {
   registrosIncluidosIA,
   validarRegistrosIA,
   normalizarResultadoIA,
+  tamanoDialogoIA,
 } from './cargaIA.js'
 
 export {

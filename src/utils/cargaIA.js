@@ -34,6 +34,24 @@ export const IA_TITULO = 'Carga con IA'
 /** Tipos de campo que el esquema entiende (se dibujan con los objetos de §1). */
 export const CAMPOS_IA = ['texto', 'numero', 'moneda', 'fecha', 'select']
 
+/** Registros a partir de los que la revisión usa el ancho completo (#16). */
+export const IA_DIALOGO_COMPLETO_REGISTROS = 6
+
+/** Campos de un tipo a partir de los que la revisión usa el ancho completo (#16). */
+export const IA_DIALOGO_COMPLETO_CAMPOS = 6
+
+/**
+ * Ancho adaptativo del diálogo por fase (#16): entrada y resultado van en
+ * `amplio`; la revisión pide `completo` solo cuando el contenido lo justifica
+ * (varias tarjetas o tipos con muchos campos). La app lo pisa con `size`.
+ */
+export function tamanoDialogoIA(fase, { registros = [], esquema } = {}) {
+  if (fase !== 'revision') return 'amplio'
+  const variasTarjetas = (registros?.length ?? 0) >= IA_DIALOGO_COMPLETO_REGISTROS
+  const tipoDenso = (esquema?.tipos ?? []).some((tipo) => (tipo?.campos?.length ?? 0) >= IA_DIALOGO_COMPLETO_CAMPOS)
+  return variasTarjetas || tipoDenso ? 'completo' : 'amplio'
+}
+
 const textoDe = (valor) => (valor === null || valor === undefined ? '' : String(valor)).trim()
 
 /** Tipo del esquema por id; `null` si no está. */

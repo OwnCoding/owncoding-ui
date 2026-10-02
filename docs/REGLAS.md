@@ -1059,13 +1059,22 @@ editable, los errores esperables y el matching, aprendidos en EventOS
   chequear»), entrada, analizando, error con reintento, **revisión editable por
   tarjetas con avisos** (incluir/descartar, obligatorios visibles) y resultado
   (creados/errores/advertencias). El diálogo se monta recién al abrirlo.
+- **Ancho adaptativo y densidad (#16):** `entrada` y `resultado` abren en
+  `amplio` (`max-w-3xl`); la `revisión` pide `completo` solo con varias tarjetas
+  (`IA_DIALOGO_COMPLETO_REGISTROS`) o tipos densos
+  (`IA_DIALOGO_COMPLETO_CAMPOS`), y `tamanoDialogoIA(fase, …)` lo resuelve. La
+  prop aditiva `size` fija el ancho. El textarea usa alto acotado (5 filas,
+  `min-h-28`/`max-h-56`, redimensionable) con el contador en la fila del hint;
+  el ritmo sigue §17 (gap 12–16, tarjetas 16–20, secciones 16–24) y mobile
+  conserva el bottom-sheet a alto completo.
 
 ### La persona confirma: carrito editable (#15)
 
 - El asistente **propone y la persona decide**: el preview es un **carrito
   editable**, la misma idea que una venta. Se puede **agregar** un registro a
   mano, **editar cualquier campo**, **duplicar** y **quitar**; nada se aplica
-  hasta la confirmación final («Crear todo» / «Aplicar»).
+  hasta la confirmación final («Crear todo» / «Aplicar»). El contador muestra
+  **N por crear/vincular** y la confirmación aplica solo lo incluido.
 - **Editar no reescribe el maestro:** cambiar un precio (o cualquier dato) en
   el carrito ajusta **solo esa fila**; actualizar el producto o cliente
   existente es una **acción explícita** («Actualizar el producto») y nunca un
@@ -1093,7 +1102,10 @@ editable, los errores esperables y el matching, aprendidos en EventOS
 - **Vincular antes que crear:** cada registro detectado se compara primero con
   la cartera de la empresa (clientes por nombre/empresa/RUC/teléfono; productos
   por nombre/SKU/categoría) con normalización + fuzzy; el preview muestra
-  «Existente: … (N %) → Vincular» y «Crear nuevo».
+  «Existente: … (N %) → Vincular» y «Crear nuevo». La **`confianza` es 0–100**
+  y se deriva de las señales + la **distancia de edición** entre claves
+  normalizadas (tolera typos, espacios y mayúsculas); los umbrales se evalúan
+  en el servidor.
 - **Preselección por confianza** (siempre cambiable, con «elegir otro»):
   **≥90 %** deja elegido *Vincular*; **60–89 %** deja elegido el **mejor
   candidato**; **<60 %** deja elegido *Crear nuevo*. Nunca un estado bloqueante
@@ -1122,6 +1134,9 @@ editable, los errores esperables y el matching, aprendidos en EventOS
   pendiente con su vencimiento; el total no se marca «cobrado».
 - **Dividir un cobro** en N partes (montos y fechas) se aplica como pagos/plan
   de la app, todo dentro del mismo carrito y con una sola confirmación.
+- **Validaciones sin efectos:** monto ≤ 0, suma de las partes ≠ monto, cuenta
+  inexistente o inactiva y duplicados se avisan y **no aplican nada**; el flujo
+  no queda a medias.
 - Un cobro detectado («me pagó X») exige **cliente resuelto**: nunca se
   registra contra un «pendiente de vincular».
 
@@ -1190,8 +1205,10 @@ editable, los errores esperables y el matching, aprendidos en EventOS
 - [ ] Proveedor encargado + aviso de datos sensibles; solo el texto pegado.
 
 **Referencia real:** LedBox `#120` y los aprendizajes de `#122`–`#129` (playbook
-#15); Scale OS `#117`/`#118`. Adopción: checklist de `docs/ADOPCION-V2.md` §10
-y el checklist de arriba.
+#15); **implementación validada** del playbook en Scale OS `#131`–`#133` (motor
+con `confianza`/verificación de escalares, carrito con preselección e imágenes,
+y pagos parciales/seña con cuentas reales) y `#117`/`#118`. Adopción: checklist
+de `docs/ADOPCION-V2.md` §10 y el checklist de arriba.
 
 ## 19. Fronteras de paquete, control y compatibilidad
 
