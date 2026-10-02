@@ -1,6 +1,7 @@
 import React, { Component, useDeferredValue, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import packageJson from '../package.json'
+import { galleryStateUrl, useGalleryUrlState } from './url-state.js'
 import { BLOG_POSTS, articlePath } from './blog/metadata.js'
 import '../src/styles/tokens.css'
 import '../src/styles/base.css'
@@ -657,12 +658,12 @@ function Ficha({ item, onAbrir }) {
   )
 }
 
-function App() {
-  const [consulta, setConsulta] = useState('')
+export function App() {
+  const [urlState, updateUrlState] = useGalleryUrlState()
+  const { consulta, categoria, tipo, exportName } = urlState
   const consultaDiferida = useDeferredValue(consulta)
-  const [categoria, setCategoria] = useState('Todas')
-  const [tipo, setTipo] = useState('visual')
-  const [seleccionado, setSeleccionado] = useState(null)
+  const seleccionado = CATALOGO_EXPORTS.find(item => item.nombre === exportName) || null
+  const shareHref = galleryStateUrl(typeof window === 'undefined' ? 'https://controlaria.online/' : window.location.href, urlState)
   const [limite, setLimite] = useState(60)
 
   const resultados = useMemo(() => {
@@ -683,7 +684,7 @@ function App() {
   const { api, visuales } = METRICAS_CATALOGO
 
   function abrirFicha(item) {
-    setSeleccionado(item)
+    updateUrlState({ exportName: item.nombre })
     requestAnimationFrame(() => document.querySelector('#ficha-export')?.focus())
   }
 
@@ -744,19 +745,20 @@ function App() {
 
         <section aria-label="Controles del catálogo" className="sticky top-0 z-20 -mx-4 mt-10 border-y border-fore/10 bg-paper/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center">
-            <SearchField className="min-w-0 flex-1" value={consulta} onChange={(event) => { setConsulta(event.target.value); setLimite(60) }} placeholder="Buscar componente, automatización o API" />
+            <SearchField className="min-w-0 flex-1" value={consulta} onChange={(event) => { updateUrlState({ consulta: event.target.value.slice(0, 200) }, 'replace'); setLimite(60) }} placeholder="Buscar componente, automatización o API" />
             <div className="flex flex-wrap gap-2" aria-label="Tipo de export">
-              {[['visual', 'Visuales'], ['api', 'API'], ['todos', 'Todos']].map(([valor, etiqueta]) => <button key={valor} type="button" aria-pressed={tipo === valor} onClick={() => { setTipo(valor); setLimite(60) }} className={`min-h-11 rounded-xl border px-4 text-sm font-semibold ${tipo === valor ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{etiqueta}</button>)}
+              {[['visual', 'Visuales'], ['api', 'API'], ['todos', 'Todos']].map(([valor, etiqueta]) => <button key={valor} type="button" aria-pressed={tipo === valor} onClick={() => { updateUrlState({ tipo: valor }); setLimite(60) }} className={`min-h-11 rounded-xl border px-4 text-sm font-semibold ${tipo === valor ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{etiqueta}</button>)}
             </div>
           </div>
           <div className="mx-auto mt-3 flex max-w-7xl gap-2 overflow-x-auto pb-1" aria-label="Categorías">
-            {['Todas', ...CATEGORIAS_CATALOGO].map((item) => <button key={item} type="button" aria-pressed={categoria === item} onClick={() => { setCategoria(item); setLimite(60) }} className={`min-h-11 shrink-0 rounded-xl border px-3 text-sm font-medium ${categoria === item ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{item}</button>)}
+            {['Todas', ...CATEGORIAS_CATALOGO].map((item) => <button key={item} type="button" aria-pressed={categoria === item} onClick={() => { updateUrlState({ categoria: item }); setLimite(60) }} className={`min-h-11 shrink-0 rounded-xl border px-3 text-sm font-medium ${categoria === item ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{item}</button>)}
           </div>
         </section>
 
         {seleccionado ? (
           <section id="ficha-export" tabIndex="-1" aria-live="polite" className="mt-6 rounded-2xl border border-fono/30 bg-fono/10 p-5 outline-none">
-            <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.14em] text-fono-text">Ficha seleccionada</p><h2 className="mt-1 text-xl font-bold">{seleccionado.nombre}</h2><p className="mt-2 text-sm text-mute">{seleccionado.categoria} · {seleccionado.tipo === 'visual' ? 'export visual disponible en la entrada raíz' : 'API documentada sin render visual'}.</p></div><button type="button" className="min-h-11 rounded-lg px-3 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" onClick={() => setSeleccionado(null)}>Cerrar ficha</button></div>
+            <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.14em] text-fono-text">Ficha seleccionada</p><h2 className="mt-1 text-xl font-bold">{seleccionado.nombre}</h2><p className="mt-2 text-sm text-mute">{seleccionado.categoria} · {seleccionado.tipo === 'visual' ? 'export visual disponible en la entrada raíz' : 'API documentada sin render visual'}.</p></div><button type="button" className="min-h-11 rounded-lg px-3 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" onClick={() => updateUrlState({ exportName: null })}>Cerrar ficha</button></div>
+            <a href={shareHref} aria-label={`Enlace directo a ${seleccionado.nombre}`} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-fono-dark underline dark:text-fono-light">Enlace a esta ficha</a>
             {seleccionado.presentacion ? <div key={seleccionado.nombre} className="mt-4 min-w-0"><ErrorBoundary>{seleccionado.presentacion === 'individual' ? <ComponentPreview name={seleccionado.nombre} /> : <Presentacion id={seleccionado.presentacion} />}</ErrorBoundary></div> : <p className="mt-3 text-sm text-mute">Sin preview curado todavía.</p>}
           </section>
         ) : null}
@@ -766,7 +768,7 @@ function App() {
           <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 id="titulo-catalogo" className="text-2xl font-bold">Catálogo completo</h2><p className="text-sm text-mute" role="status">{resultados.length} resultados</p></div>
           {resultados.length > 0 ? (
             <><div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{resultados.slice(0, limite).map((item) => <Ficha key={item.nombre} item={item} onAbrir={abrirFicha} />)}</div>{resultados.length > limite ? <div className="mt-6 text-center"><Button variant="outline" onClick={() => setLimite((actual) => actual + 60)}>Mostrar más exports</Button></div> : null}</>
-          ) : <div className="mt-5"><EmptyState title="No encontramos ese export" description="Probá otra palabra o cambiá los filtros." action={<Button variant="outline" onClick={() => { setConsulta(''); setCategoria('Todas'); setTipo('visual'); setLimite(60) }}>Limpiar filtros</Button>} /></div>}
+          ) : <div className="mt-5"><EmptyState title="No encontramos ese export" description="Probá otra palabra o cambiá los filtros." action={<Button variant="outline" onClick={() => { updateUrlState({ consulta: '', categoria: 'Todas', tipo: 'visual' }); setLimite(60) }}>Limpiar filtros</Button>} /></div>}
         </section>
       </main>
 

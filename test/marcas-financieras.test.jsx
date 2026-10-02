@@ -294,6 +294,16 @@ describe('manifest y bundles financieros', () => {
     expect(manifest.blockers.map((item) => item.id).sort()).toEqual(BLOQUEOS_ASSETS_FINANCIEROS.map((item) => item.id).sort())
   })
 
+  test('Pix stays blocked for missing browser-ready originals, not participant access', () => {
+    const pix = BLOQUEOS_ASSETS_FINANCIEROS.find(item => item.id === 'Pix')
+    expect(pix.motivo).toBe('kit-oficial-ai-eps-pdf-sin-original-png-svg-gif-jpg-webp')
+    const manifest = JSON.parse(readFileSync(join(process.cwd(), 'docs/financial-assets-manifest.json'), 'utf8'))
+    const recorded = manifest.blockers.find(item => item.id === 'Pix')
+    expect(recorded.archiveFormatCounts).toEqual({ ai: 70, eps: 70, pdf: 52 })
+    expect(recorded.browserReadyFiles).toBe(0)
+    for (const variant of ['compacto', 'horizontal']) expect(logoDeMedioPago('Pix', variant).visual?.empaquetado).toBeUndefined()
+  })
+
   test('el bundle visual contiene imágenes locales y metadata permanece sin bytes', async () => {
     const { BancoLogo: BancoLogoPublicado } = await import('../dist/index.js')
     const html = renderToStaticMarkup(<BancoLogoPublicado banco="ueno bank" variante="compacto" />)
