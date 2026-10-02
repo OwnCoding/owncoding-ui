@@ -29,6 +29,7 @@ describe('identidad publica y SEO de la galeria', () => {
 
   test('incluye favicons y manifest con todos sus archivos locales', () => {
     const expectedAssets = [
+      'favicon.ico',
       'favicon.svg',
       'favicon-16x16.png',
       'favicon-32x32.png',
@@ -38,6 +39,7 @@ describe('identidad publica y SEO de la galeria', () => {
       'app-icon-512.png',
       'app-icon-maskable-512.png',
       'og-owncoding-ui.png',
+      'manifest.json',
       'site.webmanifest',
       'robots.txt',
       'sitemap.xml',
@@ -47,17 +49,51 @@ describe('identidad publica y SEO de la galeria', () => {
       expect(existsSync(`${PUBLIC_DIR}/${asset}`), asset).toBe(true)
     }
 
-    expect(INDEX).toContain('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />')
-    expect(INDEX).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />')
-    expect(INDEX).toContain('<link rel="manifest" href="/site.webmanifest" />')
+    const iconLinks = [...INDEX.matchAll(/<link rel="(?:icon|apple-touch-icon|mask-icon|manifest)"[^>]*>/g)].map(([tag]) => tag)
+    expect(iconLinks).toHaveLength(7)
+    const revisions = new Set()
+    for (const tag of iconLinks) {
+      const url = new URL(attribute(tag, 'href'), SITE_URL)
+      expect(existsSync(`${PUBLIC_DIR}${url.pathname}`), url.pathname).toBe(true)
+      expect(url.searchParams.get('v')).toMatch(/^[a-f0-9]{12}$/)
+      revisions.add(url.searchParams.get('v'))
+    }
+    expect(revisions.size).toBe(1)
+    expect(iconLinks.find((tag) => tag.includes('/favicon.svg?'))).toContain('sizes="any"')
+    expect(iconLinks.find((tag) => tag.includes('/manifest.json?'))).toContain('type="application/json"')
+    const revision = [...revisions][0]
 
-    const manifest = JSON.parse(readFileSync(`${PUBLIC_DIR}/site.webmanifest`, 'utf8'))
+    const manifestSource = readFileSync(`${PUBLIC_DIR}/manifest.json`, 'utf8')
+    expect(manifestSource).toBe(readFileSync(`${PUBLIC_DIR}/site.webmanifest`, 'utf8'))
+    const manifest = JSON.parse(manifestSource)
     expect(manifest.lang).toBe('es-PY')
     expect(manifest.icons.map(({ src, sizes, purpose }) => ({ src, sizes, purpose }))).toEqual([
-      { src: '/app-icon-192.png', sizes: '192x192', purpose: 'any' },
-      { src: '/app-icon-512.png', sizes: '512x512', purpose: 'any' },
-      { src: '/app-icon-maskable-512.png', sizes: '512x512', purpose: 'maskable' },
+      { src: `/app-icon-192.png?v=${revision}`, sizes: '192x192', purpose: 'any' },
+      { src: `/app-icon-512.png?v=${revision}`, sizes: '512x512', purpose: 'any' },
+      { src: `/app-icon-maskable-512.png?v=${revision}`, sizes: '512x512', purpose: 'maskable' },
     ])
+  })
+
+  test('serves a multi-size ICO containing the existing PNG artwork', () => {
+    const ico = readFileSync(`${PUBLIC_DIR}/favicon.ico`)
+    expect(ico.readUInt16LE(0)).toBe(0)
+    expect(ico.readUInt16LE(2)).toBe(1)
+    expect(ico.readUInt16LE(4)).toBe(3)
+    const assets = ['favicon-16x16.png', 'favicon-32x32.png', 'app-icon-192.png']
+    const sizes = [16, 32, 192]
+    assets.forEach((asset, index) => {
+      const entry = 6 + index * 16
+      const length = ico.readUInt32LE(entry + 8)
+      const offset = ico.readUInt32LE(entry + 12)
+      expect(ico[entry]).toBe(sizes[index])
+      expect(ico[entry + 1]).toBe(sizes[index])
+      expect(ico.readUInt16LE(entry + 4)).toBe(1)
+      expect(ico.readUInt16LE(entry + 6)).toBe(32)
+      const png = ico.subarray(offset, offset + length)
+      expect(png.equals(readFileSync(`${PUBLIC_DIR}/${asset}`))).toBe(true)
+      expect(png.readUInt32BE(16)).toBe(sizes[index])
+      expect(png.readUInt32BE(20)).toBe(sizes[index])
+    })
   })
 
   test('mantiene robots, sitemap y JSON-LD limitados a la galeria publica', () => {

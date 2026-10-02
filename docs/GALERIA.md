@@ -50,6 +50,21 @@ consulta desde `www` y evitan publicar rutas internas o privadas.
 - Código esperado: `200`; además validar `status: "ok"`, la versión y la
   identidad del build.
 
+Los iconos y el manifest usan una revisión en la URL para invalidar cachés
+anteriores sin cambiar la identidad visual. `/favicon.ico` también existe como
+fallback convencional y contiene los PNG existentes de 16, 32 y 192 píxeles.
+Cuando cambie el arte, actualizar la revisión de los enlaces y del manifest.
+
+El enlace del manifest usa `/manifest.json` para aprovechar la asociación MIME
+JSON del hosting sin modificar el servidor. `application/json` es válido para
+un manifest, aunque `application/manifest+json` es el tipo recomendado por
+[W3C](https://www.w3.org/TR/appmanifest/#using-a-link-element-to-link-to-a-manifest).
+`site.webmanifest` se conserva como endpoint compatible con contenido idéntico;
+el test de SEO impide que ambas copias diverjan. Actualizar ambos archivos juntos.
+El endpoint legado puede seguir sirviéndose como `application/octet-stream` hasta
+que el hosting configure su MIME. Después del deploy, comprobar que el enlace
+activo `/manifest.json` responde con `application/json` y no con el fallback HTML.
+
 El dominio, DNS, HTTPS y el recurso de Coolify se configuran fuera de este
 repositorio. Un webhook aceptado no confirma un deploy: hay que comprobar el
 estado final, el healthcheck y un smoke del catálogo.
