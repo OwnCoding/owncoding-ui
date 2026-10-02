@@ -285,7 +285,7 @@ describe('marcas y productos de pago', () => {
 describe('manifest y bundles financieros', () => {
   test('el API visual coincide con el manifest autorizado y cada archivo tiene una variante', () => {
     expect([...ASSET_KEYS_FINANCIEROS].sort()).toEqual(manifest.assets.map((asset) => asset.file).sort())
-    expect(manifest.assets).toHaveLength(84)
+    expect(manifest.assets).toHaveLength(88)
     const referencias = new Set([
       ...coberturaBancos().flatMap(variantesEmpaquetadas),
       ...coberturaMediosPago().flatMap(variantesEmpaquetadas),
@@ -294,14 +294,38 @@ describe('manifest y bundles financieros', () => {
     expect(manifest.blockers.map((item) => item.id).sort()).toEqual(BLOQUEOS_ASSETS_FINANCIEROS.map((item) => item.id).sort())
   })
 
-  test('Pix stays blocked for missing browser-ready originals, not participant access', () => {
-    const pix = BLOQUEOS_ASSETS_FINANCIEROS.find(item => item.id === 'Pix')
-    expect(pix.motivo).toBe('kit-oficial-ai-eps-pdf-sin-original-png-svg-gif-jpg-webp')
-    const manifest = JSON.parse(readFileSync(join(process.cwd(), 'docs/financial-assets-manifest.json'), 'utf8'))
-    const recorded = manifest.blockers.find(item => item.id === 'Pix')
-    expect(recorded.archiveFormatCounts).toEqual({ ai: 70, eps: 70, pdf: 52 })
-    expect(recorded.browserReadyFiles).toBe(0)
-    for (const variant of ['compacto', 'horizontal']) expect(logoDeMedioPago('Pix', variant).visual?.empaquetado).toBeUndefined()
+  test('authorized derivatives retain exact official originals and honest variants', () => {
+    const variants = {
+      'Red Infonet': { compacto: 'horizontal-contained', horizontal: 'archivo' },
+      Panal: { compacto: 'archivo', horizontal: 'marca-contained' },
+      Pix: { compacto: 'archivo', horizontal: 'archivo' },
+    }
+    for (const [brand, slots] of Object.entries(variants)) {
+      expect(BLOQUEOS_ASSETS_FINANCIEROS.some(item => item.id === brand)).toBe(false)
+      for (const [slot, type] of Object.entries(slots)) {
+        const logo = logoDeMedioPago(brand, slot)
+        expect(logo.estado).toBe('verificado')
+        expect(logo.visual.tipo).toBe(type)
+        const asset = manifest.assets.find(item => item.file === logo.visual.empaquetado)
+        expect(asset.sourceFile).toMatch(/^docs\/financial-originals\/[a-z_]+\.(png|pdf)$/)
+        const original = readFileSync(join(process.cwd(), asset.sourceFile))
+        expect(createHash('sha256').update(original).digest('hex')).toBe(asset.sourceSha256)
+        expect(asset.sha256).not.toBe(asset.sourceSha256)
+        expect(asset.transformation).toContain('User-authorized')
+        expect(htmlLogo(MedioPagoLogo, 'marca', brand, slot)).toContain('<img')
+      }
+    }
+    const fpj = manifest.assets.find(item => item.file === 'bancos/fpj-compacto.png')
+    expect(fpj.sourceFile).toBe('docs/financial-originals/fpj_compacto.png')
+    expect(createHash('sha256').update(readFileSync(join(process.cwd(), fpj.sourceFile))).digest('hex')).toBe(fpj.sourceSha256)
+    expect(fpj.dimensions).toEqual({ width: fpj.sourceIdentity.pixelWidth, height: fpj.sourceIdentity.pixelHeight })
+    expect(fpj.transformation).toContain('no resize, crop or color quantization')
+    for (const slot of ['compacto', 'horizontal']) {
+      const asset = manifest.assets.find(item => item.file === `pagos/pix-${slot}.svg`)
+      expect(asset.sourceArchive.sha256).toBe('fcae3039f06bd33023f4236d8649eb289ce9cbf50e52f62516f2c201d2a600ac')
+      expect(asset.sourceArchive.member).toMatch(/^ArquivosdaMarcaPix\/pdf\/.+\.pdf$/)
+      expect(asset.sourceFile.endsWith('.pdf')).toBe(true)
+    }
   })
 
   test('el bundle visual contiene imágenes locales y metadata permanece sin bytes', async () => {

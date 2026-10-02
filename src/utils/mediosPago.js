@@ -59,7 +59,8 @@ export const MARCAS_MEDIOS_PAGO = {
   }),
   'Red Infonet': entrada({
     categoria: 'red-procesamiento', alias: ['infonet'], monograma: 'RI', color: '#263C8F',
-    fuenteOficial: 'https://www.bancard.com.py/productos', estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    fuenteOficial: 'https://www.bancard.com.py/productos', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO('infonet-marca.png', 'oficial', { descripcion: 'Marca oficial completa contenida en el espacio compacto; no es un símbolo independiente.' }), horizontal: EMPAQUETADO('infonet-marca.png') },
   }),
   Dinelco: entrada({
     categoria: 'red-procesamiento', monograma: 'D', color: '#5E2A84', fuenteOficial: 'https://www.dinelco.com.py/',
@@ -68,7 +69,8 @@ export const MARCAS_MEDIOS_PAGO = {
   }),
   Pix: entrada({
     categoria: 'red-pago-instantaneo', monograma: 'PX', color: '#32BCAD', fuenteOficial: 'https://www.bcb.gov.br/estabilidadefinanceira/pix',
-    estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('pix-compacto.svg', 'oficial', { fondo: '#ffffff', padding: true }), horizontal: EMPAQUETADO('pix-horizontal.svg', 'oficial', { fondo: '#ffffff', padding: true }) },
   }),
   upay: entrada({
     categoria: 'procesador', alias: ['u pay'], monograma: 'U', color: '#5A31F4', fuenteOficial: 'https://upay.com.py/',
@@ -151,7 +153,8 @@ export const MARCAS_MEDIOS_PAGO = {
   }),
   Panal: entrada({
     categoria: 'red-tarjeta', monograma: 'P', color: '#A56A1C', fuenteOficial: 'https://www.bcp.gov.py/comisiones-por-intermediacion-cobradas-a-los-comercios-por-las-operaciones-con-tarjetas',
-    estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
+    estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO('panal-marca.png'), horizontal: { ...EMPAQUETADO('panal-marca.png'), tipo: 'marca-contained', descripcion: 'Marca oficial completa contenida en el espacio horizontal; no es un wordmark independiente.' } },
   }),
 }
 

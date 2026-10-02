@@ -58,6 +58,15 @@ for (const asset of manifest.assets) {
   }
   if (asset.retrievedAt === '2026-10-02' && (!Number.isFinite(asset.dimensions?.width) || asset.dimensions.width <= 0 || !Number.isFinite(asset.dimensions?.height) || asset.dimensions.height <= 0)) errors.push(`${asset.file}: dimensiones verificadas ausentes o inválidas`)
   if (asset.sourceSha256 && (!/^[a-f0-9]{64}$/.test(asset.sourceSha256) || !asset.transformation || asset.sourceSha256 === asset.sha256)) errors.push(`${asset.file}: fuente original o transformación SVG incorrecta`)
+  if (asset.sourceFile) {
+    if (!/^docs\/financial-originals\/[a-z_]+\.(png|pdf)$/.test(asset.sourceFile)) errors.push(`${asset.file}: ruta de original retenido inválida`)
+    else {
+      try {
+        const retained = await readFile(path.join(root, asset.sourceFile))
+        if (createHash('sha256').update(retained).digest('hex') !== asset.sourceSha256) errors.push(`${asset.file}: hash de original retenido no coincide`)
+      } catch { errors.push(`${asset.file}: original retenido ausente`) }
+    }
+  }
   if (asset.sourceIdentity) {
     if (!/^[a-f0-9]{64}$/.test(asset.sourceIdentity.sha256 || '')) errors.push(`${asset.file}: sha256 de fuente original inválido`)
     if (!Number.isInteger(asset.sourceIdentity.pixelWidth) || asset.sourceIdentity.pixelWidth < 1) errors.push(`${asset.file}: ancho de fuente original inválido`)

@@ -35,7 +35,7 @@ import {
   relacionFinancieraDe,
   sugerenciasDeBanco,
   sugerenciasDeMarcaPago
-} from "./chunks/chunk-LZTBYIN2.js";
+} from "./chunks/chunk-AUQVXZLH.js";
 export {
   ASSETS_FINANCIEROS,
   ASSET_KEYS_FINANCIEROS,

@@ -1,6 +1,6 @@
 {
   "evaluatedAt": "2026-10-02",
-  "note": "Evaluation evidence only; none of these original files is included in the package. Source provenance is separate from project-surface permission.",
+  "note": "Evaluation evidence; packaged authorized derivatives are explicitly distinguished from their retained exact originals. Source provenance is separate from project-surface permission.",
   "sources": [
     {
       "name": "24 de Octubre",
@@ -68,10 +68,11 @@
         "width": 480,
         "height": 459
       },
-      "disposition": "not-packaged",
-      "reason": "transparent-canvas",
+      "disposition": "original-retained-derived-runtime-packaged",
+      "reason": "authorized-transparent-margin-crop",
       "transparentCoverage": 0.38932007988380535,
-      "minimumCoverage": 0.55
+      "minimumCoverage": 0.55,
+      "derivedAsset": "pagos/infonet-marca.png"
     },
     {
       "name": "Panal",
@@ -83,8 +84,8 @@
         "width": 480,
         "height": 459
       },
-      "disposition": "not-packaged",
-      "reason": "transparent-canvas",
+      "disposition": "original-retained-derived-runtime-packaged",
+      "reason": "authorized-transparent-margin-crop",
       "transparentCoverage": 0.32843591140159767,
       "minimumCoverage": 0.55,
       "sourceAuthority": "Official processor Bancard, not issuer-hosted; card mark, not Panal Seguros",
@@ -100,7 +101,8 @@
         },
         "disposition": "not-packaged",
         "reason": "full-card-mockup-not-standalone-logo"
-      }
+      },
+      "derivedAsset": "pagos/panal-marca.png"
     },
     {
       "name": "uPOS",

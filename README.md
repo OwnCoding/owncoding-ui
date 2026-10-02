@@ -472,8 +472,11 @@ contenidas explícitas cuando no existe un símbolo o lockup independiente.
 Capiatá, Ñemby y Lambaré ya se incorporan; 24 de Octubre y Tobatí siguen
 bloqueadas por calidad sin recortar ni reconstruir imágenes. San Lorenzo usa
 su compacto oficial también como marca contenida horizontal. Visa y Mastercard
-usan originales públicos de primera parte; Pix, Red Infonet y Panal conservan
-sus bloqueos y uPOS su presentación de producto padre.
+usan originales públicos de primera parte. Pix incorpora conversiones de los
+PDF vectoriales oficiales del BCB; Red Infonet y Panal incorporan recortes
+solo de márgenes transparentes autorizados. Los originales y las recetas se
+conservan en `docs/financial-originals/`; uPOS mantiene su presentación
+explícita de producto padre, sin inventar una marca independiente.
 
 El build visual comparte los data URLs en un único chunk ESM, conservando
 importación síncrona y SSR Node sin URLs de archivo. La deduplicación es física

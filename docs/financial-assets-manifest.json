@@ -397,7 +397,7 @@
       "sourceKind": "official-first-party",
       "sourceUrl": "https://www.fpj.com.py/img/fpj-logo-movile.png",
       "retrievedAt": "2026-10-01",
-      "sha256": "597f7ac1dc3286ae0199a85ee1d9e496cfed642e8ce350e47f1035a85138bdc4",
+      "sha256": "a9bd0f6c3f44bb33e411f8f7090931062971bee30cc75a2092cf118425b504f5",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -406,6 +406,18 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceSha256": "597f7ac1dc3286ae0199a85ee1d9e496cfed642e8ce350e47f1035a85138bdc4",
+      "sourceFile": "docs/financial-originals/fpj_compacto.png",
+      "sourceIdentity": {
+        "sha256": "597f7ac1dc3286ae0199a85ee1d9e496cfed642e8ce350e47f1035a85138bdc4",
+        "pixelWidth": 542,
+        "pixelHeight": 293
+      },
+      "transformation": "User-authorized lossless PNG representation conversion. Exact original retained byte-for-byte. Pillow12.3.0 maps each distinct RGBA tuple to one indexed palette entry with exact per-index alpha; no resize, crop or color quantization. ZopfliPNG lossless compression with lossy_transparent=False, lossy_8bit=False, num_iterations=15. DecodedRGBA bytes proven identical to original.",
+      "dimensions": {
+        "width": 542,
+        "height": 293
       }
     },
     {
@@ -1586,6 +1598,162 @@
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
       }
+    },
+    {
+      "id": "pagos-infonet-marca",
+      "file": "pagos/infonet-marca.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Infonet.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "ec087acd2ae4181d55d027e91be3e5204ecb0198f520930e92f9d7bbe7dbe922",
+      "dimensions": {
+        "width": 365,
+        "height": 235
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceSha256": "07c382d6254fb8dd24bc4d2e8deba08b4bbd18abc3fb7076eace5b7c41d88670",
+      "sourceFile": "docs/financial-originals/infonet.png",
+      "sourceIdentity": {
+        "sha256": "07c382d6254fb8dd24bc4d2e8deba08b4bbd18abc3fb7076eace5b7c41d88670",
+        "pixelWidth": 480,
+        "pixelHeight": 459
+      },
+      "cropBounds": [
+        57,
+        112,
+        422,
+        347
+      ],
+      "transformation": "User-authorized lossless RGBA alpha bounding-box crop with Pillow 12.3.0. Only fully transparent outer rows/columns removed; no resampling, upscaling, recoloring or redrawing. Crop box uses left/top inclusive and right/bottom exclusive coordinates. Lossless indexed PNG encoding: map every distinct RGBA tuple to one palette index with per-index alpha; decoded RGBA bytes proven identical. ZopfliPNG lossless compression with lossy_transparent=False, lossy_8bit=False, num_iterations=15; decoded RGBA bytes verified unchanged.",
+      "sourceAuthority": "Official first-party Bancard network mark."
+    },
+    {
+      "id": "pagos-panal-marca",
+      "file": "pagos/panal-marca.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Panal.png",
+      "retrievedAt": "2026-10-02",
+      "sha256": "c138959fd17bea67fd912b3ab359591cef7a2c5eeac1fac3bf5f3740807391eb",
+      "dimensions": {
+        "width": 269,
+        "height": 269
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceSha256": "218dbe3fa86dd7a244652b842104a9513dcfeb4e7214f8ec622a4c59ca3788ce",
+      "sourceFile": "docs/financial-originals/panal.png",
+      "sourceIdentity": {
+        "sha256": "218dbe3fa86dd7a244652b842104a9513dcfeb4e7214f8ec622a4c59ca3788ce",
+        "pixelWidth": 480,
+        "pixelHeight": 459
+      },
+      "cropBounds": [
+        105,
+        95,
+        374,
+        364
+      ],
+      "transformation": "User-authorized lossless RGBA alpha bounding-box crop with Pillow 12.3.0. Only fully transparent outer rows/columns removed; no resampling, upscaling, recoloring or redrawing. Crop box uses left/top inclusive and right/bottom exclusive coordinates. Lossless indexed PNG encoding: map every distinct RGBA tuple to one palette index with per-index alpha; decoded RGBA bytes proven identical. ZopfliPNG lossless compression with lossy_transparent=False, lossy_8bit=False, num_iterations=15; decoded RGBA bytes verified unchanged.",
+      "sourceAuthority": "Official processor Bancard; standalone Panal mark, not issuer-hosted."
+    },
+    {
+      "id": "pagos-pix-horizontal",
+      "file": "pagos/pix-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bcb.gov.br/content/estabilidadefinanceira/pix/marca/ArquivosdaMarcaPix.zip",
+      "sourcePageUrl": "https://www.bcb.gov.br/estabilidadefinanceira/pix-participantes",
+      "retrievedAt": "2026-10-02",
+      "sha256": "9aae47f6471295179713a310c5f83734b98199260c8da4af6aabcc57193c1d58",
+      "dimensions": {
+        "width": 503.0,
+        "height": 179.6
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceSha256": "53750811270e55a660afb28e95fba4987bb76197fba05df8cd52805581597b42",
+      "sourceFile": "docs/financial-originals/marca_pix_policromia_positiva_sem_mensagem.pdf",
+      "sourceArchive": {
+        "sha256": "fcae3039f06bd33023f4236d8649eb289ce9cbf50e52f62516f2c201d2a600ac",
+        "bytes": 124383881,
+        "member": "ArquivosdaMarcaPix/pdf/marca_pix_policromia_positiva_sem_mensagem.pdf"
+      },
+      "transformation": "User-authorized vector-only PDF to SVG conversion via PyMuPDF1.28.2 Page.get_svg_image(text_as_path=True). All generated paths, transforms and paints retained byte-for-byte; only outer SVG width/height/viewBox changed. Filled path bounds inspected with Page.get_drawings; viewBox rounded outward to0.1pt plus0.1pt safety margins so painted edges cannot be clipped. No tracing, path simplification, recoloring or embedded raster.",
+      "sourceDrawingBounds": [
+        30.873998641967773,
+        23.215993881225586,
+        533.5759887695312,
+        202.56698608398438
+      ],
+      "viewBox": [
+        30.7,
+        23.1,
+        503.0,
+        179.6
+      ]
+    },
+    {
+      "id": "pagos-pix-compacto",
+      "file": "pagos/pix-compacto.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bcb.gov.br/content/estabilidadefinanceira/pix/marca/ArquivosdaMarcaPix.zip",
+      "sourcePageUrl": "https://www.bcb.gov.br/estabilidadefinanceira/pix-participantes",
+      "retrievedAt": "2026-10-02",
+      "sha256": "643729cda0225c9d6b3c507e5144f4c5b3ac886be0a7231bfa023f60c331da41",
+      "dimensions": {
+        "width": 172.0,
+        "height": 172.0
+      },
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceSha256": "97f05061832a99c04d3ca834dd14598eabac672a81e18fd1df6760ba2555cffc",
+      "sourceFile": "docs/financial-originals/simbolo_pix_policromia_positivo.pdf",
+      "sourceArchive": {
+        "sha256": "fcae3039f06bd33023f4236d8649eb289ce9cbf50e52f62516f2c201d2a600ac",
+        "bytes": 124383881,
+        "member": "ArquivosdaMarcaPix/pdf/simbolo_pix_policromia_positivo.pdf"
+      },
+      "transformation": "User-authorized vector-only PDF to SVG conversion via PyMuPDF1.28.2 Page.get_svg_image(text_as_path=True). All generated paths, transforms and paints retained byte-for-byte; only outer SVG width/height/viewBox changed. Filled path bounds inspected with Page.get_drawings; viewBox rounded outward to0.1pt plus0.1pt safety margins so painted edges cannot be clipped. No tracing, path simplification, recoloring or embedded raster.",
+      "sourceDrawingBounds": [
+        30.873998641967773,
+        30.876998901367188,
+        202.56500244140625,
+        202.56698608398438
+      ],
+      "viewBox": [
+        30.7,
+        30.7,
+        172.0,
+        172.0
+      ]
     }
   ],
   "blockers": [
@@ -1600,48 +1768,6 @@
         "height": 48
       },
       "minimumRasterPixels": 64,
-      "verifiedAt": "2026-10-02"
-    },
-    {
-      "catalog": "payment",
-      "id": "Panal",
-      "reason": "Processor-published original fails the unchanged 0.55 transparent-canvas quality minimum. No crop/recreation or exception applied. Panal is the card mark, not Panal Seguros; not claimed as issuer-hosted.",
-      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Panal.png",
-      "sourceSha256": "218dbe3fa86dd7a244652b842104a9513dcfeb4e7214f8ec622a4c59ca3788ce",
-      "dimensions": {
-        "width": 480,
-        "height": 459
-      },
-      "transparentCoverage": 0.32843591140159767,
-      "verifiedAt": "2026-10-02"
-    },
-    {
-      "catalog": "payment",
-      "id": "Pix",
-      "reason": "Public official BCB ZIP contains original AI/EPS/PDF artwork but no browser-ready PNG/SVG/GIF/JPG/WebP files. No conversion, recreation or runtime integration applied.",
-      "sourceUrl": "https://www.bcb.gov.br/content/estabilidadefinanceira/pix/marca/ArquivosdaMarcaPix.zip",
-      "sourcePageUrl": "https://www.bcb.gov.br/estabilidadefinanceira/pix-participantes",
-      "sourceSha256": "fcae3039f06bd33023f4236d8649eb289ce9cbf50e52f62516f2c201d2a600ac",
-      "sourceBytes": 124383881,
-      "archiveFormatCounts": {
-        "ai": 70,
-        "eps": 70,
-        "pdf": 52
-      },
-      "browserReadyFiles": 0,
-      "verifiedAt": "2026-10-02"
-    },
-    {
-      "catalog": "payment",
-      "id": "Red Infonet",
-      "reason": "Official Bancard-published independent Infonet original fails the unchanged 0.55 transparent-canvas quality minimum. No crop/recreation or exception applied.",
-      "sourceUrl": "https://www.bancard.com.py/storage/app/media/marcas/Infonet.png",
-      "sourceSha256": "07c382d6254fb8dd24bc4d2e8deba08b4bbd18abc3fb7076eace5b7c41d88670",
-      "dimensions": {
-        "width": 480,
-        "height": 459
-      },
-      "transparentCoverage": 0.38932007988380535,
       "verifiedAt": "2026-10-02"
     },
     {

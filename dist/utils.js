@@ -67,10 +67,7 @@ var AUTORIZACION_ASSETS_FINANCIEROS = Object.freeze({
 });
 var BLOQUEOS_ASSETS_FINANCIEROS = Object.freeze([
   { catalogo: "banco", id: "Banco do Brasil", motivo: "favicon-oficial-48px-bajo-minimo-64px-sin-lockup-horizontal-verificado" },
-  { catalogo: "pago", id: "Pix", motivo: "kit-oficial-ai-eps-pdf-sin-original-png-svg-gif-jpg-webp" },
-  { catalogo: "pago", id: "Red Infonet", motivo: "original-bancard-canvas-transparente-excesivo-sin-derivado-autorizado" },
-  { catalogo: "pago", id: "uPOS", variante: "horizontal", motivo: "producto-upay-sin-marca-independiente" },
-  { catalogo: "pago", id: "Panal", motivo: "original-procesador-canvas-transparente-excesivo-sin-derivado-autorizado" }
+  { catalogo: "pago", id: "uPOS", variante: "horizontal", motivo: "producto-upay-sin-marca-independiente" }
 ]);
 
 // src/utils/relacionesFinancieras.js
@@ -738,8 +735,9 @@ var MARCAS_MEDIOS_PAGO = {
     monograma: "RI",
     color: "#263C8F",
     fuenteOficial: "https://www.bancard.com.py/productos",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO2("asset-bloqueado"), horizontal: TEXTO2("asset-bloqueado") }
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: CONTENIDO2("infonet-marca.png", "oficial", { descripcion: "Marca oficial completa contenida en el espacio compacto; no es un s\xEDmbolo independiente." }), horizontal: EMPAQUETADO2("infonet-marca.png") }
   }),
   Dinelco: entrada2({
     categoria: "red-procesamiento",
@@ -755,8 +753,9 @@ var MARCAS_MEDIOS_PAGO = {
     monograma: "PX",
     color: "#32BCAD",
     fuenteOficial: "https://www.bcb.gov.br/estabilidadefinanceira/pix",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO2("asset-bloqueado"), horizontal: TEXTO2("asset-bloqueado") }
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO2("pix-compacto.svg", "oficial", { fondo: "#ffffff", padding: true }), horizontal: EMPAQUETADO2("pix-horizontal.svg", "oficial", { fondo: "#ffffff", padding: true }) }
   }),
   upay: entrada2({
     categoria: "procesador",
@@ -912,8 +911,9 @@ var MARCAS_MEDIOS_PAGO = {
     monograma: "P",
     color: "#A56A1C",
     fuenteOficial: "https://www.bcp.gov.py/comisiones-por-intermediacion-cobradas-a-los-comercios-por-las-operaciones-con-tarjetas",
-    estado: "asset-bloqueado",
-    variantes: { compacto: TEXTO2("asset-bloqueado"), horizontal: TEXTO2("asset-bloqueado") }
+    estado: "verificado",
+    redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
+    variantes: { compacto: EMPAQUETADO2("panal-marca.png"), horizontal: { ...EMPAQUETADO2("panal-marca.png"), tipo: "marca-contained", descripcion: "Marca oficial completa contenida en el espacio horizontal; no es un wordmark independiente." } }
   })
 };
 var SOLUCIONES_PAGO_COMERCIOS = Object.freeze({

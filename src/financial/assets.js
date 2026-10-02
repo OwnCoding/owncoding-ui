@@ -1,3 +1,7 @@
+import assetPixCompact from '../assets/financial/pagos/pix-compacto.svg'
+import assetPixHorizontal from '../assets/financial/pagos/pix-horizontal.svg'
+import assetInfonet from '../assets/financial/pagos/infonet-marca.png'
+import assetPanal from '../assets/financial/pagos/panal-marca.png'
 import asset_mastercard_marca from '../assets/financial/pagos/mastercard-marca.svg'
 import asset_visa_marca from '../assets/financial/pagos/visa-marca.png'
 import assetcapiata_horizontal from '../assets/financial/bancos/capiata-horizontal.png'
@@ -85,6 +89,10 @@ import asset68 from '../assets/financial/bancos/universitaria-horizontal.svg'
 import asset69 from '../assets/financial/bancos/citi-horizontal.svg'
 
 export const ASSETS_FINANCIEROS = Object.freeze({
+  'pagos/pix-compacto.svg': assetPixCompact,
+  'pagos/pix-horizontal.svg': assetPixHorizontal,
+  'pagos/infonet-marca.png': assetInfonet,
+  'pagos/panal-marca.png': assetPanal,
   'pagos/mastercard-marca.svg': asset_mastercard_marca,
   'pagos/visa-marca.png': asset_visa_marca,
   'bancos/capiata-horizontal.png': assetcapiata_horizontal,

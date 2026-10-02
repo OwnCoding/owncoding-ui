@@ -26,5 +26,7 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: true,
     manifest: true,
+    // Keep small brand assets external: lossless optimization must not inflate eager JS.
+    assetsInlineLimit: 0,
   },
 })
