@@ -1,6 +1,5 @@
-import { SPECIALIZED_DEMOS, SpecializedPreview } from './specialized-previews.jsx'
-import { SEARCH_BOARD_DEMOS, SearchBoardPreview } from './search-board-previews.jsx'
-import { RECEIVING_DEMOS, ReceivingPreview } from './receiving-previews.jsx'
+import { previewGroup } from './preview-registry.js'
+import { DeferredPreview } from './deferred-preview.jsx'
 import React, { useId, useMemo, useState } from 'react'
 import {
   PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState, Nota, Input,
@@ -11,15 +10,16 @@ import {
 } from '../src/index.js'
 import { crearCorreoTransaccional, renderCorreoHtml, renderCorreoTexto } from '../src/email/index.js'
 import packageJson from '../package.json'
-import { SHELL_DEMOS, ShellPreview } from './shell-previews.jsx'
-import { OPERATION_DEMOS, OperationPreview } from './operation-previews.jsx'
-import { DOCUMENT_DEMOS, DocumentPreview } from './document-previews.jsx'
-import { REVIEW_DEMOS, ReviewPreview } from './review-previews.jsx'
 
 const identity = crearIdentidadApp({ nombre: 'OwnCoding UI', version: packageJson.version })
 const rows = [{ id: 'a', nombre: 'Pedido Demo A', estado: 'Pendiente' }, { id: 'b', nombre: 'Pedido Demo B', estado: 'Completo' }]
 
 export function ComponentPreview({ name }) {
+  const group = previewGroup(name)
+  return group ? <DeferredPreview key={name} group={group} name={name} /> : <BasicPreview key={name} name={name} />
+}
+
+function BasicPreview({ name }) {
   const id = useId()
   const [value, setValue] = useState('')
   const [open, setOpen] = useState(false)
@@ -31,13 +31,6 @@ export function ComponentPreview({ name }) {
   const [cambios, setCambios] = useState(false)
   const [muestra, setMuestra] = useState('')
   const field = (label, element) => <div><Label htmlFor={id}>{label}</Label>{element}</div>
-  if (SPECIALIZED_DEMOS[name]) return <SpecializedPreview key={name} name={name} />
-  if (SEARCH_BOARD_DEMOS[name]) return <SearchBoardPreview key={name} name={name} />
-  if (RECEIVING_DEMOS[name]) return <ReceivingPreview key={name} name={name} />
-  if (DOCUMENT_DEMOS[name]) return <DocumentPreview key={name} name={name} />
-  if (REVIEW_DEMOS[name]) return <ReviewPreview key={name} name={name} />
-  if (SHELL_DEMOS[name]) return <ShellPreview key={name} name={name} />
-  if (OPERATION_DEMOS[name]) return <OperationPreview key={name} name={name} />
   switch (name) {
     case 'PasswordInput': return field('Contraseña de muestra', <PasswordInput id={id} defaultValue="demo-only" />)
     case 'PinInput': return field('PIN de muestra', <PinInput id={id} ariaLabel="PIN de muestra" value={value} onChange={setValue} />)

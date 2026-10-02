@@ -10,9 +10,10 @@ test('actual QR effect ignores late generation after leaving its scene', async (
   const host = document.createElement('div'); document.body.append(host); const root = createRoot(host)
   try {
     await act(async () => root.render(<ComponentPreview key="qr" name="CodigoQr" />))
-    expect(pending).toHaveLength(1)
+    await vi.waitFor(async () => { await act(async () => {}); expect(pending).toHaveLength(1) })
     await act(async () => root.render(<ComponentPreview key="text" name="Eyebrow" />))
     await act(async () => pending[0]('data:image/png;base64,fixture'))
+    await vi.waitFor(async () => { await act(async () => {}); expect(host.querySelector('[data-demo-export]')?.dataset.demoExport).toBe('Eyebrow') })
     expect(host.querySelector('img')).toBeNull()
     expect(host.querySelector('[data-demo-export]').dataset.demoExport).toBe('Eyebrow')
   } finally { act(() => root.unmount()); host.remove() }

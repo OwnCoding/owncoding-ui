@@ -25,5 +25,6 @@ export default defineConfig({
     outDir: '../site-dist',
     emptyOutDir: true,
     sourcemap: true,
+    manifest: true,
   },
 })

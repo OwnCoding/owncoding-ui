@@ -14,18 +14,18 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true
 let host, root
 beforeEach(() => { observed.clear(); host = document.createElement('div'); document.body.append(host); root = createRoot(host) })
 afterEach(() => { act(() => root.unmount()); host.remove(); vi.restoreAllMocks() })
-const render = name => act(() => root.render(<ComponentPreview key={name} name={name} />))
+const render = async name => { await act(async () => root.render(<ComponentPreview key={name} name={name} />)) }
 const click = label => act(() => [...host.querySelectorAll('button')].find(button => button.textContent === label).click())
-test.each(Object.keys(SEARCH_BOARD_DEMOS))('%s instantiates the actual named export', name => { render(name); expect(observed.has(name)).toBe(true) })
-test('people fixture selection does not persist usage', () => {
+test.each(Object.keys(SEARCH_BOARD_DEMOS))('%s instantiates the actual named export', async name => { await render(name); expect(observed.has(name)).toBe(true) })
+test('people fixture selection does not persist usage', async () => {
   const storage = vi.spyOn(Storage.prototype, 'setItem')
-  render('BuscadorPersonas'); act(() => host.querySelector('[role="option"]').click())
+  await render('BuscadorPersonas'); act(() => host.querySelector('[role="option"]').click())
   expect(host.textContent).toContain('Selección local: a'); expect(storage).not.toHaveBeenCalled()
 })
-test('kanban select applies and rolls back local moves without network', () => {
+test('kanban select applies and rolls back local moves without network', async () => {
   const request = vi.spyOn(globalThis, 'fetch')
   const move = value => act(() => { const select = host.querySelector('select'); select.value = value; select.dispatchEvent(new Event('change', { bubbles: true })) })
-  render('TableroKanban'); move('revisado')
+  await render('TableroKanban'); move('revisado')
   expect(host.textContent).toContain('Movimiento local aplicado')
   click('Simular rechazo local'); move('pendiente')
   expect(host.textContent).toContain('Movimiento revertido por rechazo local')

@@ -18,56 +18,56 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true
 let host, root
 beforeEach(() => { observed.clear(); host = document.createElement('div'); document.body.append(host); root = createRoot(host) })
 afterEach(() => { act(() => root.unmount()); host.remove() })
-const render = name => act(() => root.render(<ComponentPreview key={name} name={name} />))
+const render = async name => { await act(async () => root.render(<ComponentPreview key={name} name={name} />)) }
 const click = label => act(() => [...document.querySelectorAll('button')].find(button => button.textContent === label || button.getAttribute('aria-label') === label).click())
 
-test.each([...Object.keys(SHELL_DEMOS), ...Object.keys(OPERATION_DEMOS)])('%s mapping instantiates its actual named export', name => {
-  render(name)
+test.each([...Object.keys(SHELL_DEMOS), ...Object.keys(OPERATION_DEMOS)])('%s mapping instantiates its actual named export', async name => {
+  await render(name)
   if (name === 'SaveActions') click('Abrir formulario local')
   expect(observed.has(name)).toBe(true)
   expect(CATALOGO_EXPORTS.find(item => item.nombre === name).presentacion).toBe('individual')
   expect(host.querySelector('[data-demo-export]').dataset.demoExport).toBe(name)
 })
-test('numeric keypad changes local output and supports deletion', () => {
-  render('NumericKeypad'); click('Agregar 7'); click('Agregar 2')
+test('numeric keypad changes local output and supports deletion', async () => {
+  await render('NumericKeypad'); click('Agregar 7'); click('Agregar 2')
   expect(host.querySelector('output').textContent).toBe('72')
   click('Borrar último dígito')
   expect(host.querySelector('output').textContent).toBe('7')
 })
-test('menu selection and navigation affect local status only', () => {
-  render('MenuDesplegable'); click('Acciones de muestra'); click('Ver detalle local')
+test('menu selection and navigation affect local status only', async () => {
+  await render('MenuDesplegable'); click('Acciones de muestra'); click('Ver detalle local')
   expect(host.textContent).toContain('Detalle local seleccionado.')
   expect(host.querySelector('[role="menu"]')).toBeNull()
-  render('BarraInferior'); click('Actividad')
+  await render('BarraInferior'); click('Actividad')
   expect(host.querySelector('[aria-current="page"]').textContent).toContain('Actividad')
 })
-test('OAuth simulation never authenticates and has deterministic busy state', () => {
-  render('GoogleButton'); click('Continuar con Google')
+test('OAuth simulation never authenticates and has deterministic busy state', async () => {
+  await render('GoogleButton'); click('Continuar con Google')
   expect(host.textContent).toContain('no autenticación OAuth')
   click('Alternar ocupado')
   expect(host.querySelector('[aria-busy="true"]').disabled).toBe(true)
 })
-test('empty chart fixture and local completion are controllable', () => {
-  render('GraficoBarras'); click('Alternar sin datos')
+test('empty chart fixture and local completion are controllable', async () => {
+  await render('GraficoBarras'); click('Alternar sin datos')
   expect(host.textContent).toContain('Sin datos para graficar')
-  render('ConteoChecklist'); click('Avanzar muestra'); click('Avanzar muestra'); click('Avanzar muestra')
+  await render('ConteoChecklist'); click('Avanzar muestra'); click('Avanzar muestra'); click('Avanzar muestra')
   expect(host.textContent).toContain('4 de 4 verificaciones')
 })
-test('collapsible demo explicitly disables session persistence', () => {
+test('collapsible demo explicitly disables session persistence', async () => {
   const spy = vi.spyOn(Storage.prototype, 'setItem')
-  render('SeccionColapsable')
+  await render('SeccionColapsable')
   act(() => host.querySelector('button').click())
   expect(host.querySelector('button').getAttribute('aria-expanded')).toBe('true')
   expect(spy).not.toHaveBeenCalled()
   spy.mockRestore()
 })
-test('Itaú contained slot has targeted larger sizing without changing other marks', () => {
+test('Itaú contained slot has targeted larger sizing without changing other marks', async () => {
   const source = readFileSync('gallery/financial-fixtures.js', 'utf8')
   expect(source).toContain("nombre === 'Itaú' && variante === 'horizontal' && contenida ? 'h-16'")
   expect(source).toContain("variante === 'compacto' ? 'h-12' : 'h-10'")
 })
 
-test('every curated mapping is auditable against actual JSX or documented composition', () => {
+test('every curated mapping is auditable against actual JSX or documented composition', async () => {
   const source = ['gallery/main.jsx', 'gallery/component-previews.jsx', 'gallery/shell-previews.jsx', 'gallery/operation-previews.jsx', 'gallery/document-previews.jsx', 'gallery/review-previews.jsx', 'gallery/receiving-previews.jsx', 'gallery/search-board-previews.jsx', 'gallery/specialized-previews.jsx'].map(path => readFileSync(path, 'utf8')).join('\n')
   const composed = {
     CountryPhoneSelect: readFileSync('src/components/PhoneField.jsx', 'utf8'),
@@ -87,7 +87,7 @@ test('every curated mapping is auditable against actual JSX or documented compos
   }
 })
 
-test('supplied financial originals preserve byte identities and provenance', () => {
+test('supplied financial originals preserve byte identities and provenance', async () => {
   const manifest = JSON.parse(readFileSync('docs/financial-assets-manifest.json', 'utf8'))
   for (const [file, digest, dimension] of [
     ['bancos/gnb-compacto.png', 'cf652c79268aeb719b033cd5ce84d26a57a0e45d31828a55913b4eaa9d262db6', 920],
