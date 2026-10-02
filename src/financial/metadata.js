@@ -17,6 +17,7 @@ export {
 export {
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
+  SOLUCIONES_PAGO_COMERCIOS,
   normalizarMarcaPago,
   logoDeMedioPago,
   coberturaMediosPago,

@@ -1,8 +1,15 @@
 import { readFileSync } from 'node:fs'
 import { init, parse } from 'es-module-lexer'
 import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from '../gallery/catalog.js'
-import { BANCO_DESTACADO, BANCOS_PREVIEW, MARCAS_CONECTADAS_PREVIEW, MARCAS_PAGO_PREVIEW } from '../gallery/financial-fixtures.js'
-import { logoDeBanco } from '../src/utils/bancos.js'
+import {
+  BANCO_DESTACADO,
+  BANCOS_PREVIEW,
+  MARCAS_CONECTADAS_PREVIEW,
+  MARCAS_PAGO_PREVIEW,
+  SOLUCIONES_PAGO_COMERCIOS_PREVIEW,
+} from '../gallery/financial-fixtures.js'
+import { BANCOS_PARAGUAY, logoDeBanco } from '../src/utils/bancos.js'
+import { BLOQUEOS_ASSETS_FINANCIEROS } from '../src/utils/financialAssets.js'
 import { logoDeMedioPago } from '../src/utils/mediosPago.js'
 import { relacionFinancieraDe } from '../src/utils/relacionesFinancieras.js'
 
@@ -61,8 +68,19 @@ const ordenCategoriasInvalido = categoriasPrioritarias.every((categoria, indice)
 
 const erroresFinancieros = []
 if (BANCO_DESTACADO !== 'ueno bank' || BANCOS_PREVIEW[0] !== BANCO_DESTACADO) erroresFinancieros.push('ueno bank debe liderar bancos-pagos')
+if (BANCOS_PREVIEW.length !== BANCOS_PARAGUAY.length || BANCOS_PARAGUAY.some((nombre) => !BANCOS_PREVIEW.includes(nombre))) {
+  erroresFinancieros.push('la revisión bancaria debe incluir las 24 instituciones del catálogo')
+}
 if (JSON.stringify(MARCAS_CONECTADAS_PREVIEW) !== JSON.stringify(['Mango', 'Vaquita', 'EKO', 'eCLUB', 'Pik'])) {
   erroresFinancieros.push('el orden de marcas conectadas debe ser Mango > Vaquita > EKO > eCLUB > Pik')
+}
+if (JSON.stringify(SOLUCIONES_PAGO_COMERCIOS_PREVIEW.marcas) !== JSON.stringify(['Bancard', 'Dinelco', 'upay', 'Pik'])) {
+  erroresFinancieros.push('el grupo funcional de comercios debe ser Bancard > Dinelco > upay > Pik')
+}
+for (const marca of SOLUCIONES_PAGO_COMERCIOS_PREVIEW.marcas) {
+  for (const variante of ['compacto', 'horizontal']) {
+    if (!logoDeMedioPago(marca, variante)?.visual?.empaquetado) erroresFinancieros.push(`pago:${marca}:${variante} falta en el grupo funcional`)
+  }
 }
 for (const marca of MARCAS_CONECTADAS_PREVIEW) {
   if (!relacionFinancieraDe(marca)) erroresFinancieros.push(`pago:${marca} no tiene relación financiera verificable`)
@@ -76,7 +94,8 @@ for (const [grupo, nombres, resolver] of [
     for (const variante of ['compacto', 'horizontal']) {
       const visual = resolver(nombre, variante)?.visual
       if (!visual?.empaquetado || !['archivo', 'horizontal-contained'].includes(visual.tipo)) {
-        erroresFinancieros.push(`${grupo}:${nombre}:${variante} no resuelve un asset oficial local`)
+        const bloqueo = BLOQUEOS_ASSETS_FINANCIEROS.some((item) => item.catalogo === grupo && item.id === nombre && (!item.variante || item.variante === variante))
+        if (grupo !== 'banco' || visual?.tipo !== 'texto' || !bloqueo) erroresFinancieros.push(`${grupo}:${nombre}:${variante} no resuelve un asset local ni un bloqueo explícito`)
       }
     }
   }

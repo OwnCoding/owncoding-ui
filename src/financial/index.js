@@ -16,6 +16,7 @@ import {
 import {
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
+  SOLUCIONES_PAGO_COMERCIOS,
   normalizarMarcaPago,
   sugerenciasDeMarcaPago,
 } from '../utils/mediosPago.js'
@@ -49,6 +50,7 @@ export {
   sugerenciasDeBanco,
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
+  SOLUCIONES_PAGO_COMERCIOS,
   normalizarMarcaPago,
   sugerenciasDeMarcaPago,
 }

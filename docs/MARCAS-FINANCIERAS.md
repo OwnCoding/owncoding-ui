@@ -9,8 +9,9 @@ obligar a `financial-metadata` o `utils` a importar imágenes.
 
 - `compacto`: símbolo, app icon o favicon oficial cuando existe;
 - `horizontal`: wordmark o lockup oficial;
-- si la fuente oficial no ofrece un símbolo separado, el logo completo se
-  contiene dentro de la caja cuadrada con `object-fit: contain`;
+- si la fuente oficial no ofrece un símbolo separado, se usa una aplicación
+  vertical auténtica dentro de la caja cuadrada o se declara la variante como
+  pendiente; nunca se reutiliza un wordmark horizontal como falso ícono;
 - nunca se recorta un wordmark para fabricar un símbolo ni se crea una letra
   que aparente ser el logo.
 
@@ -38,7 +39,10 @@ el **2026-10-01** para estas superficies:
 
 No se describe como licencia abierta ni como permiso universal para terceros.
 Cada archivo de [`financial-assets-manifest.json`](financial-assets-manifest.json)
-registra URL oficial exacta, fecha de recuperación, SHA-256 y alcance. Los SVG
+registra su clase de fuente, fecha de recuperación, SHA-256 y alcance. Las
+fuentes oficiales conservan la URL exacta; las referencias entregadas por el
+usuario se identifican explícitamente como `user-provided-reference` y nunca se
+presentan como procedencia oficial. Los SVG
 se rechazan si contienen scripts, handlers, `foreignObject`, entidades, imports
 o referencias externas; se permiten únicamente fragmentos internos y datos de
 imagen embebidos por el propio archivo oficial.
@@ -54,7 +58,33 @@ const uenoCompacto = obtenerAssetFinanciero('bancos/ueno-compacto.svg')
 ```
 
 `npm run financial-assets:check` verifica manifiesto, hashes, firmas de archivo,
-seguridad SVG, cobertura de variantes y ausencia de assets huérfanos.
+seguridad SVG, cobertura de variantes y ausencia de assets huérfanos. Para
+bancos y marcas de pago también controla proporción compacta/horizontal,
+resolución mínima, canvas transparente excesivo y reutilización accidental del
+mismo archivo en ambas variantes. Las limitaciones históricas de primera parte
+se declaran como excepciones específicas, sin debilitar la validación de assets
+nuevos.
+
+## Soluciones de aceptación para comercios
+
+`SOLUCIONES_PAGO_COMERCIOS` ofrece una agrupación funcional reutilizable, en
+orden estable: **Bancard**, **Dinelco**, **upay** y **Pik**. Sirve para comparar
+alternativas de aceptación, procesamiento y cobro sin afirmar propiedad ni
+afiliación entre las marcas.
+
+```js
+import { SOLUCIONES_PAGO_COMERCIOS } from 'owncoding-ui/financial-metadata'
+
+SOLUCIONES_PAGO_COMERCIOS.marcas
+// ['Bancard', 'Dinelco', 'upay', 'Pik']
+```
+
+Las relaciones corporativas siguen en `RELACIONES_FINANCIERAS`; por eso Pik
+mantiene por separado su relación verificada con Itaú. El compacto de Bancard
+usa la referencia cuadrada de alta resolución entregada por el usuario y se
+identifica como `user-provided-reference`; el manifiesto conserva el SHA-256 y
+las dimensiones de esa fuente 2500×2500 por separado del hash del derivado
+runtime 512×512. El horizontal conserva el asset de primera parte.
 
 ## Instituciones y marcas conectadas
 
@@ -97,7 +127,7 @@ y medios cuya fuente directa pudo verificarse. Estos IDs permanecen bloqueados
 en esta versión; se muestra su nombre, no una inicial que pueda confundirse con
 una marca:
 
-- banco: `Banco Continental` (`horizontal`), `Banco do Brasil`, `Banco GNB Paraguay`, `Citi`, `Universitaria`;
+- banco: `Banco Continental` (`horizontal`), `Banco do Brasil`, `Banco GNB Paraguay`, `Citi`, `Itaú` (`horizontal`), `San Cristóbal` (`compacto`), `Tu Financiera` (`horizontal`), `Universitaria`;
 - pago: `Visa`, `Mastercard`, `Pix`, `Red Infonet`, `Panal`;
 - producto: `uPOS` no tiene una marca independiente verificada; se conserva
   explícitamente como producto de `upay`.
@@ -115,6 +145,14 @@ restringido nunca se reemplaza con un mirror de terceros.
 - Sudameris usa el campo rojo `#FF0000` definido en su
   [guía oficial](https://www.sudameris.com.py/Descargar-arte-de-marca) para el
   lockup blanco; no se infiere un color desde otros productos.
+- Banco Atlas usa su lockup blanco sobre el campo rojo de marca y un símbolo
+  compacto genuino derivado del vector de primera parte.
+- Banco Nación usa el vector vigente, sin conceptos ocultos ni metadata de
+  Illustrator, sobre su superficie institucional; el compacto conserva el
+  isotipo vectorial.
+- BNF e Interfisa usan referencias visuales entregadas por el usuario, marcadas
+  como tales en el manifiesto. FPJ aplica su superficie azul para conservar el
+  contraste y Solar usa la aplicación vertical oficial en el espacio compacto.
 - Las URLs oficiales son `https://www.medalla.coop.py/`,
   `https://www.universitaria.coop/`, `https://tu.com.py/` y
   `https://www.zbanco.com.py/`.

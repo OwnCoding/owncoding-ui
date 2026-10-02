@@ -48,7 +48,13 @@ import {
   telefonoInternacionalValido,
 } from '../src/index.js'
 import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from './catalog.js'
-import { BANCO_DESTACADO, BANCOS_PREVIEW, MARCAS_CONECTADAS_PREVIEW, MARCAS_PAGO_RESTO_PREVIEW } from './financial-fixtures.js'
+import {
+  BANCO_DESTACADO,
+  BANCOS_PREVIEW,
+  MARCAS_CONECTADAS_PREVIEW,
+  MARCAS_PAGO_RESTO_PREVIEW,
+  SOLUCIONES_PAGO_COMERCIOS_PREVIEW,
+} from './financial-fixtures.js'
 
 const METRICAS_CATALOGO = Object.freeze({
   total: CATALOGO_EXPORTS.length,
@@ -104,6 +110,7 @@ const ETIQUETA_ESTADO_MARCA = Object.freeze({
   parcial: 'Parcial',
   fallback: 'Fallback neutral',
   'permiso-pendiente': 'Permiso pendiente',
+  'asset-bloqueado': 'Asset pendiente',
   'producto-padre': 'Marca padre',
   legado: 'Legado',
 })
@@ -136,6 +143,53 @@ function EtiquetaFixture({ children = 'Fixture local' }) {
   return <span className="fixture-label">{children}</span>
 }
 
+function VistaVarianteBanco({ nombre, variante }) {
+  const registro = logoDeBanco(nombre, variante)
+  const disponible = Boolean(registro?.visual?.empaquetado)
+  const etiqueta = variante === 'compacto' ? 'Logo compacto' : 'Logo horizontal'
+
+  return (
+    <div className={`bank-variant bank-variant--${variante}`}>
+      <span className="bank-variant__label">{etiqueta}</span>
+      <div
+        className="bank-variant__surface"
+        style={registro?.visual?.fondo ? { backgroundColor: registro.visual.fondo } : undefined}
+      >
+        {disponible ? (
+          <BancoLogo banco={nombre} variante={variante} alto={variante === 'compacto' ? 'h-12' : 'h-10'} />
+        ) : (
+          <span className="bank-variant__pending" role="status">Sin asset redistribuible</span>
+        )}
+      </div>
+      <span className={`bank-variant__state${disponible ? '' : ' bank-variant__state--pending'}`}>
+        {disponible ? 'Asset disponible' : etiquetaEstadoMarca(registro?.visual?.estado)}
+      </span>
+    </div>
+  )
+}
+
+function TarjetaBancoRevision({ nombre, seleccionado, onSelect }) {
+  const registro = logoDeBanco(nombre, 'horizontal')
+
+  return (
+    <article className="bank-review-card" aria-current={seleccionado ? 'true' : undefined}>
+      <header className="bank-review-card__header">
+        <div>
+          <h5>{nombre}</h5>
+          <p>{registro?.categoria || 'entidad financiera'} · {etiquetaEstadoMarca(registro?.estado)}</p>
+        </div>
+        <button type="button" aria-label={`Seleccionar ${nombre}`} onClick={() => onSelect(nombre)}>
+          {seleccionado ? 'Seleccionado' : 'Ver arriba'}
+        </button>
+      </header>
+      <div className="bank-review-card__variants">
+        <VistaVarianteBanco nombre={nombre} variante="compacto" />
+        <VistaVarianteBanco nombre={nombre} variante="horizontal" />
+      </div>
+    </article>
+  )
+}
+
 function VistaBancosPagos() {
   const [banco, setBanco] = useState(BANCO_DESTACADO)
   const registro = logoDeBanco(banco, 'horizontal')
@@ -146,7 +200,7 @@ function VistaBancosPagos() {
         <div className="preview-panel__heading">
           <div>
             <p className="preview-kicker">Selección bancaria</p>
-            <h4 id="preview-banco-titulo">ueno bank primero, logos auténticos para elegir</h4>
+            <h4 id="preview-banco-titulo">Todos los bancos, con logo compacto y horizontal</h4>
           </div>
           <Badge color={tonoEstadoMarca(registro?.estado)}>{etiquetaEstadoMarca(registro?.estado)}</Badge>
         </div>
@@ -159,23 +213,6 @@ function VistaBancosPagos() {
           placeholder="Buscar por nombre o alias"
           logoProps={{ decorativo: true }}
         />
-
-        <p className="bank-picker__label" id="gallery-bancos-rapidos">Bancos frecuentes</p>
-        <ul className="bank-picker" aria-labelledby="gallery-bancos-rapidos">
-          {BANCOS_PREVIEW.map((nombre) => (
-            <li key={nombre}>
-              <button
-                type="button"
-                aria-label={`Seleccionar ${nombre}`}
-                aria-pressed={banco === nombre}
-                onClick={() => setBanco(nombre)}
-              >
-                <BancoLogo banco={nombre} variante="compacto" alto="h-8" decorativo />
-                <span>{nombre}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
 
         <div className="brand-selection" aria-live="polite">
           <div className="brand-selection__compact" aria-label={`Variante compacta de ${banco}`}>
@@ -190,6 +227,19 @@ function VistaBancosPagos() {
         <p className="preview-note">
           Assets locales obtenidos de fuentes oficiales, con procedencia y hash auditables. Las marcas bloqueadas nunca se recrean.
         </p>
+
+        <div className="bank-review-heading">
+          <div>
+            <p className="bank-picker__label" id="gallery-bancos-todos">Revisión completa · {BANCOS_PREVIEW.length} instituciones</p>
+            <p>ueno bank aparece primero; el resto conserva el orden canónico del catálogo.</p>
+          </div>
+          <span>Compacto + horizontal</span>
+        </div>
+        <div className="bank-review-grid" aria-labelledby="gallery-bancos-todos">
+          {BANCOS_PREVIEW.map((nombre) => (
+            <TarjetaBancoRevision key={nombre} nombre={nombre} seleccionado={banco === nombre} onSelect={setBanco} />
+          ))}
+        </div>
       </section>
 
       <section className="preview-panel" aria-labelledby="preview-pagos-titulo">
@@ -200,6 +250,35 @@ function VistaBancosPagos() {
           </div>
           <EtiquetaFixture>Assets autorizados</EtiquetaFixture>
         </div>
+        <section className="payment-peer-group" aria-labelledby="gallery-soluciones-comercios">
+          <div className="payment-peer-group__heading">
+            <div>
+              <p className="bank-picker__label" id="gallery-soluciones-comercios">{SOLUCIONES_PAGO_COMERCIOS_PREVIEW.titulo}</p>
+              <p>{SOLUCIONES_PAGO_COMERCIOS_PREVIEW.descripcion}</p>
+            </div>
+            <span>Alternativas funcionales</span>
+          </div>
+          <ul className="payment-peer-grid" aria-labelledby="gallery-soluciones-comercios">
+            {SOLUCIONES_PAGO_COMERCIOS_PREVIEW.marcas.map((marca) => {
+              const marcaRegistro = logoDeMedioPago(marca, 'horizontal')
+              return (
+                <li key={marca}>
+                  <strong>{marca}</strong>
+                  <div className="payment-peer-grid__logos">
+                    <span className="payment-peer-grid__compact" aria-label={`Logo compacto de ${marca}`}>
+                      <MedioPagoLogo marca={marca} variante="compacto" alto="h-11" decorativo />
+                    </span>
+                    <span className="payment-peer-grid__horizontal" aria-label={`Logo horizontal de ${marca}`}>
+                      <MedioPagoLogo marca={marca} variante="horizontal" alto="h-7" decorativo />
+                    </span>
+                  </div>
+                  <span className="payment-grid__status">{etiquetaEstadoMarca(marcaRegistro?.estado)}</span>
+                </li>
+              )
+            })}
+          </ul>
+          <p className="preview-note">Grupo funcional de soluciones para comercios. Pik mantiene, por separado, su relación corporativa verificada con Itaú.</p>
+        </section>
         <p className="bank-picker__label" id="gallery-marcas-conectadas">Apps conectadas a instituciones</p>
         <ul className="connected-brand-grid" aria-labelledby="gallery-marcas-conectadas">
           {MARCAS_CONECTADAS_PREVIEW.map((marca) => {

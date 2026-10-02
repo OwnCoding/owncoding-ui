@@ -56,8 +56,12 @@
   "files": [
     "dist",
     "src",
+    "!src/**/* 2.*",
+    "!src/**/* 3.*",
     "types",
     "docs",
+    "!docs/**/* 2.*",
+    "!docs/**/* 3.*",
     "!docs/qa",
     "CHANGELOG.md",
     "tailwind-preset.js",

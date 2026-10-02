@@ -1,14 +1,33 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "generatedAt": "2026-10-01",
   "authorizationStatement": "User-provided written authorization for the public dariodeoli/owncoding-ui repository and Own UI / OwnCoding website/gallery. This is not described as an open license or universal grant.",
   "assets": [
     {
-      "id": "bancos-atlas-horizontal-negro",
-      "file": "bancos/atlas-horizontal-negro.svg",
-      "sourceUrl": "https://www.bancoatlas.com.py/img/logoNegro-letraBlanca.svg",
+      "id": "bancos-atlas-compacto",
+      "file": "bancos/atlas-compacto.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bancoatlas.com.py/img/logoBlanco-letraBlanca.svg",
       "retrievedAt": "2026-10-01",
-      "sha256": "59a76d6ca0210068549faaf1febcf5bc9e332d7be6afe29625cf72c4950de1bc",
+      "transformation": "Cropped to the genuine compact symbol without redrawing.",
+      "sha256": "4c29ee2a2d311c7b054823547467c6e9e7071f7cf4456c84417831f9bb07b776",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-atlas-horizontal-blanco",
+      "file": "bancos/atlas-horizontal-blanco.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bancoatlas.com.py/img/logoBlanco-letraBlanca.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "6a4daed4628201c0d8558c2aedfc494824d46014308db70d8cb83f4deb7ff6ed",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -22,9 +41,11 @@
     {
       "id": "bancos-bancop-compacto",
       "file": "bancos/bancop-compacto.png",
-      "sourceUrl": "https://www.bancop.com.py/images/favicon-32x32.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bancop.com.py/images/apple-touch-icon.png",
       "retrievedAt": "2026-10-01",
-      "sha256": "d2565de3ee03efe9a2d43d7755324b90169c1bf3807bcfc3c61e8c225b31852b",
+      "transformation": "Replaced the 32px favicon with the first-party 180px touch icon.",
+      "sha256": "f735e105d710bf4d753acdc63782ca6a17c10bcd9bc20c123772c02027d10154",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -38,6 +59,7 @@
     {
       "id": "bancos-bancop-horizontal",
       "file": "bancos/bancop-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bancop.com.py/images/logo.png",
       "retrievedAt": "2026-10-01",
       "sha256": "302928c3475014c39324a543ec82893270a3f2112fa6fbff012a3da3213e53fc",
@@ -54,6 +76,7 @@
     {
       "id": "bancos-basa-compacto",
       "file": "bancos/basa-compacto.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bancobasa.com.py/themes/default/assets/images/logo-min.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "4411aa74e0e4ab257f8127948b1f21b0ef7f8c18adb96ce74635ea1d5805c1e1",
@@ -70,6 +93,7 @@
     {
       "id": "bancos-basa-horizontal",
       "file": "bancos/basa-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bancobasa.com.py/themes/default/assets/images/logo-basa.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "ace264e7547acb347009a62b69964b817f5baf7fef57f63d3156586244a2f2ec",
@@ -85,10 +109,12 @@
     },
     {
       "id": "bancos-bna-compacto",
-      "file": "bancos/bna-compacto.ico",
-      "sourceUrl": "https://www.bna.com.ar/Images/ico/favicon.ico",
+      "file": "bancos/bna-compacto.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.bna.com.ar/Images/Logo___BNA.svg",
       "retrievedAt": "2026-10-01",
-      "sha256": "121bd6e510ed627acc907915ce9bdcbb4243e142efb4d6708d2c80498d2df394",
+      "transformation": "Cropped from the current first-party vector and stripped of hidden Illustrator metadata.",
+      "sha256": "56a7262809942722366c2b12c36717d618913a7ebba10e6abcec40e8c722a99b",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -102,9 +128,29 @@
     {
       "id": "bancos-bna-horizontal",
       "file": "bancos/bna-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bna.com.ar/Images/Logo___BNA.svg",
       "retrievedAt": "2026-10-01",
-      "sha256": "f4f77a47e5e547d30633e2bf413ecdd6f4a6b8dbaa19bccfd0ffbf0b5b78e183",
+      "transformation": "Removed hidden Illustrator concepts and metadata while preserving visible paths.",
+      "sha256": "a0e2a5d13887a8771ce3de326ea0adf4f293ed09ad1f2836ec397532bbab6c35",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "bancos-bnf-compacto",
+      "file": "bancos/bnf-compacto.png",
+      "sourceKind": "user-provided-reference",
+      "sourceRef": "codex-clipboard-4d9b30c5-bnf.png",
+      "retrievedAt": "2026-10-01",
+      "transformation": "Lossless crop of the supplied BNF symbol; no upscaling.",
+      "sha256": "a8b817a247550783edffa8800d64c695987167a42beb0871979b5b9406dbacea",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -118,9 +164,10 @@
     {
       "id": "bancos-bnf-horizontal",
       "file": "bancos/bnf-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bnf.gov.py/bnf/web/assets/images/bnf-logo.svg",
       "retrievedAt": "2026-10-01",
-      "sha256": "e7eab6e96f0436878909d932f7abc8c8fb98ed460d698424f1ffd271e2c41fe6",
+      "sha256": "545884fe24dd33a3c3bec2b61a336eac7d2641cb174bda6a6746c08931868386",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -129,11 +176,18 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
+      },
+      "sourceIdentity": {
+        "sha256": "e7eab6e96f0436878909d932f7abc8c8fb98ed460d698424f1ffd271e2c41fe6",
+        "pixelWidth": 1917,
+        "pixelHeight": 833
+      },
+      "transformation": "Extracted the official gold-and-white horizontal lockup from the primary embedded image in the first-party SVG, trimmed transparent canvas, and downsampled to a 512 x 167 runtime payload; alpha preserved and no upscaling."
     },
     {
       "id": "bancos-continental-compacto",
       "file": "bancos/continental-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bancontinental.com.py/assets/images/logos/favicon.png",
       "retrievedAt": "2026-10-01",
       "sha256": "85f220cb291da25059a9dd92e01431537befe5ca1972047dbc8283797031c1ab",
@@ -150,6 +204,7 @@
     {
       "id": "bancos-coomecipar-compacto",
       "file": "bancos/coomecipar-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.coomecipar.coop.py/images/favicon3.png",
       "retrievedAt": "2026-10-01",
       "sha256": "9ee9dac1b98445f182e7e43555136c9792894c2afc29fa7ef087454aaa69acd3",
@@ -166,6 +221,7 @@
     {
       "id": "bancos-coomecipar-horizontal",
       "file": "bancos/coomecipar-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.coomecipar.coop.py/storage/logo-light.png",
       "retrievedAt": "2026-10-01",
       "sha256": "f98712863c445756590af0752de95d0ff1dea62b209c3ecce304f44bd5b3cb50",
@@ -182,9 +238,11 @@
     {
       "id": "bancos-familiar-compacto",
       "file": "bancos/familiar-compacto.png",
-      "sourceUrl": "https://cdn.prod.website-files.com/67dc13c0080579f362360a31/6848260a9a3271ea233d6d8c_favicon.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://cdn.prod.website-files.com/67dc13c0080579f362360a31/684825c9b34e0047c7e0e2ef_webclip.png",
       "retrievedAt": "2026-10-01",
-      "sha256": "101c699228c9f265c8eb3ec22617e9e21fec6e02c134d3d129f03a371ecb3706",
+      "transformation": "Replaced the 32px favicon with the first-party 256px webclip.",
+      "sha256": "00e0827fb53c2f73a671195496da56adcfc9a50313aec2d6479ebea8ddb5bcdc",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -198,6 +256,7 @@
     {
       "id": "bancos-familiar-horizontal",
       "file": "bancos/familiar-horizontal.webp",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://cdn.prod.website-files.com/67dc13c0080579f362360a31/67dec80c5bd12b62877afc69_LOGO%20BANCO%20FAMILIAR%20-%20FULL%20COLOR%201.webp",
       "retrievedAt": "2026-10-01",
       "sha256": "50ce89718b045e424cde9d4e0184d738a35b482efc22d200bbb5907345b80b48",
@@ -214,6 +273,7 @@
     {
       "id": "bancos-fic-compacto",
       "file": "bancos/fic-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://fic.com.py/wp-content/uploads/2025/06/cropped-FIC-LOGO-FINANCIERA-FIC-696X280-px_PNG-4-scaled-1-192x192.png",
       "retrievedAt": "2026-10-01",
       "sha256": "4227435f559d1df1d79027528ef6419e9fbd0f363ddd50994dd22ad6279be8d3",
@@ -230,9 +290,11 @@
     {
       "id": "bancos-fic-horizontal",
       "file": "bancos/fic-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://fic.com.py/wp-content/uploads/2025/06/FIC-LOGO-FINANCIERA-FIC-696X280-px_PNG-1-scaled.png",
       "retrievedAt": "2026-10-01",
-      "sha256": "9fc7e21e2ac975d75fbb7ec93389b82503147ad81f401e224790efe02c513b81",
+      "transformation": "Cropped excessive transparent canvas and downscaled to a 512x337 runtime derivative; never upscaled.",
+      "sha256": "a13e18acf1a2ad04d56e4d38326f9fc306cee10b1076a0f377419aec2bb8e4af",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -246,6 +308,7 @@
     {
       "id": "bancos-finlatina-compacto",
       "file": "bancos/finlatina-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.finlatina.com.py/assets/logo/logoVentana.png",
       "retrievedAt": "2026-10-01",
       "sha256": "fa5cfa596c43c280faad8e3f88add8a724c21aaeb91e7b1c284e0a24b0d675ac",
@@ -262,6 +325,7 @@
     {
       "id": "bancos-finlatina-horizontal",
       "file": "bancos/finlatina-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.finlatina.com.py/assets/logo/logo.png",
       "retrievedAt": "2026-10-01",
       "sha256": "822f75bd84aabb1abbf00ec09aec99a77dae007c496107e5be26a6dec4a3f513",
@@ -278,6 +342,7 @@
     {
       "id": "bancos-fpj-compacto",
       "file": "bancos/fpj-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.fpj.com.py/img/fpj-logo-movile.png",
       "retrievedAt": "2026-10-01",
       "sha256": "597f7ac1dc3286ae0199a85ee1d9e496cfed642e8ce350e47f1035a85138bdc4",
@@ -294,6 +359,7 @@
     {
       "id": "bancos-fpj-horizontal",
       "file": "bancos/fpj-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.fpj.com.py/fpj-logo.png",
       "retrievedAt": "2026-10-01",
       "sha256": "532e7dea208f8c26165eabb28cfc3fb4c1c9d02aa99940571c20a2c281d1f7bf",
@@ -308,11 +374,12 @@
       }
     },
     {
-      "id": "bancos-interfisa-horizontal",
-      "file": "bancos/interfisa-horizontal.png",
-      "sourceUrl": "https://www.interfisa.com.py/themes/default/assets/images/logo.png",
+      "id": "bancos-interfisa-compacto",
+      "file": "bancos/interfisa-compacto.png",
+      "sourceKind": "user-provided-reference",
+      "sourceRef": "codex-clipboard-84d4a10a-interfisa-compact.png",
       "retrievedAt": "2026-10-01",
-      "sha256": "1b8c624cbb64df9896bac750a973ff5917eee98dde6906a189a6f3df273b4d40",
+      "sha256": "fb358b1081409b53f1116ff6700d593375ed03337ef580160d891a092334a371",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -321,11 +388,41 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceIdentity": {
+        "sha256": "c0fca01059d7fbad948a442a0eac0b23d674100eb5b60c07fafa40079910e2a8",
+        "pixelWidth": 512,
+        "pixelHeight": 512
+      },
+      "transformation": "Downscaled from the supplied 512x512 source to a 256x256 runtime derivative; no redrawing or upscaling."
+    },
+    {
+      "id": "bancos-interfisa-horizontal",
+      "file": "bancos/interfisa-horizontal.png",
+      "sourceKind": "user-provided-reference",
+      "sourceRef": "codex-clipboard-82d78535-interfisa-stacked.png",
+      "retrievedAt": "2026-10-01",
+      "transformation": "Cropped surrounding whitespace from the supplied source and downscaled to a 320x185 runtime derivative; no redrawing or upscaling.",
+      "sha256": "840a2b5abe79d1064ab0438fd22d49fbb36c6d893a7e9b5e5ae45302ab6e1dd1",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceIdentity": {
+        "sha256": "688b9f8717415241c243c3a8a00e487c10e9bf98614a9eabf683692d09cffeb9",
+        "pixelWidth": 447,
+        "pixelHeight": 447
       }
     },
     {
       "id": "bancos-itau-compacto",
       "file": "bancos/itau-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.itau.com.py/images/favicon/android-icon-192x192.png",
       "retrievedAt": "2026-10-01",
       "sha256": "f32533a0f8b7a71be92db579429fb88d348151814d15c89add044e075459f67c",
@@ -340,24 +437,9 @@
       }
     },
     {
-      "id": "bancos-itau-horizontal",
-      "file": "bancos/itau-horizontal.png",
-      "sourceUrl": "https://www.itau.com.py/images/logo_itau.png",
-      "retrievedAt": "2026-10-01",
-      "sha256": "6cf09c0b922bad5fb64518bd5454f0e869df9827ebee48885e7e921403eac036",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
       "id": "bancos-medalla-compacto",
       "file": "bancos/medalla-compacto.webp",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.medalla.coop.py/wp-content/uploads/favicon-1.webp",
       "retrievedAt": "2026-10-01",
       "sha256": "de66f21e35ece741a87927bae70747792c442a4c8358707be05114cefd5b79ee",
@@ -374,6 +456,7 @@
     {
       "id": "bancos-medalla-horizontal",
       "file": "bancos/medalla-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.medalla.coop.py/wp-content/uploads/medalla-trans.png",
       "retrievedAt": "2026-10-01",
       "sha256": "e8eaa62a8b229dbf108238140b5fd396f206ab42db77fd0ca57e30d8133fa5fb",
@@ -388,24 +471,9 @@
       }
     },
     {
-      "id": "bancos-san-cristobal-compacto",
-      "file": "bancos/san-cristobal-compacto.ico",
-      "sourceUrl": "https://www.sancristobal.coop.py/templates/tx_finance/favicon.ico",
-      "retrievedAt": "2026-10-01",
-      "sha256": "ca789cb280739076f113c0d0711e8905abd028ca0e8e33b12365ee881a28667f",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
       "id": "bancos-san-cristobal-horizontal",
       "file": "bancos/san-cristobal-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.sancristobal.coop.py/images/logo1.png",
       "retrievedAt": "2026-10-01",
       "sha256": "4de863118aff9f037b86f0541d8fcb30b99b128b831489b543ba0ecefbd79478",
@@ -420,8 +488,27 @@
       }
     },
     {
+      "id": "bancos-solar-compacto",
+      "file": "bancos/solar-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://api.solar.com.py/media/original_images/solar_logo_principal_ver_rgb.png",
+      "retrievedAt": "2026-10-01",
+      "transformation": "Trimmed the first-party vertical application and downscaled to a 512x276 runtime derivative; never upscaled.",
+      "sha256": "40eb8264be636a03ee9206d46abcac54dc2d6c76d71ef2eeecff4855f4cb6d8a",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
       "id": "bancos-solar-horizontal",
       "file": "bancos/solar-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://solar.com.py/_next/static/media/solar_logo.590cac10.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "779cf4c07f9b019e057989dec50cd0c7d1bb1175b0e46aa2bce1afc4ca98aa88",
@@ -437,12 +524,12 @@
     },
     {
       "id": "bancos-sudameris-compacto",
-      "file": "bancos/sudameris-compacto.png",
-      "sourceUrl": "https://www.sudameris.com.py/themes/sudameris/assets/images/favicon.png",
-      "brandGuideUrl": "https://www.sudameris.com.py/Descargar-arte-de-marca",
-      "brandFieldColor": "#FF0000",
+      "file": "bancos/sudameris-compacto.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.sudameris.com.py/themes/sudameris/assets/sudameris/images/logo-sudameris.svg",
       "retrievedAt": "2026-10-01",
-      "sha256": "bd346f6d50f1246cbe24e795ae82300951ec78838be79648a10df9f9307940c2",
+      "transformation": "Cropped to the genuine compact S from the first-party vector.",
+      "sha256": "c9b7f61a7ee765c13ba1d5bdfa63efb149dbf406f4dae6632f3be09cce39743e",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -456,9 +543,8 @@
     {
       "id": "bancos-sudameris-horizontal",
       "file": "bancos/sudameris-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.sudameris.com.py/themes/sudameris/assets/sudameris/images/logo-sudameris.svg",
-      "brandGuideUrl": "https://www.sudameris.com.py/Descargar-arte-de-marca",
-      "brandFieldColor": "#FF0000",
       "retrievedAt": "2026-10-01",
       "sha256": "11dbe174a816ecff14532c9d6e7d7b14633ea95a4d7e7e54e892bada4ed71f34",
       "authorization": {
@@ -472,10 +558,12 @@
       }
     },
     {
-      "id": "bancos-tu-financiera-horizontal",
-      "file": "bancos/tu-financiera-horizontal.svg",
+      "id": "bancos-tu-financiera-compacto",
+      "file": "bancos/tu-financiera-compacto.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://tu.com.py/wp-content/uploads/2025/02/logo_tufi.svg",
       "retrievedAt": "2026-10-01",
+      "transformation": "Retained as the published vertical compact mark; not mislabeled as a horizontal lockup.",
       "sha256": "81b071006b70566c5233df076a44589585ca8c05f0e76e4a595bcd8441e4dafb",
       "authorization": {
         "basis": "User-provided written authorization",
@@ -490,6 +578,7 @@
     {
       "id": "bancos-ueno-compacto",
       "file": "bancos/ueno-compacto.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.ueno.com.py/wp-content/uploads/2024/08/App-Icon.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "7c4192237fc114c1e8688c4c19f6c428173d580aa2cdb1e3b04613cf718efec9",
@@ -506,6 +595,7 @@
     {
       "id": "bancos-ueno-horizontal",
       "file": "bancos/ueno-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.ueno.com.py/wp-content/uploads/2026/02/logo-ueno-bank.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "68ce499ed273ace6075006690089c32c6b51fd2e307c9b20229234252d5aa86b",
@@ -522,6 +612,7 @@
     {
       "id": "bancos-zeta-compacto",
       "file": "bancos/zeta-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.zbanco.com.py/logo192.png",
       "retrievedAt": "2026-10-01",
       "sha256": "b507ca2b8f4d3fc902a7ac6ae59d38e75a4da90c05d54179277f2d9051e20b3e",
@@ -538,9 +629,11 @@
     {
       "id": "bancos-zeta-horizontal",
       "file": "bancos/zeta-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.zbanco.com.py/static/media/brand-primary.5f81cd4a02d2d2092696.png",
       "retrievedAt": "2026-10-01",
-      "sha256": "e66af41f57ee4fc4033172111261ced4e52bddea8ab057854155166beeb42e3d",
+      "transformation": "Lossless crop of excessive transparent canvas; no upscaling.",
+      "sha256": "d8a13d31ec7d2198779966f8405f82b3acd8051054c46d5abc261d626de8f0db",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -554,6 +647,7 @@
     {
       "id": "pagos-amex-compacto",
       "file": "pagos/amex-compacto.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.8.0/package/dist/img/logos/dls-logo-bluebox-solid.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "43a52b84b4905e69e8ba4e7d86d92aa80d9c0912355bcc0238466177f8b7717f",
@@ -570,6 +664,7 @@
     {
       "id": "pagos-amex-horizontal",
       "file": "pagos/amex-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.8.0/package/dist/img/logos/dls-logo-stack.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "5b67bce7893fcbe8360c0c840c54607185f0025482efba7221b878a474c019d1",
@@ -586,9 +681,9 @@
     {
       "id": "pagos-bancard-compacto",
       "file": "pagos/bancard-compacto.png",
-      "sourceUrl": "https://www.bancard.com.py/themes/default/assets/images/apple-touch-icon-144x144-precomposed.png",
+      "sourceKind": "user-provided-reference",
       "retrievedAt": "2026-10-01",
-      "sha256": "bc3a3e8ed47066e767010e7ec053e2985f210c3a57ac02390d95f4681b8f4c3d",
+      "sha256": "32ef3cdce8798c3143c2d06dc72dee8cac95b2a16c8d39625a0ac8faad1fba5f",
       "authorization": {
         "basis": "User-provided written authorization",
         "confirmedAt": "2026-10-01",
@@ -597,11 +692,19 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      },
+      "sourceRef": "codex-clipboard-3d5d5ba4-bancard-compact.png",
+      "transformation": "Downscaled from the supplied 2500x2500 source to a 512x512 runtime derivative; alpha and rounded corners preserved, with no redrawing or upscaling.",
+      "sourceIdentity": {
+        "sha256": "809a55d06848da60375d11634c9ac6189c807bcd704c74dd9fc64d1fb932a7b6",
+        "pixelWidth": 2500,
+        "pixelHeight": 2500
       }
     },
     {
       "id": "pagos-bancard-horizontal",
       "file": "pagos/bancard-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.bancard.com.py/storage/app/media/bancard-logotipo.png",
       "retrievedAt": "2026-10-01",
       "sha256": "19975900383d461ebc65bb03843ba8d528ac5212a4d54af361a07a19c8dd50bf",
@@ -618,6 +721,7 @@
     {
       "id": "pagos-cabal-horizontal",
       "file": "pagos/cabal-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.cabal.coop/cabal-logo.png",
       "retrievedAt": "2026-10-01",
       "sha256": "3f6e2545eead330f445817faa68fbb806a18ff4fc0ee5062e8f80d6f61b41e9c",
@@ -634,6 +738,7 @@
     {
       "id": "pagos-dinelco-compacto",
       "file": "pagos/dinelco-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.dinelco.com.py/assets_front/img/favicon/apple-touch-icon.png",
       "retrievedAt": "2026-10-01",
       "sha256": "bf81976daade6f40494ec0445e20fbee29115313e12790a86c679604e41a5e5f",
@@ -650,6 +755,7 @@
     {
       "id": "pagos-dinelco-horizontal",
       "file": "pagos/dinelco-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.dinelco.com.py/assets_front/img/logo.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "6c3b8b18579e6375722df1fdbb60a03220a55f098c8a54f325cbf36e33339d68",
@@ -664,8 +770,111 @@
       }
     },
     {
+      "id": "pagos-eclub-compacto",
+      "file": "pagos/eclub-compacto.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://eclub.com.py/wp-content/uploads/2022/05/eclub-favicon.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "521a928fff91aa0fd789f42210cd5a624daf52421c934afc071b225921fdc7bc",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-eclub-horizontal",
+      "file": "pagos/eclub-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://eclub.com.py/wp-content/uploads/2022/05/eclub-logo-en-color.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "317e954089a80baf2ab2430c204b7efd090821e769cceb32617e308dedb059d4",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-eko-compacto",
+      "file": "pagos/eko-compacto.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.eko.com.py/src/img/logos/logo-eko.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "ec4cef6663d5597b44c4f81eced1bdeb5a03e4500a8707720ea62c5be6088587",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-eko-horizontal",
+      "file": "pagos/eko-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.eko.com.py/src/img/logos/eko.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "c7a5b71f1ae1068fffe9f39f4073574eaa96ba7c8cd9aa0d3746e81e0ba63d44",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-mango-compacto",
+      "file": "pagos/mango-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://mangoapp.com.py/src/img/favicon.ico?13-01-2022",
+      "retrievedAt": "2026-10-01",
+      "sha256": "2e41e28bd2e8e2f80b017b087eb9263416f91e6389d55ca73a728e52bbbeb75d",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-mango-horizontal",
+      "file": "pagos/mango-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://mangoapp.com.py/src/img/mango-main-logo.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "43f2e45f30cba5f4f61712f30181bc043836687df193f723d51d4b9cb63469f6",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
       "id": "pagos-pagopar-horizontal",
       "file": "pagos/pagopar-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://upay.com.py/wp-content/uploads/sites/4/2026/08/LogosPagoparNew.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "8903a9f990381b21a10ffa1b4d05f5136a2948db39b9e068795fa0d3f23babc9",
@@ -682,6 +891,7 @@
     {
       "id": "pagos-paypro-horizontal",
       "file": "pagos/paypro-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.procard.com.py/procard_institucional/wp-content/uploads/logo-paypro-2.png",
       "retrievedAt": "2026-10-01",
       "sha256": "5a2cf4bfc4d28eb5d250550afa85261788adbb2c7800fb727c914d829a4fe8c8",
@@ -698,6 +908,7 @@
     {
       "id": "pagos-personal-pay-compacto",
       "file": "pagos/personal-pay-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.personalpay.com.py/images/android-icon-192x192.png",
       "retrievedAt": "2026-10-01",
       "sha256": "3d9096356b76a8ec065b50b379ad84bd9972211d369aa0846058999a9bbec18e",
@@ -714,6 +925,7 @@
     {
       "id": "pagos-personal-pay-horizontal",
       "file": "pagos/personal-pay-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.personalpay.com.py/#nuevo-logo-personal-pay-navbar_svg__Capa_1",
       "retrievedAt": "2026-10-01",
       "sha256": "939a9fe100c29732de9dd110c7202157b09b611e9a324b2184fa5b896f689e75",
@@ -725,12 +937,46 @@
           "Own UI / OwnCoding website and gallery"
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      },
-      "sourceExtraction": "Exact inline SVG geometry from element #nuevo-logo-personal-pay-navbar_svg__Capa_1"
+      }
+    },
+    {
+      "id": "pagos-pik-compacto",
+      "file": "pagos/pik-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.pik.com.py/assets_front/img/favicon/apple-touch-icon.png",
+      "retrievedAt": "2026-10-01",
+      "sha256": "ed6cb38392a9caeff2e43f9a18da298858ec56b8570d3a0a1e586874e7c00760",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-pik-horizontal",
+      "file": "pagos/pik-horizontal.svg",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://www.pik.com.py/assets_front/img/logo.svg",
+      "retrievedAt": "2026-10-01",
+      "sha256": "7ca6cff1b1a8fc8bc704d4ccc4739b316859f17509c30097f57b3bacf94a719c",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
     },
     {
       "id": "pagos-procard-compacto",
       "file": "pagos/procard-compacto.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.procard.com.py/procard_institucional/wp-content/uploads/2017/07/favicon-1.png",
       "retrievedAt": "2026-10-01",
       "sha256": "805ae77df70ce7e93369d64e0c1d621e9f28bb32ae6f3c7a17fa13e6b62a3382",
@@ -747,6 +993,7 @@
     {
       "id": "pagos-procard-horizontal",
       "file": "pagos/procard-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.procard.com.py/procard_institucional/wp-content/uploads/2017/02/logo_prd.png",
       "retrievedAt": "2026-10-01",
       "sha256": "bd0def95f33e175ed7d64bad967e62a0316ffb4ea6f4909188b96531a8ab6881",
@@ -763,6 +1010,7 @@
     {
       "id": "pagos-upay-compacto",
       "file": "pagos/upay-compacto.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://upay.com.py/wp-content/uploads/sites/4/2025/11/new-favicon-upay.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "3d0a0abc7099db2c2a072ffbf4fcbe95d7f1b177e8eb7d642c7d7b9da236d663",
@@ -779,6 +1027,7 @@
     {
       "id": "pagos-upay-horizontal",
       "file": "pagos/upay-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://upay.com.py/wp-content/uploads/sites/4/2025/11/new-logo-upay.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "beae5351ae9f194e7549a0a5ac460922f4e97c52df3ffef68e849753862346c7",
@@ -793,8 +1042,43 @@
       }
     },
     {
+      "id": "pagos-vaquita-compacto",
+      "file": "pagos/vaquita-compacto.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://vaquita.com.py/img2/isotipo/icon-app.png",
+      "retrievedAt": "2026-10-01",
+      "sha256": "a2c9c700328c677d32bee4bdc827402e8ee09df02139286d791f15cbd24d30da",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
+      "id": "pagos-vaquita-horizontal",
+      "file": "pagos/vaquita-horizontal.png",
+      "sourceKind": "official-first-party",
+      "sourceUrl": "https://vaquita.com.py/img2/logotipo/logo-yellow.png",
+      "retrievedAt": "2026-10-01",
+      "sha256": "9ef001513dd1edb3d2dae43d287de3874e0e0b939c493773c5db6cf52d0a4ce0",
+      "authorization": {
+        "basis": "User-provided written authorization",
+        "confirmedAt": "2026-10-01",
+        "scope": [
+          "Public GitHub repository dariodeoli/owncoding-ui",
+          "Own UI / OwnCoding website and gallery"
+        ],
+        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
+      }
+    },
+    {
       "id": "pagos-wally-compacto",
       "file": "pagos/wally-compacto.ico",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.wally.com.py/favicon.ico",
       "retrievedAt": "2026-10-01",
       "sha256": "f06b7b7a7a97913fc0635c149218bd3ff01a99489c967783719c89b4b6e80bf9",
@@ -811,6 +1095,7 @@
     {
       "id": "pagos-wally-horizontal",
       "file": "pagos/wally-horizontal.svg",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.wally.com.py/images/logo.svg",
       "retrievedAt": "2026-10-01",
       "sha256": "44e39a79362de44f3412d33ea2befd02db72dc1cf93fd5f6cbb206cdfd8aa797",
@@ -827,6 +1112,7 @@
     {
       "id": "pagos-zimple-compacto",
       "file": "pagos/zimple-compacto.ico",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.zimple.com.py/img/favicon.ico",
       "retrievedAt": "2026-10-01",
       "sha256": "0711db9e336695bbc890235371a69db9f0aa8a73c2001618e549d727d9aa5806",
@@ -843,6 +1129,7 @@
     {
       "id": "pagos-zimple-horizontal",
       "file": "pagos/zimple-horizontal.png",
+      "sourceKind": "official-first-party",
       "sourceUrl": "https://www.zimple.com.py/img/logo-zimple.png",
       "retrievedAt": "2026-10-01",
       "sha256": "294b06d2ce91ed5d8f4776eee23cd72ef6c3536707b4f1144013b00eafeb98fb",
@@ -855,180 +1142,6 @@
         ],
         "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
       }
-    },
-    {
-      "id": "pagos-mango-compacto",
-      "file": "pagos/mango-compacto.png",
-      "sourceUrl": "https://mangoapp.com.py/src/img/favicon.ico?13-01-2022",
-      "retrievedAt": "2026-10-01",
-      "sha256": "2e41e28bd2e8e2f80b017b087eb9263416f91e6389d55ca73a728e52bbbeb75d",
-      "relationshipEvidenceUrl": "https://mangoapp.com.py/terms-and-conditions/",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-mango-horizontal",
-      "file": "pagos/mango-horizontal.svg",
-      "sourceUrl": "https://mangoapp.com.py/src/img/mango-main-logo.svg",
-      "retrievedAt": "2026-10-01",
-      "sha256": "43f2e45f30cba5f4f61712f30181bc043836687df193f723d51d4b9cb63469f6",
-      "relationshipEvidenceUrl": "https://mangoapp.com.py/terms-and-conditions/",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-vaquita-compacto",
-      "file": "pagos/vaquita-compacto.png",
-      "sourceUrl": "https://vaquita.com.py/img2/isotipo/icon-app.png",
-      "retrievedAt": "2026-10-01",
-      "sha256": "a2c9c700328c677d32bee4bdc827402e8ee09df02139286d791f15cbd24d30da",
-      "relationshipEvidenceUrl": "https://www.vaquita.com.py/terminosycondiciones/",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-vaquita-horizontal",
-      "file": "pagos/vaquita-horizontal.png",
-      "sourceUrl": "https://vaquita.com.py/img2/logotipo/logo-yellow.png",
-      "retrievedAt": "2026-10-01",
-      "sha256": "9ef001513dd1edb3d2dae43d287de3874e0e0b939c493773c5db6cf52d0a4ce0",
-      "relationshipEvidenceUrl": "https://www.vaquita.com.py/terminosycondiciones/",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-eko-compacto",
-      "file": "pagos/eko-compacto.svg",
-      "sourceUrl": "https://www.eko.com.py/src/img/logos/logo-eko.svg",
-      "retrievedAt": "2026-10-01",
-      "sha256": "ec4cef6663d5597b44c4f81eced1bdeb5a03e4500a8707720ea62c5be6088587",
-      "relationshipEvidenceUrl": "https://www.eko.com.py/src/pdf/byc-billetera-eko.pdf",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      },
-      "sourceSha256": "5c178756e3854e020a80f534803b2da5b971069d5c36088314d6a2c5011a490e",
-      "sanitization": "Removed XML declaration and generator comment; preserved viewBox, colors and geometry."
-    },
-    {
-      "id": "pagos-eko-horizontal",
-      "file": "pagos/eko-horizontal.svg",
-      "sourceUrl": "https://www.eko.com.py/src/img/logos/eko.svg",
-      "retrievedAt": "2026-10-01",
-      "sha256": "c7a5b71f1ae1068fffe9f39f4073574eaa96ba7c8cd9aa0d3746e81e0ba63d44",
-      "relationshipEvidenceUrl": "https://www.eko.com.py/src/pdf/byc-billetera-eko.pdf",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-eclub-compacto",
-      "file": "pagos/eclub-compacto.svg",
-      "sourceUrl": "https://eclub.com.py/wp-content/uploads/2022/05/eclub-favicon.svg",
-      "retrievedAt": "2026-10-01",
-      "sha256": "521a928fff91aa0fd789f42210cd5a624daf52421c934afc071b225921fdc7bc",
-      "relationshipEvidenceUrl": "https://eclub.com.py/",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-eclub-horizontal",
-      "file": "pagos/eclub-horizontal.svg",
-      "sourceUrl": "https://eclub.com.py/wp-content/uploads/2022/05/eclub-logo-en-color.svg",
-      "retrievedAt": "2026-10-01",
-      "sha256": "317e954089a80baf2ab2430c204b7efd090821e769cceb32617e308dedb059d4",
-      "relationshipEvidenceUrl": "https://eclub.com.py/",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-pik-compacto",
-      "file": "pagos/pik-compacto.png",
-      "sourceUrl": "https://www.pik.com.py/assets_front/img/favicon/apple-touch-icon.png",
-      "retrievedAt": "2026-10-01",
-      "sha256": "ed6cb38392a9caeff2e43f9a18da298858ec56b8570d3a0a1e586874e7c00760",
-      "relationshipEvidenceUrl": "https://www.pik.com.py/bases-y-condiciones-reintegros",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      }
-    },
-    {
-      "id": "pagos-pik-horizontal",
-      "file": "pagos/pik-horizontal.svg",
-      "sourceUrl": "https://www.pik.com.py/assets_front/img/logo.svg",
-      "retrievedAt": "2026-10-01",
-      "sha256": "7ca6cff1b1a8fc8bc704d4ccc4739b316859f17509c30097f57b3bacf94a719c",
-      "relationshipEvidenceUrl": "https://www.pik.com.py/bases-y-condiciones-reintegros",
-      "authorization": {
-        "basis": "User-provided written authorization",
-        "confirmedAt": "2026-10-01",
-        "scope": [
-          "Public GitHub repository dariodeoli/owncoding-ui",
-          "Own UI / OwnCoding website and gallery"
-        ],
-        "note": "Project-surface authorization; not represented as an open license or universal redistribution grant."
-      },
-      "sourceSha256": "5f02e3bd7a6693030cdb27d5b02b777e57303c9b215d5f2b88a51499c3772fe9",
-      "sanitization": "Added viewBox 0 0 83 40 from the official width/height; preserved colors and geometry."
     }
   ],
   "blockers": [
@@ -1055,18 +1168,36 @@
     },
     {
       "catalog": "bank",
+      "id": "Itaú",
+      "variant": "horizontal",
+      "reason": "The first-party site only publishes a square app mark; it is not relabeled as a horizontal logo."
+    },
+    {
+      "catalog": "bank",
+      "id": "San Cristóbal",
+      "variant": "compacto",
+      "reason": "The only direct first-party compact asset is 16px; it is not upscaled or presented as production quality."
+    },
+    {
+      "catalog": "bank",
+      "id": "Tu Financiera",
+      "variant": "horizontal",
+      "reason": "The first-party site only publishes a vertical mark; it is not mislabeled as a horizontal logo."
+    },
+    {
+      "catalog": "bank",
       "id": "Universitaria",
       "reason": "Official site returned HTTP 403; no direct owner-issued asset was verified."
     },
     {
       "catalog": "payment",
-      "id": "Visa",
-      "reason": "Official merchant artwork requires gated brand-asset access; no exact downloadable file was obtained."
+      "id": "Mastercard",
+      "reason": "Official brand artwork endpoint blocked automated retrieval; no exact downloadable file was obtained."
     },
     {
       "catalog": "payment",
-      "id": "Mastercard",
-      "reason": "Official brand artwork endpoint blocked automated retrieval; no exact downloadable file was obtained."
+      "id": "Panal",
+      "reason": "No current owner-issued direct artwork was verified from an official product surface."
     },
     {
       "catalog": "payment",
@@ -1086,8 +1217,8 @@
     },
     {
       "catalog": "payment",
-      "id": "Panal",
-      "reason": "No current owner-issued direct artwork was verified from an official product surface."
+      "id": "Visa",
+      "reason": "Official merchant artwork requires gated brand-asset access; no exact downloadable file was obtained."
     }
   ]
 }

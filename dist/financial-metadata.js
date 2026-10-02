@@ -11,6 +11,9 @@ var BLOQUEOS_ASSETS_FINANCIEROS = Object.freeze([
   { catalogo: "banco", id: "Banco do Brasil", motivo: "sitio-oficial-bloquea-descarga" },
   { catalogo: "banco", id: "Banco GNB Paraguay", motivo: "sitio-oficial-http-403" },
   { catalogo: "banco", id: "Citi", motivo: "sin-asset-paraguay-verificado" },
+  { catalogo: "banco", id: "Ita\xFA", variante: "horizontal", motivo: "variante-horizontal-oficial-no-publicada" },
+  { catalogo: "banco", id: "San Crist\xF3bal", variante: "compacto", motivo: "asset-oficial-solo-16px" },
+  { catalogo: "banco", id: "Tu Financiera", variante: "horizontal", motivo: "fuente-oficial-solo-publica-version-vertical" },
   { catalogo: "banco", id: "Universitaria", motivo: "sitio-oficial-http-403" },
   { catalogo: "pago", id: "Visa", motivo: "kit-oficial-requiere-acceso" },
   { catalogo: "pago", id: "Mastercard", motivo: "endpoint-oficial-bloqueado" },
@@ -143,7 +146,6 @@ var COOPERATIVAS_PARAGUAY = [
 ];
 var BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY];
 var EMPAQUETADO = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion });
-var CONTENIDO = (archivo, estado = "oficial", presentacion = {}) => ({ ...EMPAQUETADO(archivo, estado, presentacion), tipo: "horizontal-contained" });
 var MONOGRAMA = (estado = "fallback") => ({ tipo: "monograma", estado });
 var TEXTO = (estado = "fallback") => ({ tipo: "texto", estado });
 function variantesFallback(estado = "fallback") {
@@ -173,12 +175,15 @@ var LOGOS_BANCOS = {
     categoria: "banco",
     alias: ["atlas"],
     monograma: "BA",
-    color: "#174A7E",
-    archivo: "atlas-horizontal-negro.svg",
+    color: "#B20933",
+    archivo: "atlas-horizontal-blanco.svg",
     fuenteOficial: "https://www.bancoatlas.com.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("atlas-horizontal-negro.svg"), horizontal: EMPAQUETADO("atlas-horizontal-negro.svg") }
+    variantes: {
+      compacto: EMPAQUETADO("atlas-compacto.svg", "oficial", { fondo: "#B20933", padding: true }),
+      horizontal: EMPAQUETADO("atlas-horizontal-blanco.svg", "oficial", { fondo: "#B20933", padding: true })
+    }
   }),
   "Banco Basa": entrada({
     categoria: "banco",
@@ -199,17 +204,20 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.bancontinental.com.py/",
     estado: "parcial",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("continental-compacto.png"), horizontal: TEXTO("parcial") }
+    variantes: { compacto: EMPAQUETADO("continental-compacto.png"), horizontal: TEXTO("asset-bloqueado") }
   }),
   "Banco de la Naci\xF3n Argentina": entrada({
     categoria: "banco",
     alias: ["banco nacion", "banco naci\xF3n", "bna"],
     monograma: "BNA",
-    color: "#005F5B",
+    color: "#007894",
     fuenteOficial: "https://www.bna.com.ar/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("bna-compacto.ico"), horizontal: EMPAQUETADO("bna-horizontal.svg") }
+    variantes: {
+      compacto: EMPAQUETADO("bna-compacto.svg", "oficial", { fondo: "#007894", padding: true }),
+      horizontal: EMPAQUETADO("bna-horizontal.svg", "oficial", { fondo: "#007894", padding: true })
+    }
   }),
   "Banco do Brasil": entrada({
     categoria: "banco",
@@ -250,18 +258,18 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.interfisa.com.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("interfisa-horizontal.png"), horizontal: EMPAQUETADO("interfisa-horizontal.png") }
+    variantes: { compacto: EMPAQUETADO("interfisa-compacto.png"), horizontal: EMPAQUETADO("interfisa-horizontal.png") }
   }),
   "Ita\xFA": entrada({
     categoria: "banco",
     alias: ["itau", "banco itau", "itau paraguay", "banco ita\xFA paraguay"],
     monograma: "I",
     color: "#EC7000",
-    archivo: "itau-horizontal.png",
+    archivo: "itau-compacto.png",
     fuenteOficial: "https://www.itau.com.py/",
-    estado: "verificado",
+    estado: "parcial",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("itau-compacto.png"), horizontal: EMPAQUETADO("itau-horizontal.png") }
+    variantes: { compacto: EMPAQUETADO("itau-compacto.png"), horizontal: TEXTO("asset-bloqueado") }
   }),
   "Banco Nacional de Fomento": entrada({
     categoria: "banco",
@@ -272,7 +280,7 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.bnf.gov.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("bnf-horizontal.svg"), horizontal: EMPAQUETADO("bnf-horizontal.svg") }
+    variantes: { compacto: EMPAQUETADO("bnf-compacto.png"), horizontal: EMPAQUETADO("bnf-horizontal.svg", "oficial", { fondo: "#0B1F3A", padding: true }) }
   }),
   "Sudameris": entrada({
     categoria: "banco",
@@ -284,7 +292,7 @@ var LOGOS_BANCOS = {
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
     variantes: {
-      compacto: EMPAQUETADO("sudameris-compacto.png", "oficial", { fondo: "#FF0000", padding: true }),
+      compacto: EMPAQUETADO("sudameris-compacto.svg", "oficial", { fondo: "#FF0000", padding: true }),
       horizontal: EMPAQUETADO("sudameris-horizontal.svg", "oficial", { fondo: "#FF0000", padding: true })
     }
   }),
@@ -327,7 +335,10 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.fpj.com.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("fpj-compacto.png"), horizontal: EMPAQUETADO("fpj-horizontal.png") }
+    variantes: {
+      compacto: EMPAQUETADO("fpj-compacto.png", "oficial", { fondo: "#0066A4", padding: true }),
+      horizontal: EMPAQUETADO("fpj-horizontal.png", "oficial", { fondo: "#0066A4", padding: true })
+    }
   }),
   "Finlatina": entrada({
     categoria: "financiera",
@@ -349,18 +360,18 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://solar.com.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("solar-horizontal.svg"), horizontal: EMPAQUETADO("solar-horizontal.svg") }
+    variantes: { compacto: EMPAQUETADO("solar-compacto.png"), horizontal: EMPAQUETADO("solar-horizontal.svg") }
   }),
   "Tu Financiera": entrada({
     categoria: "financiera",
     alias: ["tu financiera"],
     monograma: "TF",
     color: "#314255",
-    archivo: "tu-financiera-horizontal.svg",
+    archivo: "tu-financiera-compacto.svg",
     fuenteOficial: "https://tu.com.py/",
-    estado: "verificado",
+    estado: "parcial",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO("tu-financiera-horizontal.svg"), horizontal: EMPAQUETADO("tu-financiera-horizontal.svg") }
+    variantes: { compacto: EMPAQUETADO("tu-financiera-compacto.svg"), horizontal: TEXTO("asset-bloqueado") }
   }),
   "ueno bank": entrada({
     categoria: "banco",
@@ -393,7 +404,10 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.coomecipar.coop.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("coomecipar-compacto.png"), horizontal: EMPAQUETADO("coomecipar-horizontal.png") }
+    variantes: {
+      compacto: EMPAQUETADO("coomecipar-compacto.png"),
+      horizontal: EMPAQUETADO("coomecipar-horizontal.png", "oficial", { fondo: "#092959", padding: true })
+    }
   }),
   "Medalla Milagrosa": entrada({
     categoria: "cooperativa",
@@ -411,9 +425,12 @@ var LOGOS_BANCOS = {
     monograma: "SC",
     color: "#167A54",
     fuenteOficial: "https://www.sancristobal.coop.py/",
-    estado: "verificado",
+    estado: "parcial",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("san-cristobal-compacto.ico"), horizontal: EMPAQUETADO("san-cristobal-horizontal.png") }
+    variantes: {
+      compacto: TEXTO("asset-bloqueado"),
+      horizontal: EMPAQUETADO("san-cristobal-horizontal.png", "oficial", { fondo: "#5FAD3E", padding: true })
+    }
   }),
   "Universitaria": entrada({
     categoria: "cooperativa",
@@ -537,7 +554,7 @@ function sugerenciasDeBanco(texto, catalogo = BANCOS_PARAGUAY) {
 
 // src/utils/mediosPago.js
 var EMPAQUETADO2 = (archivo, estado = "oficial", presentacion = {}) => ({ tipo: "archivo", archivo, estado, empaquetado: `pagos/${archivo}`, ...presentacion });
-var CONTENIDO2 = (archivo, estado = "oficial", presentacion = {}) => ({ ...EMPAQUETADO2(archivo, estado, presentacion), tipo: "horizontal-contained" });
+var CONTENIDO = (archivo, estado = "oficial", presentacion = {}) => ({ ...EMPAQUETADO2(archivo, estado, presentacion), tipo: "horizontal-contained" });
 var MONOGRAMA2 = (estado = "fallback") => ({ tipo: "monograma", estado });
 var TEXTO2 = (estado = "fallback") => ({ tipo: "texto", estado });
 var FALLBACK = (estado = "fallback") => ({ compacto: MONOGRAMA2(estado), horizontal: TEXTO2(estado) });
@@ -596,7 +613,7 @@ var MARCAS_MEDIOS_PAGO = {
     fuenteOficial: "https://www.bancard.com.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO2("bancard-compacto.png", "oficial", { fondo: "#F8FAFC", padding: true }), horizontal: EMPAQUETADO2("bancard-horizontal.png", "oficial", { fondo: "#F8FAFC", padding: true }) }
+    variantes: { compacto: EMPAQUETADO2("bancard-compacto.png"), horizontal: EMPAQUETADO2("bancard-horizontal.png", "oficial", { fondo: "#F8FAFC", padding: true }) }
   }),
   "Red Infonet": entrada2({
     categoria: "red-procesamiento",
@@ -657,7 +674,7 @@ var MARCAS_MEDIOS_PAGO = {
     estado: "verificado",
     marcaPadre: "upay",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO2("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }), horizontal: EMPAQUETADO2("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }) }
+    variantes: { compacto: CONTENIDO("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }), horizontal: EMPAQUETADO2("pagopar-horizontal.svg", "oficial", { fondo: "#0A507B", padding: true }) }
   }),
   Procard: entrada2({
     categoria: "procesador",
@@ -678,7 +695,7 @@ var MARCAS_MEDIOS_PAGO = {
     fuenteOficial: "https://www.procard.com.py/procard_institucional/paypro/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO2("paypro-horizontal.png"), horizontal: EMPAQUETADO2("paypro-horizontal.png") }
+    variantes: { compacto: CONTENIDO("paypro-horizontal.png"), horizontal: EMPAQUETADO2("paypro-horizontal.png") }
   }),
   Wally: entrada2({
     categoria: "billetera",
@@ -771,7 +788,7 @@ var MARCAS_MEDIOS_PAGO = {
     fuenteOficial: "https://www.cabal.coop/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: CONTENIDO2("cabal-horizontal.png"), horizontal: EMPAQUETADO2("cabal-horizontal.png") }
+    variantes: { compacto: CONTENIDO("cabal-horizontal.png"), horizontal: EMPAQUETADO2("cabal-horizontal.png") }
   }),
   Panal: entrada2({
     categoria: "red-tarjeta",
@@ -782,6 +799,12 @@ var MARCAS_MEDIOS_PAGO = {
     variantes: { compacto: TEXTO2("asset-bloqueado"), horizontal: TEXTO2("asset-bloqueado") }
   })
 };
+var SOLUCIONES_PAGO_COMERCIOS = Object.freeze({
+  id: "soluciones-pago-comercios",
+  titulo: "Aceptaci\xF3n y pagos para comercios",
+  descripcion: "Procesamiento, adquirencia y cobros digitales para operaciones comerciales.",
+  marcas: Object.freeze(["Bancard", "Dinelco", "upay", "Pik"])
+});
 var MEDIOS_PAGO_CON_MARCA = Object.keys(MARCAS_MEDIOS_PAGO).filter((nombre) => !MARCAS_MEDIOS_PAGO[nombre].redirigeA);
 function normalizarMarcaPago(texto) {
   return String(texto || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -879,6 +902,7 @@ export {
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
   RELACIONES_FINANCIERAS,
+  SOLUCIONES_PAGO_COMERCIOS,
   buscarRelacionesFinancieras,
   coberturaBancos,
   coberturaMediosPago,

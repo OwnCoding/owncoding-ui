@@ -2,7 +2,12 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { BANCO_DESTACADO, BANCOS_PREVIEW, MARCAS_PAGO_PREVIEW } from '../gallery/financial-fixtures.js'
+import {
+  BANCO_DESTACADO,
+  BANCOS_PREVIEW,
+  MARCAS_PAGO_PREVIEW,
+  SOLUCIONES_PAGO_COMERCIOS_PREVIEW,
+} from '../gallery/financial-fixtures.js'
 import {
   ASSET_KEYS_FINANCIEROS,
   BLOQUEOS_ASSETS_FINANCIEROS,
@@ -11,6 +16,7 @@ import {
   COOPERATIVAS_PARAGUAY,
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
+  SOLUCIONES_PAGO_COMERCIOS,
   BancoLogo,
   MedioPagoLogo,
   coberturaBancos,
@@ -30,21 +36,26 @@ function htmlLogo(Componente, prop, nombre, variante) {
 }
 
 describe('catálogo de instituciones financieras', () => {
-  test('la muestra prioritaria destaca ueno y usa imágenes auténticas locales', () => {
+  test('la revisión completa destaca ueno y muestra assets auténticos o bloqueos explícitos', () => {
     expect(BANCO_DESTACADO).toBe('ueno bank')
     expect(BANCOS_PREVIEW[0]).toBe(BANCO_DESTACADO)
-    expect(BANCOS_PREVIEW.length).toBeGreaterThanOrEqual(15)
+    expect(BANCOS_PREVIEW).toHaveLength(BANCOS_PARAGUAY.length)
 
     for (const nombre of BANCOS_PREVIEW) {
       expect(BANCOS_PARAGUAY).toContain(nombre)
       for (const variante of ['compacto', 'horizontal']) {
         const registro = logoDeBanco(nombre, variante)
-        expect(registro).toMatchObject({ banco: nombre, redistribucion: { permitida: true } })
-        expect(registro.visual.asset).toMatch(/^(?:data:image\/|\/src\/assets\/financial\/)/)
+        expect(registro).toMatchObject({ banco: nombre })
         const html = htmlLogo(BancoLogo, 'banco', nombre, variante)
-        expect(html).toContain('<img')
-        expect(html).toMatch(/src="(?:data:image\/|\/src\/assets\/financial\/)/)
-        expect(html).not.toMatch(/src="https?:/)
+        if (registro.visual.empaquetado) {
+          expect(registro).toMatchObject({ redistribucion: { permitida: true } })
+          expect(registro.visual.asset).toMatch(/^(?:data:image\/|\/src\/assets\/financial\/)/)
+          expect(html).toContain('<img')
+          expect(html).toMatch(/src="(?:data:image\/|\/src\/assets\/financial\/)/)
+          expect(html).not.toMatch(/src="https?:/)
+        } else {
+          expect(registro.visual).toMatchObject({ tipo: 'texto', estado: 'asset-bloqueado' })
+        }
         expect(html).not.toContain('data-logo-tipo="monograma"')
       }
     }
@@ -66,6 +77,26 @@ describe('catálogo de instituciones financieras', () => {
     expect(sugerenciasDeBanco('Banco Itaú Paraguay')).toEqual(['Itaú'])
   })
 
+  test('los logos claros conservan pintura y superficies de contraste explícitas', async () => {
+    const { LOGOS_BANCOS } = await import('../src/utils/bancos.js')
+    expect(LOGOS_BANCOS.Sudameris.variantes).toMatchObject({
+      compacto: { fondo: '#FF0000', padding: true },
+      horizontal: { fondo: '#FF0000', padding: true },
+    })
+    expect(LOGOS_BANCOS['Banco Nacional de Fomento'].variantes.horizontal).toMatchObject({ fondo: '#0B1F3A', padding: true })
+    expect(LOGOS_BANCOS.Coomecipar.variantes.horizontal).toMatchObject({ fondo: '#092959', padding: true })
+    expect(LOGOS_BANCOS['San Cristóbal'].variantes.horizontal).toMatchObject({ fondo: '#5FAD3E', padding: true })
+
+    const sudamerisCompacto = readFileSync(join(process.cwd(), 'src/assets/financial/bancos/sudameris-compacto.svg'), 'utf8')
+    expect(sudamerisCompacto).toMatch(/<path\s+fill="#FFFFFE"/)
+
+    const css = readFileSync(join(process.cwd(), 'gallery/styles.css'), 'utf8')
+    const superficie = css.match(/\.bank-variant__surface\s*\{([\s\S]*?)\n\}/)?.[1]
+    expect(superficie).toContain('background: #fff')
+    expect(superficie).toContain('color: #1f2937')
+    expect(superficie).not.toContain('var(--c-ink)')
+  })
+
   test('cada entidad conocida usa un asset oficial o un bloqueo textual explícito, nunca iniciales', () => {
     const bloqueados = new Set(BLOQUEOS_ASSETS_FINANCIEROS.filter((item) => item.catalogo === 'banco').map((item) => item.id))
     for (const entrada of coberturaBancos()) {
@@ -84,6 +115,58 @@ describe('catálogo de instituciones financieras', () => {
 })
 
 describe('marcas y productos de pago', () => {
+  test('agrupa alternativas funcionales para comercios sin mezclar relaciones corporativas', () => {
+    expect(SOLUCIONES_PAGO_COMERCIOS).toMatchObject({
+      id: 'soluciones-pago-comercios',
+      titulo: 'Aceptación y pagos para comercios',
+      marcas: ['Bancard', 'Dinelco', 'upay', 'Pik'],
+    })
+    expect(SOLUCIONES_PAGO_COMERCIOS_PREVIEW).toBe(SOLUCIONES_PAGO_COMERCIOS)
+
+    for (const nombre of SOLUCIONES_PAGO_COMERCIOS.marcas) {
+      const compacto = logoDeMedioPago(nombre, 'compacto')
+      const horizontal = logoDeMedioPago(nombre, 'horizontal')
+      expect(compacto.visual).toMatchObject({ tipo: 'archivo', estado: 'oficial' })
+      expect(horizontal.visual).toMatchObject({ tipo: 'archivo', estado: 'oficial' })
+      expect(compacto.visual.empaquetado).not.toBe(horizontal.visual.empaquetado)
+      expect(htmlLogo(MedioPagoLogo, 'marca', nombre, 'compacto')).toContain('<img')
+      expect(htmlLogo(MedioPagoLogo, 'marca', nombre, 'horizontal')).toContain('<img')
+    }
+
+    expect(logoDeMedioPago('Pik')).toMatchObject({
+      relacionFinanciera: expect.objectContaining({ financialProvider: 'Itaú' }),
+    })
+  })
+
+  test('Bancard usa el compacto de alta resolución sin doble fondo ni padding', () => {
+    expect(MARCAS_MEDIOS_PAGO.Bancard.variantes.compacto).toMatchObject({
+      archivo: 'bancard-compacto.png',
+      empaquetado: 'pagos/bancard-compacto.png',
+    })
+    expect(MARCAS_MEDIOS_PAGO.Bancard.variantes.compacto).not.toHaveProperty('fondo')
+    expect(MARCAS_MEDIOS_PAGO.Bancard.variantes.compacto).not.toHaveProperty('padding')
+    expect(MARCAS_MEDIOS_PAGO.Bancard.variantes.horizontal).toMatchObject({ fondo: '#F8FAFC', padding: true })
+
+    const manifestAsset = manifest.assets.find((asset) => asset.file === 'pagos/bancard-compacto.png')
+    expect(manifestAsset).toMatchObject({
+      sourceKind: 'user-provided-reference',
+      sourceRef: 'codex-clipboard-3d5d5ba4-bancard-compact.png',
+      sourceIdentity: {
+        sha256: '809a55d06848da60375d11634c9ac6189c807bcd704c74dd9fc64d1fb932a7b6',
+        pixelWidth: 2500,
+        pixelHeight: 2500,
+      },
+      sha256: '32ef3cdce8798c3143c2d06dc72dee8cac95b2a16c8d39625a0ac8faad1fba5f',
+    })
+
+    const runtimeAsset = readFileSync(join(process.cwd(), 'src/assets/financial/pagos/bancard-compacto.png'))
+    expect([runtimeAsset.readUInt32BE(16), runtimeAsset.readUInt32BE(20)]).toEqual([512, 512])
+
+    const html = htmlLogo(MedioPagoLogo, 'marca', 'Bancard', 'compacto')
+    expect(html).not.toContain('background-color')
+    expect(html).not.toContain('p-1.5')
+  })
+
   test('Pagopar está activo bajo upay y uPOS no inventa una marca independiente', () => {
     expect(MEDIOS_PAGO_CON_MARCA).toContain('Pagopar')
     expect(MARCAS_MEDIOS_PAGO.Pagopar).toMatchObject({ categoria: 'producto', marcaPadre: 'upay', estado: 'verificado' })
@@ -122,7 +205,7 @@ describe('marcas y productos de pago', () => {
 describe('manifest y bundles financieros', () => {
   test('el API visual coincide con el manifest autorizado y cada archivo tiene una variante', () => {
     expect([...ASSET_KEYS_FINANCIEROS].sort()).toEqual(manifest.assets.map((asset) => asset.file).sort())
-    expect(manifest.assets).toHaveLength(63)
+    expect(manifest.assets).toHaveLength(65)
     const referencias = new Set([
       ...coberturaBancos().flatMap(variantesEmpaquetadas),
       ...coberturaMediosPago().flatMap(variantesEmpaquetadas),

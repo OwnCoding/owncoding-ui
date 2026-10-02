@@ -50,7 +50,7 @@ export default function LogoFinanciero({
   const etiqueta = registro.banco || registro.marca || nombre
   const semantica = decorativo
     ? { 'aria-hidden': true }
-    : { role: 'img', 'aria-label': etiqueta }
+    : { role: 'img', 'aria-label': `${etiqueta}, logo ${compacto ? 'compacto' : 'horizontal'}` }
 
   const marcaPersonalizada = registro.marca && marcas[registro.marca]
   if (marcaPersonalizada) {
@@ -73,8 +73,8 @@ export default function LogoFinanciero({
         {...semantica}
         className={cn(
           'inline-flex items-center',
-          compacto && 'aspect-square shrink-0 justify-center overflow-hidden rounded-[5px]',
-          visual.fondo && visual.padding && 'rounded-md p-1',
+          compacto && 'aspect-square shrink-0 justify-center rounded-[5px]',
+          visual.fondo && visual.padding && 'rounded-md p-1.5',
           alto,
           className,
         )}
@@ -91,7 +91,7 @@ export default function LogoFinanciero({
           onError={() => setAssetFallido(fuente)}
           className={cn(
             'object-contain',
-            compacto ? 'h-full w-full' : 'h-full w-auto max-w-[8rem]',
+            compacto ? 'h-full w-full' : 'h-full w-auto max-w-[11rem]',
             registro.chip && 'rounded-[4px] bg-white px-1 py-[1px]',
           )}
         />

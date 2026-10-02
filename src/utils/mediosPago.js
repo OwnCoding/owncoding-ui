@@ -53,7 +53,7 @@ export const MARCAS_MEDIOS_PAGO = {
   Bancard: entrada({
     categoria: 'procesador', monograma: 'B', color: '#0068B3', fuenteOficial: 'https://www.bancard.com.py/',
     estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO('bancard-compacto.png', 'oficial', { fondo: '#F8FAFC', padding: true }), horizontal: EMPAQUETADO('bancard-horizontal.png', 'oficial', { fondo: '#F8FAFC', padding: true }) },
+    variantes: { compacto: EMPAQUETADO('bancard-compacto.png'), horizontal: EMPAQUETADO('bancard-horizontal.png', 'oficial', { fondo: '#F8FAFC', padding: true }) },
   }),
   'Red Infonet': entrada({
     categoria: 'red-procesamiento', alias: ['infonet'], monograma: 'RI', color: '#263C8F',
@@ -152,6 +152,15 @@ export const MARCAS_MEDIOS_PAGO = {
     estado: 'asset-bloqueado', variantes: { compacto: TEXTO('asset-bloqueado'), horizontal: TEXTO('asset-bloqueado') },
   }),
 }
+
+// Agrupación funcional para experiencias de selección e integración comercial.
+// No expresa propiedad, afiliación corporativa ni reemplaza relaciones verificadas.
+export const SOLUCIONES_PAGO_COMERCIOS = Object.freeze({
+  id: 'soluciones-pago-comercios',
+  titulo: 'Aceptación y pagos para comercios',
+  descripcion: 'Procesamiento, adquirencia y cobros digitales para operaciones comerciales.',
+  marcas: Object.freeze(['Bancard', 'Dinelco', 'upay', 'Pik']),
+})
 
 export const MEDIOS_PAGO_CON_MARCA = Object.keys(MARCAS_MEDIOS_PAGO).filter((nombre) => !MARCAS_MEDIOS_PAGO[nombre].redirigeA)
 

@@ -14,6 +14,8 @@ describe('seguridad del catálogo financiero', () => {
 
   test('el auditor acepta SVG pasivo y rechaza XML malformado y contenido activo', () => {
     expect(auditSvg('safe.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path d="M0 0h1v1z"/></svg>')).toEqual([])
+    expect(auditSvg('blank.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" fill="none"><path d="M0 0h1v1z"/></svg>')).toContain('blank.svg: SVG sin pintura visible')
+    expect(auditSvg('white.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" fill="none"><path fill="#fff" d="M0 0h1v1z"/></svg>')).toEqual([])
     expect(auditSvg('broken.svg', '<svg viewBox="0 0 1 1"><g></svg>')).toContain('broken.svg: XML/SVG malformado')
     expect(auditSvg('smil.svg', '<svg viewBox="0 0 1 1"><set attributeName="href" to="https://example.com/x"/></svg>')).toContain('smil.svg: elemento activo SVG no permitido')
   })

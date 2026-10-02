@@ -28,9 +28,14 @@ for (const [archivo, limite] of Object.entries(budgets)) {
 
 if (fallo) process.exitCode = 1
 
-const [{ size, unpackedSize, entryCount }] = JSON.parse(
+const [{ size, unpackedSize, entryCount, files }] = JSON.parse(
   execNpmSync(['pack', '--dry-run', '--json', '--ignore-scripts'], { encoding: 'utf8' }),
 )
+const duplicateArtifacts = files.filter(({ path }) => / \d+\.[^/]+$/.test(path))
+if (duplicateArtifacts.length) {
+  console.error(`npm package contiene ${duplicateArtifacts.length} copias locales numeradas`)
+  process.exitCode = 1
+}
 const paquete = { packed: size, unpacked: unpackedSize }
 // v0.60.1 incorpora el catálogo financiero oficial tanto en `src` como en los
 // bundles publicables. El margen sigue acotado y los presupuestos ejecutables

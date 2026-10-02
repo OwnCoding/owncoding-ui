@@ -13,6 +13,37 @@ const ACTIVE_LOCAL_NAMES = new Set([
   'animatetransform',
   'discard',
 ])
+const DRAWABLE_LOCAL_NAMES = new Set([
+  'circle',
+  'ellipse',
+  'image',
+  'line',
+  'path',
+  'polygon',
+  'polyline',
+  'rect',
+  'text',
+  'use',
+])
+
+function declaredPaint(element, property) {
+  if (element.hasAttribute(property)) return element.getAttribute(property)
+  const declaration = element.getAttribute('style')?.match(new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*([^;]+)`, 'i'))
+  return declaration?.[1]
+}
+
+function effectivePaint(element, property) {
+  for (let current = element; current; current = current.parentElement) {
+    const declared = declaredPaint(current, property)
+    if (declared !== undefined) return declared.trim().toLowerCase()
+  }
+  return property === 'fill' ? 'black' : 'none'
+}
+
+function hasVisiblePaint(element) {
+  const visible = (paint) => paint !== 'none' && paint !== 'transparent'
+  return visible(effectivePaint(element, 'fill')) || visible(effectivePaint(element, 'stroke'))
+}
 
 // CSS escapes may hide active tokens (`@im\70ort`, `u\72l(...)`). Decode the
 // lexical form before applying policy checks; this does not mutate the asset.
@@ -64,6 +95,10 @@ export function auditSvg(file, source, depth = 0) {
   const cssNormalized = decodeCssEscapes(text)
   if (CSS_IMPORT.test(cssNormalized)) errors.push(`${file}: CSS @import no permitido`)
   if (XML_STYLESHEET.test(text)) errors.push(`${file}: stylesheet XML no permitido`)
+  const drawable = elements.filter((element) => DRAWABLE_LOCAL_NAMES.has(element.localName.toLowerCase()))
+  if (!root.querySelector('style') && drawable.length > 0 && !drawable.some(hasVisiblePaint)) {
+    errors.push(`${file}: SVG sin pintura visible`)
+  }
 
   for (const attribute of elements.flatMap((element) => [...element.attributes])) {
     if (attribute.localName.toLowerCase() !== 'href') continue

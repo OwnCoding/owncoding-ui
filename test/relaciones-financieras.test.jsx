@@ -112,7 +112,7 @@ describe('fallback accesible de marcas conocidas', () => {
     await act(async () => { imagen.dispatchEvent(new Event('error')) })
     const fallback = contenedor.querySelector('[data-logo-tipo="texto"]')
     expect(fallback?.getAttribute('role')).toBe('img')
-    expect(fallback?.getAttribute('aria-label')).toBe('Mango')
+    expect(fallback?.getAttribute('aria-label')).toBe('Mango, logo compacto')
     expect(fallback?.textContent).toBe('Mango')
     expect(contenedor.querySelector('[data-logo-tipo="monograma"]')).toBeNull()
   })

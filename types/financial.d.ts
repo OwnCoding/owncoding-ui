@@ -52,6 +52,13 @@ export type {
   RelacionFinanciera,
 } from './utils.js'
 
+export const SOLUCIONES_PAGO_COMERCIOS: Readonly<{
+  id: 'soluciones-pago-comercios'
+  titulo: string
+  descripcion: string
+  marcas: readonly ['Bancard', 'Dinelco', 'upay', 'Pik']
+}>
+
 
 export const AUTORIZACION_ASSETS_FINANCIEROS: Readonly<{
   permitida: true

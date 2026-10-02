@@ -48,11 +48,16 @@ describe('contrato publico de la galeria', () => {
     const vistaBancos = galeria.match(/function VistaBancosPagos\(\) \{([\s\S]*?)\n\}\n\nfunction VistaTelefono/)?.[1]
     expect(vistaBancos).toContain('useState(BANCO_DESTACADO)')
     expect(vistaBancos).toContain('BANCOS_PREVIEW.map')
-    expect(vistaBancos).toContain('aria-pressed={banco === nombre}')
+    expect(vistaBancos).toContain('seleccionado={banco === nombre}')
+    expect(galeria).toContain('Sin asset redistribuible')
     expect(vistaBancos).toContain('variante="compacto"')
     expect(vistaBancos).toContain('variante="horizontal"')
+    expect(galeria).toContain("style={registro?.visual?.fondo ? { backgroundColor: registro.visual.fondo } : undefined}")
     expect(vistaBancos).toContain('MARCAS_CONECTADAS_PREVIEW.map')
     expect(vistaBancos).toContain('BancoLogo banco={institucion}')
+    expect(vistaBancos).toContain('SOLUCIONES_PAGO_COMERCIOS_PREVIEW.marcas.map')
+    expect(vistaBancos.indexOf('SOLUCIONES_PAGO_COMERCIOS_PREVIEW.marcas.map')).toBeLessThan(vistaBancos.indexOf('MARCAS_CONECTADAS_PREVIEW.map'))
+    expect(vistaBancos).toContain('Pik mantiene, por separado, su relación corporativa verificada con Itaú')
   })
 })
 
