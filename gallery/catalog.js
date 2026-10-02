@@ -37,7 +37,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "AjustesImpresion",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "anchoParaLargo",
@@ -97,7 +97,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "AvisoPrivacidad",
     "tipo": "visual",
     "categoria": "Identidad y privacidad",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "AyudaModulo",
@@ -152,7 +152,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BarraLote",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BarraProgreso",
@@ -182,13 +182,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "BotonDentroCampo",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BotonImprimir",
     "tipo": "visual",
     "categoria": "Documentos e impresión",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "BuscadorCliente",
@@ -296,7 +296,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "CampoSeriales",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "campoVacio",
@@ -416,7 +416,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ChipFusion",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ChipOrigen",
@@ -434,7 +434,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ChipsLocks",
     "tipo": "visual",
     "categoria": "Datos y estados",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "CIERRE_CON_CAMBIOS",
@@ -639,7 +639,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ColumnaLote",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "columnasDeAncho",
@@ -711,13 +711,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ConsentimientoDatos",
     "tipo": "visual",
     "categoria": "Identidad y privacidad",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ContadoresCompra",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "ContadorLote",
@@ -807,7 +807,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "CurrencySelect",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "DataTable",
@@ -903,7 +903,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "DocumentoImpresion",
     "tipo": "visual",
     "categoria": "Documentos e impresión",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "DOMINIOS_EMAIL",
@@ -1233,7 +1233,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "EtiquetaLote",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "etiquetaMedioCuenta",
@@ -1407,13 +1407,13 @@ export const CATALOGO_EXPORTS = [
     "nombre": "FichaCertificado",
     "tipo": "visual",
     "categoria": "Documentos e impresión",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "FilaChecklist",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "FilaDato",
@@ -1425,7 +1425,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "FilaRevision",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "filtrarClientes",
@@ -1713,7 +1713,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ImporteDelta",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "INCIDENCIAS",
@@ -1725,7 +1725,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "IndicadorConexion",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "indiceSemana",
@@ -1893,7 +1893,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ManifiestoEnvio",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "MARCAS_ACCESORIOS",
@@ -1941,7 +1941,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "MedidorBateria",
     "tipo": "visual",
     "categoria": "Componentes generales",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "MedidorStock",
@@ -2415,7 +2415,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "PasosEquipo",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "PasswordInput",
@@ -2831,7 +2831,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SemaforoItem",
     "tipo": "visual",
     "categoria": "Operación",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "separarSeriales",
@@ -2855,7 +2855,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "SerialTexto",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "signoDe",
@@ -3401,7 +3401,7 @@ export const CATALOGO_EXPORTS = [
     "nombre": "VistaPreviaPapel",
     "tipo": "visual",
     "categoria": "Documentos e impresión",
-    "presentacion": null
+    "presentacion": "individual"
   },
   {
     "nombre": "whatsappUrl",

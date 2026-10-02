@@ -108,7 +108,7 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 | Exports de la entrada raíz | **563** |
 | Exports visuales | **146** |
 | API, modelos y utilidades | **417** |
-| Vistas curadas con fixtures controlados | **86** |
+| Vistas curadas con fixtures controlados | **111** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -456,6 +456,18 @@ Antes de incorporar un componente, confirma que no exista un patrón equivalente
 y sigue [`docs/ALIMENTAR.md`](docs/ALIMENTAR.md). La biblioteca debe resolver
 interfaz compartida; la lógica de negocio continúa en cada producto.
 
-El catálogo ofrecido contiene 23 instituciones: Banco do Brasil se excluye por
+El catálogo ofrecido contiene 25 instituciones: Banco do Brasil se excluye por
 curaduría del usuario; sus aliases y metadatos históricos siguen disponibles.
 Esta selección no representa el padrón completo de entidades supervisadas.
+
+La ampliación de documentos y revisión suma 25 demos reales: ajustes y estados
+de impresión simulada, hoja y papel aislado, certificado, manifiesto, etiqueta,
+seriales, consentimiento, revisión y lotes. Ningún control envía trabajos de
+impresión, consulta dispositivos, sube datos o persiste cambios.
+
+El grupo de cooperativas incorpora Luque y Coopeduc con originales de primera
+parte y procedencia verificable; sus marcas horizontales completas se contienen
+en el slot compacto, sin fabricar símbolos. Son 6 cooperativas ofrecidas, no
+un padrón exhaustivo. Capiatá y Ñemby quedan pendientes del presupuesto finito
+de bytes, y Lambaré de soporte seguro del GIF original; no se modifican assets
+para forzar cobertura ni se elevan presupuestos.

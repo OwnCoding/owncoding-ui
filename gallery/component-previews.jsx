@@ -10,6 +10,8 @@ import { crearCorreoTransaccional, renderCorreoHtml, renderCorreoTexto } from '.
 import packageJson from '../package.json'
 import { SHELL_DEMOS, ShellPreview } from './shell-previews.jsx'
 import { OPERATION_DEMOS, OperationPreview } from './operation-previews.jsx'
+import { DOCUMENT_DEMOS, DocumentPreview } from './document-previews.jsx'
+import { REVIEW_DEMOS, ReviewPreview } from './review-previews.jsx'
 
 const identity = crearIdentidadApp({ nombre: 'OwnCoding UI', version: packageJson.version })
 const rows = [{ id: 'a', nombre: 'Pedido Demo A', estado: 'Pendiente' }, { id: 'b', nombre: 'Pedido Demo B', estado: 'Completo' }]
@@ -26,6 +28,8 @@ export function ComponentPreview({ name }) {
   const [cambios, setCambios] = useState(false)
   const [muestra, setMuestra] = useState('')
   const field = (label, element) => <div><Label htmlFor={id}>{label}</Label>{element}</div>
+  if (DOCUMENT_DEMOS[name]) return <DocumentPreview key={name} name={name} />
+  if (REVIEW_DEMOS[name]) return <ReviewPreview key={name} name={name} />
   if (SHELL_DEMOS[name]) return <ShellPreview key={name} name={name} />
   if (OPERATION_DEMOS[name]) return <OperationPreview key={name} name={name} />
   switch (name) {
