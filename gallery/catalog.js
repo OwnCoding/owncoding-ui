@@ -239,6 +239,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "buscarRelacionesFinancieras",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "Button",
     "tipo": "visual",
     "categoria": "Componentes generales",
@@ -290,6 +296,12 @@ export const CATALOGO_EXPORTS = [
     "nombre": "CampoSeriales",
     "tipo": "visual",
     "categoria": "Campos y formularios",
+    "presentacion": null
+  },
+  {
+    "nombre": "campoVacio",
+    "tipo": "api",
+    "categoria": "API y modelos",
     "presentacion": null
   },
   {
@@ -422,6 +434,12 @@ export const CATALOGO_EXPORTS = [
     "nombre": "ChipsLocks",
     "tipo": "visual",
     "categoria": "Datos y estados",
+    "presentacion": null
+  },
+  {
+    "nombre": "CIERRE_CON_CAMBIOS",
+    "tipo": "api",
+    "categoria": "API y modelos",
     "presentacion": null
   },
   {
@@ -906,10 +924,22 @@ export const CATALOGO_EXPORTS = [
     "presentacion": "individual"
   },
   {
+    "nombre": "EMAIL_RE",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "EmailField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
     "presentacion": "individual"
+  },
+  {
+    "nombre": "emailValido",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
   },
   {
     "nombre": "EmptyState",
@@ -1320,6 +1350,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "FECHA_VERIFICACION_RELACIONES_FINANCIERAS",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "fechaCorta",
     "tipo": "api",
     "categoria": "Fecha y agenda",
@@ -1722,6 +1758,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "institucionesSugeridasPorMarca",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "internationalPhone",
     "tipo": "api",
     "categoria": "API y modelos",
@@ -1734,9 +1776,21 @@ export const CATALOGO_EXPORTS = [
     "presentacion": "individual"
   },
   {
+    "nombre": "largoMaximo",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "largoMaximoMonto",
     "tipo": "api",
     "categoria": "Finanzas y pagos",
+    "presentacion": null
+  },
+  {
+    "nombre": "largoMinimo",
+    "tipo": "api",
+    "categoria": "API y modelos",
     "presentacion": null
   },
   {
@@ -1777,6 +1831,12 @@ export const CATALOGO_EXPORTS = [
   },
   {
     "nombre": "limpiarDependientes",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "limpiarError",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
@@ -1842,13 +1902,31 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "MARCAS_CON_RELACION_FINANCIERA",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "MARCAS_MEDIOS_PAGO",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
   },
   {
+    "nombre": "marcasRelacionadasConInstitucion",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "MARGEN_VENTANA",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "maximo",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
@@ -1914,6 +1992,24 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "mensajeFallo",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "mensajeResultado",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "MENSAJES_VALIDACION",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "MenuDesplegable",
     "tipo": "visual",
     "categoria": "Shell y acceso",
@@ -1939,6 +2035,12 @@ export const CATALOGO_EXPORTS = [
   },
   {
     "nombre": "MIMES_IMAGEN",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "minimo",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
@@ -2100,6 +2202,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "normalizarRelacionFinanciera",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "normalizarResultadoIA",
     "tipo": "api",
     "categoria": "Carga con IA",
@@ -2151,6 +2259,12 @@ export const CATALOGO_EXPORTS = [
     "nombre": "OAuthDivider",
     "tipo": "visual",
     "categoria": "Shell y acceso",
+    "presentacion": null
+  },
+  {
+    "nombre": "obligatorio",
+    "tipo": "api",
+    "categoria": "API y modelos",
     "presentacion": null
   },
   {
@@ -2308,6 +2422,12 @@ export const CATALOGO_EXPORTS = [
     "tipo": "visual",
     "categoria": "Campos y formularios",
     "presentacion": "individual"
+  },
+  {
+    "nombre": "patron",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
   },
   {
     "nombre": "PATRON_RUC",
@@ -2563,6 +2683,18 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "RELACIONES_FINANCIERAS",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "relacionFinancieraDe",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "repartirLinea",
     "tipo": "api",
     "categoria": "API y modelos",
@@ -2570,6 +2702,12 @@ export const CATALOGO_EXPORTS = [
   },
   {
     "nombre": "resolverRecientes",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "RESULTADOS_VALIDOS",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
@@ -2798,6 +2936,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "sugerenciasDeMarcaPago",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "sumarDias",
     "tipo": "api",
     "categoria": "API y modelos",
@@ -2837,6 +2981,12 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TAMANO_OBJETIVO_IMAGEN",
     "tipo": "api",
     "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "tamanoDialogoIA",
+    "tipo": "api",
+    "categoria": "Carga con IA",
     "presentacion": null
   },
   {
@@ -2897,12 +3047,6 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TaxIdField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
-    "presentacion": null
-  },
-  {
-    "nombre": "tamanoDialogoIA",
-    "tipo": "api",
-    "categoria": "Carga con IA",
     "presentacion": null
   },
   {
@@ -3152,6 +3296,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "useDialogDirty",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "useDialogFocusTrap",
     "tipo": "api",
     "categoria": "API y modelos",
@@ -3159,6 +3309,12 @@ export const CATALOGO_EXPORTS = [
   },
   {
     "nombre": "useDialogPending",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "useResultado",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
@@ -3177,6 +3333,24 @@ export const CATALOGO_EXPORTS = [
   },
   {
     "nombre": "useToast",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "useValidacionCampos",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "validarCampo",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "validarCampos",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null
@@ -3231,60 +3405,6 @@ export const CATALOGO_EXPORTS = [
   },
   {
     "nombre": "whatsappUrl",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "FECHA_VERIFICACION_RELACIONES_FINANCIERAS",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "MARCAS_CON_RELACION_FINANCIERA",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "RELACIONES_FINANCIERAS",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "buscarRelacionesFinancieras",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "institucionesSugeridasPorMarca",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "marcasRelacionadasConInstitucion",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "normalizarRelacionFinanciera",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "relacionFinancieraDe",
-    "tipo": "api",
-    "categoria": "API y modelos",
-    "presentacion": null
-  },
-  {
-    "nombre": "sugerenciasDeMarcaPago",
     "tipo": "api",
     "categoria": "API y modelos",
     "presentacion": null

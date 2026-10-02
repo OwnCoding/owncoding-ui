@@ -61,7 +61,7 @@ test('footer models and version are selectable', () => {
   const select = host.querySelector('select')
   act(() => { select.value = 'apilado'; select.dispatchEvent(new Event('change', { bubbles: true })) })
   expect(host.querySelector('footer').dataset.modelo).toBe('apilado')
-  expect(host.querySelector('footer').textContent).toContain('v0.61.1')
+  expect(host.querySelector('footer').textContent).toContain('v0.62.0')
 })
 test('email is isolated HTML or text without sending controls', () => {
   render(<EmailPreview />)

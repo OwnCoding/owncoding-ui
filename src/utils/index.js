@@ -45,8 +45,24 @@ export {
   marcasRelacionadasConInstitucion,
 } from './relacionesFinancieras.js'
 export { TAMANOS_CAMPO, anchoParaLargo } from './tamanos.js'
-export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO } from './modal.js'
+export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO, CIERRE_CON_CAMBIOS } from './modal.js'
 export { GRILLA_DOS_COLUMNAS, GRILLA_DOS_COLUMNAS_COMPACTA, PIE_ACCIONES, PIE_ACCIONES_REVERSO } from './formulario.js'
+export {
+  MENSAJES_VALIDACION,
+  EMAIL_RE,
+  campoVacio,
+  obligatorio,
+  largoMinimo,
+  largoMaximo,
+  patron,
+  emailValido,
+  minimo,
+  maximo,
+  validarCampo,
+  validarCampos,
+  limpiarError,
+} from './validacion.js'
+export { RESULTADOS_VALIDOS, mensajeResultado, mensajeFallo } from './resultado.js'
 export { ROTULO_DATO, CELDA_ENCABEZADO, ROTULO_SECCION, CELDA_DATO, CELDA_NUMERO, CELDA_IDENTIDAD, CELDA_IDENTIDAD_GRANDE } from './tabla.js'
 
 // ── Catálogos por defecto ───────────────────────────────────────────────────

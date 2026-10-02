@@ -266,6 +266,35 @@ con versión/fecha/canal y se revoca con el mismo peso. Objetos
 - Eliminación destructiva: confirmación propia; datos críticos con doble
   confirmación y plazo recuperable.
 
+### Modal/drawer estándar (#323)
+
+- **La estructura es del objeto, no del uso:** altura máxima (`max-h` del
+  objeto), header fijo, **cuerpo desplazable** (`min-h-0 flex-1
+  overflow-y-auto`) y **pie fijo** fuera del scroll. El ancho se elige con
+  `size` (§5) y el pie con `FormActions`/`SaveActions`; la pantalla no arma el
+  overlay, el alto ni el scroll a mano.
+- **Etiquetas visibles:** todo campo de un diálogo lleva su `Label` en
+  `FormField` (el placeholder no es etiqueta) y su mensaje debajo. Un campo sin
+  etiqueta visible no es estándar.
+- **Error junto al campo:** `FormField error={…}` (mensaje con `role="alert"`,
+  `aria-invalid` y `aria-describedby`); las reglas salen de
+  `utils/validacion.js` (`obligatorio`, `largoMinimo`, `largoMaximo`, `patron`,
+  `emailValido`, `minimo`, `maximo`) y el estado por campo, de
+  `useValidacionCampos` (`validar`, `limpiar`, `errorDe`). Un error que no
+  pertenece a un campo va en `Aviso`, no colgado de un input.
+- **Acción primaria única:** el pie tiene un solo `Button` primario (el que
+  confirma); el resto es `outline`/`ghost` y lo destructivo va en `danger`.
+  `SaveActions` deja el cancelar deshabilitado mientras guarda.
+- **Cierre con cambios:** un diálogo con `dirty` —o con formularios que
+  registran `useDialogDirty(hayCambios)`— no descarta en silencio: ×, Esc,
+  clic afuera y Cancelar abren la confirmación de `CIERRE_CON_CAMBIOS`
+  («Seguir editando» / «Descartar y cerrar»). El guardado real cierra por
+  `onClose` directo, sin confirmación; los textos se pisan con `descarte`.
+- **Toasts de resultado:** `useResultado()` da los cuatro avisos canónicos
+  (`guardado`, `copiado`, `impreso`, `enviado`) y `fallo(accion, detalle)`; los
+  textos viven en `utils/resultado.js` y ninguna pantalla los reescribe. El
+  fallo nunca se anuncia como éxito y el detalle dice qué revisar.
+
 ## 6. Identidad y personas
 
 - Identidad **por ID**, nunca por nombre o correo.

@@ -81,6 +81,14 @@ describe('useDialogFocusTrap (#1)', () => {
     expect(libre).not.toContain('disabled=""')
   })
 
+  test('el estándar de cierre con cambios queda en el objeto y en la regla (#323)', () => {
+    expect(fuente).toContain('useDialogDirty')
+    expect(fuente).toContain('CIERRE_CON_CAMBIOS')
+    expect(reglas).toContain('Modal/drawer estándar (#323)')
+    expect(reglas).toContain('`useValidacionCampos`')
+    expect(reglas).toContain('`useResultado()`')
+  })
+
   test('FormActions/SaveActions usan el pie del diálogo y el <form> real', () => {
     expect(fuente).toContain('createPortal(acciones, pie)')
     expect(fuente).toContain("ancla.current?.closest('form')")

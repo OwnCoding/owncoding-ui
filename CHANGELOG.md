@@ -8,6 +8,32 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.62.0 — 2026-10-02
+
+- **Modal/drawer estándar (#323):** `Modal` y `Drawer` suman la prop `dirty`
+  (o el registro desde el formulario con `useDialogDirty(hayCambios)`): ×, Esc,
+  clic afuera y Cancelar abren la confirmación `CIERRE_CON_CAMBIOS` («Seguir
+  editando» / «Descartar y cerrar») en vez de descartar los cambios en
+  silencio. El guardado real cierra por `onClose` directo y los textos se pisan
+  con `descarte`. La estructura sigue siendo la del objeto: altura máxima,
+  header fijo, cuerpo desplazable y pie fijo (con `FormActions`/`SaveActions`).
+- **Validación compartida (#323):** `utils/validacion.js` con reglas puras
+  (`obligatorio`, `largoMinimo`, `largoMaximo`, `patron`, `emailValido`,
+  `minimo`, `maximo`), `validarCampos`/`validarCampo` y `limpiarError`; el hook
+  `useValidacionCampos` mantiene los errores por campo para el `error` de
+  `FormField` (junto al campo, con `role="alert"` y `aria-invalid`). `EMAIL_RE`
+  queda como formato único de correo.
+- **Toasts de resultado (#323):** `utils/resultado.js` fija los textos
+  canónicos de guardar, copiar, imprimir y enviar (con sujeto o genéricos,
+  nunca «guardado» concordado a mano) y `useResultado()` los conecta al
+  `ToastProvider`; `fallo(accion, detalle)` arma el error con la misma forma.
+- **Regla (#323):** `REGLAS.md` §5 suma el estándar de modal/drawer: etiquetas
+  visibles, error junto al campo, acción primaria única y cierre con
+  confirmación. `ConfirmDialog` acepta `cancelLabel` para el diálogo de
+  descarte.
+- **Galería y tipos:** catálogo, README y previews actualizados (563 exports),
+  `.d.ts` del paquete raíz y de `owncoding-ui/utils`.
+
 ## v0.61.1 — 2026-10-02
 
 - **RUC numérico y confirmable:** `RucField` elimina letras y separadores ajenos

@@ -211,6 +211,35 @@ var TAMANOS_MODAL = {
   // editores y pantallas grandes
 };
 var TAMANO_MODAL_PREDETERMINADO = "formulario";
+var CIERRE_CON_CAMBIOS = {
+  titulo: "\xBFDescartar los cambios?",
+  descripcion: "Ten\xE9s cambios sin guardar en este formulario. Si cerr\xE1s ahora, se pierden.",
+  confirmar: "Descartar y cerrar",
+  seguir: "Seguir editando"
+};
+
+// src/utils/resultado.js
+var RESULTADOS_VALIDOS = ["guardar", "copiar", "imprimir", "enviar"];
+var SIN_SUJETO = {
+  guardar: "Cambios guardados",
+  copiar: "Contenido copiado",
+  imprimir: "Impresi\xF3n enviada",
+  enviar: "Env\xEDo completado"
+};
+var CON_SUJETO = {
+  guardar: (sujeto) => `${sujeto} se guard\xF3`,
+  copiar: (sujeto) => `${sujeto} se copi\xF3`,
+  imprimir: (sujeto) => `${sujeto} se envi\xF3 a la impresora`,
+  enviar: (sujeto) => `${sujeto} se envi\xF3`
+};
+function mensajeResultado(accion, sujeto) {
+  const texto = String(sujeto || "").trim();
+  if (texto && CON_SUJETO[accion]) return CON_SUJETO[accion](texto);
+  return SIN_SUJETO[accion] || "Listo";
+}
+function mensajeFallo(accion) {
+  return RESULTADOS_VALIDOS.includes(accion) ? `No se pudo ${accion}` : "No se pudo completar";
+}
 
 // src/utils/tonos.js
 var TONOS = {
@@ -781,6 +810,14 @@ function useDialogPending(pendiente) {
     return () => contexto?.registrar(id, false);
   }, [contexto, id, pendiente]);
 }
+function useDialogDirty(hayCambios) {
+  const contexto = useContext(ContextoDialogo);
+  const id = useRef2(/* @__PURE__ */ Symbol("cambios")).current;
+  useEfectoLayout(() => {
+    contexto?.registrarCambios(id, Boolean(hayCambios));
+    return () => contexto?.registrarCambios(id, false);
+  }, [contexto, id, hayCambios]);
+}
 function conFormulario(children, formId) {
   return Children.map(
     children,
@@ -817,43 +854,78 @@ function SaveActions({ pendiente = false, children, cancelLabel = "Cancelar", cl
     children
   ] });
 }
-function Modal({ open, onClose, title, children, className, size = TAMANO_MODAL_PREDETERMINADO, busy = false }) {
+function Modal({ open, onClose, title, children, className, size = TAMANO_MODAL_PREDETERMINADO, busy = false, dirty = false, descarte }) {
   const dialog = useRef2(null);
   const titleId = useId();
   const [pie, setPie] = useState2(null);
   const pendientes = useRef2(crearRegistroPendientes()).current;
   const [hayPendientes, setHayPendientes] = useState2(false);
+  const cambios = useRef2(crearRegistroPendientes()).current;
+  const [hayCambiosRegistrados, setHayCambiosRegistrados] = useState2(false);
+  const [confirmandoDescarte, setConfirmandoDescarte] = useState2(false);
   const bloqueado = Boolean(busy || hayPendientes);
+  const hayCambios = Boolean(dirty) || hayCambiosRegistrados;
   const cerrar = useCallback2(() => {
-    if (!busy && !pendientes.bloqueado) onClose?.();
-  }, [busy, onClose, pendientes]);
+    if (bloqueado) return;
+    if (hayCambios) {
+      setConfirmandoDescarte(true);
+      return;
+    }
+    onClose?.();
+  }, [bloqueado, hayCambios, onClose]);
   const { esSuperior, requestClose } = useDialogFocusTrap(open, cerrar, dialog, { busy: bloqueado });
   const registrar = useCallback2((id, pendiente) => {
     pendientes.registrar(id, pendiente);
     setHayPendientes(pendientes.bloqueado);
   }, [pendientes]);
-  const contexto = useMemo(() => ({ requestClose, registrar }), [requestClose, registrar]);
+  const registrarCambios = useCallback2((id, hay) => {
+    cambios.registrar(id, hay);
+    setHayCambiosRegistrados(cambios.bloqueado);
+  }, [cambios]);
+  const contexto = useMemo(() => ({ requestClose, registrar, registrarCambios }), [requestClose, registrar, registrarCambios]);
+  useEffect2(() => {
+    if (!open || !hayCambios) setConfirmandoDescarte(false);
+  }, [open, hayCambios]);
+  const textosDescarte = { ...CIERRE_CON_CAMBIOS, ...descarte };
   if (!open) return null;
-  return /* @__PURE__ */ jsx2("div", { className: "fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 sm:items-center sm:p-6", onMouseDown: (e) => e.target === e.currentTarget && requestClose(), children: /* @__PURE__ */ jsxs(
-    "div",
-    {
-      ref: dialog,
-      tabIndex: -1,
-      role: "dialog",
-      "aria-modal": esSuperior ? "true" : void 0,
-      "aria-labelledby": titleId,
-      "aria-busy": bloqueado || void 0,
-      className: cn("flex max-h-[min(90dvh,720px)] w-full flex-col overflow-hidden rounded-2xl border border-ink-600 bg-ink shadow-float", TAMANOS_MODAL[size] || TAMANOS_MODAL[TAMANO_MODAL_PREDETERMINADO], className),
-      children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between gap-3 border-b border-ink-600 p-4 sm:px-6", children: [
-          /* @__PURE__ */ jsx2("h2", { id: titleId, className: "text-base font-bold text-fore", children: title }),
-          /* @__PURE__ */ jsx2("button", { type: "button", onClick: requestClose, disabled: bloqueado, className: "toque-44 rounded-lg p-2 text-mute transition hover:bg-ink-700 hover:text-fore disabled:pointer-events-none disabled:opacity-40", "aria-label": "Cerrar", children: "\xD7" })
-        ] }),
-        /* @__PURE__ */ jsx2(ContextoDialogo.Provider, { value: contexto, children: /* @__PURE__ */ jsx2(ContextoPie.Provider, { value: pie, children: /* @__PURE__ */ jsx2("div", { className: "min-h-0 flex-1 overflow-y-auto p-4 sm:p-6", children }) }) }),
-        /* @__PURE__ */ jsx2("div", { ref: setPie, className: "border-t border-ink-600 p-4 empty:hidden sm:px-6" })
-      ]
-    }
-  ) });
+  return /* @__PURE__ */ jsxs("div", { className: "fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 sm:items-center sm:p-6", onMouseDown: (e) => e.target === e.currentTarget && requestClose(), children: [
+    /* @__PURE__ */ jsxs(
+      "div",
+      {
+        ref: dialog,
+        tabIndex: -1,
+        role: "dialog",
+        "aria-modal": esSuperior ? "true" : void 0,
+        "aria-labelledby": titleId,
+        "aria-busy": bloqueado || void 0,
+        className: cn("flex max-h-[min(90dvh,720px)] w-full flex-col overflow-hidden rounded-2xl border border-ink-600 bg-ink shadow-float", TAMANOS_MODAL[size] || TAMANOS_MODAL[TAMANO_MODAL_PREDETERMINADO], className),
+        children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between gap-3 border-b border-ink-600 p-4 sm:px-6", children: [
+            /* @__PURE__ */ jsx2("h2", { id: titleId, className: "text-base font-bold text-fore", children: title }),
+            /* @__PURE__ */ jsx2("button", { type: "button", onClick: requestClose, disabled: bloqueado, className: "toque-44 rounded-lg p-2 text-mute transition hover:bg-ink-700 hover:text-fore disabled:pointer-events-none disabled:opacity-40", "aria-label": "Cerrar", children: "\xD7" })
+          ] }),
+          /* @__PURE__ */ jsx2(ContextoDialogo.Provider, { value: contexto, children: /* @__PURE__ */ jsx2(ContextoPie.Provider, { value: pie, children: /* @__PURE__ */ jsx2("div", { className: "min-h-0 flex-1 overflow-y-auto p-4 sm:p-6", children }) }) }),
+          /* @__PURE__ */ jsx2("div", { ref: setPie, className: "border-t border-ink-600 p-4 empty:hidden sm:px-6" })
+        ]
+      }
+    ),
+    confirmandoDescarte && /* @__PURE__ */ jsx2(
+      ConfirmDialog,
+      {
+        open: true,
+        variant: "danger",
+        title: textosDescarte.titulo,
+        description: textosDescarte.descripcion,
+        confirmLabel: textosDescarte.confirmar,
+        cancelLabel: textosDescarte.seguir,
+        onCancel: () => setConfirmandoDescarte(false),
+        onConfirm: () => {
+          setConfirmandoDescarte(false);
+          onClose?.();
+        }
+      }
+    )
+  ] });
 }
 function ConfirmDialog({
   open,
@@ -862,6 +934,7 @@ function ConfirmDialog({
   title = "Confirmar acci\xF3n",
   description,
   confirmLabel = "Confirmar",
+  cancelLabel = "Cancelar",
   variant = "primary",
   busy = false
 }) {
@@ -869,7 +942,7 @@ function ConfirmDialog({
     /* @__PURE__ */ jsx2("div", { className: cn("flex h-11 w-11 items-center justify-center rounded-2xl", variant === "danger" ? "bg-bad/10 text-bad-text" : "bg-fono/10 text-fono-text"), children: /* @__PURE__ */ jsx2(Icon, { name: variant === "danger" ? "alert" : "check", className: "h-5 w-5" }) }),
     /* @__PURE__ */ jsx2("p", { className: "text-sm leading-6 text-mute", children: description }),
     /* @__PURE__ */ jsxs("div", { className: "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", children: [
-      /* @__PURE__ */ jsx2(Button, { type: "button", variant: "ghost", onClick: onCancel, disabled: busy, children: "Cancelar" }),
+      /* @__PURE__ */ jsx2(Button, { type: "button", variant: "ghost", onClick: onCancel, disabled: busy, children: cancelLabel }),
       /* @__PURE__ */ jsx2(Button, { type: "button", variant, onClick: onConfirm, disabled: busy, children: busy ? "Procesando\u2026" : confirmLabel })
     ] })
   ] }) });
@@ -937,47 +1010,82 @@ function IconAction({ icon, label, tone = "mute", onClick, disabled = false, siz
     }
   );
 }
-function Drawer({ open, onClose, title, children, side = "right", className, busy = false }) {
+function Drawer({ open, onClose, title, children, side = "right", className, busy = false, dirty = false, descarte }) {
   const panel = useRef2(null);
   const titleId = useId();
   const [pie, setPie] = useState2(null);
   const pendientes = useRef2(crearRegistroPendientes()).current;
   const [hayPendientes, setHayPendientes] = useState2(false);
+  const cambios = useRef2(crearRegistroPendientes()).current;
+  const [hayCambiosRegistrados, setHayCambiosRegistrados] = useState2(false);
+  const [confirmandoDescarte, setConfirmandoDescarte] = useState2(false);
   const bloqueado = Boolean(busy || hayPendientes);
+  const hayCambios = Boolean(dirty) || hayCambiosRegistrados;
   const cerrar = useCallback2(() => {
-    if (!busy && !pendientes.bloqueado) onClose?.();
-  }, [busy, onClose, pendientes]);
+    if (bloqueado) return;
+    if (hayCambios) {
+      setConfirmandoDescarte(true);
+      return;
+    }
+    onClose?.();
+  }, [bloqueado, hayCambios, onClose]);
   const { esSuperior, requestClose } = useDialogFocusTrap(open, cerrar, panel, { busy: bloqueado });
   const registrar = useCallback2((id, pendiente) => {
     pendientes.registrar(id, pendiente);
     setHayPendientes(pendientes.bloqueado);
   }, [pendientes]);
-  const contexto = useMemo(() => ({ requestClose, registrar }), [requestClose, registrar]);
+  const registrarCambios = useCallback2((id, hay) => {
+    cambios.registrar(id, hay);
+    setHayCambiosRegistrados(cambios.bloqueado);
+  }, [cambios]);
+  const contexto = useMemo(() => ({ requestClose, registrar, registrarCambios }), [requestClose, registrar, registrarCambios]);
+  useEffect2(() => {
+    if (!open || !hayCambios) setConfirmandoDescarte(false);
+  }, [open, hayCambios]);
+  const textosDescarte = { ...CIERRE_CON_CAMBIOS, ...descarte };
   if (!open) return null;
-  return /* @__PURE__ */ jsx2("div", { className: "fixed inset-0 z-50 bg-black/60", onMouseDown: (e) => e.target === e.currentTarget && requestClose(), children: /* @__PURE__ */ jsxs(
-    "div",
-    {
-      ref: panel,
-      tabIndex: -1,
-      role: "dialog",
-      "aria-modal": esSuperior ? "true" : void 0,
-      "aria-labelledby": titleId,
-      "aria-busy": bloqueado || void 0,
-      className: cn(
-        "absolute inset-y-0 flex max-h-full w-full max-w-md flex-col overflow-hidden border-ink-600 bg-ink shadow-float",
-        side === "left" ? "left-0 border-r" : "right-0 border-l",
-        className
-      ),
-      children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between gap-3 border-b border-ink-600 p-4", children: [
-          /* @__PURE__ */ jsx2("h2", { id: titleId, className: "text-base font-bold text-fore", children: title }),
-          /* @__PURE__ */ jsx2("button", { type: "button", onClick: requestClose, disabled: bloqueado, className: "toque-44 rounded-lg p-2 text-mute transition hover:bg-ink-700 hover:text-fore disabled:pointer-events-none disabled:opacity-40", "aria-label": "Cerrar", children: "\xD7" })
-        ] }),
-        /* @__PURE__ */ jsx2(ContextoDialogo.Provider, { value: contexto, children: /* @__PURE__ */ jsx2(ContextoPie.Provider, { value: pie, children: /* @__PURE__ */ jsx2("div", { className: "flex-1 overflow-y-auto p-4 sm:p-5", children }) }) }),
-        /* @__PURE__ */ jsx2("div", { ref: setPie, className: "border-t border-ink-600 p-4 empty:hidden" })
-      ]
-    }
-  ) });
+  return /* @__PURE__ */ jsxs("div", { className: "fixed inset-0 z-50 bg-black/60", onMouseDown: (e) => e.target === e.currentTarget && requestClose(), children: [
+    /* @__PURE__ */ jsxs(
+      "div",
+      {
+        ref: panel,
+        tabIndex: -1,
+        role: "dialog",
+        "aria-modal": esSuperior ? "true" : void 0,
+        "aria-labelledby": titleId,
+        "aria-busy": bloqueado || void 0,
+        className: cn(
+          "absolute inset-y-0 flex max-h-full w-full max-w-md flex-col overflow-hidden border-ink-600 bg-ink shadow-float",
+          side === "left" ? "left-0 border-r" : "right-0 border-l",
+          className
+        ),
+        children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between gap-3 border-b border-ink-600 p-4", children: [
+            /* @__PURE__ */ jsx2("h2", { id: titleId, className: "text-base font-bold text-fore", children: title }),
+            /* @__PURE__ */ jsx2("button", { type: "button", onClick: requestClose, disabled: bloqueado, className: "toque-44 rounded-lg p-2 text-mute transition hover:bg-ink-700 hover:text-fore disabled:pointer-events-none disabled:opacity-40", "aria-label": "Cerrar", children: "\xD7" })
+          ] }),
+          /* @__PURE__ */ jsx2(ContextoDialogo.Provider, { value: contexto, children: /* @__PURE__ */ jsx2(ContextoPie.Provider, { value: pie, children: /* @__PURE__ */ jsx2("div", { className: "flex-1 overflow-y-auto p-4 sm:p-5", children }) }) }),
+          /* @__PURE__ */ jsx2("div", { ref: setPie, className: "border-t border-ink-600 p-4 empty:hidden" })
+        ]
+      }
+    ),
+    confirmandoDescarte && /* @__PURE__ */ jsx2(
+      ConfirmDialog,
+      {
+        open: true,
+        variant: "danger",
+        title: textosDescarte.titulo,
+        description: textosDescarte.descripcion,
+        confirmLabel: textosDescarte.confirmar,
+        cancelLabel: textosDescarte.seguir,
+        onCancel: () => setConfirmandoDescarte(false),
+        onConfirm: () => {
+          setConfirmandoDescarte(false);
+          onClose?.();
+        }
+      }
+    )
+  ] });
 }
 var ToastContext = createContext(null);
 var toastCounter = 0;
@@ -1072,6 +1180,19 @@ function useToast() {
   }, info: () => {
   } };
   return context;
+}
+function useResultado() {
+  const toast = useToast();
+  return useMemo(() => {
+    const exito = (accion) => (sujeto, descripcion) => toast.success(mensajeResultado(accion, sujeto), descripcion);
+    return {
+      guardado: exito("guardar"),
+      copiado: exito("copiar"),
+      impreso: exito("imprimir"),
+      enviado: exito("enviar"),
+      fallo: (accion, descripcion) => toast.error(mensajeFallo(accion), descripcion)
+    };
+  }, [toast]);
 }
 function Skeleton({ className }) {
   return /* @__PURE__ */ jsx2("div", { className: cn("animate-pulse rounded-lg bg-fore/5", className), "aria-hidden": "true" });
@@ -10369,7 +10490,7 @@ function PaletaComandos({
   atajo = "k",
   atajoTexto = "\u2318K",
   conAtajo = true,
-  minimo = 2,
+  minimo: minimo2 = 2,
   espera = 220,
   mensajeError = "No pudimos buscar. Reintent\xE1.",
   textoSeguir,
@@ -10433,7 +10554,7 @@ function PaletaComandos({
   useEffect20(() => {
     if (!visible) return void 0;
     const termino2 = consulta.trim();
-    if (termino2.length < minimo) {
+    if (termino2.length < minimo2) {
       setResultados(null);
       setCargando(false);
       setError("");
@@ -10458,9 +10579,9 @@ function PaletaComandos({
       vigente = false;
       clearTimeout(timer);
     };
-  }, [visible, consulta, intento, minimo, espera, mensajeError]);
+  }, [visible, consulta, intento, minimo2, espera, mensajeError]);
   const termino = consulta.trim();
-  const listo = termino.length >= minimo;
+  const listo = termino.length >= minimo2;
   const grupos = useMemo14(
     () => agruparResultados(resultados || [], { etiquetasTipo, iconosTipo }),
     [resultados, etiquetasTipo, iconosTipo]
@@ -10504,7 +10625,7 @@ function PaletaComandos({
       }
     }
   }
-  const textoContinuar = textoSeguir || `Segu\xED escribiendo: buscamos desde ${minimo} caracteres.`;
+  const textoContinuar = textoSeguir || `Segu\xED escribiendo: buscamos desde ${minimo2} caracteres.`;
   const idOpcion = (posicion) => `${idLista}-opcion-${posicion}`;
   return /* @__PURE__ */ jsxs76(Fragment13, { children: [
     boton && /* @__PURE__ */ jsxs76(
@@ -12618,11 +12739,11 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
   const htmlFor = `${id}-${campo.id}`;
   const descripcionId = campo.ayuda || error ? `${htmlFor}-descripcion` : void 0;
   const valor = registro.valores?.[campo.id];
-  const obligatorio = Boolean(campo.obligatorio);
+  const obligatorio2 = Boolean(campo.obligatorio);
   const comunes = {
     id: htmlFor,
     disabled,
-    required: obligatorio,
+    required: obligatorio2,
     "aria-describedby": descripcionId
   };
   let control;
@@ -12678,7 +12799,7 @@ function CampoRegistroIA({ campo, registro, error, disabled, onCambiar }) {
     {
       label: /* @__PURE__ */ jsxs90(Fragment18, { children: [
         campo.label,
-        obligatorio ? /* @__PURE__ */ jsxs90("span", { "aria-hidden": "true", className: "text-bad-text", children: [
+        obligatorio2 ? /* @__PURE__ */ jsxs90("span", { "aria-hidden": "true", className: "text-bad-text", children: [
           " ",
           "*"
         ] }) : null
@@ -13107,6 +13228,105 @@ function useSingleFlightSubmit(enviar) {
   return { pendiente, onSubmit };
 }
 
+// src/hooks/useValidacionCampos.js
+import { useCallback as useCallback6, useRef as useRef24, useState as useState38 } from "react";
+
+// src/utils/validacion.js
+var MENSAJES_VALIDACION = {
+  obligatorio: "Complet\xE1 este dato.",
+  largoMinimo: (minimo2) => `Escrib\xED al menos ${minimo2} caracteres.`,
+  largoMaximo: (maximo2) => `No superes ${maximo2} caracteres.`,
+  formato: "Revis\xE1 el formato de este dato.",
+  email: "Revis\xE1 el correo electr\xF3nico.",
+  minimo: (limite) => `El valor no puede ser menor a ${limite}.`,
+  maximo: (limite) => `El valor no puede ser mayor a ${limite}.`
+};
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function campoVacio(valor) {
+  if (valor === null || valor === void 0) return true;
+  if (Array.isArray(valor)) return valor.length === 0;
+  return String(valor).trim() === "";
+}
+var mensajeDe = (mensaje, respaldo) => typeof mensaje === "function" ? mensaje(respaldo) : mensaje || respaldo;
+function obligatorio(mensaje) {
+  return (valor) => campoVacio(valor) ? mensajeDe(mensaje, MENSAJES_VALIDACION.obligatorio) : "";
+}
+function largoMinimo(minimo2, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor)) return "";
+    return String(valor).length < minimo2 ? mensajeDe(mensaje, MENSAJES_VALIDACION.largoMinimo(minimo2)) : "";
+  };
+}
+function largoMaximo(maximo2, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor)) return "";
+    return String(valor).length > maximo2 ? mensajeDe(mensaje, MENSAJES_VALIDACION.largoMaximo(maximo2)) : "";
+  };
+}
+function patron(expresion, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor)) return "";
+    return expresion.test(String(valor)) ? "" : mensajeDe(mensaje, MENSAJES_VALIDACION.formato);
+  };
+}
+function emailValido(mensaje) {
+  return patron(EMAIL_RE, mensaje || MENSAJES_VALIDACION.email);
+}
+function minimo(limite, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor) || Number.isNaN(Number(valor))) return "";
+    return Number(valor) < limite ? mensajeDe(mensaje, MENSAJES_VALIDACION.minimo(limite)) : "";
+  };
+}
+function maximo(limite, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor) || Number.isNaN(Number(valor))) return "";
+    return Number(valor) > limite ? mensajeDe(mensaje, MENSAJES_VALIDACION.maximo(limite)) : "";
+  };
+}
+function validarCampo(valor, reglas) {
+  const lista = (Array.isArray(reglas) ? reglas : [reglas]).filter(Boolean);
+  for (const regla of lista) {
+    const mensaje = typeof regla === "function" ? regla(valor) : "";
+    if (mensaje) return mensaje;
+  }
+  return "";
+}
+function validarCampos(valores, reglas = {}) {
+  const errores = {};
+  const campos = [];
+  for (const [campo, reglasCampo] of Object.entries(reglas)) {
+    const mensaje = validarCampo(valores?.[campo], reglasCampo);
+    if (mensaje) {
+      errores[campo] = mensaje;
+      campos.push(campo);
+    }
+  }
+  return { valido: campos.length === 0, errores, primerError: errores[campos[0]] || "", campos };
+}
+function limpiarError(errores = {}, campo) {
+  if (!campo) return {};
+  if (!(campo in errores)) return errores;
+  const siguiente = { ...errores };
+  delete siguiente[campo];
+  return siguiente;
+}
+
+// src/hooks/useValidacionCampos.js
+function useValidacionCampos(reglas) {
+  const [errores, setErrores] = useState38({});
+  const ultimasReglas = useRef24(reglas);
+  ultimasReglas.current = reglas;
+  const validar = useCallback6((valores) => {
+    const resultado = validarCampos(valores, ultimasReglas.current);
+    setErrores(resultado.errores);
+    return resultado;
+  }, []);
+  const limpiar = useCallback6((campo) => setErrores((actuales) => limpiarError(actuales, campo)), []);
+  const errorDe = useCallback6((campo) => errores[campo] || "", [errores]);
+  return { errores, validar, limpiar, errorDe };
+}
+
 // src/utils/nombre.js
 var PARTICULAS = /* @__PURE__ */ new Set(["de", "del", "la", "las", "los", "y", "e", "da", "das", "do", "dos", "van", "von", "san", "santa"]);
 var titulo = (palabra) => {
@@ -13475,7 +13695,7 @@ function paginaDePrueba({
   const ref = refDePrueba();
   const ahora = (/* @__PURE__ */ new Date()).toISOString();
   const t = crearTicket({ ancho }).iniciar();
-  const minimo = tipo === "corta";
+  const minimo2 = tipo === "corta";
   const pie = () => {
     t.linea();
     t.negrita().centrado(`VALIDACI\xD3N ${validador}`).negrita(false);
@@ -13502,7 +13722,7 @@ function paginaDePrueba({
     t.linea();
     t.texto("Acentos: \xE1 \xE9 \xED \xF3 \xFA \xFC \xF1 \xD1 \xBF? \xA1!");
   };
-  if (minimo) {
+  if (minimo2) {
     t.negrita().centrado(`TICKET DE PRUEBA ${nombreApp}`).negrita(false);
     t.linea();
     t.negrita().doble().centrado(`VALIDACI\xD3N ${validador}`).doble(false).negrita(false);
@@ -13593,7 +13813,7 @@ function paginaDePrueba({
     t.texto("Si ninguna cort\xF3, revis\xE1 Cutter Enable: YES y que el rollo est\xE9 bien cargado.");
     codigos("CORTE");
   }
-  if (!minimo) pie();
+  if (!minimo2) pie();
   t.avanza(2).corte(corte);
   return { base64: () => t.base64(), lineas: () => t.lineas(), ref, validacion, sufijo, validador, corte: t.corteEnviado() };
 }
@@ -13639,6 +13859,7 @@ export {
   CELDA_IDENTIDAD,
   CELDA_IDENTIDAD_GRANDE,
   CELDA_NUMERO,
+  CIERRE_CON_CAMBIOS,
   CIUDADES_PARAGUAY,
   CLAVE_USO_PERSONAS,
   CODIGOS_PAIS,
@@ -13687,6 +13908,7 @@ export {
   DocumentoImpresion,
   Dot,
   Drawer,
+  EMAIL_RE,
   ESPACIO_BARRA_INFERIOR,
   ESTADOS_CHIP,
   ESTADOS_COMPRA,
@@ -13763,6 +13985,7 @@ export {
   MARGEN_VENTANA,
   MEDIOS_CUENTA,
   MEDIOS_PAGO_CON_MARCA,
+  MENSAJES_VALIDACION,
   MENSAJE_RUC,
   MENSAJE_RUC_CONSULTA,
   MENSAJE_RUC_SIN_DATOS,
@@ -13815,6 +14038,7 @@ export {
   ProgresoChecklist,
   QR_OPCIONES,
   RELACIONES_FINANCIERAS,
+  RESULTADOS_VALIDOS,
   ROTULO_DATO,
   ROTULO_SECCION,
   RUC_RE,
@@ -13893,6 +14117,7 @@ export {
   campoBuscableCliente,
   campoBuscableCuenta,
   campoDeTipoIA,
+  campoVacio,
   caretTrasDigitos,
   categoriaDe,
   categoriasFusion,
@@ -13940,6 +14165,7 @@ export {
   detalleProveedor,
   diasHasta,
   digitosCliente,
+  emailValido,
   enHorarioSilencioso,
   envolver,
   errorMonto,
@@ -14018,18 +14244,25 @@ export {
   inicialesDeNombre,
   institucionesSugeridasPorMarca,
   internationalPhone,
+  largoMaximo,
   largoMaximoMonto,
+  largoMinimo,
   leerUsoPersonas,
   limiteMonto,
   limpiarDependientes,
+  limpiarError,
   limpiarPercent,
   limpiarTaxId,
   logoDeBanco,
   logoDeMedioPago,
   marcasRelacionadasConInstitucion,
+  maximo,
   maximoDeBarras,
+  mensajeFallo,
+  mensajeResultado,
   metodoEnvio,
   mimeDeImagen,
+  minimo,
   mismoMes,
   montoConSigno,
   montoGs,
@@ -14057,6 +14290,7 @@ export {
   normalizarTelefono,
   normalizeTaxId,
   numeroParcialCuenta,
+  obligatorio,
   opcionesDeCampoIA,
   opcionesDependiente,
   ordenDePrioridad,
@@ -14074,6 +14308,7 @@ export {
   parseUsdInput,
   partesVersion,
   partirSerial,
+  patron,
   payloadPush,
   periodoDeRango,
   plantillaDePrueba,
@@ -14134,11 +14369,16 @@ export {
   ultimos4,
   useComboboxNavigation,
   useDialogClose,
+  useDialogDirty,
   useDialogFocusTrap,
   useDialogPending,
+  useResultado,
   useSingleFlightSubmit,
   useTableroOptimista,
   useToast,
+  useValidacionCampos,
+  validarCampo,
+  validarCampos,
   validarImagen,
   validarRegistrosIA,
   valorVacioIA,

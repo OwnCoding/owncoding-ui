@@ -34,6 +34,8 @@ export {
   SaveActions,
   useDialogClose,
   useDialogPending,
+  useDialogDirty,
+  useResultado,
   conFormulario,
   PageHeader,
   DataTable,
@@ -395,7 +397,24 @@ export { cn, primerNombre } from './utils/cn.js'
 export { default as useDialogFocusTrap, destinoDeTab, SELECTOR_ENFOCABLES } from './hooks/useDialogFocusTrap.js'
 export { crearPilaCapas, crearRegistroPendientes } from './utils/pilaOverlays.js'
 export { useSingleFlightSubmit } from './hooks/useSingleFlightSubmit.js'
+export { default as useValidacionCampos } from './hooks/useValidacionCampos.js'
 export { completeSave, crearEnvioUnico, AVISO_REFRESCO } from './utils/guardado.js'
+export {
+  MENSAJES_VALIDACION,
+  EMAIL_RE,
+  campoVacio,
+  obligatorio,
+  largoMinimo,
+  largoMaximo,
+  patron,
+  emailValido,
+  minimo,
+  maximo,
+  validarCampo,
+  validarCampos,
+  limpiarError,
+} from './utils/validacion.js'
+export { RESULTADOS_VALIDOS, mensajeResultado, mensajeFallo } from './utils/resultado.js'
 export { normalizarNombre, nombrePartes, esApellidosPrimero, esRazonSocial } from './utils/nombre.js'
 export {
   BANCOS_PARAGUAY,
@@ -454,7 +473,7 @@ export {
 } from './printing/escpos.js'
 export { paginaDePrueba, paginaDePruebaSimple, TIPOS_PRUEBA, TIPOS_TICKET_PRUEBA, ANCHOS_PRUEBA, CORTES_PRUEBA, PLANTILLA_PRUEBA, plantillaDePrueba } from './printing/prueba.js'
 export { TAMANOS_CAMPO, anchoParaLargo } from './utils/tamanos.js'
-export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO } from './utils/modal.js'
+export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO, CIERRE_CON_CAMBIOS } from './utils/modal.js'
 export { GRILLA_DOS_COLUMNAS, GRILLA_DOS_COLUMNAS_COMPACTA, PIE_ACCIONES, PIE_ACCIONES_REVERSO } from './utils/formulario.js'
 export { CIUDADES_PARAGUAY, DEPARTAMENTOS_PARAGUAY, departamentoDe, buscarCiudad } from './catalog/ciudades.js'
 export {

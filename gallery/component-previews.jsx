@@ -1,6 +1,6 @@
 import React, { useId, useMemo, useState } from 'react'
 import {
-  PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState, Nota,
+  PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState, Nota, Input,
   EmailField, MoneyInput, Money, SerialField, RangoFecha, Label, ThemeToggle,
   BuscadorCliente, DataTable, SegmentedField, ListGridToggle, PageHeader,
   Modal, Drawer, ConfirmDialog, EstadoGuardado, BarraProgreso, ProgresoChecklist,
@@ -21,6 +21,8 @@ export function ComponentPreview({ name }) {
   const [mode, setMode] = useState('list')
   const [model, setModel] = useState('compacto')
   const [version, setVersion] = useState(packageJson.version)
+  const [cambios, setCambios] = useState(false)
+  const [muestra, setMuestra] = useState('')
   const field = (label, element) => <div><Label htmlFor={id}>{label}</Label>{element}</div>
   switch (name) {
     case 'PasswordInput': return field('Contraseña de muestra', <PasswordInput id={id} defaultValue="demo-only" />)
@@ -44,7 +46,7 @@ export function ComponentPreview({ name }) {
     case 'PageHeader': return <div className="grid gap-3"><PageHeader title="Operaciones de muestra" subtitle="2 registros locales; sin persistencia" /><SegmentedField ariaLabel="Filtrar fixture" options={[[ 'todos', 'Todos' ], ['Pendiente', 'Pendientes']]} value={value || 'todos'} onChange={setValue} /><ListGridToggle value={mode} onChange={setMode} />{mode === 'list' ? <DataTable caption="Operaciones ficticias" columns={[{ key: 'nombre', label: 'Nombre' }, { key: 'estado', label: 'Estado' }]} rows={rows.filter(row => !value || value === 'todos' || row.estado === value)} /> : <div className="grid gap-2 sm:grid-cols-2">{rows.filter(row => !value || value === 'todos' || row.estado === value).map(row => <Card key={row.id} className="p-3">{row.nombre}<p className="text-xs text-mute">{row.estado}</p></Card>)}</div>}</div>
     case 'Modal':
     case 'Drawer':
-    case 'ConfirmDialog': return <div className="grid gap-3"><Button onClick={() => setOpen(true)}>Abrir {name}</Button><p role="status" className="text-sm text-mute">{confirmed ? 'Fixture confirmado; sin persistencia.' : 'No hay cambios aplicados.'}</p>{name === 'ConfirmDialog' ? <ConfirmDialog open={open} onCancel={() => setOpen(false)} onConfirm={() => { setConfirmed(true); setOpen(false) }} title="Confirmar fixture" description="Esta acción solo cambia el estado local de la muestra." /> : name === 'Modal' ? <Modal open={open} onClose={() => setOpen(false)} title="Modal de muestra"><Nota tono="info">Contenido local; Escape o cerrar restaura el foco.</Nota><Button onClick={() => setOpen(false)}>Cerrar muestra</Button></Modal> : <Drawer open={open} onClose={() => setOpen(false)} title="Drawer de muestra"><Nota tono="info">Panel local sin solicitudes de red.</Nota><Button onClick={() => setOpen(false)}>Cerrar muestra</Button></Drawer>}</div>
+    case 'ConfirmDialog': return <div className="grid gap-3"><Button onClick={() => { setCambios(false); setMuestra(''); setOpen(true) }}>Abrir {name}</Button><p role="status" className="text-sm text-mute">{confirmed ? 'Fixture confirmado; sin persistencia.' : 'No hay cambios aplicados.'}</p>{name === 'ConfirmDialog' ? <ConfirmDialog open={open} onCancel={() => setOpen(false)} onConfirm={() => { setConfirmed(true); setOpen(false) }} title="Confirmar fixture" description="Esta acción solo cambia el estado local de la muestra." /> : name === 'Modal' ? <Modal open={open} dirty={cambios} onClose={() => setOpen(false)} title="Modal de muestra"><Nota tono="info">Contenido local; Escape o cerrar restaura el foco. Si escribís, el cierre pide confirmación.</Nota><div className="mt-3"><Label htmlFor={`${id}-muestra`}>Campo de muestra</Label><Input id={`${id}-muestra`} value={muestra} onChange={(evento) => { setMuestra(evento.target.value); setCambios(true) }} /></div><Button className="mt-3" onClick={() => setOpen(false)}>Cerrar muestra</Button></Modal> : <Drawer open={open} dirty={cambios} onClose={() => setOpen(false)} title="Drawer de muestra"><Nota tono="info">Panel local sin solicitudes de red. Si escribís, el cierre pide confirmación.</Nota><div className="mt-3"><Label htmlFor={`${id}-muestra`}>Campo de muestra</Label><Input id={`${id}-muestra`} value={muestra} onChange={(evento) => { setMuestra(evento.target.value); setCambios(true) }} /></div><Button className="mt-3" onClick={() => setOpen(false)}>Cerrar muestra</Button></Drawer>}</div>
     case 'EstadoGuardado':
     case 'BarraProgreso':
     case 'ProgresoChecklist': return <div className="grid gap-3"><Button variant="outline" onClick={() => setCount((count + 1) % 5)}>Avanzar fixture</Button><ProgresoChecklist hechas={count} total={4} /><BarraProgreso valor={count} max={4} etiqueta="Avance local" /><EstadoGuardado estado={{ ok: count === 4, texto: count === 4 ? 'Fixture completado' : 'Simulación pendiente; no guardada' }} /></div>

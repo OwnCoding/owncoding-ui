@@ -992,12 +992,122 @@ var TAMANOS_MODAL = {
   // editores y pantallas grandes
 };
 var TAMANO_MODAL_PREDETERMINADO = "formulario";
+var CIERRE_CON_CAMBIOS = {
+  titulo: "\xBFDescartar los cambios?",
+  descripcion: "Ten\xE9s cambios sin guardar en este formulario. Si cerr\xE1s ahora, se pierden.",
+  confirmar: "Descartar y cerrar",
+  seguir: "Seguir editando"
+};
 
 // src/utils/formulario.js
 var GRILLA_DOS_COLUMNAS = "grid gap-3 sm:grid-cols-2";
 var GRILLA_DOS_COLUMNAS_COMPACTA = "grid gap-2 sm:grid-cols-2";
 var PIE_ACCIONES = "flex flex-wrap justify-end gap-2";
 var PIE_ACCIONES_REVERSO = "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end";
+
+// src/utils/validacion.js
+var MENSAJES_VALIDACION = {
+  obligatorio: "Complet\xE1 este dato.",
+  largoMinimo: (minimo2) => `Escrib\xED al menos ${minimo2} caracteres.`,
+  largoMaximo: (maximo2) => `No superes ${maximo2} caracteres.`,
+  formato: "Revis\xE1 el formato de este dato.",
+  email: "Revis\xE1 el correo electr\xF3nico.",
+  minimo: (limite) => `El valor no puede ser menor a ${limite}.`,
+  maximo: (limite) => `El valor no puede ser mayor a ${limite}.`
+};
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function campoVacio(valor) {
+  if (valor === null || valor === void 0) return true;
+  if (Array.isArray(valor)) return valor.length === 0;
+  return String(valor).trim() === "";
+}
+var mensajeDe = (mensaje, respaldo) => typeof mensaje === "function" ? mensaje(respaldo) : mensaje || respaldo;
+function obligatorio(mensaje) {
+  return (valor) => campoVacio(valor) ? mensajeDe(mensaje, MENSAJES_VALIDACION.obligatorio) : "";
+}
+function largoMinimo(minimo2, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor)) return "";
+    return String(valor).length < minimo2 ? mensajeDe(mensaje, MENSAJES_VALIDACION.largoMinimo(minimo2)) : "";
+  };
+}
+function largoMaximo(maximo2, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor)) return "";
+    return String(valor).length > maximo2 ? mensajeDe(mensaje, MENSAJES_VALIDACION.largoMaximo(maximo2)) : "";
+  };
+}
+function patron(expresion, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor)) return "";
+    return expresion.test(String(valor)) ? "" : mensajeDe(mensaje, MENSAJES_VALIDACION.formato);
+  };
+}
+function emailValido(mensaje) {
+  return patron(EMAIL_RE, mensaje || MENSAJES_VALIDACION.email);
+}
+function minimo(limite, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor) || Number.isNaN(Number(valor))) return "";
+    return Number(valor) < limite ? mensajeDe(mensaje, MENSAJES_VALIDACION.minimo(limite)) : "";
+  };
+}
+function maximo(limite, mensaje) {
+  return (valor) => {
+    if (campoVacio(valor) || Number.isNaN(Number(valor))) return "";
+    return Number(valor) > limite ? mensajeDe(mensaje, MENSAJES_VALIDACION.maximo(limite)) : "";
+  };
+}
+function validarCampo(valor, reglas) {
+  const lista = (Array.isArray(reglas) ? reglas : [reglas]).filter(Boolean);
+  for (const regla of lista) {
+    const mensaje = typeof regla === "function" ? regla(valor) : "";
+    if (mensaje) return mensaje;
+  }
+  return "";
+}
+function validarCampos(valores, reglas = {}) {
+  const errores = {};
+  const campos = [];
+  for (const [campo, reglasCampo] of Object.entries(reglas)) {
+    const mensaje = validarCampo(valores?.[campo], reglasCampo);
+    if (mensaje) {
+      errores[campo] = mensaje;
+      campos.push(campo);
+    }
+  }
+  return { valido: campos.length === 0, errores, primerError: errores[campos[0]] || "", campos };
+}
+function limpiarError(errores = {}, campo) {
+  if (!campo) return {};
+  if (!(campo in errores)) return errores;
+  const siguiente = { ...errores };
+  delete siguiente[campo];
+  return siguiente;
+}
+
+// src/utils/resultado.js
+var RESULTADOS_VALIDOS = ["guardar", "copiar", "imprimir", "enviar"];
+var SIN_SUJETO = {
+  guardar: "Cambios guardados",
+  copiar: "Contenido copiado",
+  imprimir: "Impresi\xF3n enviada",
+  enviar: "Env\xEDo completado"
+};
+var CON_SUJETO = {
+  guardar: (sujeto) => `${sujeto} se guard\xF3`,
+  copiar: (sujeto) => `${sujeto} se copi\xF3`,
+  imprimir: (sujeto) => `${sujeto} se envi\xF3 a la impresora`,
+  enviar: (sujeto) => `${sujeto} se envi\xF3`
+};
+function mensajeResultado(accion, sujeto) {
+  const texto = String(sujeto || "").trim();
+  if (texto && CON_SUJETO[accion]) return CON_SUJETO[accion](texto);
+  return SIN_SUJETO[accion] || "Listo";
+}
+function mensajeFallo(accion) {
+  return RESULTADOS_VALIDOS.includes(accion) ? `No se pudo ${accion}` : "No se pudo completar";
+}
 
 // src/utils/tabla.js
 var ROTULO_DATO = "text-[10px] font-bold uppercase tracking-wider text-mute";
@@ -3053,7 +3163,7 @@ function paginaDePrueba({
   const ref = refDePrueba();
   const ahora = (/* @__PURE__ */ new Date()).toISOString();
   const t = crearTicket({ ancho }).iniciar();
-  const minimo = tipo === "corta";
+  const minimo2 = tipo === "corta";
   const pie = () => {
     t.linea();
     t.negrita().centrado(`VALIDACI\xD3N ${validador}`).negrita(false);
@@ -3080,7 +3190,7 @@ function paginaDePrueba({
     t.linea();
     t.texto("Acentos: \xE1 \xE9 \xED \xF3 \xFA \xFC \xF1 \xD1 \xBF? \xA1!");
   };
-  if (minimo) {
+  if (minimo2) {
     t.negrita().centrado(`TICKET DE PRUEBA ${nombreApp}`).negrita(false);
     t.linea();
     t.negrita().doble().centrado(`VALIDACI\xD3N ${validador}`).doble(false).negrita(false);
@@ -3171,7 +3281,7 @@ function paginaDePrueba({
     t.texto("Si ninguna cort\xF3, revis\xE1 Cutter Enable: YES y que el rollo est\xE9 bien cargado.");
     codigos("CORTE");
   }
-  if (!minimo) pie();
+  if (!minimo2) pie();
   t.avanza(2).corte(corte);
   return { base64: () => t.base64(), lineas: () => t.lineas(), ref, validacion, sufijo, validador, corte: t.corteEnviado() };
 }
@@ -3584,6 +3694,7 @@ export {
   CELDA_IDENTIDAD,
   CELDA_IDENTIDAD_GRANDE,
   CELDA_NUMERO,
+  CIERRE_CON_CAMBIOS,
   CIUDADES_PARAGUAY,
   CLAVE_USO_PERSONAS,
   CODIGOS_PAIS,
@@ -3599,6 +3710,7 @@ export {
   DEPARTAMENTOS_PARAGUAY,
   DIAS_SEMANA,
   DISPOSITIVOS_MOBILE,
+  EMAIL_RE,
   ESTADOS_CHIP,
   ESTADOS_COMPRA,
   ESTADOS_ENVIO,
@@ -3638,6 +3750,7 @@ export {
   MARCAS_CON_RELACION_FINANCIERA,
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
+  MENSAJES_VALIDACION,
   MENSAJE_RUC,
   MENSAJE_RUC_CONSULTA,
   MENSAJE_RUC_SIN_DATOS,
@@ -3658,6 +3771,7 @@ export {
   PRIORIDADES_COMPRA,
   QR_OPCIONES,
   RELACIONES_FINANCIERAS,
+  RESULTADOS_VALIDOS,
   ROTULO_DATO,
   ROTULO_SECCION,
   RUC_RE,
@@ -3685,6 +3799,7 @@ export {
   buscarPaisesTelefono,
   buscarRelacionesFinancieras,
   campoDeTipoIA,
+  campoVacio,
   caretTrasDigitos,
   categoriaDe,
   chipDeTono,
@@ -3720,6 +3835,7 @@ export {
   departamentoDe,
   destinoDeConexion,
   diasHasta,
+  emailValido,
   enHorarioSilencioso,
   envolver,
   errorMonto,
@@ -3788,15 +3904,22 @@ export {
   inicialesDeNombre,
   institucionesSugeridasPorMarca,
   internationalPhone,
+  largoMaximo,
   largoMaximoMonto,
+  largoMinimo,
   leerUsoPersonas,
   limiteMonto,
   limpiarDependientes,
+  limpiarError,
   limpiarTaxId,
   logoDeBanco,
   logoDeMedioPago,
   marcasRelacionadasConInstitucion,
+  maximo,
+  mensajeFallo,
+  mensajeResultado,
   metodoEnvio,
+  minimo,
   mismoMes,
   montoConSigno,
   montoGs,
@@ -3818,6 +3941,7 @@ export {
   normalizarSeriales,
   normalizarTelefono,
   normalizeTaxId,
+  obligatorio,
   opcionesDeCampoIA,
   opcionesDependiente,
   ordenDePrioridad,
@@ -3834,6 +3958,7 @@ export {
   parseUsdInput,
   partesVersion,
   partirSerial,
+  patron,
   payloadPush,
   periodoDeRango,
   plantillaDePrueba,
@@ -3883,6 +4008,8 @@ export {
   tonoRevision,
   tonoVencimiento,
   ultimos4,
+  validarCampo,
+  validarCampos,
   validarRegistrosIA,
   valorVacioIA,
   whatsappUrl

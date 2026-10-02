@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { cn } from '../utils/cn.js'
 import { formatGs, formatGsInput, formatUsdInput, normalizarMontoInput, caretTrasDigitos, excedeMonto, LIMITE_MONTO_GENERAL, largoMaximoMonto, SIMBOLOS_MONEDA } from '../utils/moneda.js'
 import { TAMANOS_CAMPO } from '../utils/tamanos.js'
-import { TAMANO_MODAL_PREDETERMINADO, TAMANOS_MODAL } from '../utils/modal.js'
+import { CIERRE_CON_CAMBIOS, TAMANO_MODAL_PREDETERMINADO, TAMANOS_MODAL } from '../utils/modal.js'
+import { mensajeFallo, mensajeResultado } from '../utils/resultado.js'
 import { textoDeTono } from '../utils/tonos.js'
 import useDialogFocusTrap from '../hooks/useDialogFocusTrap.js'
 import { crearRegistroPendientes } from '../utils/pilaOverlays.js'
@@ -291,6 +292,19 @@ export function useDialogPending(pendiente) {
   }, [contexto, id, pendiente])
 }
 
+// Cambios sin guardar del diálogo (#323): el formulario avisa mientras tenga
+// cambios y el cierre interactivo (Esc, clic afuera, ×, Cancelar) pide
+// confirmación en vez de descartarlos en silencio. Un formulario sin cambios no
+// arrastra al que sí los tiene, y el registro se libera al desmontar.
+export function useDialogDirty(hayCambios) {
+  const contexto = useContext(ContextoDialogo)
+  const id = useRef(Symbol('cambios')).current
+  useEfectoLayout(() => {
+    contexto?.registrarCambios(id, Boolean(hayCambios))
+    return () => contexto?.registrarCambios(id, false)
+  }, [contexto, id, hayCambios])
+}
+
 // Asocia a cada acción con forma de botón el `form` del formulario que la
 // contiene: la validación nativa, el Enter y el estado disabled siguen siendo
 // los del <form>. Los botones con `form` propio no se tocan.
@@ -351,22 +365,43 @@ export function SaveActions({ pendiente = false, children, cancelLabel = 'Cancel
 // El ancho se elige con `size` (TAMANOS_MODAL): no se pasa `max-w-*` suelto.
 // El foco, el Esc, el scroll bloqueado y la pila de capas son del hook; el
 // pie queda fijo abajo y `SaveActions`/`FormActions` se montan ahí.
-export function Modal({ open, onClose, title, children, className, size = TAMANO_MODAL_PREDETERMINADO, busy = false }) {
+// Con `dirty` (o con formularios que usan `useDialogDirty`) el cierre pide
+// confirmación en vez de descartar los cambios (#323); el guardado real cierra
+// por `onClose` directo y no pregunta.
+export function Modal({ open, onClose, title, children, className, size = TAMANO_MODAL_PREDETERMINADO, busy = false, dirty = false, descarte }) {
   const dialog = useRef(null)
   const titleId = useId()
   const [pie, setPie] = useState(null)
   const pendientes = useRef(crearRegistroPendientes()).current
   const [hayPendientes, setHayPendientes] = useState(false)
+  const cambios = useRef(crearRegistroPendientes()).current
+  const [hayCambiosRegistrados, setHayCambiosRegistrados] = useState(false)
+  const [confirmandoDescarte, setConfirmandoDescarte] = useState(false)
   const bloqueado = Boolean(busy || hayPendientes)
+  const hayCambios = Boolean(dirty) || hayCambiosRegistrados
   const cerrar = useCallback(() => {
-    if (!busy && !pendientes.bloqueado) onClose?.()
-  }, [busy, onClose, pendientes])
+    if (bloqueado) return
+    if (hayCambios) {
+      setConfirmandoDescarte(true)
+      return
+    }
+    onClose?.()
+  }, [bloqueado, hayCambios, onClose])
   const { esSuperior, requestClose } = useDialogFocusTrap(open, cerrar, dialog, { busy: bloqueado })
   const registrar = useCallback((id, pendiente) => {
     pendientes.registrar(id, pendiente)
     setHayPendientes(pendientes.bloqueado)
   }, [pendientes])
-  const contexto = useMemo(() => ({ requestClose, registrar }), [requestClose, registrar])
+  const registrarCambios = useCallback((id, hay) => {
+    cambios.registrar(id, hay)
+    setHayCambiosRegistrados(cambios.bloqueado)
+  }, [cambios])
+  const contexto = useMemo(() => ({ requestClose, registrar, registrarCambios }), [requestClose, registrar, registrarCambios])
+  // Sin cambios (o diálogo cerrado) la confirmación pendiente se retira sola.
+  useEffect(() => {
+    if (!open || !hayCambios) setConfirmandoDescarte(false)
+  }, [open, hayCambios])
+  const textosDescarte = { ...CIERRE_CON_CAMBIOS, ...descarte }
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 sm:items-center sm:p-6" onMouseDown={(e) => e.target === e.currentTarget && requestClose()}>
@@ -390,6 +425,18 @@ export function Modal({ open, onClose, title, children, className, size = TAMANO
         </ContextoDialogo.Provider>
         <div ref={setPie} className="border-t border-ink-600 p-4 empty:hidden sm:px-6" />
       </div>
+      {confirmandoDescarte && (
+        <ConfirmDialog
+          open
+          variant="danger"
+          title={textosDescarte.titulo}
+          description={textosDescarte.descripcion}
+          confirmLabel={textosDescarte.confirmar}
+          cancelLabel={textosDescarte.seguir}
+          onCancel={() => setConfirmandoDescarte(false)}
+          onConfirm={() => { setConfirmandoDescarte(false); onClose?.() }}
+        />
+      )}
     </div>
   )
 }
@@ -403,6 +450,7 @@ export function ConfirmDialog({
   title = 'Confirmar acción',
   description,
   confirmLabel = 'Confirmar',
+  cancelLabel = 'Cancelar',
   variant = 'primary',
   busy = false,
 }) {
@@ -414,7 +462,7 @@ export function ConfirmDialog({
         </div>
         <p className="text-sm leading-6 text-mute">{description}</p>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={busy}>Cancelar</Button>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={busy}>{cancelLabel}</Button>
           <Button type="button" variant={variant} onClick={onConfirm} disabled={busy}>{busy ? 'Procesando…' : confirmLabel}</Button>
         </div>
       </div>
@@ -502,23 +550,42 @@ export function IconAction({ icon, label, tone = 'mute', onClick, disabled = fal
 // ── Drawer ──────────────────────────────────────────────────────────
 // Panel lateral móvil: overlay y clic afuera; el foco atrapado, Esc y el
 // scroll bloqueado salen del mismo hook que el Modal. Entra deslizándose
-// desde el costado.
-export function Drawer({ open, onClose, title, children, side = 'right', className, busy = false }) {
+// desde el costado. Igual que el Modal, con `dirty` el cierre confirma antes
+// de descartar los cambios (#323).
+export function Drawer({ open, onClose, title, children, side = 'right', className, busy = false, dirty = false, descarte }) {
   const panel = useRef(null)
   const titleId = useId()
   const [pie, setPie] = useState(null)
   const pendientes = useRef(crearRegistroPendientes()).current
   const [hayPendientes, setHayPendientes] = useState(false)
+  const cambios = useRef(crearRegistroPendientes()).current
+  const [hayCambiosRegistrados, setHayCambiosRegistrados] = useState(false)
+  const [confirmandoDescarte, setConfirmandoDescarte] = useState(false)
   const bloqueado = Boolean(busy || hayPendientes)
+  const hayCambios = Boolean(dirty) || hayCambiosRegistrados
   const cerrar = useCallback(() => {
-    if (!busy && !pendientes.bloqueado) onClose?.()
-  }, [busy, onClose, pendientes])
+    if (bloqueado) return
+    if (hayCambios) {
+      setConfirmandoDescarte(true)
+      return
+    }
+    onClose?.()
+  }, [bloqueado, hayCambios, onClose])
   const { esSuperior, requestClose } = useDialogFocusTrap(open, cerrar, panel, { busy: bloqueado })
   const registrar = useCallback((id, pendiente) => {
     pendientes.registrar(id, pendiente)
     setHayPendientes(pendientes.bloqueado)
   }, [pendientes])
-  const contexto = useMemo(() => ({ requestClose, registrar }), [requestClose, registrar])
+  const registrarCambios = useCallback((id, hay) => {
+    cambios.registrar(id, hay)
+    setHayCambiosRegistrados(cambios.bloqueado)
+  }, [cambios])
+  const contexto = useMemo(() => ({ requestClose, registrar, registrarCambios }), [requestClose, registrar, registrarCambios])
+  // Sin cambios (o drawer cerrado) la confirmación pendiente se retira sola.
+  useEffect(() => {
+    if (!open || !hayCambios) setConfirmandoDescarte(false)
+  }, [open, hayCambios])
+  const textosDescarte = { ...CIERRE_CON_CAMBIOS, ...descarte }
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 bg-black/60" onMouseDown={(e) => e.target === e.currentTarget && requestClose()}>
@@ -546,6 +613,18 @@ export function Drawer({ open, onClose, title, children, side = 'right', classNa
         </ContextoDialogo.Provider>
         <div ref={setPie} className="border-t border-ink-600 p-4 empty:hidden" />
       </div>
+      {confirmandoDescarte && (
+        <ConfirmDialog
+          open
+          variant="danger"
+          title={textosDescarte.titulo}
+          description={textosDescarte.descripcion}
+          confirmLabel={textosDescarte.confirmar}
+          cancelLabel={textosDescarte.seguir}
+          onCancel={() => setConfirmandoDescarte(false)}
+          onConfirm={() => { setConfirmandoDescarte(false); onClose?.() }}
+        />
+      )}
     </div>
   )
 }
@@ -651,6 +730,24 @@ export function useToast() {
   const context = useContext(ToastContext)
   if (!context) return { success: () => {}, error: () => {}, info: () => {} }
   return context
+}
+
+// Resultados (#323): los cuatro avisos que toda pantalla repite (guardar,
+// copiar, imprimir, enviar) con el texto canónico de `utils/resultado.js`.
+// `guardado('Cliente')` → «Cliente se guardó»; `fallo('guardar', 'Revisá los
+// datos y probá de nuevo.')` → «No se pudo guardar» con el detalle abajo.
+export function useResultado() {
+  const toast = useToast()
+  return useMemo(() => {
+    const exito = (accion) => (sujeto, descripcion) => toast.success(mensajeResultado(accion, sujeto), descripcion)
+    return {
+      guardado: exito('guardar'),
+      copiado: exito('copiar'),
+      impreso: exito('imprimir'),
+      enviado: exito('enviar'),
+      fallo: (accion, descripcion) => toast.error(mensajeFallo(accion), descripcion),
+    }
+  }, [toast])
 }
 
 // ── Skeleton ────────────────────────────────────────────────────────

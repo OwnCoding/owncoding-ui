@@ -218,10 +218,36 @@ export function anchoParaLargo(largo: number): string
 export type TamanoModal = 'corto' | 'formulario' | 'amplio' | 'completo'
 export const TAMANOS_MODAL: Record<TamanoModal, string>
 export const TAMANO_MODAL_PREDETERMINADO: TamanoModal
+export const CIERRE_CON_CAMBIOS: { titulo: string; descripcion: string; confirmar: string; seguir: string }
 export const GRILLA_DOS_COLUMNAS: string
 export const GRILLA_DOS_COLUMNAS_COMPACTA: string
 export const PIE_ACCIONES: string
 export const PIE_ACCIONES_REVERSO: string
+export type ReglaValidacion = (valor: any) => string
+export const MENSAJES_VALIDACION: {
+  obligatorio: string
+  largoMinimo: (minimo: number) => string
+  largoMaximo: (maximo: number) => string
+  formato: string
+  email: string
+  minimo: (limite: number) => string
+  maximo: (limite: number) => string
+}
+export const EMAIL_RE: RegExp
+export function campoVacio(valor: any): boolean
+export function obligatorio(mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function largoMinimo(minimo: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function largoMaximo(maximo: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function patron(expresion: RegExp, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function emailValido(mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function minimo(limite: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function maximo(limite: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function validarCampo(valor: any, reglas?: ReglaValidacion | ReglaValidacion[] | null): string
+export function validarCampos(valores: Record<string, any>, reglas?: Record<string, ReglaValidacion | ReglaValidacion[]>): { valido: boolean; errores: Record<string, string>; primerError: string; campos: string[] }
+export function limpiarError(errores?: Record<string, string>, campo?: string): Record<string, string>
+export const RESULTADOS_VALIDOS: string[]
+export function mensajeResultado(accion: 'guardar' | 'copiar' | 'imprimir' | 'enviar', sujeto?: string): string
+export function mensajeFallo(accion: 'guardar' | 'copiar' | 'imprimir' | 'enviar'): string
 export const ROTULO_DATO: string
 export const CELDA_ENCABEZADO: string
 export const ROTULO_SECCION: string

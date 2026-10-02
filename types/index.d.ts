@@ -109,11 +109,13 @@ export function Eyebrow(props: HTMLAttributes<HTMLDivElement>): ReactElement
 export function Card(props: HTMLAttributes<HTMLDivElement>): ReactElement
 
 export type TamanoModal = 'corto' | 'formulario' | 'amplio' | 'completo'
-export function Modal(props: { open: boolean; onClose?: () => void; title?: ReactNode; children?: ReactNode; size?: TamanoModal; className?: string; busy?: boolean }): ReactElement | null
+export type TextosDescarte = { titulo?: string; descripcion?: ReactNode; confirmar?: string; seguir?: string }
+export function Modal(props: { open: boolean; onClose?: () => void; title?: ReactNode; children?: ReactNode; size?: TamanoModal; className?: string; busy?: boolean; dirty?: boolean; descarte?: TextosDescarte }): ReactElement | null
 export function FormActions(props: { children?: ReactNode; className?: string }): ReactElement
 export function SaveActions(props: { pendiente?: boolean; children?: ReactNode; cancelLabel?: string | false; className?: string }): ReactElement
 export function useDialogClose(): (() => void) | undefined
 export function useDialogPending(pendiente: boolean): void
+export function useDialogDirty(hayCambios: boolean): void
 export function conFormulario(children: ReactNode, formId?: string): ReactNode
 export function ConfirmDialog(props: {
   open: boolean
@@ -122,6 +124,7 @@ export function ConfirmDialog(props: {
   title?: string
   description?: ReactNode
   confirmLabel?: string
+  cancelLabel?: string
   variant?: 'primary' | 'danger' | 'success' | 'outline' | 'ghost'
   busy?: boolean
 }): ReactElement
@@ -129,7 +132,7 @@ export function ConfirmDialog(props: {
 export function Badge(props: HTMLAttributes<HTMLSpanElement> & { color?: 'blue' | 'green' | 'red' | 'orange' | 'yellow' | 'slate' }): ReactElement
 export function Dot(props: { color?: 'green' | 'red' | 'blue' | 'slate' | 'orange'; pulse?: boolean; className?: string }): ReactElement
 export function IconAction(props: { icon: string; label: string; tone?: Tono; onClick?: () => void; disabled?: boolean; size?: 'sm' | 'touch' }): ReactElement
-export function Drawer(props: { open: boolean; onClose?: () => void; title?: ReactNode; children?: ReactNode; side?: 'left' | 'right'; className?: string; busy?: boolean }): ReactElement | null
+export function Drawer(props: { open: boolean; onClose?: () => void; title?: ReactNode; children?: ReactNode; side?: 'left' | 'right'; className?: string; busy?: boolean; dirty?: boolean; descarte?: TextosDescarte }): ReactElement | null
 export type ToastOptions = { duration?: number; persistent?: boolean }
 export type ToastMethod = {
   (title: string, description?: string, options?: ToastOptions): void
@@ -137,6 +140,13 @@ export type ToastMethod = {
 }
 export function ToastProvider(props: { children?: ReactNode; demo?: boolean }): ReactElement
 export function useToast(): { success: ToastMethod; error: ToastMethod; info: ToastMethod }
+export function useResultado(): {
+  guardado: (sujeto?: string, descripcion?: string) => void
+  copiado: (sujeto?: string, descripcion?: string) => void
+  impreso: (sujeto?: string, descripcion?: string) => void
+  enviado: (sujeto?: string, descripcion?: string) => void
+  fallo: (accion: 'guardar' | 'copiar' | 'imprimir' | 'enviar', descripcion?: string) => void
+}
 export function Skeleton(props: { className?: string }): ReactElement
 export function EmptyState(props: { icon?: string; title?: ReactNode; description?: ReactNode; action?: ReactNode; compact?: boolean; className?: string }): ReactElement
 export function ErrorState(props: { title?: string; description?: ReactNode; onRetry?: () => void; compact?: boolean; role?: string; className?: string }): ReactElement
@@ -1134,6 +1144,37 @@ export const AVISO_REFRESCO: string
 export function crearEnvioUnico(enviar: (evento?: unknown) => unknown): { readonly enCurso: boolean; ejecutar(evento?: unknown): Promise<unknown> }
 export function completeSave(cerrar?: () => void, refrescar?: () => void | Promise<void>, opciones?: { avisar?: (mensaje: string) => void }): Promise<boolean>
 export function useSingleFlightSubmit(enviar: (evento?: any) => Promise<void> | void): { pendiente: boolean; onSubmit: (evento?: any) => Promise<void> }
+export type ReglaValidacion = (valor: any) => string
+export const MENSAJES_VALIDACION: {
+  obligatorio: string
+  largoMinimo: (minimo: number) => string
+  largoMaximo: (maximo: number) => string
+  formato: string
+  email: string
+  minimo: (limite: number) => string
+  maximo: (limite: number) => string
+}
+export const EMAIL_RE: RegExp
+export function campoVacio(valor: any): boolean
+export function obligatorio(mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function largoMinimo(minimo: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function largoMaximo(maximo: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function patron(expresion: RegExp, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function emailValido(mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function minimo(limite: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function maximo(limite: number, mensaje?: string | ((respaldo: string) => string)): ReglaValidacion
+export function validarCampo(valor: any, reglas?: ReglaValidacion | ReglaValidacion[] | null): string
+export function validarCampos(valores: Record<string, any>, reglas?: Record<string, ReglaValidacion | ReglaValidacion[]>): { valido: boolean; errores: Record<string, string>; primerError: string; campos: string[] }
+export function limpiarError(errores?: Record<string, string>, campo?: string): Record<string, string>
+export function useValidacionCampos(reglas: Record<string, ReglaValidacion | ReglaValidacion[]>): {
+  errores: Record<string, string>
+  validar: (valores: Record<string, any>) => { valido: boolean; errores: Record<string, string>; primerError: string; campos: string[] }
+  limpiar: (campo?: string) => void
+  errorDe: (campo: string) => string
+}
+export const RESULTADOS_VALIDOS: string[]
+export function mensajeResultado(accion: 'guardar' | 'copiar' | 'imprimir' | 'enviar', sujeto?: string): string
+export function mensajeFallo(accion: 'guardar' | 'copiar' | 'imprimir' | 'enviar'): string
 export function columnasDelTablero(columnas: ColumnaTablero[], tarjetas: TarjetaTablero[]): Array<ColumnaTablero & { tarjetas: TarjetaTablero[] }>
 export function agruparTarjetas(columnas: ColumnaTablero[], tarjetas: TarjetaTablero[]): Record<string, TarjetaTablero[]>
 export function destinosDeTarjeta(tarjeta: TarjetaTablero): string[]
@@ -1464,6 +1505,7 @@ export const TAMANOS_CAMPO: Record<string, string>
 export function anchoParaLargo(largo: number): string
 export const TAMANOS_MODAL: Record<TamanoModal, string>
 export const TAMANO_MODAL_PREDETERMINADO: TamanoModal
+export const CIERRE_CON_CAMBIOS: { titulo: string; descripcion: string; confirmar: string; seguir: string }
 export const GRILLA_DOS_COLUMNAS: string
 export const GRILLA_DOS_COLUMNAS_COMPACTA: string
 export const PIE_ACCIONES: string

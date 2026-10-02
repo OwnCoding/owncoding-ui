@@ -9,3 +9,13 @@ export const TAMANOS_MODAL = {
 }
 
 export const TAMANO_MODAL_PREDETERMINADO = 'formulario'
+
+// Cierre con cambios sin guardar: los textos canónicos del diálogo de descarte.
+// El objeto los pisa por prop (`descarte`) solo cuando el contexto lo pide; el
+// valor por defecto es el mensaje estándar del ecosistema.
+export const CIERRE_CON_CAMBIOS = {
+  titulo: '¿Descartar los cambios?',
+  descripcion: 'Tenés cambios sin guardar en este formulario. Si cerrás ahora, se pierden.',
+  confirmar: 'Descartar y cerrar',
+  seguir: 'Seguir editando',
+}
