@@ -1548,6 +1548,18 @@ export const CATALOGO_EXPORTS = [
     "presentacion": null
   },
   {
+    "nombre": "IA_DIALOGO_COMPLETO_CAMPOS",
+    "tipo": "api",
+    "categoria": "Carga con IA",
+    "presentacion": null
+  },
+  {
+    "nombre": "IA_DIALOGO_COMPLETO_REGISTROS",
+    "tipo": "api",
+    "categoria": "Carga con IA",
+    "presentacion": null
+  },
+  {
     "nombre": "IA_RATE_LIMIT",
     "tipo": "api",
     "categoria": "Carga con IA",
@@ -2885,6 +2897,12 @@ export const CATALOGO_EXPORTS = [
     "nombre": "TaxIdField",
     "tipo": "visual",
     "categoria": "Campos y formularios",
+    "presentacion": null
+  },
+  {
+    "nombre": "tamanoDialogoIA",
+    "tipo": "api",
+    "categoria": "Carga con IA",
     "presentacion": null
   },
   {

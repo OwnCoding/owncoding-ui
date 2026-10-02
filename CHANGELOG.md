@@ -13,6 +13,10 @@ documenta acá y en el README).
 Primera versión publicada de la línea: incluye las candidatas `v0.60.0`
 (galería) y `v0.60.1` (catálogo financiero), que no se habían taggeado.
 
+- **Galería:** el catálogo registra los exports nuevos de CargaIA
+  (`IA_DIALOGO_COMPLETO_CAMPOS`, `IA_DIALOGO_COMPLETO_REGISTROS` y
+  `tamanoDialogoIA`) y las métricas verificadas quedan en 543 exports
+  (397 de API); `gallery:check` y `readme:check` en verde.
 - **«Carga con IA» — diálogo compacto y premium (#16):** feedback real de PagaYa
   (popup gigante y con espacio muerto). El diálogo deja el `max-w-5xl` fijo:
   **entrada** y **resultado** abren en `amplio` (`max-w-3xl`), la **revisión**

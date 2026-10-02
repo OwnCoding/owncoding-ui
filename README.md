@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 540 exports, 146 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 543 exports, 146 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -102,9 +102,9 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **540** |
+| Exports de la entrada raíz | **543** |
 | Exports visuales | **146** |
-| API, modelos y utilidades | **394** |
+| API, modelos y utilidades | **397** |
 | Vistas curadas con fixtures controlados | **30** |
 | Categorías del catálogo | **14** |
 

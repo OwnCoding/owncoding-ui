@@ -32,7 +32,7 @@
 
     <g transform="translate(64 348)" font-size="14" font-weight="680">
       <rect width="126" height="38" rx="19" fill="#062e22" stroke="#087a57"/>
-      <text x="63" y="24" fill="#7cffc9" text-anchor="middle">540 exports</text>
+      <text x="63" y="24" fill="#7cffc9" text-anchor="middle">543 exports</text>
       <rect x="138" width="142" height="38" rx="19" fill="#18233e" stroke="#3d5ca3"/>
       <text x="209" y="24" fill="#b8c8ff" text-anchor="middle">146 visuales</text>
       <rect x="292" width="148" height="38" rx="19" fill="#25202f" stroke="#624d79"/>
