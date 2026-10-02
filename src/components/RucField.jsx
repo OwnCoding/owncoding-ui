@@ -1,7 +1,10 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Badge, Input } from './ui.jsx'
 import BotonDentroCampo from './BotonDentroCampo.jsx'
 import { cn } from '../utils/cn.js'
+
+// Preserve synchronous client invalidation without invoking layout effects in SSR.
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 const LARGO_MAXIMO_RUC = 10
 
@@ -57,17 +60,48 @@ export default function RucField({
   const hayRuc = Boolean(rucSanitizado)
   const puedeExtraer = mostrarExtractor && typeof consultar === 'function'
 
+  const requestGeneration = useRef(0)
+  const mounted = useRef(true)
+  const currentScope = useRef(null)
+  currentScope.current = { query: rucSanitizado, provider: consultar, disabled, consultarDisabled, puedeExtraer }
+
+  function invalidateLookup() {
+    requestGeneration.current += 1
+    setConsultando(false)
+    setResultado(null)
+    setError('')
+  }
+
+  // Controlled updates and provider replacement invalidate even without an input event.
+  useIsomorphicLayoutEffect(() => {
+    invalidateLookup()
+  }, [rucSanitizado, consultar, disabled, consultarDisabled, puedeExtraer])
+
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false; requestGeneration.current += 1 }
+  }, [])
+
   async function extraer() {
     const ruc = rucSanitizado
-    if (!ruc || consultando || !puedeExtraer) return
+    if (!ruc || consultando || !puedeExtraer || disabled || consultarDisabled) return
+    const generation = ++requestGeneration.current
+    const provider = consultar
+    const isCurrent = () => {
+      const scope = currentScope.current
+      return mounted.current && generation === requestGeneration.current &&
+        scope.query === ruc && scope.provider === provider &&
+        !scope.disabled && !scope.consultarDisabled && scope.puedeExtraer
+    }
     setConsultando(true); setError(''); setResultado(null)
     try {
-      const datos = await consultar(ruc)
+      const datos = await provider(ruc)
+      if (!isCurrent()) return
       if (!datos?.name) throw new Error('No encontramos datos para ese RUC.')
       setResultado(datos)
     } catch (causa) {
-      setError(causa?.message || 'No se pudo consultar el RUC. Podés completar los datos manualmente.')
-    } finally { setConsultando(false) }
+      if (isCurrent()) setError(causa?.message || 'No se pudo consultar el RUC. Podés completar los datos manualmente.')
+    } finally { if (isCurrent()) setConsultando(false) }
   }
 
   return (
@@ -88,7 +122,7 @@ export default function RucField({
           autoComplete={autoComplete}
           disabled={disabled}
           value={rucSanitizado}
-          onChange={(event) => { onChange?.(sanitizarRuc(event.target.value)); setResultado(null); setError('') }}
+          onChange={(event) => { invalidateLookup(); onChange?.(sanitizarRuc(event.target.value)) }}
           placeholder={placeholder}
         />
         {puedeExtraer && (

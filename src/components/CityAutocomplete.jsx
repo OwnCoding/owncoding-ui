@@ -1,8 +1,11 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Input } from './ui.jsx'
 import { buscarCiudad, departamentoDe } from '../catalog/ciudades.js'
 import { cn } from '../utils/cn.js'
 import useComboboxNavigation from '../hooks/useComboboxNavigation.js'
+
+// Preserve synchronous client invalidation without invoking layout effects in SSR.
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 // Ciudad con autocompletado y departamento automático: el departamento es
 // dependiente de la ciudad, así que se resuelve solo (al tipear una coincidencia
@@ -42,35 +45,84 @@ export default function CityAutocomplete({
   const timer = useRef(null)
   const raiz = useRef(null)
   const errorId = useId()
+  const requestGeneration = useRef(0)
+  const mounted = useRef(true)
+  const activeQuery = useRef(String(value || '').trim())
+  const previousProvider = useRef(buscar)
+  const previousLimit = useRef(limite)
+  const previousDisabled = useRef(disabled)
+  const currentScope = useRef(null)
+  currentScope.current = { query: String(value || '').trim(), provider: buscar, limite, disabled }
+
+  function invalidateSearch() {
+    requestGeneration.current += 1
+    if (timer.current !== null) clearTimeout(timer.current)
+    timer.current = null
+  }
+
+  useIsomorphicLayoutEffect(() => {
+    const query = String(value || '').trim()
+    if (query !== activeQuery.current || buscar !== previousProvider.current ||
+      limite !== previousLimit.current || disabled !== previousDisabled.current) {
+      invalidateSearch()
+      activeQuery.current = query
+      setSugerencias([])
+      setAbierto(false)
+      setError('')
+    }
+    previousProvider.current = buscar
+    previousLimit.current = limite
+    previousDisabled.current = disabled
+  }, [value, buscar, limite, disabled])
 
   useEffect(() => {
     const cerrarFuera = (event) => {
       if (event.target instanceof Node && raiz.current?.contains(event.target)) return
+      invalidateSearch()
       setAbierto(false)
     }
     document.addEventListener('mousedown', cerrarFuera)
     return () => document.removeEventListener('mousedown', cerrarFuera)
   }, [])
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false; invalidateSearch() }
+  }, [])
 
   function resolver(texto) {
+    // Cancellation precedes all early returns, including a cleared/short query.
+    invalidateSearch()
     const q = String(texto || '').trim()
-    if (q.length < 2) { setSugerencias([]); setAbierto(false); setError(''); return }
+    activeQuery.current = q
+    setSugerencias([])
+    setAbierto(false)
+    setError('')
+    if (q.length < 2 || disabled) return
     if (!buscar) {
       setSugerencias(buscarCiudad(q, limite))
       setAbierto(true)
-      setError('')
       return
     }
-    if (timer.current) clearTimeout(timer.current)
+    const generation = requestGeneration.current
+    const provider = buscar
+    const limit = limite
+    const isCurrent = () => {
+      const scope = currentScope.current
+      return mounted.current && generation === requestGeneration.current &&
+        scope.query === q && scope.provider === provider && scope.limite === limit && !scope.disabled
+    }
     timer.current = setTimeout(async () => {
+      timer.current = null
+      if (!isCurrent()) return
       try {
-        const filas = await buscar(q)
-        setSugerencias(Array.isArray(filas) ? filas.slice(0, limite) : [])
+        const filas = await provider(q)
+        if (!isCurrent()) return
+        setSugerencias(Array.isArray(filas) ? filas.slice(0, limit) : [])
         setAbierto(true)
         setError('')
       } catch {
+        if (!isCurrent()) return
         setSugerencias([])
         setAbierto(false)
         setError(mensajeError)
@@ -87,9 +139,10 @@ export default function CityAutocomplete({
   }
 
   function elegir(fila) {
-    if (timer.current) clearTimeout(timer.current)
+    invalidateSearch()
     const ciudad = ciudadDe(fila)
     const departamento = departamentoDeFila(fila) || departamentoDe(ciudad)
+    activeQuery.current = String(ciudad || '').trim()
     onChange?.(ciudad)
     onSelect?.(ciudad, departamento)
     setSugerencias([])
@@ -100,7 +153,7 @@ export default function CityAutocomplete({
   const navegacion = useComboboxNavigation({
     options: sugerencias,
     open: listaVisible,
-    onOpenChange: setAbierto,
+    onOpenChange: (open) => { if (!open) invalidateSearch(); setAbierto(open) },
     onSelect: elegir,
     getOptionKey: (fila) => `${ciudadDe(fila)}-${departamentoDeFila(fila)}`,
   })
