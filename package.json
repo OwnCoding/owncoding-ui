@@ -58,6 +58,7 @@
     "src",
     "types",
     "docs",
+    "!docs/qa",
     "CHANGELOG.md",
     "tailwind-preset.js",
     "README.md"

@@ -26,6 +26,7 @@ import {
   normalizarResultadoIA,
   opcionesDeCampoIA,
   registrosIncluidosIA,
+  tamanoDialogoIA,
   tipoDeEsquemaIA,
   tituloDeRegistroIA,
   validarRegistrosIA,
@@ -88,6 +89,7 @@ export function CargaIA({
   placeholder,
   maxTexto,
   maxRegistros,
+  size,
   className,
   classNameBoton,
 }) {
@@ -113,6 +115,7 @@ export function CargaIA({
           placeholder={placeholder}
           maxTexto={maxTexto}
           maxRegistros={maxRegistros}
+          size={size}
           className={className}
         />
       ) : null}
@@ -213,7 +216,7 @@ function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
       aria-label={titulo}
       className={cn('rounded-xl border border-ink-600 bg-ink-800/40 p-3 sm:p-4', !registro.incluir && 'opacity-60')}
     >
-      <header className="mb-3 flex items-start justify-between gap-3">
+      <header className="mb-2.5 flex items-start justify-between gap-3">
         <p className="min-w-0 flex-1 break-words text-sm font-semibold text-fore">{titulo}</p>
         <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-mute">
           <span className="hidden sm:inline">{registro.incluir ? 'Incluir' : 'Descartado'}</span>
@@ -225,11 +228,11 @@ function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
         </label>
       </header>
       {registro.avisos?.length > 0 ? (
-        <Nota tono="warn" compact className="mb-3">
+        <Nota tono="warn" compact className="mb-2.5">
           {registro.avisos.join(' ')}
         </Nota>
       ) : null}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2">
         {(tipo?.campos ?? []).map((campo) => (
           <CampoRegistroIA
             key={campo.id}
@@ -248,7 +251,8 @@ function TarjetaRegistroIA({ registro, tipo, errores, onCambiar, onIncluir }) {
 /**
  * Diálogo del asistente. La app inyecta `consultarConfig` (opcional: sin él se
  * asume configurado), `analizar` y `crear`; `crear` recibe solo los registros
- * incluidos y **solo se llama desde «Crear todo»**.
+ * incluidos y **solo se llama desde «Crear todo»**. El ancho se adapta a la
+ * fase y al contenido (#16) salvo que la app lo fije con `size`.
  */
 export default function DialogoCargaIA({
   abierto,
@@ -262,6 +266,7 @@ export default function DialogoCargaIA({
   placeholder = PLACEHOLDER,
   maxTexto = IA_TEXTO_MAX,
   maxRegistros = IA_REGISTROS_MAX,
+  size = 'auto',
   className,
 }) {
   const idTexto = useId()
@@ -422,7 +427,6 @@ export default function DialogoCargaIA({
           .filter(Boolean)
           .join(', ')} a la vez).`
       : '',
-    `Máximo ${topeTexto.toLocaleString('es-PY')} caracteres.`,
   ]
     .filter(Boolean)
     .join(' ')
@@ -436,12 +440,23 @@ export default function DialogoCargaIA({
       }
     : null
 
+  // #16: compacto por defecto; `completo` solo cuando la revisión tiene varias
+  // tarjetas o tipos densos. `size` lo pisa si la app quiere fijarlo.
+  const tamano = size === 'auto' ? tamanoDialogoIA(fase, { registros, esquema }) : size
+
   return (
     <Modal
       open={Boolean(abierto)}
       onClose={onCerrar}
-      title={titulo}
-      size="completo"
+      title={
+        <span className="flex items-center gap-2">
+          <span aria-hidden="true" className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-fono/10 text-fono-light">
+            <Icon name="sparkles" className="h-3.5 w-3.5" />
+          </span>
+          {titulo}
+        </span>
+      }
+      size={tamano}
       busy={analizando || creando}
       className={className}
     >
@@ -454,7 +469,7 @@ export default function DialogoCargaIA({
       ) : null}
 
       {configError ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <Aviso tono="error">{configError}</Aviso>
           <FormActions>
             <Button type="button" variant="ghost" onClick={onCerrar}>
@@ -468,7 +483,7 @@ export default function DialogoCargaIA({
       ) : null}
 
       {config && !config.configurada ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <Nota tono="warn">
             La IA no está configurada en este servidor. Mientras tanto, los registros se cargan a mano desde cada
             módulo, sin perder nada.
@@ -488,7 +503,7 @@ export default function DialogoCargaIA({
       ) : null}
 
       {config?.configurada && permitidos.length === 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <Nota tono="warn">No tenés permiso para crear ninguno de los tipos de este asistente.</Nota>
           <FormActions>
             <Button type="button" variant="primary" onClick={onCerrar}>
@@ -500,42 +515,50 @@ export default function DialogoCargaIA({
 
       {config?.configurada && permitidos.length > 0 && fase === 'entrada' ? (
         <form
-          className="space-y-4"
+          className="space-y-3"
           onSubmit={(evento) => {
             evento.preventDefault()
             void analizarTexto()
           }}
         >
-          <div>
-            <FormField label="Texto para cargar" htmlFor={idTexto} hint={pista}>
-              <Textarea
-                id={idTexto}
-                rows={10}
-                maxLength={topeTexto}
-                value={entrada}
-                disabled={analizando}
-                placeholder={placeholder}
-                aria-describedby={`${idTexto}-descripcion`}
-                onChange={(evento) => setEntrada(evento.target.value)}
-              />
-            </FormField>
-            <p className="mt-1.5 text-right text-xs text-mute">
+          <FormField label="Texto para cargar" htmlFor={idTexto}>
+            <Textarea
+              id={idTexto}
+              rows={5}
+              maxLength={topeTexto}
+              value={entrada}
+              disabled={analizando}
+              placeholder={placeholder}
+              aria-describedby={`${idTexto}-descripcion`}
+              onChange={(evento) => setEntrada(evento.target.value)}
+              className="min-h-28 max-h-56 resize-y"
+            />
+          </FormField>
+          <div
+            id={`${idTexto}-descripcion`}
+            className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-xs text-mute"
+          >
+            <p>{pista}</p>
+            <p className="ml-auto tabular-nums">
               {entrada.length.toLocaleString('es-PY')} / {topeTexto.toLocaleString('es-PY')}
             </p>
           </div>
-          <p className="text-xs leading-5 text-mute">
-            Se manda solo este texto al proveedor de IA configurado{config.modelo ? ` (${config.modelo})` : ''} para
-            armar la vista previa; no se guarda ni se toca la base.{' '}
-            {enlacePrivacidad ? (
-              <a
-                className="font-medium text-fono-light underline-offset-2 hover:underline"
-                href={enlacePrivacidad}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Política de privacidad
-              </a>
-            ) : null}
+          <p className="flex items-start gap-1.5 text-xs leading-5 text-mute">
+            <Icon name="shield" className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span>
+              Se manda solo este texto al proveedor de IA configurado{config.modelo ? ` (${config.modelo})` : ''} para
+              armar la vista previa; no se guarda ni se toca la base.{' '}
+              {enlacePrivacidad ? (
+                <a
+                  className="font-medium text-fono-light underline-offset-2 hover:underline"
+                  href={enlacePrivacidad}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Política de privacidad
+                </a>
+              ) : null}
+            </span>
           </p>
           {error ? <Aviso tono="error">{error}</Aviso> : null}
           <FormActions>
@@ -550,7 +573,7 @@ export default function DialogoCargaIA({
       ) : null}
 
       {config?.configurada && permitidos.length > 0 && fase === 'revision' ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <p className="text-sm text-mute">
             {grupos.length > 0 ? (
               <>
@@ -561,11 +584,12 @@ export default function DialogoCargaIA({
               'No detectamos registros en el texto.'
             )}
           </p>
-          {avisos.length > 0 ? <Nota tono="warn">{avisos.join(' ')}</Nota> : null}
+          {avisos.length > 0 ? <Nota tono="warn" compact>{avisos.join(' ')}</Nota> : null}
           {error ? <Aviso tono="error">{error}</Aviso> : null}
 
           {grupos.length === 0 ? (
             <EmptyState
+              compact
               icon="sparkles"
               title="No detectamos registros"
               description="Probá con un texto más completo (nombres, fechas o precios) o volvé a pegar."
@@ -573,7 +597,7 @@ export default function DialogoCargaIA({
           ) : null}
 
           {grupos.map(({ tipo, registros: delTipo }) => (
-            <section key={tipo.id} aria-label={`${tipo.label} detectados (${delTipo.length})`} className="space-y-2.5">
+            <section key={tipo.id} aria-label={`${tipo.label} detectados (${delTipo.length})`} className="space-y-2">
               <h3 className="text-[10px] font-bold uppercase tracking-wider text-mute">
                 {tipo.label} <span className="text-mute/80">{delTipo.length}</span>
               </h3>
@@ -607,14 +631,17 @@ export default function DialogoCargaIA({
       ) : null}
 
       {config?.configurada && permitidos.length > 0 && fase === 'listo' && resumen ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {resumen.creados === null ? (
             <Nota tono="info">La app terminó el alta; el detalle queda en su módulo.</Nota>
           ) : resumen.creados > 0 ? (
-            <Aviso tono="ok">
-              {resumen.total !== null && resumen.creados < resumen.total
-                ? `Creamos ${resumen.creados} de ${resumen.total} registros.`
-                : `Creamos ${listar(resumen.creados, 'registro', 'registros')}.`}
+            <Aviso tono="ok" className="flex items-start gap-2">
+              <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>
+                {resumen.total !== null && resumen.creados < resumen.total
+                  ? `Creamos ${resumen.creados} de ${resumen.total} registros.`
+                  : `Creamos ${listar(resumen.creados, 'registro', 'registros')}.`}
+              </span>
             </Aviso>
           ) : resumen.errores.length === 0 ? (
             <Nota tono="neutro">No se creó ningún registro.</Nota>

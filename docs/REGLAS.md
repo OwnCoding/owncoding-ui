@@ -1059,6 +1059,14 @@ editable, los errores esperables y el matching, aprendidos en EventOS
   chequear»), entrada, analizando, error con reintento, **revisión editable por
   tarjetas con avisos** (incluir/descartar, obligatorios visibles) y resultado
   (creados/errores/advertencias). El diálogo se monta recién al abrirlo.
+- **Ancho adaptativo y densidad (#16):** `entrada` y `resultado` abren en
+  `amplio` (`max-w-3xl`); la `revisión` pide `completo` solo con varias tarjetas
+  (`IA_DIALOGO_COMPLETO_REGISTROS`) o tipos densos
+  (`IA_DIALOGO_COMPLETO_CAMPOS`), y `tamanoDialogoIA(fase, …)` lo resuelve. La
+  prop aditiva `size` fija el ancho. El textarea usa alto acotado (5 filas,
+  `min-h-28`/`max-h-56`, redimensionable) con el contador en la fila del hint;
+  el ritmo sigue §17 (gap 12–16, tarjetas 16–20, secciones 16–24) y mobile
+  conserva el bottom-sheet a alto completo.
 
 ### La persona confirma: carrito editable (#15)
 

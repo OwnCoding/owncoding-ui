@@ -14,6 +14,8 @@ import {
   CargaIA,
   DialogoCargaIA,
   IA_BOTON,
+  IA_DIALOGO_COMPLETO_CAMPOS,
+  IA_DIALOGO_COMPLETO_REGISTROS,
   IA_RATE_LIMIT,
   IA_REGISTROS_MAX,
   IA_TEXTO_MAX,
@@ -22,6 +24,7 @@ import {
   normalizarResultadoIA,
   opcionesDeCampoIA,
   registrosIncluidosIA,
+  tamanoDialogoIA,
   tituloDeRegistroIA,
   validarRegistrosIA,
 } from '../src/index.js'
@@ -196,6 +199,31 @@ describe('contrato puro de Carga con IA', () => {
       { value: 'RESELLER', label: 'Mayorista' },
     ])
   })
+
+  test('el ancho del diálogo se adapta a la fase y al contenido (#16)', () => {
+    expect(tamanoDialogoIA('entrada', { registros: [], esquema: ESQUEMA })).toBe('amplio')
+    expect(tamanoDialogoIA('listo', { registros: [], esquema: ESQUEMA })).toBe('amplio')
+    expect(tamanoDialogoIA('revision', { registros: [], esquema: ESQUEMA })).toBe('amplio')
+    const pocos = Array.from({ length: IA_DIALOGO_COMPLETO_REGISTROS - 1 }, (_, indice) => ({ id: `r${indice}` }))
+    const varios = Array.from({ length: IA_DIALOGO_COMPLETO_REGISTROS }, (_, indice) => ({ id: `r${indice}` }))
+    expect(tamanoDialogoIA('revision', { registros: pocos, esquema: ESQUEMA })).toBe('amplio')
+    expect(tamanoDialogoIA('revision', { registros: varios, esquema: ESQUEMA })).toBe('completo')
+    // Un tipo denso también pide el ancho completo aunque haya pocas tarjetas.
+    const denso = {
+      tipos: [
+        {
+          id: 'x',
+          label: 'X',
+          campos: Array.from({ length: IA_DIALOGO_COMPLETO_CAMPOS }, (_, indice) => ({
+            id: `c${indice}`,
+            label: `C${indice}`,
+            tipo: 'texto',
+          })),
+        },
+      ],
+    }
+    expect(tamanoDialogoIA('revision', { registros: [{ id: 'r' }], esquema: denso })).toBe('completo')
+  })
 })
 
 describe('BotonCargaIA y DialogoCargaIA', () => {
@@ -239,6 +267,11 @@ describe('BotonCargaIA y DialogoCargaIA', () => {
     )
     const area = ui.contenedor.querySelector('textarea')
     expect(area.getAttribute('maxlength')).toBe(String(IA_TEXTO_MAX))
+    // #16: alto acotado y redimensionable, con el contador en la fila del hint.
+    expect(area.getAttribute('rows')).toBe('5')
+    expect(area.className).toContain('min-h-28')
+    expect(area.className).toContain('max-h-56')
+    expect(ui.contenedor.querySelector('[role="dialog"]').className).toContain('max-w-3xl')
     expect(ui.contenedor.textContent).toContain('0 / 20.000')
     expect(ui.contenedor.textContent).toContain('Se manda solo este texto al proveedor de IA')
     expect(ui.contenedor.querySelector('a[href="/privacidad"]')).not.toBeNull()
@@ -246,6 +279,43 @@ describe('BotonCargaIA y DialogoCargaIA', () => {
     ui.escribir(area, 'Ana — 0981 123 456')
     expect(ui.boton('Analizar con IA').disabled).toBe(false)
     ui.desmontar()
+  })
+
+  test('la revisión con varias tarjetas usa el ancho completo y `size` lo pisa (#16)', async () => {
+    const muchos = Array.from({ length: IA_DIALOGO_COMPLETO_REGISTROS }, (_, indice) => ({
+      tipo: 'clientes',
+      valores: { nombre: `Cliente ${indice}` },
+    }))
+    const ui = montar(
+      <DialogoCargaIA abierto onCerrar={() => {}} esquema={ESQUEMA} analizar={async () => ({ registros: muchos })} crear={async () => ({})} />,
+    )
+    ui.escribir(ui.contenedor.querySelector('textarea'), 'texto')
+    await ui.enviarAsync(ui.contenedor.querySelector('form'))
+    expect(ui.contenedor.querySelectorAll('article')).toHaveLength(IA_DIALOGO_COMPLETO_REGISTROS)
+    expect(ui.contenedor.querySelector('[role="dialog"]').className).toContain('max-w-5xl')
+    ui.desmontar()
+
+    // Una revisión chica queda en `amplio`…
+    const chica = montar(
+      <DialogoCargaIA
+        abierto
+        onCerrar={() => {}}
+        esquema={ESQUEMA}
+        analizar={async () => ({ registros: [{ tipo: 'clientes', valores: { nombre: 'Ana' } }] })}
+        crear={async () => ({})}
+      />,
+    )
+    chica.escribir(chica.contenedor.querySelector('textarea'), 'texto')
+    await chica.enviarAsync(chica.contenedor.querySelector('form'))
+    expect(chica.contenedor.querySelector('[role="dialog"]').className).toContain('max-w-3xl')
+    chica.desmontar()
+
+    // …y la prop aditiva la fija.
+    const fija = montar(
+      <DialogoCargaIA abierto onCerrar={() => {}} size="formulario" esquema={ESQUEMA} analizar={async () => ({})} crear={async () => ({})} />,
+    )
+    expect(fija.contenedor.querySelector('[role="dialog"]').className).toContain('max-w-xl')
+    fija.desmontar()
   })
 
   test('sin proveedor configurado avisa, no rompe y permite volver a chequear', async () => {
@@ -396,7 +466,9 @@ describe('guardas de fuente y reglas', () => {
     expect(reglas).toContain('No se persiste el texto pegado')
     expect(reglas).toContain('Ley 7593/2025')
     expect(reglas).toContain('IA_RATE_LIMIT')
+    expect(reglas).toContain('IA_DIALOGO_COMPLETO_REGISTROS')
     expect(adopcion).toContain('Carga con IA')
     expect(changelog).toContain('«Carga con IA» (#11)')
+    expect(changelog).toContain('#16')
   })
 })
