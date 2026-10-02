@@ -55,6 +55,7 @@ import {
   MARCAS_CONECTADAS_PREVIEW,
   MARCAS_PAGO_RESTO_PREVIEW,
   SOLUCIONES_PAGO_COMERCIOS_PREVIEW,
+  bankReviewSize,
 } from './financial-fixtures.js'
 
 const METRICAS_CATALOGO = Object.freeze({
@@ -184,10 +185,11 @@ function VistaVarianteBanco({ nombre, variante }) {
       <span className="bank-variant__label">{etiqueta}</span>
       <div
         className="bank-variant__surface"
+        data-bank-review-size={bankReviewSize(nombre, variante)}
         style={registro?.visual?.fondo ? { backgroundColor: registro.visual.fondo } : undefined}
       >
         {disponible ? (
-          <BancoLogo banco={nombre} variante={variante} alto={nombre === 'Itaú' && variante === 'horizontal' && contenida ? 'h-16' : variante === 'compacto' ? 'h-12' : 'h-10'} />
+          <BancoLogo banco={nombre} variante={variante} alto={bankReviewSize(nombre, variante)} />
         ) : (
           <span className="bank-variant__pending" role="status">Sin asset redistribuible</span>
         )}
@@ -213,7 +215,7 @@ function TarjetaBancoRevision({ nombre, seleccionado, onSelect }) {
           {seleccionado ? 'Seleccionado' : 'Ver arriba'}
         </button>
       </header>
-      <div className="bank-review-card__variants">
+      <div className="bank-review-card__variants" data-bank-review-enlarged={bankReviewSize(nombre, 'compacto') !== 'h-12' ? 'true' : undefined}>
         <VistaVarianteBanco nombre={nombre} variante="compacto" />
         <VistaVarianteBanco nombre={nombre} variante="horizontal" />
       </div>

@@ -313,7 +313,7 @@ var LOGOS_BANCOS = {
     fuenteOficial: "https://www.bnf.gov.py/",
     estado: "verificado",
     redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO("bnf-compacto.png"), horizontal: EMPAQUETADO("bnf-horizontal.svg", "oficial", { fondo: "#0B1F3A", padding: true }) }
+    variantes: { compacto: EMPAQUETADO("bnf-compacto.png", "oficial", { fondo: "#0B1F3A", padding: true }), horizontal: EMPAQUETADO("bnf-horizontal.svg", "oficial", { fondo: "#0B1F3A", padding: true }) }
   }),
   "Sudameris": entrada({
     categoria: "banco",
@@ -1561,4 +1561,4 @@ export {
   BancoLogo,
   MedioPagoLogo
 };
-//# sourceMappingURL=chunk-4FUMTVCC.js.map
+//# sourceMappingURL=chunk-Z5ZO4D3O.js.map

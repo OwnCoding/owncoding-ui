@@ -163,7 +163,7 @@ export const LOGOS_BANCOS = {
   'Banco Nacional de Fomento': entrada({
     categoria: 'banco', alias: ['bnf', 'nacional de fomento'], monograma: 'BNF', color: '#006A44', archivo: 'bnf-horizontal.svg',
     fuenteOficial: 'https://www.bnf.gov.py/', estado: 'verificado', redistribucion: AUTORIZACION_ASSETS_FINANCIEROS,
-    variantes: { compacto: EMPAQUETADO('bnf-compacto.png'), horizontal: EMPAQUETADO('bnf-horizontal.svg', 'oficial', { fondo: '#0B1F3A', padding: true }) },
+    variantes: { compacto: EMPAQUETADO('bnf-compacto.png', 'oficial', { fondo: '#0B1F3A', padding: true }), horizontal: EMPAQUETADO('bnf-horizontal.svg', 'oficial', { fondo: '#0B1F3A', padding: true }) },
   }),
   'Sudameris': entrada({
     categoria: 'banco', alias: ['banco sudameris'], monograma: 'S', color: '#FF0000', archivo: 'sudameris-horizontal.svg',

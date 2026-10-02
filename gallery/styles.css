@@ -728,3 +728,15 @@
   width: calc(100% - 2rem);
   max-width: 24rem;
 }
+
+/* Larger review frames preserve complete original marks, including source whitespace. */
+.bank-review-card__variants[data-bank-review-enlarged] { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.bank-variant__surface[data-bank-review-size="h-24"],
+.bank-variant__surface[data-bank-review-size="h-28"],
+.bank-variant__surface[data-bank-review-size="h-20"] { min-height: 8.25rem; padding: .35rem; }
+.bank-variant__surface[data-bank-review-size="h-24"] > span { height: 6rem; }
+.bank-variant__surface[data-bank-review-size="h-28"] > span { height: 7rem; }
+.bank-variant__surface[data-bank-review-size="h-20"] > span { height: 5rem; }
+@media (max-width: 420px) {
+  .bank-review-card__variants[data-bank-review-enlarged] { grid-template-columns: minmax(0, 1fr); }
+}

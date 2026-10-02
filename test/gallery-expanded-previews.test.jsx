@@ -62,7 +62,7 @@ test('collapsible demo explicitly disables session persistence', () => {
   spy.mockRestore()
 })
 test('Itaú contained slot has targeted larger sizing without changing other marks', () => {
-  const source = readFileSync('gallery/main.jsx', 'utf8')
+  const source = readFileSync('gallery/financial-fixtures.js', 'utf8')
   expect(source).toContain("nombre === 'Itaú' && variante === 'horizontal' && contenida ? 'h-16'")
   expect(source).toContain("variante === 'compacto' ? 'h-12' : 'h-10'")
 })
