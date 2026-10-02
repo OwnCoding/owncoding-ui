@@ -52,7 +52,9 @@ const version = packageJson.version
 if (!readme.includes(`v${version}`)) fallar(`README no referencia la versión actual: v${version}`)
 if (!readme.includes(`versi%C3%B3n-${version}-`)) fallar(`badge de versión desactualizado: ${version}`)
 if (!readme.includes('https://controlaria.online')) fallar('falta el destino de la galería')
-if (!/No se\s+considera publicado/.test(readme)) fallar('la galería debe conservar su aclaración de despliegue pendiente')
+if (!/Estado verificado el \d{4}-\d{2}-\d{2}/.test(readme)) fallar('falta fecha de evidencia de publicación')
+if (!readme.includes('https://controlaria.online/status.json') || !/build `[a-f0-9]{40}`/.test(readme)) fallar('falta evidencia de status.json y build publicado')
+if (!readme.includes('HTTP 200') || !readme.includes('fixtures locales')) fallar('falta evidencia HTTP o limitación de demostraciones locales')
 
 const previews = [
   'docs/assets/readme-hero.svg',

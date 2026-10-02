@@ -1614,7 +1614,18 @@
     {
       "catalog": "payment",
       "id": "Pix",
-      "reason": "Official BCB artwork is restricted to the participant area; the public manual is not an asset kit."
+      "reason": "Public official BCB ZIP contains original AI/EPS/PDF artwork but no browser-ready PNG/SVG/GIF/JPG/WebP files. No conversion, recreation or runtime integration applied.",
+      "sourceUrl": "https://www.bcb.gov.br/content/estabilidadefinanceira/pix/marca/ArquivosdaMarcaPix.zip",
+      "sourcePageUrl": "https://www.bcb.gov.br/estabilidadefinanceira/pix-participantes",
+      "sourceSha256": "fcae3039f06bd33023f4236d8649eb289ce9cbf50e52f62516f2c201d2a600ac",
+      "sourceBytes": 124383881,
+      "archiveFormatCounts": {
+        "ai": 70,
+        "eps": 70,
+        "pdf": 52
+      },
+      "browserReadyFiles": 0,
+      "verifiedAt": "2026-10-02"
     },
     {
       "catalog": "payment",

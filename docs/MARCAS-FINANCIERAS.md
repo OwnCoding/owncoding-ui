@@ -155,7 +155,7 @@ como `Pagopar` → `upay`.
 ## Cobertura y bloqueos explícitos
 
 El runtime conserva cinco registros de bloqueo: Banco do Brasil (calidad y
-exclusión del selector por curaduría), Pix (original BCB no obtenido), Red
+exclusión del selector por curaduría), Pix (originales BCB sin formato browser-ready verificado), Red
 Infonet y Panal (canvas transparente de sus originales), y la variante horizontal
 de uPOS (producto padre, sin logo independiente). No equivale a cinco marcas
 `asset-bloqueado`: son tres marcas de pago completamente bloqueadas, un slot
@@ -167,10 +167,20 @@ La variante horizontal de Mastercard contiene el símbolo original, sin afirmar
 un wordmark independiente. El manifiesto guarda URL/hash/fecha de estos dos
 archivos. No se afirma que el acceso público sea una licencia abierta.
 
+El 2026-10-02 se verificó el [ZIP público de marca Pix del BCB](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/marca/ArquivosdaMarcaPix.zip),
+enlazado desde su [página de participantes](https://www.bcb.gov.br/estabilidadefinanceira/pix-participantes):
+HTTP 200, 124.383.881 bytes y SHA-256
+`fcae3039f06bd33023f4236d8649eb289ce9cbf50e52f62516f2c201d2a600ac`.
+El archivo contiene 70 AI, 70 EPS y 52 PDF (incluye metadata Apple), pero ningún
+PNG, SVG, GIF, JPG o WebP. El bloqueo es de formato utilizable, no de acceso
+público; no se convierte ni recrea el material y Pix sigue sin asset de runtime.
+
 Red Infonet y Panal tienen originales publicados por Bancard, pero fallan el
 mínimo inalterado de cobertura 0,55 (0,389320 y 0,328436). Panal se identifica
 como tarjeta confirmada por Universitaria, no Panal Seguros; el archivo es del
-procesador, no del emisor. uPOS tiene una ilustración de terminal pública, no
+procesador, no del emisor. La [imagen publicada por Universitaria](https://www.universitaria.coop/assets_front/img/panal_imagen1698690586.png)
+es un mockup de tarjeta completo (1348 × 859, 91.787 bytes), no un logo
+independiente; su hash y evaluación se conservan sin integrarla. uPOS tiene una ilustración de terminal pública, no
 una identidad de marca certificada. No se recorta, reconstruye ni sustituye el
 logo de otra entidad. La evaluación no empaquetada conserva evidencia en
 [financial-assets-evaluation.json](financial-assets-evaluation.json).

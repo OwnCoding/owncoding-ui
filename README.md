@@ -17,17 +17,19 @@
 </p>
 
 <p align="center">
-  <strong><a href="https://controlaria.online">Destino de la galería</a></strong>
+  <strong><a href="https://controlaria.online">Galería publicada</a></strong>
   · <a href="docs/ADOPCION.md">Adopción</a>
   · <a href="docs/REGLAS.md">Reglas</a>
   · <a href="docs/ACCESIBILIDAD.md">Accesibilidad</a>
   · <a href="CHANGELOG.md">Changelog</a>
 </p>
 
-> **Estado de la galería:** `controlaria.online` es el destino previsto.
-> **No se considera publicado** hasta completar deploy, HTTPS, `status.json` y smoke del
-> catálogo. Mientras tanto, puede ejecutarse localmente con
-> `npm run gallery:dev`.
+> **Estado verificado el 2026-10-02:** la galería está publicada en HTTPS en
+> [controlaria.online](https://controlaria.online), con respuesta HTTP 200 y
+> [status.json](https://controlaria.online/status.json) indicando versión `0.62.0`
+> y build `8011af3b3cba84747b41b989bec3ca987529efc0`. Esta evidencia no implica
+> cobertura completa de instituciones ni activación de servicios externos: las
+> demostraciones usan fixtures locales. Para ejecutarla localmente: `npm run gallery:dev`.
 
 ## Primero: las automatizaciones de mayor valor
 

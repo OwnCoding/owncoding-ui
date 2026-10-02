@@ -88,7 +88,19 @@
       "transparentCoverage": 0.32843591140159767,
       "minimumCoverage": 0.55,
       "sourceAuthority": "Official processor Bancard, not issuer-hosted; card mark, not Panal Seguros",
-      "issuerConfirmationUrl": "https://www.universitaria.coop/tarjetas/panal"
+      "issuerConfirmationUrl": "https://www.universitaria.coop/tarjetas/panal",
+      "issuerArtworkEvidence": {
+        "sourceUrl": "https://www.universitaria.coop/assets_front/img/panal_imagen1698690586.png",
+        "retrievedAt": "2026-10-02",
+        "bytes": 91787,
+        "sha256": "b0bb3db45aff171141ff8c1a6cda3670f1ae208897c65359c42445189f479f6c",
+        "dimensions": {
+          "width": 1348,
+          "height": 859
+        },
+        "disposition": "not-packaged",
+        "reason": "full-card-mockup-not-standalone-logo"
+      }
     },
     {
       "name": "uPOS",
