@@ -6,6 +6,13 @@ documenta acá y en el README).
 
 ## Sin publicar
 
+- Sin cambios todavía.
+
+## v0.61.0 — 2026-10-01
+
+Primera versión publicada de la línea: incluye las candidatas `v0.60.0`
+(galería) y `v0.60.1` (catálogo financiero), que no se habían taggeado.
+
 - **«Carga con IA» — diálogo compacto y premium (#16):** feedback real de PagaYa
   (popup gigante y con espacio muerto). El diálogo deja el `max-w-5xl` fijo:
   **entrada** y **resultado** abren en `amplio` (`max-w-3xl`), la **revisión**
@@ -16,8 +23,7 @@ documenta acá y en el README).
   globales compactos y ritmo §17; mobile conserva el bottom-sheet. Sin cambios
   de contrato ni de comportamiento. Las capturas de QA dejan de viajar en el
   paquete npm (`files` suma `!docs/qa`): son evidencia del repo y el tarball
-  vuelve al presupuesto. **Tag propuesto: `v0.61.0`** (el bump y el tag los
-  hace el integrador).
+  vuelve al presupuesto.
 - **«Carga con IA» — playbook de errores esperables y carrito editable (#15):**
   `REGLAS.md` §18 suma el **carrito editable** (agregar/editar/duplicar/quitar;
   editar un precio **no** reescribe el maestro sin «actualizar el producto»),

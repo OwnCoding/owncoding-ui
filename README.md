@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.60.1" src="https://img.shields.io/badge/versi%C3%B3n-0.60.1-05a36f" />
+  <img alt="Versión 0.61.0" src="https://img.shields.io/badge/versi%C3%B3n-0.61.0-05a36f" />
   <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
   <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
 </p>
@@ -146,11 +146,11 @@ puedan confundirse con una marca. Consulta el manifiesto y el contrato en
 
 ### 1. Instalar una versión fija
 
-El paquete preparado por este candidato es `v0.60.1`, pero el tag todavía no
-se creó ni se publicó. Después de publicar ese tag, la instalación fija será:
+El paquete publicado es `v0.61.0` —incluye las candidatas de la galería
+(`v0.60.0`) y del catálogo financiero (`v0.60.1`)—. La instalación fija:
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.60.1
+npm install github:dariodeoli/owncoding-ui#v0.61.0
 ```
 
 Para probar la rama principal sin fijar un release:
