@@ -1258,3 +1258,11 @@ de `docs/ADOPCION-V2.md` §10 y el checklist de arriba.
 - `dist/` se regenera solo con `npm run build`. CI compila un consumidor
   TypeScript real, instala el tarball en un directorio temporal y controla
   presupuestos raw/gzip.
+
+### Movimiento compartido (opt-in)
+
+- `AnimatedStatus`: feedback de operación controlado, mensaje accesible y sin
+  éxito inventado. `MotionSurface`: compone `Card`/controles existentes, sin
+  convertir un `div` en acción. [Contrato](MOTION.md).
+- Respetar movimiento reducido, puntero fino y teclado; nunca esperar una
+  animación para ejecutar una acción. Estados reales pertenecen a la app.

@@ -241,3 +241,10 @@ html.dark {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
 }
+
+/* Shared motion tokens; presentation is opt-in through base.css. */
+:root {
+  --oc-motion-fast: 160ms;
+  --oc-motion-feedback: 240ms;
+  --oc-motion-ease: cubic-bezier(.2, .8, .2, 1);
+}

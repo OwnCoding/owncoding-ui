@@ -12879,6 +12879,43 @@ function FooterPreset({ variant = "app", name, version, links = [], columns = []
     /* @__PURE__ */ jsx109(ProductFooter, { className: variant === "public" ? "rounded-b-xl" : "rounded-xl", nombre: name, version, enlaces: links, modelo: variant === "auth" ? "apilado" : "distribuido" })
   ] });
 }
+
+// src/components/AnimatedStatus.jsx
+import { jsx as jsx110, jsxs as jsxs93 } from "react/jsx-runtime";
+var icons = { idle: "clock", loading: "refresh", success: "check", error: "close" };
+var tones = { idle: "mute", loading: "info", success: "ok", error: "bad" };
+function AnimatedStatus({ state = "idle", children, motion = true, className, ...props }) {
+  const current = Object.hasOwn(icons, state) ? state : "idle";
+  return /* @__PURE__ */ jsxs93(
+    "span",
+    {
+      ...props,
+      role: "status",
+      "aria-live": "polite",
+      "aria-atomic": "true",
+      "data-oc-status": current,
+      "data-motion": motion ? "on" : "off",
+      className: cn("inline-flex items-center gap-2 text-sm", textoDeTono(tones[current]), className),
+      children: [
+        /* @__PURE__ */ jsx110("span", { className: "oc-status-icon", "aria-hidden": "true", children: /* @__PURE__ */ jsx110(Icon, { name: icons[current], className: "h-5 w-5" }) }, current),
+        /* @__PURE__ */ jsx110("span", { children })
+      ]
+    }
+  );
+}
+
+// src/components/MotionSurface.jsx
+import { Children as Children2, cloneElement as cloneElement2 } from "react";
+function MotionSurface({ children, hover = false, press = false, elevation = false, motion = true, className }) {
+  const child = Children2.only(children);
+  return cloneElement2(child, {
+    className: cn(child.props.className, "oc-motion-surface", className),
+    "data-oc-hover": hover ? "on" : "off",
+    "data-oc-press": press ? "on" : "off",
+    "data-oc-elevation": elevation ? "on" : "off",
+    "data-motion": motion ? "on" : "off"
+  });
+}
 export {
   ANCHOS_PAPEL,
   ANCHOS_PRUEBA,
@@ -12887,6 +12924,7 @@ export {
   AccountSwitcher,
   ActionToolbar,
   AjustesImpresion,
+  AnimatedStatus,
   AppHeader,
   AsyncButton,
   AuthLayout,
@@ -13071,6 +13109,7 @@ export {
   Modal,
   Money,
   MoneyInput,
+  MotionSurface,
   NavLateral,
   NavegacionSeccion,
   Nota,

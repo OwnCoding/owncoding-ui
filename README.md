@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 583 exports, 161 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 585 exports, 163 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -111,10 +111,10 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **583** |
-| Exports visuales | **161** |
+| Exports de la entrada raíz | **585** |
+| Exports visuales | **163** |
 | API, modelos y utilidades | **422** |
-| Vistas curadas con fixtures controlados | **161** |
+| Vistas curadas con fixtures controlados | **163** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -490,3 +490,9 @@ totales del paquete permanecen sin cambios; consulte BUNDLE-BUDGETS.md.
 ## Componentes reutilizables ampliados
 
 Headers públicos y administrativos, perfiles y cambio de cuenta, Combobox simple/múltiple, Popover/Tooltip accesibles, cierre protegido, centro de notificaciones, acciones asíncronas, copia, barra de acciones y modelos de pie. [Contratos y ejemplos](docs/REUSABLE-UI.md). Son UI controlada: no implementan autenticación ni servicios externos.
+
+### Movimiento reutilizable (opt-in)
+
+`AnimatedStatus` anuncia estados controlados; `MotionSurface` compone tarjetas y
+controles existentes sin cambiar su semántica. [Contrato y adopción](docs/MOTION.md).
+Las nuevas vistas son fixtures locales, no integraciones con servicios.

@@ -548,3 +548,6 @@ export {
 } from './utils/paisesTelefono.js'
 
 export { Combobox, Popover, Tooltip, CloseButton, AppHeader, PublicHeader, ProfileCard, UserMenu, AccountSwitcher, NotificationCenter, AsyncButton, FooterPreset, CopyButton, ActionToolbar } from './components/ReusableUI.jsx'
+
+export { default as AnimatedStatus } from './components/AnimatedStatus.jsx'
+export { default as MotionSurface } from './components/MotionSurface.jsx'

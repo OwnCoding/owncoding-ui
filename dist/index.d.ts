@@ -1816,3 +1816,14 @@ export function AsyncButton(props: AsyncButtonProps): ReactElement
 export function CopyButton(props: Omit<AsyncButtonProps, 'action' | 'children'> & { text: string; copy?: (text: string) => void | Promise<void>; onCopied?: (text: string) => void; label?: string }): ReactElement
 export function ActionToolbar(props: { label?: string; children?: ReactNode; className?: string }): ReactElement
 export function FooterPreset(props: { variant?: 'app' | 'auth' | 'public'; name?: string; version?: string; links?: Parameters<typeof ProductFooter>[0]['enlaces']; columns?: Parameters<typeof ProductPrefooter>[0]['columnas']; callToAction?: Parameters<typeof ProductPrefooter>[0]['accion']; children?: ReactNode; className?: string }): ReactElement
+
+/** Controlled state feedback; children supply the accessible status message. */
+export type AnimatedStatusProps = Omit<HTMLAttributes<HTMLSpanElement>, 'children' | 'role' | 'aria-live' | 'aria-atomic'> & {
+  state?: 'idle' | 'loading' | 'success' | 'error'; children: ReactNode; motion?: boolean
+}
+export function AnimatedStatus(props: AnimatedStatusProps): ReactElement
+/** The single child must forward className and data attributes to its root. */
+export type MotionSurfaceProps = {
+  children: ReactElement; hover?: boolean; press?: boolean; elevation?: boolean; motion?: boolean; className?: string
+}
+export function MotionSurface(props: MotionSurfaceProps): ReactElement
