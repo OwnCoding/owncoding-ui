@@ -98,3 +98,8 @@ void variantContract
 import { PricingCard } from 'owncoding-ui'
 const pricingContract = <PricingCard title="Sample" price={100} features={[{ id: 'reports', label: 'Reports', included: true }]} onSelect={() => {}} />
 void pricingContract
+import { RucField, createOwnDataRucProvider, mapOwnDataRucResponse, mapOwnDataRucError } from 'owncoding-ui'
+import { createOwnDataRucProvider as serverOwnDataProvider } from 'owncoding-ui/utils'
+const ownDataProvider = createOwnDataRucProvider({ lookup: async () => ({}) })
+const ownDataField = <RucField maxBaseDigits={9} value="80012345-6" onChange={() => {}} consultar={ownDataProvider} onAplicar={result => { const source: string = result.ownData.provenance.source; void source }} />
+void ownDataField; void serverOwnDataProvider; void mapOwnDataRucResponse; void mapOwnDataRucError

@@ -330,3 +330,5 @@ export {
   leerUsoPersonas,
   registrarUsoPersona,
 } from './personas.js'
+
+export { mapOwnDataRucResponse, mapOwnDataRucError, createOwnDataRucProvider } from './ownDataRuc.js'

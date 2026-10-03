@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 590 exports, 168 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 593 exports, 168 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -38,9 +38,9 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **590** |
+| Exports de la entrada raíz | **593** |
 | Exports visuales | **168** |
-| API, modelos y utilidades | **422** |
+| API, modelos y utilidades | **425** |
 | Vistas curadas con fixtures controlados | **168** |
 | Categorías del catálogo | **14** |
 
@@ -517,3 +517,10 @@ disponibilidad aportada por la app. [Contrato](docs/PRODUCT-VARIANT-SELECTOR.md)
 
 `PricingCard` presenta planes y precios provistos por la app, con selección
 explícita sin contratos ni cobros locales. [Contrato](docs/PRICING-CARD.md).
+
+### OwnData: base propia DNIT, integración mediante backend
+
+`createOwnDataRucProvider`, `mapOwnDataRucResponse` y `mapOwnDataRucError` conectan
+un transporte inyectado con `RucField`, sin claves en frontend ni consultas propias.
+La API comercial de OwnData permanece deshabilitada, pendiente de autorización
+escrita; la galería solo ejercita un contrato simulado. [Contrato](docs/OWNDATA-RUC.md).

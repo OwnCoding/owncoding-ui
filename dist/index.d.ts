@@ -580,16 +580,18 @@ export function etiquetaDispositivo(valor?: any, opciones?: { separador?: string
 export function nombreDeDispositivo(modelo?: any): string
 export function codigoDeDispositivo(modelo?: any): string
 export function normalizarBusqueda(texto?: string): string
-export function RucField(props: Record<string, any> & {
+export type RucFieldResult = { name: string; fullRuc?: string; simulado?: boolean }
+export function RucField<TResult extends RucFieldResult = RucFieldResult>(props: Record<string, any> & {
   id?: string
   value?: string
   onChange: (valor: string) => void
-  onAplicar?: (resultado: { name: string; fullRuc?: string; simulado?: boolean }) => void
-  consultar?: (ruc: string) => Promise<{ name: string; fullRuc?: string; simulado?: boolean }>
+  onAplicar?: (resultado: TResult) => void
+  consultar?: (ruc: string) => Promise<TResult>
   disabled?: boolean
   consultarDisabled?: boolean
   mostrarExtractor?: boolean
   maxLength?: number
+  maxBaseDigits?: 8 | 9
   placeholder?: string
   autoComplete?: string
   ariaLabel?: string
@@ -1871,3 +1873,18 @@ export type PricingCardProps = {
   selectLabel?: string; selectedLabel?: string; unavailableLabel?: string; message?: ReactNode; className?: string
 }
 export function PricingCard(props: PricingCardProps): ReactElement
+
+/** OwnData snapshot metadata is preserved, not interpreted as contact/stock authority. */
+export type OwnDataRucResult = {
+  name: string; fullRuc: string; reviewRequired: true
+  ownData: {
+    ruc: string; dv: string | number; nameOfficial: string; equivalenceRaw: string | null; stateRaw: string | null; sourcePartition: string
+    requestId?: string; environment: 'test' | 'live'
+    quota: { limit: number; used: number; remaining: number; day: string; resetAfter: number }
+    provenance: { source: 'dnit_official_snapshot'; sourcePage: string; publicationDate: string; publishedText: string; importedAt: string; snapshotHash: string }
+  }
+}
+export type OwnDataRucError = Error & { code: string; status: number; retryAfter?: number; requestId?: string }
+export function mapOwnDataRucResponse(envelope: unknown, requestedRuc: string): OwnDataRucResult
+export function mapOwnDataRucError(envelope: unknown): OwnDataRucError
+export function createOwnDataRucProvider(options: { lookup: (ruc: string) => Promise<unknown> }): (ruc: string) => Promise<OwnDataRucResult>

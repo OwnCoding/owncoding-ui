@@ -12,7 +12,7 @@
     <text x="32" y="217" fill="#aab3c2" font-size="15">Campos, operaciones y estados con contratos claros.</text>
     <g transform="translate(32 254)" font-size="13" font-weight="700">
       <rect width="138" height="44" rx="13" fill="#063426" stroke="#087a57"/>
-      <text x="69" y="28" text-anchor="middle" fill="#7cffc9">590 exports</text>
+      <text x="69" y="28" text-anchor="middle" fill="#7cffc9">593 exports</text>
       <rect x="150" width="138" height="44" rx="13" fill="#18233e" stroke="#35538d"/>
       <text x="219" y="28" text-anchor="middle" fill="#cbd6ff">168 visuales</text>
       <rect x="300" width="138" height="44" rx="13" fill="#25202f" stroke="#624d79"/>

@@ -561,3 +561,5 @@ export { default as CartSummary } from './components/CartSummary.jsx'
 export { default as ProductVariantSelector } from './components/ProductVariantSelector.jsx'
 
 export { default as PricingCard } from './components/PricingCard.jsx'
+
+export { mapOwnDataRucResponse, mapOwnDataRucError, createOwnDataRucProvider } from './utils/ownDataRuc.js'

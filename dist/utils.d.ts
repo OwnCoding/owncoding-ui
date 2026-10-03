@@ -674,3 +674,18 @@ export function validarRegistrosIA(
   esquema?: EsquemaIA | null,
 ): { valido: boolean; errores: Map<string, Record<string, string>> }
 export function normalizarResultadoIA(resultado?: ResultadoCreacionIA | null, opciones?: { total?: number }): ResultadoIA
+
+/** OwnData snapshot metadata is preserved, not interpreted as contact/stock authority. */
+export type OwnDataRucResult = {
+  name: string; fullRuc: string; reviewRequired: true
+  ownData: {
+    ruc: string; dv: string | number; nameOfficial: string; equivalenceRaw: string | null; stateRaw: string | null; sourcePartition: string
+    requestId?: string; environment: 'test' | 'live'
+    quota: { limit: number; used: number; remaining: number; day: string; resetAfter: number }
+    provenance: { source: 'dnit_official_snapshot'; sourcePage: string; publicationDate: string; publishedText: string; importedAt: string; snapshotHash: string }
+  }
+}
+export type OwnDataRucError = Error & { code: string; status: number; retryAfter?: number; requestId?: string }
+export function mapOwnDataRucResponse(envelope: unknown, requestedRuc: string): OwnDataRucResult
+export function mapOwnDataRucError(envelope: unknown): OwnDataRucError
+export function createOwnDataRucProvider(options: { lookup: (ruc: string) => Promise<unknown> }): (ruc: string) => Promise<OwnDataRucResult>

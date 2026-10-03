@@ -2,6 +2,7 @@ import React, { Component, useDeferredValue, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import packageJson from '../package.json'
 import { galleryStateUrl, useGalleryUrlState } from './url-state.js'
+import { OwnDataIntegrationPreview } from './owndata-ruc-preview.jsx'
 import { BLOG_POSTS, articlePath } from './blog/metadata.js'
 import '../src/styles/tokens.css'
 import '../src/styles/base.css'
@@ -515,6 +516,7 @@ function VistaClienteDocumento() {
         <ResumenCliente cliente={extraido} titulo="Datos aplicados con confirmación" />
         <p className="preview-note">CI y RUC son búsquedas independientes: la demo nunca afirma que una CI se convierta universalmente en RUC.</p>
       </section>
+      <OwnDataIntegrationPreview />
     </div>
   )
 }

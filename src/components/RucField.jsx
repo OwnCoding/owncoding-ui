@@ -41,7 +41,8 @@ export default function RucField({
   disabled = false,
   consultarDisabled = false,
   mostrarExtractor = true,
-  maxLength = LARGO_MAXIMO_RUC,
+  maxLength,
+  maxBaseDigits = 8,
   placeholder = '80012345-6',
   autoComplete = 'off',
   ariaLabel,
@@ -56,8 +57,11 @@ export default function RucField({
   const [resultado, setResultado] = useState(null)
   const [consultando, setConsultando] = useState(false)
   const [error, setError] = useState('')
-  const rucSanitizado = sanitizarRuc(value).slice(0, Math.min(LARGO_MAXIMO_RUC, Math.max(1, Number(maxLength) || LARGO_MAXIMO_RUC)))
-  const hayRuc = Boolean(rucSanitizado)
+  const strictNine = maxBaseDigits === 9
+  const limit = Math.min(strictNine ? 11 : LARGO_MAXIMO_RUC, Math.max(1, Number(maxLength) || (strictNine ? 11 : LARGO_MAXIMO_RUC)))
+  // Nine-digit mode preserves exact controlled identity; malformed input never retargets lookup.
+  const rucSanitizado = strictNine ? String(value ?? '') : sanitizarRuc(value).slice(0, limit)
+  const hayRuc = strictNine ? /^[1-9][0-9]{0,8}(-[0-9])?$/.test(rucSanitizado) : Boolean(rucSanitizado)
   const puedeExtraer = mostrarExtractor && typeof consultar === 'function'
 
   const requestGeneration = useRef(0)
@@ -116,13 +120,23 @@ export default function RucField({
           className={puedeExtraer ? (consultando ? 'pr-32' : 'pr-11') : undefined}
           type="text"
           inputMode="numeric"
-          pattern="[0-9]{0,8}(-[0-9]?)?"
+          pattern={strictNine ? "[1-9][0-9]{0,8}(-[0-9])?" : "[0-9]{0,8}(-[0-9]?)?"}
           spellCheck={false}
-          maxLength={Math.min(LARGO_MAXIMO_RUC, Math.max(1, Number(maxLength) || LARGO_MAXIMO_RUC))}
+          maxLength={limit}
           autoComplete={autoComplete}
           disabled={disabled}
           value={rucSanitizado}
-          onChange={(event) => { invalidateLookup(); onChange?.(sanitizarRuc(event.target.value)) }}
+          onChange={(event) => { invalidateLookup(); onChange?.(strictNine ? event.target.value : sanitizarRuc(event.target.value)) }}
+          onPaste={event => {
+            inputProps.onPaste?.(event)
+            if (!strictNine || event.defaultPrevented) return
+            event.preventDefault()
+            const input = event.currentTarget
+            const candidate = rucSanitizado.slice(0, input.selectionStart ?? 0) + event.clipboardData.getData('text') + rucSanitizado.slice(input.selectionEnd ?? rucSanitizado.length)
+            if (candidate.length <= limit && (!candidate || /^[1-9][0-9]{0,8}(-[0-9]?)?$/.test(candidate))) {
+              invalidateLookup(); onChange?.(candidate)
+            }
+          }}
           placeholder={placeholder}
         />
         {puedeExtraer && (
