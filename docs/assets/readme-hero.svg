@@ -1,78 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540" role="img" aria-labelledby="title desc">
-  <title id="title">OwnCoding UI, sistema de interfaz compartido</title>
-  <desc id="desc">Composición editorial con métricas del catálogo y una muestra de botones, campos, navegación y estados.</desc>
-  <defs>
-    <linearGradient id="canvas" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#0e1116"/>
-      <stop offset="0.55" stop-color="#151a23"/>
-      <stop offset="1" stop-color="#0b241b"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0" x2="1">
-      <stop stop-color="#05f19c"/>
-      <stop offset="1" stop-color="#4d7cfe"/>
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
-      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity=".32"/>
-    </filter>
-  </defs>
-  <rect width="1200" height="540" rx="28" fill="url(#canvas)"/>
-  <circle cx="1110" cy="-20" r="290" fill="#05f19c" opacity=".06"/>
-  <circle cx="620" cy="560" r="260" fill="#4d7cfe" opacity=".06"/>
-  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <g transform="translate(64 64)">
-      <rect width="68" height="68" rx="20" fill="#1f2430" stroke="#3e475a"/>
-      <path d="M19 24h30M19 34h20M19 44h26" fill="none" stroke="url(#accent)" stroke-width="5" stroke-linecap="round"/>
-      <text x="88" y="25" fill="#7cffc9" font-size="13" font-weight="700" letter-spacing="2.2">OWNCODING ECOSYSTEM</text>
-      <text x="88" y="58" fill="#f4f6fa" font-size="30" font-weight="760">OwnCoding UI</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="title desc">
+  <title id="title">OwnCoding UI, base compartida de interfaces</title>
+  <desc id="desc">Representación editorial compacta: métricas verificables y primitivas compartidas; no es una captura de producto.</desc>
+  <rect width="1200" height="340" rx="24" fill="#0e1116"/>
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <rect x="32" y="32" width="46" height="46" rx="14" fill="#05f19c"/>
+    <path d="M46 47h18M46 55h12M46 63h16" stroke="#06271b" stroke-width="3" stroke-linecap="round"/>
+    <text x="92" y="51" fill="#f4f6fa" font-size="18" font-weight="750">OwnCoding UI</text>
+    <text x="92" y="72" fill="#aab3c2" font-size="12">v0.66.0 · React 18+ · Tailwind CSS 3.4+</text>
+    <text x="32" y="134" fill="#f4f6fa" font-size="40" font-weight="750">Una base común.</text>
+    <text x="32" y="181" fill="#f4f6fa" font-size="40" font-weight="750">Interfaces que funcionan.</text>
+    <text x="32" y="217" fill="#aab3c2" font-size="15">Campos, operaciones y estados con contratos claros.</text>
+    <g transform="translate(32 254)" font-size="13" font-weight="700">
+      <rect width="138" height="44" rx="13" fill="#063426" stroke="#087a57"/>
+      <text x="69" y="28" text-anchor="middle" fill="#7cffc9">590 exports</text>
+      <rect x="150" width="138" height="44" rx="13" fill="#18233e" stroke="#35538d"/>
+      <text x="219" y="28" text-anchor="middle" fill="#cbd6ff">168 visuales</text>
+      <rect x="300" width="138" height="44" rx="13" fill="#25202f" stroke="#624d79"/>
+      <text x="369" y="28" text-anchor="middle" fill="#ddc7fa">14 categorías</text>
     </g>
-
-    <text x="64" y="200" fill="#f4f6fa" font-size="48" font-weight="780" letter-spacing="-1.5">Una interfaz común.</text>
-    <text x="64" y="254" fill="#f4f6fa" font-size="48" font-weight="780" letter-spacing="-1.5">Menos copias. Más producto.</text>
-    <text x="64" y="300" fill="#aab3c2" font-size="18">Componentes, modelos y reglas reutilizables para las apps de OwnCoding.</text>
-
-    <g transform="translate(64 348)" font-size="14" font-weight="680">
-      <rect width="126" height="38" rx="19" fill="#062e22" stroke="#087a57"/>
-      <text x="63" y="24" fill="#7cffc9" text-anchor="middle">590 exports</text>
-      <rect x="138" width="142" height="38" rx="19" fill="#18233e" stroke="#3d5ca3"/>
-      <text x="209" y="24" fill="#b8c8ff" text-anchor="middle">168 visuales</text>
-      <rect x="292" width="148" height="38" rx="19" fill="#25202f" stroke="#624d79"/>
-      <text x="366" y="24" fill="#ddc7fa" text-anchor="middle">14 categorías</text>
-    </g>
-    <text x="64" y="454" fill="#7f8b9f" font-size="14">v0.66.0 · React 18+ · Tailwind CSS 3.4+ · objetivo WCAG 2.1 AA</text>
-
-    <g transform="translate(690 60)" filter="url(#shadow)">
-      <rect width="446" height="420" rx="26" fill="#1f2430" stroke="#3e475a"/>
-      <rect x="22" y="22" width="402" height="46" rx="14" fill="#181d27" stroke="#3e475a"/>
-      <circle cx="46" cy="45" r="7" fill="#05f19c"/>
-      <text x="64" y="51" fill="#d8dde7" font-size="14" font-weight="650">Catálogo verificable</text>
-      <rect x="340" y="34" width="62" height="22" rx="11" fill="#063426"/>
-      <text x="371" y="49" fill="#7cffc9" font-size="10" font-weight="700" text-anchor="middle">v0.66.0</text>
-
-      <rect x="22" y="88" width="188" height="136" rx="18" fill="#242a38" stroke="#3e475a"/>
-      <text x="40" y="116" fill="#7cffc9" font-size="11" font-weight="700">ACCIONES</text>
-      <rect x="40" y="136" width="100" height="34" rx="10" fill="#05f19c"/>
-      <text x="90" y="158" fill="#061e14" font-size="12" font-weight="750" text-anchor="middle">Guardar</text>
-      <rect x="40" y="180" width="136" height="26" rx="8" fill="none" stroke="#7c879b"/>
-      <text x="108" y="197" fill="#d8dde7" font-size="11" font-weight="650" text-anchor="middle">Acción secundaria</text>
-
-      <rect x="222" y="88" width="202" height="136" rx="18" fill="#242a38" stroke="#3e475a"/>
-      <text x="240" y="116" fill="#9fb5ff" font-size="11" font-weight="700">CAMPO</text>
-      <text x="240" y="143" fill="#c7ceda" font-size="11">Nombre de la operación</text>
-      <rect x="240" y="154" width="166" height="42" rx="10" fill="#181d27" stroke="#7c879b"/>
-      <text x="255" y="180" fill="#f4f6fa" font-size="12">Venta mayorista</text>
-
-      <rect x="22" y="236" width="402" height="70" rx="18" fill="#242a38" stroke="#3e475a"/>
-      <circle cx="51" cy="271" r="11" fill="#16c65c"/>
-      <text x="74" y="266" fill="#f4f6fa" font-size="13" font-weight="680">Operación sincronizada</text>
-      <text x="74" y="285" fill="#aab3c2" font-size="11">Estado y feedback con contraste verificable.</text>
-      <rect x="330" y="256" width="72" height="28" rx="14" fill="#073923"/>
-      <text x="366" y="274" fill="#80f2b0" font-size="10" font-weight="700" text-anchor="middle">ACTIVO</text>
-
-      <rect x="22" y="318" width="402" height="80" rx="18" fill="#181d27" stroke="#3e475a"/>
-      <rect x="40" y="336" width="42" height="42" rx="12" fill="#242a38" stroke="#4d7cfe"/>
-      <path d="M53 347h16M53 355h11M53 363h14" stroke="#9fb5ff" stroke-width="2.5" stroke-linecap="round"/>
-      <text x="98" y="352" fill="#f4f6fa" font-size="13" font-weight="680">Patrones compartidos</text>
-      <text x="98" y="372" fill="#aab3c2" font-size="11">Forms · datos · navegación · identidad</text>
+    <g transform="translate(650 32)">
+      <rect width="518" height="276" rx="20" fill="#1f2430" stroke="#3e475a"/>
+      <text x="24" y="34" fill="#7cffc9" font-size="11" font-weight="700">PRIMITIVAS COMPARTIDAS · MUESTRA EDITORIAL</text>
+      <text x="24" y="65" fill="#f4f6fa" font-size="16" font-weight="700">Operación Demo</text>
+      <rect x="24" y="80" width="470" height="46" rx="12" fill="#181d27" stroke="#7c879b"/>
+      <text x="40" y="109" fill="#d9dee8" font-size="13">Datos proporcionados por la aplicación</text>
+      <rect x="24" y="142" width="142" height="44" rx="12" fill="#05f19c"/>
+      <text x="95" y="170" text-anchor="middle" fill="#06271b" font-size="13" font-weight="750">Acción principal</text>
+      <rect x="178" y="142" width="138" height="44" rx="12" fill="none" stroke="#7c879b"/>
+      <text x="247" y="170" text-anchor="middle" fill="#d9dee8" font-size="13">Secundaria</text>
+      <rect x="24" y="204" width="470" height="46" rx="12" fill="#18233e" stroke="#35538d"/>
+      <text x="40" y="232" fill="#cbd6ff" font-size="12">Fixtures locales. Sin servicios ni resultados inventados.</text>
     </g>
   </g>
 </svg>

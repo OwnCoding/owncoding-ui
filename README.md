@@ -5,8 +5,8 @@
 <h1 align="center">OwnCoding UI</h1>
 
 <p align="center">
-  Componentes, modelos y reglas de interfaz para construir las aplicaciones de OwnCoding<br />
-  con una base consistente, accesible y verificable.
+  Una base compartida para formularios, operaciones e identidad.<br />
+  Explore los componentes, pruebe sus estados e integre una versión fija.
 </p>
 
 <p align="center">
@@ -24,14 +24,104 @@
   · <a href="CHANGELOG.md">Changelog</a>
 </p>
 
-> **Estado verificado el 2026-10-02:** la galería está publicada en HTTPS en
-> [controlaria.online](https://controlaria.online), con respuesta HTTP 200 y
-> [status.json](https://controlaria.online/status.json) indicando versión `0.62.0`
-> y build `8011af3b3cba84747b41b989bec3ca987529efc0`. Esta evidencia no implica
-> cobertura completa de instituciones ni activación de servicios externos: las
-> demostraciones usan fixtures locales. Para ejecutarla localmente: `npm run gallery:dev`.
+> **Estado verificado el 2026-10-03:** la galería publicada en HTTPS respondió
+> HTTP 200; [status.json](https://controlaria.online/status.json) indicó versión
+> `0.66.0` y build `f269fe491baabe3079194577cf90c551cc2336cb`.
+> Esta es evidencia del release previo, no prueba de despliegue de este rediseño.
+> Las demostraciones usan fixtures locales, sin activar servicios externos.
+> Para explorar localmente: `npm run gallery:dev`.
 
-## Primero: las automatizaciones de mayor valor
+## Catálogo actual
+
+El inventario se deriva de `src/index.js` y se comprueba contra
+`gallery/catalog.js`; no son números estimados.
+
+| Cobertura | Cantidad |
+| --- | ---: |
+| Exports de la entrada raíz | **590** |
+| Exports visuales | **168** |
+| API, modelos y utilidades | **422** |
+| Vistas curadas con fixtures controlados | **168** |
+| Categorías del catálogo | **14** |
+
+La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
+está asociada explícitamente a un fixture aprobado y el resto aparece como
+ficha consultable.
+
+## Inicio rápido
+
+### 1. Instalar una versión fija
+
+La versión del paquete es `v0.66.0`. Al publicar su tag, la instalación fija es:
+
+```bash
+npm install github:dariodeoli/owncoding-ui#v0.66.0
+```
+
+Para probar la rama principal sin fijar un release:
+
+```bash
+npm install github:dariodeoli/owncoding-ui
+```
+
+Requisitos de consumo: **Node.js 18+**, **React 18+** y **Tailwind CSS 3.4+**.
+El repositorio es público, pero el paquete figura como `UNLICENSED` y se instala
+desde Git; no se anuncia como publicado en npm ni bajo una licencia open source.
+
+<details>
+<summary><strong>Configurar Tailwind, estilos y primer componente</strong></summary>
+
+### 2. Configurar Tailwind
+
+```js
+// tailwind.config.js
+import preset, { owncodingContent } from 'owncoding-ui/tailwind-preset'
+
+export default {
+  presets: [preset],
+  // Tailwind 3.4 ignora el content de un preset: debe agregarse aquí.
+  content: [...owncodingContent, './src/**/*.{js,jsx,ts,tsx}'],
+}
+```
+
+### 3. Importar estilos
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens + base global */
+@import 'owncoding-ui/styles.css';
+```
+
+Una aplicación con diseño propio puede importar únicamente variables con
+`owncoding-ui/tokens.css`, o sumar la base de manera explícita con
+`owncoding-ui/base.css`. Consulta las diferencias y el rollback en la
+[`guía de adopción`](docs/ADOPCION.md).
+
+### 4. Usar componentes
+
+```jsx
+import 'owncoding-ui/styles.css'
+import { Aviso, Button, Card, Money, PhoneField } from 'owncoding-ui'
+
+export function Resumen({ total, telefono, setTelefono, guardar }) {
+  return (
+    <Card className="space-y-4">
+      <Aviso tono="info">Los datos están listos para revisar.</Aviso>
+      <Money value={total} />
+      <PhoneField phone={telefono} onChange={setTelefono} />
+      <Button onClick={guardar}>Guardar</Button>
+    </Card>
+  )
+}
+```
+
+
+</details>
+
+## Explore primero los componentes de mayor valor
 
 El recorrido visual empieza por los campos que más trabajo manual evitan en
 aplicaciones paraguayas. Todos son componentes reales de la biblioteca; las
@@ -104,23 +194,6 @@ incorpora aquí y luego se adopta mediante una versión fija.
 - **Verificable:** pruebas, tipos de consumidor, paquete instalable, límites de
   bundle y cobertura de galería se validan antes de publicar.
 
-## Catálogo actual
-
-El inventario se deriva de `src/index.js` y se comprueba contra
-`gallery/catalog.js`; no son números estimados.
-
-| Cobertura | Cantidad |
-| --- | ---: |
-| Exports de la entrada raíz | **590** |
-| Exports visuales | **168** |
-| API, modelos y utilidades | **422** |
-| Vistas curadas con fixtures controlados | **168** |
-| Categorías del catálogo | **14** |
-
-La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
-está asociada explícitamente a un fixture aprobado y el resto aparece como
-ficha consultable.
-
 ## Áreas del sistema
 
 | Área | Incluye |
@@ -134,7 +207,7 @@ ficha consultable.
 | Carga con IA | asistente declarativo con confirmación humana y motor server opcional en `owncoding-ui/ia` |
 | Operación e impresión | inventario, dispositivos, documentos, QR, tickets ESC/POS y estado de impresoras |
 
-### Después: el resto del sistema
+### Primitivas, composiciones y estados
 
 Los previews prioritarios no ocultan el catálogo completo. Después aparecen
 moneda, porcentaje, correo, fechas, seriales y el resto de primitivas, datos,
@@ -160,73 +233,6 @@ OwnCoding; no se presenta como licencia abierta. Consulta el manifiesto y el
 contrato en
 [`docs/MARCAS-FINANCIERAS.md`](docs/MARCAS-FINANCIERAS.md) y
 [`docs/financial-assets-manifest.json`](docs/financial-assets-manifest.json).
-
-## Inicio rápido
-
-### 1. Instalar una versión fija
-
-La versión del paquete es `v0.66.0`. Al publicar su tag, la instalación fija es:
-
-```bash
-npm install github:dariodeoli/owncoding-ui#v0.66.0
-```
-
-Para probar la rama principal sin fijar un release:
-
-```bash
-npm install github:dariodeoli/owncoding-ui
-```
-
-Requisitos de consumo: **Node.js 18+**, **React 18+** y **Tailwind CSS 3.4+**.
-El repositorio es público, pero el paquete figura como `UNLICENSED` y se instala
-desde Git; no se anuncia como publicado en npm ni bajo una licencia open source.
-
-### 2. Configurar Tailwind
-
-```js
-// tailwind.config.js
-import preset, { owncodingContent } from 'owncoding-ui/tailwind-preset'
-
-export default {
-  presets: [preset],
-  // Tailwind 3.4 ignora el content de un preset: debe agregarse aquí.
-  content: [...owncodingContent, './src/**/*.{js,jsx,ts,tsx}'],
-}
-```
-
-### 3. Importar estilos
-
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Tokens + base global */
-@import 'owncoding-ui/styles.css';
-```
-
-Una aplicación con diseño propio puede importar únicamente variables con
-`owncoding-ui/tokens.css`, o sumar la base de manera explícita con
-`owncoding-ui/base.css`. Consulta las diferencias y el rollback en la
-[`guía de adopción`](docs/ADOPCION.md).
-
-### 4. Usar componentes
-
-```jsx
-import 'owncoding-ui/styles.css'
-import { Aviso, Button, Card, Money, PhoneField } from 'owncoding-ui'
-
-export function Resumen({ total, telefono, setTelefono, guardar }) {
-  return (
-    <Card className="space-y-4">
-      <Aviso tono="info">Los datos están listos para revisar.</Aviso>
-      <Money value={total} />
-      <PhoneField phone={telefono} onChange={setTelefono} />
-      <Button onClick={guardar}>Guardar</Button>
-    </Card>
-  )
-}
-```
 
 ## Entradas granulares
 
