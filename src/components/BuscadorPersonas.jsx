@@ -17,6 +17,10 @@ import {
 // inactivas al final), muestra **foto** y se navega con ↑↓ / Enter / Esc.
 // Mobile-first y AA en claro/oscuro (tokens del sistema).
 //
+// #169: el valor seleccionado también se ve **con avatar** (foto o iniciales)
+// en el trigger cerrado; al enfocar/editar se oculta para dejar lugar a la
+// búsqueda. Se puede desactivar con `avatarSeleccionado={false}`.
+//
 //   <BuscadorPersonas
 //     personas={profesionales.map((p) => ({ id: p.id, nombre: p.nombre, rol: p.especialidad, fotoUrl: p.fotoUrl, activo: p.activo }))}
 //     valor={staffId}
@@ -46,6 +50,8 @@ export default function BuscadorPersonas({
   /** 0 = sin límite. */
   maxResultados = 0,
   disabled = false,
+  /** #169: avatar (foto/iniciales) del seleccionado en el trigger cerrado. */
+  avatarSeleccionado = true,
   required = false,
   id,
   className,
@@ -103,6 +109,18 @@ export default function BuscadorPersonas({
     const persona = (Array.isArray(personas) ? personas : []).find((p) => p.id === valor)
     return persona?.nombre ?? ''
   }, [opcionesFijas, opcionVacia, personas, valor])
+
+  // #169: persona seleccionada (no opción fija/vacía) para el avatar del trigger.
+  const personaSeleccionada = useMemo(() => {
+    if (valor === '' || valor == null) return null
+    const fijas = Array.isArray(opcionesFijas) ? opcionesFijas : []
+    if (fijas.some((opcion) => (opcion.valor !== undefined ? opcion.valor === valor : opcion.id === valor))) {
+      return null
+    }
+    return (Array.isArray(personas) ? personas : []).find((persona) => persona.id === valor) ?? null
+  }, [opcionesFijas, personas, valor])
+
+  const mostrarAvatar = Boolean(avatarSeleccionado && !editando && personaSeleccionada)
 
   function elegir(opcion) {
     if (!opcion) return
@@ -165,6 +183,20 @@ export default function BuscadorPersonas({
 
   return (
     <div ref={raiz} className={cn('relative', className)}>
+      {mostrarAvatar ? (
+        <span
+          data-testid="buscador-persona-seleccionada"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2"
+        >
+          <Avatar
+            nombre={personaSeleccionada.nombre ?? ''}
+            src={personaSeleccionada.fotoUrl}
+            tamano="sm"
+            decorativo
+          />
+        </span>
+      ) : null}
       <Input
         id={id}
         type="search"
@@ -206,7 +238,7 @@ export default function BuscadorPersonas({
           if (desplegable && !raiz.current?.contains(evento.relatedTarget)) setAbierto(false)
         }}
         onKeyDown={alTeclear}
-        className={limpiarVisible ? 'pr-9' : undefined}
+        className={cn(mostrarAvatar && 'pl-10', limpiarVisible && 'pr-9')}
       />
       {limpiarVisible ? (
         <button

@@ -8,6 +8,13 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.63.1 — 2026-10-03
+
+- **BuscadorPersonas (#169):** el valor seleccionado ahora se ve con avatar
+  (foto o iniciales) en el trigger cerrado; al enfocar/editar se oculta para
+  dejar lugar a la búsqueda. Nuevo prop `avatarSeleccionado` (default `true`)
+  para desactivarlo. Tests nuevos en `test/buscador-personas.test.jsx`.
+
 ## v0.63.0 — 2026-10-03
 
 - **IMEI check (#17):** `ImeiField` valida el IMEI de 15 dígitos con Luhn en

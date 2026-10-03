@@ -418,6 +418,11 @@ export function BuscadorPersonas(props: {
   opcionVacia?: string
   maxResultados?: number
   disabled?: boolean
+  /**
+   * #169: muestra el avatar (foto o iniciales) del seleccionado en el trigger
+   * cerrado. Al enfocar/editar se oculta para buscar. Default: `true`.
+   */
+  avatarSeleccionado?: boolean
   required?: boolean
   id?: string
   className?: string

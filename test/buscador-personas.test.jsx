@@ -240,3 +240,98 @@ describe('BuscadorPersonas · Escape no lo limpia el navegador (#108)', () => {
     ui.desmontar()
   })
 })
+
+// #169: el valor seleccionado se ve con avatar (foto o iniciales) en el trigger
+// cerrado; al enfocar/editar se oculta para buscar, y las opciones fijas o
+// vacías no llevan avatar.
+describe('BuscadorPersonas · avatar del seleccionado (#169)', () => {
+  const CON_FOTO = [
+    { id: 'ana', nombre: 'Ana López', rol: 'Corte', activo: true, fotoUrl: 'https://ejemplo.test/ana.png' },
+    { id: 'beto', nombre: 'Beto Ruiz', rol: 'Color', activo: true },
+  ]
+
+  function ControladoFoto({ inicial = '', ...props }) {
+    const [valor, setValor] = useState(inicial)
+    return (
+      <BuscadorPersonas
+        personas={CON_FOTO}
+        valor={valor}
+        onCambiar={(persona) => setValor(persona?.id ?? '')}
+        desplegable
+        opcionVacia="Todos"
+        ariaLabel="Persona"
+        {...props}
+      />
+    )
+  }
+
+  function montarFoto(props = {}) {
+    const contenedor = document.createElement('div')
+    document.body.appendChild(contenedor)
+    const root = createRoot(contenedor)
+    act(() => {
+      root.render(<ControladoFoto {...props} />)
+    })
+    const input = contenedor.querySelector('input')
+    const avatar = () => contenedor.querySelector('[data-testid="buscador-persona-seleccionada"]')
+    const desmontar = () => act(() => root.unmount())
+    return { contenedor, input, avatar, desmontar }
+  }
+
+  test('con foto muestra el avatar y el nombre en el trigger', () => {
+    const ui = montarFoto({ inicial: 'ana' })
+    expect(ui.avatar()).not.toBeNull()
+    expect(ui.avatar().querySelector('img')?.getAttribute('src')).toBe('https://ejemplo.test/ana.png')
+    expect(ui.input.value).toBe('Ana López')
+    ui.desmontar()
+  })
+
+  test('sin foto cae a iniciales (sin imagen rota)', () => {
+    const ui = montarFoto({ inicial: 'beto' })
+    expect(ui.avatar()).not.toBeNull()
+    expect(ui.avatar().querySelector('img')).toBeNull()
+    expect(ui.avatar().textContent).toContain('BR')
+    ui.desmontar()
+  })
+
+  test('al editar se oculta y al salir vuelve', () => {
+    const ui = montarFoto({ inicial: 'ana' })
+    act(() => ui.input.focus())
+    expect(ui.avatar()).toBeNull()
+    act(() => {
+      ui.input.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: document.body }))
+    })
+    expect(ui.avatar()).not.toBeNull()
+    ui.desmontar()
+  })
+
+  test('las opciones fijas y la vacía no llevan avatar', () => {
+    const vacia = montarFoto({ inicial: '' })
+    expect(vacia.avatar()).toBeNull()
+    vacia.desmontar()
+
+    const contenedor = document.createElement('div')
+    document.body.appendChild(contenedor)
+    const root = createRoot(contenedor)
+    act(() => {
+      root.render(
+        <BuscadorPersonas
+          personas={CON_FOTO}
+          valor="todos"
+          opcionesFijas={[{ valor: 'todos', nombre: 'Todos' }]}
+          desplegable
+          ariaLabel="Persona"
+        />,
+      )
+    })
+    expect(contenedor.querySelector('[data-testid="buscador-persona-seleccionada"]')).toBeNull()
+    act(() => root.unmount())
+  })
+
+  test('avatarSeleccionado={false} lo desactiva', () => {
+    const ui = montarFoto({ inicial: 'ana', avatarSeleccionado: false })
+    expect(ui.avatar()).toBeNull()
+    expect(ui.input.value).toBe('Ana López')
+    ui.desmontar()
+  })
+})

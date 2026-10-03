@@ -3921,6 +3921,8 @@ function BuscadorPersonas({
   /** 0 = sin límite. */
   maxResultados = 0,
   disabled = false,
+  /** #169: avatar (foto/iniciales) del seleccionado en el trigger cerrado. */
+  avatarSeleccionado = true,
   required = false,
   id,
   className
@@ -3968,6 +3970,15 @@ function BuscadorPersonas({
     const persona = (Array.isArray(personas) ? personas : []).find((p) => p.id === valor);
     return persona?.nombre ?? "";
   }, [opcionesFijas, opcionVacia, personas, valor]);
+  const personaSeleccionada = useMemo8(() => {
+    if (valor === "" || valor == null) return null;
+    const fijas = Array.isArray(opcionesFijas) ? opcionesFijas : [];
+    if (fijas.some((opcion) => opcion.valor !== void 0 ? opcion.valor === valor : opcion.id === valor)) {
+      return null;
+    }
+    return (Array.isArray(personas) ? personas : []).find((persona) => persona.id === valor) ?? null;
+  }, [opcionesFijas, personas, valor]);
+  const mostrarAvatar = Boolean(avatarSeleccionado && !editando && personaSeleccionada);
   function elegir(opcion) {
     if (!opcion) return;
     setAbierto(false);
@@ -4019,6 +4030,23 @@ function BuscadorPersonas({
   }
   const limpiarVisible = Boolean(opcionVacia) && valor !== "" && valor != null && !disabled;
   return /* @__PURE__ */ jsxs20("div", { ref: raiz, className: cn("relative", className), children: [
+    mostrarAvatar ? /* @__PURE__ */ jsx27(
+      "span",
+      {
+        "data-testid": "buscador-persona-seleccionada",
+        "aria-hidden": "true",
+        className: "pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2",
+        children: /* @__PURE__ */ jsx27(
+          Avatar,
+          {
+            nombre: personaSeleccionada.nombre ?? "",
+            src: personaSeleccionada.fotoUrl,
+            tamano: "sm",
+            decorativo: true
+          }
+        )
+      }
+    ) : null,
     /* @__PURE__ */ jsx27(
       Input,
       {
@@ -4058,7 +4086,7 @@ function BuscadorPersonas({
           if (desplegable && !raiz.current?.contains(evento.relatedTarget)) setAbierto(false);
         },
         onKeyDown: alTeclear,
-        className: limpiarVisible ? "pr-9" : void 0
+        className: cn(mostrarAvatar && "pl-10", limpiarVisible && "pr-9")
       }
     ),
     limpiarVisible ? /* @__PURE__ */ jsx27(
