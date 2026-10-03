@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.67.0" src="https://img.shields.io/badge/versi%C3%B3n-0.67.0-05a36f" />
+  <img alt="Versión 0.67.1" src="https://img.shields.io/badge/versi%C3%B3n-0.67.1-05a36f" />
   <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
   <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
 </p>
@@ -52,10 +52,10 @@ ficha consultable.
 
 ### 1. Instalar una versión fija
 
-La versión del paquete es `v0.67.0`. Al publicar su tag, la instalación fija es:
+La versión del paquete es `v0.67.1`. Al publicar su tag, la instalación fija es:
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.67.0
+npm install github:dariodeoli/owncoding-ui#v0.67.1
 ```
 
 Para probar la rama principal sin fijar un release:
@@ -522,5 +522,9 @@ explícita sin contratos ni cobros locales. [Contrato](docs/PRICING-CARD.md).
 
 `createOwnDataRucProvider`, `mapOwnDataRucResponse` y `mapOwnDataRucError` conectan
 un transporte inyectado con `RucField`, sin claves en frontend ni consultas propias.
-La API comercial de OwnData permanece deshabilitada, pendiente de autorización
-escrita; la galería solo ejercita un contrato simulado. [Contrato](docs/OWNDATA-RUC.md).
+La API comercial de OwnData permanece deshabilitada por política interna de
+publicación; la galería solo ejercita un contrato simulado, sin consultas reales.
+La licencia general de información pública no prueba una exigencia universal de
+carta separada ni certifica tratamientos privados. El enlace a la consulta de
+cuenta existente no acredita un nuevo despliegue de RucField.
+[Contrato y fuentes primarias](docs/OWNDATA-RUC.md).

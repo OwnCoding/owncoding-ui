@@ -8,6 +8,19 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.67.1 — 2026-10-03
+
+- **Enlace a OwnData:** la galería ofrece acceso a la consulta autenticada de
+  cuenta existente; no presenta la nueva adopción de RucField como desplegada.
+  El contrato en la galería sigue siendo simulado, sin claves ni consultas reales.
+- **Clarificación documental:** consulta de cuenta y API comercial usan envelopes
+  distintos. Se citan DNIT y Decreto 4064/2015, artículo 38/Anexo II, distinguiendo
+  la licencia general de reutilización y la política interna más estricta de
+  publicación comercial. No se certifican usos privados ni se eliminan controles.
+- **Alcance:** sin cambios de API, exports, dependencias, presupuestos o gates.
+  La API comercial permanece deshabilitada; publicación y despliegue son pasos
+  separados. Se preserva el historial de los releases anteriores.
+
 ## v0.67.0 — 2026-10-03
 
 - **Integración OwnData:** adaptadores puros de respuesta/error y proveedor con
