@@ -1855,3 +1855,11 @@ export type CartSummaryProps = {
   pending?: boolean; disabled?: boolean; motion?: boolean; title?: string; emptyLabel?: string; checkoutLabel?: string; message?: ReactNode; className?: string
 }
 export function CartSummary(props: CartSummaryProps): ReactElement
+
+export type ProductVariantGroup = { id: string; label: string; options: Array<{ id: string; label: string; disabled?: boolean }> }
+export type ProductVariant = { id: string; values: Record<string, string>; available: boolean }
+export type ProductVariantSelectorProps = {
+  groups: ProductVariantGroup[]; variants: ProductVariant[]; value: Record<string, string>; onChange: (value: Record<string, string>) => void
+  disabled?: boolean; pending?: boolean; title?: string; clearLabel?: string; className?: string
+}
+export function ProductVariantSelector(props: ProductVariantSelectorProps): ReactElement

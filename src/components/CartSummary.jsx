@@ -37,9 +37,9 @@ export default function CartSummary({ items = [], totals = [], total, currency =
           {item.unavailable && <p className="text-sm text-mute">No disponible</p>}
         </li>
       })}</ul> : <p className="text-sm text-mute">{emptyLabel}</p>}
-      <dl className="space-y-2">{totals.map(row => <div key={row.id} className="flex flex-wrap justify-between gap-2"><dt>{row.label}</dt><dd><Money value={validMoney(row.amount) ? row.amount : NaN} currency={currency} /></dd></div>)}
-        <div className="flex flex-wrap justify-between gap-2 font-semibold"><dt>Total</dt><dd><Money value={validMoney(total) ? total : NaN} currency={currency} /></dd></div></dl>
-      <AnimatedStatus state={pending ? 'loading' : 'idle'} motion={motion}>{message ?? (pending ? 'Actualizando carrito…' : 'Importes y disponibilidad confirmados por la aplicación.')}</AnimatedStatus>
+      <dl className="space-y-2">{totals.map(row => <div key={row.id} className="flex flex-wrap justify-between gap-2"><dt className="min-w-0 break-words">{row.label}</dt><dd className="min-w-0 break-words"><Money value={validMoney(row.amount) ? row.amount : NaN} currency={currency} /></dd></div>)}
+        <div className="flex flex-wrap justify-between gap-2 font-semibold"><dt className="min-w-0 break-words">Total</dt><dd className="min-w-0 break-words"><Money value={validMoney(total) ? total : NaN} currency={currency} /></dd></div></dl>
+      <AnimatedStatus state={pending ? 'loading' : 'idle'} motion={motion}>{message ?? (pending ? 'Actualizando carrito…' : 'Resumen proporcionado por la aplicación.')}</AnimatedStatus>
       <MotionSurface press motion={motion}><Button type="button" className="w-full" disabled={locked || !ready || items.some(item => item.unavailable) || !onCheckout}
         onClick={() => { if (!locked && ready && !items.some(item => item.unavailable)) onCheckout?.() }}>{checkoutLabel}</Button></MotionSurface>
     </section>

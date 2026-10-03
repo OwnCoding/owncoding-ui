@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 588 exports, 166 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 589 exports, 167 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -111,10 +111,10 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **588** |
-| Exports visuales | **166** |
+| Exports de la entrada raíz | **589** |
+| Exports visuales | **167** |
 | API, modelos y utilidades | **422** |
-| Vistas curadas con fixtures controlados | **166** |
+| Vistas curadas con fixtures controlados | **167** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -505,3 +505,6 @@ autoplay ni swipe. [Contrato de carrusel](docs/CAROUSEL.md).
 
 `CartSummary` presenta cantidades e importes controlados por la app, sin calcular
 precios ni ejecutar pagos. [Contrato](docs/CART-SUMMARY.md).
+
+`ProductVariantSelector` emite selecciones controladas contra una matriz de
+disponibilidad aportada por la app. [Contrato](docs/PRODUCT-VARIANT-SELECTOR.md).

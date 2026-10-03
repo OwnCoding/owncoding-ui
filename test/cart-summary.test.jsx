@@ -40,3 +40,13 @@ it('gallery fixture changes quantity, pending, removal and empty state locally',
   fireEvent.click(screen.getByRole('button', { name: 'Alternar pendiente demo' })); fireEvent.click(screen.getByRole('button', { name: 'Quitar Producto Demo' }))
   expect(screen.getByText('El carrito está vacío.')).toBeTruthy()
 })
+
+it('default copy never implies financial or availability validation', () => {
+  const { rerender } = render(<CartSummary items={[]} total={NaN} />)
+  for (const items of [[], [{ ...item, unavailable: true }], [{ ...item, amount: NaN }]]) {
+    rerender(<CartSummary items={items} total={NaN} totals={[{ id: 'long', label: 'Etiqueta'.repeat(40), amount: 100 }]} />)
+    expect(screen.getByText('Resumen proporcionado por la aplicación.')).toBeTruthy()
+    expect(screen.queryByText(/confirmados por/)).toBeNull()
+    expect(screen.getByText('Etiqueta'.repeat(40)).className).toContain('break-words')
+  }
+})

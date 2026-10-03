@@ -90,3 +90,7 @@ void carouselContract
 import { CartSummary } from 'owncoding-ui'
 const cartContract = <CartSummary items={[{ id: 'sample', label: 'Sample', quantity: 1, amount: 10 }]} total={10} onQuantityChange={(id: string, quantity: number) => {}} />
 void cartContract
+
+import { ProductVariantSelector } from 'owncoding-ui'
+const variantContract = <ProductVariantSelector groups={[]} variants={[]} value={{}} onChange={(value: Record<string, string>) => {}} />
+void variantContract
