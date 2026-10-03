@@ -100,3 +100,25 @@ it('opt-in nine-digit invalid extras disable lookup; excessive paste is rejected
   fireEvent.paste(input, { clipboardData: { getData: () => '123456789' } }); expect(change).toHaveBeenCalledExactlyOnceWith('123456789')
   expect(provider).not.toHaveBeenCalled()
 })
+
+it('accepts actual numeric source partitions, optional absence and empty published text faithfully', () => {
+  for (const partition of [0, 9]) {
+    const envelope = simulatedOwnDataEnvelope(); envelope.data.sourcePartition = partition
+    envelope.meta.provenance.publishedText = ''
+    const mapped = mapOwnDataRucResponse(envelope, '80012345-6')
+    expect(mapped.ownData.sourcePartition).toBe(partition)
+    expect(mapped.ownData.provenance.publishedText).toBe('')
+  }
+  const envelope = simulatedOwnDataEnvelope(); delete envelope.data.sourcePartition
+  expect(mapOwnDataRucResponse(envelope, '80012345').ownData).not.toHaveProperty('sourcePartition')
+})
+it('rejects invalid present source partitions and non-string published text', () => {
+  for (const partition of ['0', 'fixture', null, undefined, -1, 10, 0.5, NaN, Infinity]) {
+    const envelope = simulatedOwnDataEnvelope(); envelope.data.sourcePartition = partition
+    expect(() => mapOwnDataRucResponse(envelope, '80012345')).toThrow()
+  }
+  for (const publishedText of [null, undefined, 0, {}]) {
+    const envelope = simulatedOwnDataEnvelope(); envelope.meta.provenance.publishedText = publishedText
+    expect(() => mapOwnDataRucResponse(envelope, '80012345')).toThrow()
+  }
+})

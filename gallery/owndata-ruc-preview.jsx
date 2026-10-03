@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { RucField, createOwnDataRucProvider } from '../src/index.js'
 
 export function simulatedOwnDataEnvelope() {
-  return { data: { ruc: '80012345', fullRuc: '80012345-6', dv: '6', nameOfficial: 'EMPRESA DEMO — CONTRATO SIMULADO', equivalenceRaw: null, stateRaw: 'ESTADO DEMO', sourcePartition: 'fixture' },
+  return { data: { ruc: '80012345', fullRuc: '80012345-6', dv: '6', nameOfficial: 'EMPRESA DEMO — CONTRATO SIMULADO', equivalenceRaw: null, stateRaw: 'ESTADO DEMO', sourcePartition: 0 },
     requestId: 'fixture-own-data', meta: { environment: 'test', quota: { limit: 10, used: 1, remaining: 9, day: '2026-10-03', resetAfter: 60 },
       provenance: { source: 'dnit_official_snapshot', sourcePage: 'https://www.dnit.gov.py', publicationDate: '2026-10-03', publishedText: 'Fixture; no publicación real.', importedAt: '2026-10-03', snapshotHash: '0'.repeat(64) } } }
 }

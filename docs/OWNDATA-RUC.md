@@ -82,3 +82,11 @@ Cambiar RUC/proveedor/disabled invalida resultados viejos; no se aplican sin con
 La galería conserva sus fixtures habituales y agrega un **contrato OwnData
 simulado** que usa el mapper real, con error deshabilitado o éxito ficticio explícito.
 No hay llamadas a contribuyentes, claves, autorización comercial ni datos DNIT reales.
+
+### Metadatos específicos de la fuente
+
+`sourcePartition` es opcional: cuando está presente, conserva un entero de 0 a 9
+(incluido 0), sin convertirlo a texto. Su ausencia no invalida una respuesta.
+`provenance.publishedText` conserva la cadena publicada, incluso si está vacía;
+no se completa ni se infiere contenido. Valores presentes de partición inválidos
+y valores no textuales de `publishedText` se rechazan.

@@ -679,7 +679,7 @@ export function normalizarResultadoIA(resultado?: ResultadoCreacionIA | null, op
 export type OwnDataRucResult = {
   name: string; fullRuc: string; reviewRequired: true
   ownData: {
-    ruc: string; dv: string | number; nameOfficial: string; equivalenceRaw: string | null; stateRaw: string | null; sourcePartition: string
+    ruc: string; dv: string | number; nameOfficial: string; equivalenceRaw: string | null; stateRaw: string | null; sourcePartition?: number
     requestId?: string; environment: 'test' | 'live'
     quota: { limit: number; used: number; remaining: number; day: string; resetAfter: number }
     provenance: { source: 'dnit_official_snapshot'; sourcePage: string; publicationDate: string; publishedText: string; importedAt: string; snapshotHash: string }

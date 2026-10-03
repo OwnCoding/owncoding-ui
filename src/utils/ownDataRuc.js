@@ -44,9 +44,9 @@ export function mapOwnDataRucResponse(envelope, requested) {
   const dv = typeof data?.dv === 'number' && Number.isInteger(data.dv) ? String(data.dv) : data?.dv
   const valid = typeof base === 'string' && /^[1-9][0-9]{0,8}$/.test(base) && typeof dv === 'string' && /^[0-9]$/.test(dv) &&
     data.fullRuc === `${base}-${dv}` && (requested.includes('-') ? requested === data.fullRuc : requested === base) &&
-    nonempty(data.nameOfficial) && raw(data.equivalenceRaw) && raw(data.stateRaw) && nonempty(data.sourcePartition) &&
+    nonempty(data.nameOfficial) && raw(data.equivalenceRaw) && raw(data.stateRaw) && (!Object.hasOwn(data, 'sourcePartition') || (Number.isSafeInteger(data.sourcePartition) && data.sourcePartition >= 0 && data.sourcePartition <= 9)) &&
     ['test', 'live'].includes(meta?.environment) && source?.source === 'dnit_official_snapshot' &&
-    ['sourcePage', 'publicationDate', 'publishedText', 'importedAt', 'snapshotHash'].every(key => nonempty(source[key])) &&
+    ['sourcePage', 'publicationDate', 'importedAt', 'snapshotHash'].every(key => nonempty(source[key])) && typeof source.publishedText === 'string' &&
     /^[a-f0-9]{64}$/i.test(source.snapshotHash) && quota &&
     ['limit', 'used', 'remaining', 'resetAfter'].every(key => Number.isSafeInteger(quota[key]) && quota[key] >= 0) && nonempty(quota.day)
   if (!valid) throw failure('OWNDATA_INVALID_RESPONSE', envelope)
@@ -54,7 +54,7 @@ export function mapOwnDataRucResponse(envelope, requested) {
     name: data.nameOfficial, fullRuc: data.fullRuc, reviewRequired: true,
     ownData: {
       ruc: base, dv: data.dv, nameOfficial: data.nameOfficial, equivalenceRaw: data.equivalenceRaw,
-      stateRaw: data.stateRaw, sourcePartition: data.sourcePartition,
+      stateRaw: data.stateRaw, ...(Object.hasOwn(data, 'sourcePartition') ? { sourcePartition: data.sourcePartition } : {}),
       requestId: safeRequestId(envelope.requestId), environment: meta.environment,
       quota: { limit: quota.limit, used: quota.used, remaining: quota.remaining, day: quota.day, resetAfter: quota.resetAfter },
       provenance: { source: source.source, sourcePage: source.sourcePage, publicationDate: source.publicationDate,
