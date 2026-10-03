@@ -8,6 +8,21 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.64.0 — 2026-10-03
+
+- **Movimiento compartido:** `AnimatedStatus` comunica estados controlados
+  (`idle`, `loading`, `success`, `error`) con una región de estado accesible e
+  iconos compartidos; `MotionSurface` compone tarjetas y controles existentes
+  con feedback opcional de hover, presión y elevación, sin wrappers interactivos.
+- **Accesibilidad:** movimiento reducido conserva texto e iconos estáticos;
+  hover solo para puntero fino; controles deshabilitados y foco visible no se
+  transforman. Ninguna acción espera a que termine una animación.
+- **Galería, tipos y docs:** demos diferidas de subida, verificación y pago
+  controladas con acciones explícitas sobre fixtures locales, sin servicios
+  externos; tipos de consumidor y contrato en `docs/MOTION.md`.
+- **Alcance:** no incluye OTP, carrito, indicador animado de `Subtabs` ni
+  adopción en aplicaciones. El tag de esta versión se publica por separado.
+
 ## v0.63.1 — 2026-10-03
 
 - **BuscadorPersonas (#169):** el valor seleccionado ahora se ve con avatar
