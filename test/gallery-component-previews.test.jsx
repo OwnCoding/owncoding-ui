@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import { ComponentPreview, EmailPreview } from '../gallery/component-previews.jsx'
 import LogoFinanciero from '../src/components/LogoFinanciero.jsx'
 import { BancoCombobox } from '../src/index.js'
+import packageJson from '../package.json'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 let host, root
@@ -61,7 +62,7 @@ test('footer models and version are selectable', () => {
   const select = host.querySelector('select')
   act(() => { select.value = 'apilado'; select.dispatchEvent(new Event('change', { bubbles: true })) })
   expect(host.querySelector('footer').dataset.modelo).toBe('apilado')
-  expect(host.querySelector('footer').textContent).toContain('v0.63.0')
+  expect(host.querySelector('footer').textContent).toContain(`v${packageJson.version}`)
 })
 test('email is isolated HTML or text without sending controls', () => {
   render(<EmailPreview />)
