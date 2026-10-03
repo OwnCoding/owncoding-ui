@@ -1,51 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="554" viewBox="0 0 1200 554" role="img" aria-labelledby="title desc">
   <title id="title">Identidad de aplicación, prefooter, footer y correo transaccional</title>
   <desc id="desc">Composición de una página con llamada previa, pie institucional y correo transaccional con identidad y versión.</desc>
-  <rect width="1200" height="640" rx="28" fill="#0e1116"/>
-  <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <text x="56" y="58" fill="#7cffc9" font-size="13" font-weight="700" letter-spacing="2">IDENTIDAD TRANSVERSAL</text>
-    <text x="56" y="99" fill="#f4f6fa" font-size="30" font-weight="760">La misma versión y la misma voz en cada superficie</text>
-    <text x="56" y="130" fill="#aab3c2" font-size="14">Modelos compartidos para la app, el pie institucional y la presentación de correo.</text>
-
-    <g transform="translate(56 168)">
-      <rect width="674" height="412" rx="24" fill="#1f2430" stroke="#3e475a"/>
-      <rect x="24" y="24" width="626" height="170" rx="20" fill="#181d27" stroke="#3e475a"/>
-      <rect x="46" y="46" width="52" height="52" rx="16" fill="#063426" stroke="#087a57"/>
-      <path d="M61 64h22M61 74h15M61 84h19" stroke="#7cffc9" stroke-width="3" stroke-linecap="round"/>
+  <rect width="1200" height="554" rx="24" fill="#0e1116" />
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <text x="56" y="30" fill="#7cffc9" font-size="11" font-weight="750">IDENTIDAD TRANSVERSAL</text>
+    <text x="56" y="64" fill="#f4f6fa" font-size="28" font-weight="750">Una identidad para cada superficie.</text>
+    <text x="56" y="88" fill="#aab3c2" font-size="13" font-weight="500">Versión, pie y correo compartidos · contenido editorial de muestra</text>
+    <g transform="translate(56 110)">
+      <rect width="674" height="412" rx="20" fill="#1f2430" stroke="#3e475a" />
+      <rect x="24" y="24" width="626" height="170" rx="20" fill="#181d27" stroke="#3e475a" />
+      <rect x="46" y="46" width="52" height="52" rx="16" fill="#063426" stroke="#087a57" />
+      <path d="M61 64h22M61 74h15M61 84h19" stroke="#7cffc9" stroke-width="3" stroke-linecap="round" />
       <text x="116" y="68" fill="#f4f6fa" font-size="18" font-weight="730">Mi aplicación</text>
       <text x="116" y="91" fill="#aab3c2" font-size="11">Identidad creada desde una fuente única</text>
-      <rect x="46" y="119" width="146" height="40" rx="12" fill="#05f19c"/>
+      <rect x="46" y="119" width="146" height="40" rx="12" fill="#05f19c" />
       <text x="119" y="144" fill="#061e14" font-size="12" font-weight="750" text-anchor="middle">Acción principal</text>
-      <rect x="205" y="119" width="128" height="40" rx="12" fill="none" stroke="#7c879b"/>
+      <rect x="205" y="119" width="128" height="40" rx="12" fill="none" stroke="#7c879b" />
       <text x="269" y="144" fill="#f4f6fa" font-size="12" font-weight="650" text-anchor="middle">Documentación</text>
-
-      <rect x="24" y="210" width="626" height="108" rx="20" fill="#242a38" stroke="#3e475a"/>
+      <rect x="24" y="210" width="626" height="108" rx="20" fill="#242a38" stroke="#3e475a" />
       <text x="46" y="240" fill="#7cffc9" font-size="10" font-weight="700" letter-spacing="1.2">PRODUCTPREFOOTER</text>
       <text x="46" y="268" fill="#f4f6fa" font-size="16" font-weight="700">¿Necesitás integrar otra app?</text>
       <text x="46" y="291" fill="#aab3c2" font-size="11">Navegación y llamada a la acción sin duplicar layouts.</text>
-      <rect x="480" y="244" width="144" height="42" rx="12" fill="#05f19c"/>
+      <rect x="480" y="244" width="144" height="42" rx="12" fill="#05f19c" />
       <text x="552" y="270" fill="#061e14" font-size="11" font-weight="750" text-anchor="middle">Explorar objetos</text>
-
-      <rect x="24" y="334" width="626" height="54" rx="16" fill="#181d27" stroke="#3e475a"/>
+      <rect x="24" y="334" width="626" height="54" rx="16" fill="#181d27" stroke="#3e475a" />
       <text x="46" y="366" fill="#d9dee8" font-size="11">© 2026 Mi aplicación · v1.4.2</text>
       <text x="628" y="366" fill="#7cffc9" font-size="11" font-weight="650" text-anchor="end">Desarrollado por OwnCoding</text>
     </g>
-
-    <g transform="translate(754 168)">
-      <rect width="390" height="412" rx="24" fill="#f7f8fa" stroke="#d6dce6"/>
-      <rect x="24" y="24" width="342" height="52" rx="14" fill="#10151d"/>
-      <circle cx="50" cy="50" r="13" fill="#05f19c"/>
+    <g transform="translate(754 110)">
+      <rect width="390" height="412" rx="20" fill="#f7f8fa" stroke="#d6dce6" />
+      <rect x="24" y="24" width="342" height="52" rx="14" fill="#10151d" />
+      <circle cx="50" cy="50" r="13" fill="#05f19c" />
       <text x="76" y="48" fill="#f4f6fa" font-size="13" font-weight="720">Mi aplicación</text>
       <text x="76" y="64" fill="#aab3c2" font-size="9">Mensaje transaccional</text>
       <text x="24" y="118" fill="#111827" font-size="20" font-weight="750">Confirmá tu cuenta</text>
       <text x="24" y="148" fill="#4b5563" font-size="11">Recibimos una solicitud para activar tu acceso.</text>
-      <rect x="24" y="172" width="342" height="72" rx="12" fill="#edf1f5"/>
+      <rect x="24" y="172" width="342" height="72" rx="12" fill="#edf1f5" />
       <text x="42" y="198" fill="#6b7280" font-size="9" font-weight="700">CUENTA</text>
       <text x="42" y="222" fill="#111827" font-size="12">usuario@example.com</text>
-      <rect x="24" y="266" width="174" height="42" rx="11" fill="#047857"/>
+      <rect x="24" y="266" width="174" height="42" rx="11" fill="#047857" />
       <text x="111" y="292" fill="#fff" font-size="11" font-weight="750" text-anchor="middle">Confirmar cuenta</text>
       <text x="24" y="340" fill="#6b7280" font-size="10">Si no fuiste vos, ignorá este correo.</text>
-      <line x1="24" y1="360" x2="366" y2="360" stroke="#d6dce6"/>
+      <line x1="24" y1="360" x2="366" y2="360" stroke="#d6dce6" />
       <text x="24" y="384" fill="#6b7280" font-size="9">Mi aplicación · v1.4.2</text>
       <text x="366" y="384" fill="#047857" font-size="9" text-anchor="end">OwnCoding</text>
     </g>
