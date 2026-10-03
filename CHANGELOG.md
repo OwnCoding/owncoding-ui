@@ -8,6 +8,26 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.66.0 — 2026-10-03
+
+- **Carrito controlado:** `CartSummary` presenta importes de línea y totales
+  aportados por la aplicación; emite intenciones de cantidad, eliminación y
+  continuación. Cantidades, límites o importes inválidos bloquean continuar;
+  estados pendiente/no disponible conservan límites explícitos de acción.
+- **Variantes del producto:** `ProductVariantSelector` usa grupos de radios
+  nativos y una matriz de combinaciones disponible provista por la aplicación.
+  Selección parcial y limpieza controladas, sin autoselección ni stock inventado.
+- **Planes y precios:** `PricingCard` compone dinero, badge, superficie y acción
+  compartidos; estados seleccionado, pendiente y no disponible controlados.
+  Solo el botón elige: la tarjeta no convierte su contenido en una acción.
+- **Galería y contratos:** 590 exports, 168 visuales y fixtures interactivos
+  explícitos de carrito, variantes y planes. Tipos, pruebas de comportamiento y
+  guías en `docs/CART-SUMMARY.md`, `docs/PRODUCT-VARIANT-SELECTOR.md` y
+  `docs/PRICING-CARD.md`. Feedback reutiliza tokens y movimiento reducido.
+- **Alcance:** sin nuevos servicios, dependencias ni presupuestos. La aplicación
+  autoriza precios, inventario, impuestos, contratos y cobro en servidor; la UI
+  no crea compras, pagos ni suscripciones. Tag y despliegue se publican por separado.
+
 ## v0.65.0 — 2026-10-03
 
 - **Build compacto:** esbuild elimina solo whitespace; identificadores y sintaxis
