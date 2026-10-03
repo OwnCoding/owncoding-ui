@@ -94,3 +94,7 @@ void cartContract
 import { ProductVariantSelector } from 'owncoding-ui'
 const variantContract = <ProductVariantSelector groups={[]} variants={[]} value={{}} onChange={(value: Record<string, string>) => {}} />
 void variantContract
+
+import { PricingCard } from 'owncoding-ui'
+const pricingContract = <PricingCard title="Sample" price={100} features={[{ id: 'reports', label: 'Reports', included: true }]} onSelect={() => {}} />
+void pricingContract

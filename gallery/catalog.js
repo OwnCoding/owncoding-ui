@@ -3,6 +3,7 @@
 // aprobados se renderizan en la galería. scripts/gallery-check.mjs exige paridad.
 
 export const CATALOGO_EXPORTS = [
+{"nombre": "PricingCard", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "ProductVariantSelector", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "CartSummary", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "Carousel", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},

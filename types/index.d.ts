@@ -1863,3 +1863,11 @@ export type ProductVariantSelectorProps = {
   disabled?: boolean; pending?: boolean; title?: string; clearLabel?: string; className?: string
 }
 export function ProductVariantSelector(props: ProductVariantSelectorProps): ReactElement
+
+export type PricingFeature = { id: string; label: string; included: boolean }
+export type PricingCardProps = {
+  title: string; description?: ReactNode; price: number; currency?: 'PYG' | 'USD'; period?: string; features?: PricingFeature[]; badge?: ReactNode
+  selected?: boolean; unavailable?: boolean; pending?: boolean; disabled?: boolean; onSelect?: () => void; motion?: boolean
+  selectLabel?: string; selectedLabel?: string; unavailableLabel?: string; message?: ReactNode; className?: string
+}
+export function PricingCard(props: PricingCardProps): ReactElement
