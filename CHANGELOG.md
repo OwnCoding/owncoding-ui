@@ -8,6 +8,27 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.65.0 — 2026-10-03
+
+- **Build compacto:** esbuild elimina solo whitespace; identificadores y sintaxis
+  no se minifican. Se conservan exports, assets, sourcemaps, SSR y fronteras de
+  cliente, sin aumentar presupuestos ni cambiar dependencias.
+- **OTP controlado:** `OtpVerification` compone `PinInput`, `FormField` y feedback
+  compartido. La app controla valor, verificación, resultado, reenvío y cooldown;
+  no hay timer interno ni verificación automática al completar. `PinInput`
+  mantiene el PIN enmascarado por defecto y admite código visible, ARIA nativo y
+  pegado numérico parcial/con separadores.
+- **Carrusel manual:** `Carousel` usa contenido e índice controlados, botones
+  nativos, pickers accesibles y solo contenido activo montado. Preserva el foco
+  de navegación y anuncia cambios manuales confirmados; transición opcional por
+  puntero, sin movimiento para teclado o preferencia de movimiento reducido.
+- **Galería, tipos y contratos:** 587 exports, 165 visuales; fixtures locales
+  explícitos para OTP y carrusel, pruebas de comportamiento y guías de adopción
+  en `docs/OTP-VERIFICATION.md` y `docs/CAROUSEL.md`.
+- **Alcance:** no incluye backend SMS/autenticación, autoplay, swipe, carrito,
+  indicador animado de `Subtabs`, adopción en todas las apps ni todos los
+  componentes vistos en Instagram. Tag y despliegue se publican por separado.
+
 ## v0.64.0 — 2026-10-03
 
 - **Movimiento compartido:** `AnimatedStatus` comunica estados controlados
