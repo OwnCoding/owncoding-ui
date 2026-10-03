@@ -122,3 +122,16 @@ it('rejects invalid present source partitions and non-string published text', ()
     expect(() => mapOwnDataRucResponse(envelope, '80012345')).toThrow()
   }
 })
+
+it('links the existing authenticated account surface without turning the gallery fixture into a live provider', () => {
+  const fetcher = vi.spyOn(globalThis, 'fetch')
+  render(<OwnDataIntegrationPreview />)
+  const link = screen.getByRole('link', { name: 'Abrir consulta autenticada en OwnData' })
+  expect(link.getAttribute('href')).toBe('https://app.controlaria.online/panel/ruc')
+  expect(link.getAttribute('target')).toBe('_blank')
+  expect(screen.getByText(/no acredita el despliegue de una nueva integración RucField/)).toBeTruthy()
+  expect(screen.getByText(/no envía consultas reales ni incluye claves/)).toBeTruthy()
+  expect(screen.getByRole('checkbox', { name: 'Simular API deshabilitada' }).checked).toBe(true)
+  expect(fetcher).not.toHaveBeenCalled()
+  fetcher.mockRestore()
+})

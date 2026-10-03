@@ -18,11 +18,13 @@ export function OwnDataIntegrationPreview() {
   }, [blocked])
   return <section className="preview-panel col-span-full" aria-label="Integración OwnData mediante backend">
     <div className="preview-panel__heading"><div><p className="preview-kicker">OwnData + RucField</p><h4>Base propia DNIT; integración mediante backend</h4></div><span className="fixture-label">Contrato OwnData simulado</span></div>
-    <p className="preview-note">La API comercial está deshabilitada, pendiente de autorización escrita de la fuente. Sin claves de clientes ni consultas reales desde esta galería.</p>
+    <p className="preview-note">La API comercial permanece deshabilitada por política interna de publicación. Esta galería solo simula el contrato: no envía consultas reales ni incluye claves de clientes.</p>
     <label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={blocked} onChange={event => { setBlocked(event.target.checked); setResult(null) }} />Simular API deshabilitada</label>
     <RucField maxBaseDigits={9} ariaLabel="RUC del contrato OwnData simulado" value={value} onChange={setValue}
       consultar={provider} onAplicar={setResult} textoAyuda="Fixture local 80012345-6; extraiga y confirme para revisar metadatos simulados." />
     {result && <p role="status" className="preview-note">Confirmado solo en demo: {result.name} · {result.ownData.stateRaw} · revisión requerida.</p>}
+    <a className="inline-flex min-h-11 items-center text-sm underline" href="https://app.controlaria.online/panel/ruc" target="_blank" rel="noreferrer">Abrir consulta autenticada en OwnData</a>
+    <p className="preview-note">El enlace abre la consulta de cuenta existente en OwnData; no acredita el despliegue de una nueva integración RucField. La cuenta y la API comercial usan contratos distintos.</p>
     <a className="inline-flex min-h-11 items-center text-sm underline" href="https://github.com/dariodeoli/owncoding-ui/blob/main/docs/OWNDATA-RUC.md">Contrato de integración OwnData</a>
   </section>
 }

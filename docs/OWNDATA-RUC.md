@@ -4,8 +4,9 @@
 
 OwnData mantiene una base propia DNIT: el camino comercial usa su snapshot local,
 no SUN ni fallback de red. **La API comercial está implementada pero deshabilitada**,
-pendiente de autorización escrita de la fuente; no hay claves de clientes activadas
-por esta integración. Este documento no habilita el servicio ni acredita derechos.
+por política interna de publicación; no hay claves de clientes activadas por esta
+integración. Este documento no habilita el servicio ni certifica jurídicamente
+datos, finalidades o tratamientos.
 
 `createOwnDataRucProvider({ lookup })` solo compone una función de transporte
 inyectada. No recibe claves, URL ni configuración global, no hace fetch por defecto,
@@ -90,3 +91,28 @@ No hay llamadas a contribuyentes, claves, autorización comercial ni datos DNIT 
 `provenance.publishedText` conserva la cadena publicada, incluso si está vacía;
 no se completa ni se infiere contenido. Valores presentes de partición inválidos
 y valores no textuales de `publishedText` se rechazan.
+
+## Consulta de cuenta y base documental
+
+[Abrir consulta autenticada en OwnData](https://app.controlaria.online/panel/ruc)
+abre el endpoint web de cuenta existente: requiere sesión y correo verificado.
+El enlace no prueba que una nueva integración RucField esté desplegada. La galería
+permanece simulada, sin peticiones reales, claves ni proxy propio implementado.
+
+La consulta de cuenta usa `POST /api/account/ruc` con cookies same-origin y
+responde `{data, provenance, fullRuc, allowance}`. No use el mapper comercial
+para ese envelope ni invente `meta.environment` o `meta.quota`. La API comercial
+usa `GET /api/v1/ruc/{ruc}`, clave solo en servidor y el envelope documentado arriba.
+El estado comercial deshabilitado no describe la disponibilidad de la cuenta web.
+
+Fuentes primarias:
+
+- [Decreto 4064/2015, artículo 38 y Anexo II](https://informacionpublica.paraguay.gov.py/public/decreto_4064.pdf): licencia general de reutilización de información pública no exceptuada por reserva legal; atribución de fuente/licencia, fecha conocida y ausencia de aval oficial.
+- [Publicación oficial DNIT de RUC y equivalencias](https://www.dnit.gov.py/en/web/portal-institucional/listado-de-ruc-con-sus-equivalencias): fuente del snapshot, cuya fecha/procedencia deben conservarse.
+
+Estas fuentes no prueban una exigencia general de carta separada para toda
+reutilización. La autorización escrita adicional es una política interna más
+estricta para publicar la API comercial, no una certificación o conclusión legal
+universal. No se elimina ese guard ni los controles de datos privados, finalidad,
+sesión, abuso y cuotas. OwnData no representa ni está patrocinado por DNIT o el
+Estado paraguayo; no se habilitan exportación masiva ni enriquecimiento.
