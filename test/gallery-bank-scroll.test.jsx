@@ -49,19 +49,16 @@ test('review has a responsive height ceiling, focus affordance and native page-s
   expect(css.match(/\.priority-grid \{([^}]+)\}/)[1]).toContain('align-items: start')
 })
 
-test('priority columns preserve reading and anchor order while stacking all three inputs beside financial previews', () => {
+test('flat priority grid preserves financial, phone, city and customer reading order', () => {
   act(() => root.render(<PriorityPreviews />))
-  expect([...host.querySelectorAll('.priority-card')].map(card => card.id)).toEqual([
+  const cards = [...host.querySelector('.priority-grid').children]
+  expect(cards.map(card => card.id)).toEqual([
     'preview-bancos-pagos', 'preview-telefono-py', 'preview-ciudad-departamento', 'preview-cliente-ci-ruc',
   ])
-  expect(host.querySelector('.priority-column--financial').children).toHaveLength(1)
-  expect([...host.querySelector('.priority-column--inputs').children].map(card => card.id)).toEqual([
-    'preview-telefono-py', 'preview-ciudad-departamento', 'preview-cliente-ci-ruc',
-  ])
+  expect(cards.every(card => card.tagName === 'ARTICLE')).toBe(true)
   const css = readFileSync('gallery/styles.css', 'utf8')
-  expect(css).toContain('.priority-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }')
-  expect(css).toContain('.priority-column { display: grid; min-width: 0; align-content: start; gap: 1rem; }')
-  expect(css).not.toMatch(/\.priority-card--[1-4]\s*\{\s*grid-column/)
-  expect(css.match(/\.priority-column \{([^}]+)\}/)[1]).not.toMatch(/order|grid-area/)
+  expect(css).toContain('.priority-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }')
+  expect(css).toContain('.priority-card--1, .priority-card--4 { grid-column: 1 / -1; }')
+  expect(css).not.toMatch(/\.priority-card--[1-4][^{]*\{[^}]*\border:/)
   expect(css.match(/\.priority-grid \{([^}]+)\}/)[1]).toContain('grid-template-columns: minmax(0, 1fr)')
 })

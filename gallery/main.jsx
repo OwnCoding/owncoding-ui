@@ -51,7 +51,7 @@ import {
 } from '../src/index.js'
 import { ComponentPreview, EmailPreview } from './component-previews.jsx'
 import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from './catalog.js'
-import { galleryEntryTier, hasInlineGalleryPreview, orderGalleryEntries } from './catalog-order.js'
+import { COMPACT_SCENES, galleryCardIsWide, galleryEntryTier, hasInlineGalleryPreview, orderGalleryEntries } from './catalog-order.js'
 import {
   BANCO_DESTACADO,
   BANCOS_PREVIEW,
@@ -624,19 +624,14 @@ function Destacado({ item }) {
 export function PriorityPreviews() {
   return (
     <div className="priority-grid">
-      <div className="priority-column priority-column--financial">
-        {DESTACADOS_CATALOGO.slice(0, 1).map((item) => <Destacado key={item.destacado.id} item={item} />)}
-      </div>
-      <div className="priority-column priority-column--inputs">
-        {DESTACADOS_CATALOGO.slice(1).map((item) => <Destacado key={item.destacado.id} item={item} />)}
-      </div>
+      {DESTACADOS_CATALOGO.map((item) => <Destacado key={item.destacado.id} item={item} />)}
     </div>
   )
 }
 
-function Ficha({ item, onAbrir }) {
+export function Ficha({ item, onAbrir }) {
   return (
-    <article className="gallery-card min-w-0 rounded-2xl border border-ink-600 bg-ink p-4 shadow-card">
+    <article className={`gallery-card min-w-0 rounded-2xl border border-ink-600 bg-ink p-4 shadow-card${galleryCardIsWide(item) ? ' gallery-card--wide' : ''}`} data-export={item.nombre}>
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-fono-dark dark:text-fono-light">{item.categoria}</p>
@@ -649,11 +644,11 @@ function Ficha({ item, onAbrir }) {
           <span>Preview profesional #{item.destacado.prioridad}</span>
           <strong>{item.destacado.titulo}</strong>
         </a>
-      ) : item.presentacion === 'individual' ? (
-        <p className="mt-3 text-sm text-mute">Demo interactiva en la ficha ampliada.</p>
       ) : hasInlineGalleryPreview(item) ? (
-        <div className="mt-4 min-w-0 overflow-hidden rounded-xl border border-ink-600 bg-ink-800 p-3"><ErrorBoundary><Presentacion id={item.presentacion} /></ErrorBoundary></div>
-      ) : null}
+        <div className="catalog-miniature"><span className="preview-kicker">Miniatura de primitivas compartidas</span><ErrorBoundary><Presentacion id={COMPACT_SCENES[item.nombre] || item.presentacion} /></ErrorBoundary></div>
+      ) : item.presentacion === 'individual' ? (
+        <div className="catalog-demo-ready"><span>Demo funcional</span><p>Abra la ficha para explorar el componente y sus estados.</p></div>
+      ) : <p className="mt-3 text-sm text-mute">Contrato y utilidades para integrar en la aplicación.</p>}
       <button type="button" onClick={() => onAbrir(item)} className="mt-4 inline-flex min-h-11 items-center rounded-lg px-1 text-sm font-semibold text-fono-dark underline-offset-4 hover:underline dark:text-fono-light">Ver ficha del export</button>
     </article>
   )
@@ -686,13 +681,14 @@ export function App() {
 
   return (
     <div className="min-h-dvh bg-paper text-fore">
-      <header className="border-b border-fore/10 bg-ink/95 px-4 py-5 backdrop-blur sm:px-6">
+      <header className="gallery-header border-b border-fore/10 bg-ink/95 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[.16em] text-fono-dark dark:text-fono-light">OwnCoding ecosystem</p>
             <p className="mt-1 text-lg font-bold">UI Gallery <span className="font-normal text-mute">{IDENTIDAD.etiquetaVersion}</span></p>
           </div>
-          <nav aria-label="Acciones de la galería" className="flex items-center gap-2">
+          <nav aria-label="Acciones de la galería" className="flex flex-wrap items-center gap-2">
+            <a className="toque-44 inline-flex min-h-11 items-center px-2 text-sm font-semibold" href="#catalogo">Catálogo</a>
             <a className="toque-44 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" href="/status.json">Estado</a>
             <a className="toque-44 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" href="/blog/">Blog</a>
             <ThemeToggle clave="owncoding-gallery-theme" />
@@ -700,12 +696,13 @@ export function App() {
         </div>
       </header>
 
-      <main id="contenido" className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
+      <main id="contenido" className="gallery-main mx-auto w-full max-w-7xl px-4 py-5 sm:px-6">
         <section className="gallery-hero">
           <div>
             <Badge color="green">Catálogo verificable</Badge>
-            <h1>Automatizaciones que hacen más simples los formularios reales.</h1>
-            <p>Primero: bancos y pagos, teléfono con +595, ciudad con departamento y clientes por CI/RUC. Después, los {METRICAS_CATALOGO.total} exports del sistema.</p>
+            <h1>Una base común.<br />Interfaces que funcionan.</h1>
+            <p>Componentes reales, estados claros y contratos compartidos. Explore campos, operaciones y los {METRICAS_CATALOGO.total} exports del sistema.</p>
+            <a className="hero-catalog-link" href="#catalogo">Explorar catálogo →</a>
             <nav aria-label="Vistas principales" className="hero-priority-nav">
               {DESTACADOS_CATALOGO.map((item) => (
                 <a key={item.destacado.id} href={`#preview-${item.destacado.id}`}>
@@ -715,11 +712,11 @@ export function App() {
               ))}
             </nav>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Stat label="Total" valor={METRICAS_CATALOGO.total} />
-            <Stat label="Visuales" valor={visuales} tono="ok" />
-            <Stat label="API" valor={api} tono="info" />
-          </div>
+          <aside className="hero-index" aria-label="Inventario de la biblioteca">
+            <dl className="hero-metrics">{[['Exports', METRICAS_CATALOGO.total], ['Visuales', visuales], ['API', api]].map(([label, count]) => <div key={label}><dt>{label}</dt><dd>{count}</dd></div>)}</dl>
+            <p>Pruebe antes de integrar</p><ul><li>Formularios y datos locales</li><li>Composiciones de operación</li><li>Estados controlados por la app</li></ul>
+            <span className="fixture-label">Fixtures locales · sin servicios externos</span>
+          </aside>
         </section>
 
         <section aria-labelledby="titulo-destacados" className="priority-section">
@@ -739,36 +736,40 @@ export function App() {
           <div className="gallery-blog__grid">{BLOG_POSTS.slice(0, 3).map((article) => <article key={article.slug}><span>{article.category}</span><h3><a href={articlePath(article)}>{article.title}</a></h3><p>{article.description}</p><a href={articlePath(article)} className="gallery-blog__read">Leer guía <span aria-hidden="true">↗</span></a></article>)}</div>
         </section>
 
-        <section aria-label="Controles del catálogo" className="sticky top-0 z-20 -mx-4 mt-10 border-y border-fore/10 bg-paper/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
-          <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center">
+        <div id="catalogo" className="catalog-workspace">
+        <section aria-label="Controles del catálogo" className="catalog-filters">
+          <div className="catalog-search">
             <SearchField className="min-w-0 flex-1" value={consulta} onChange={(event) => { updateUrlState({ consulta: event.target.value.slice(0, 200) }, 'replace'); setLimite(60) }} placeholder="Buscar componente, automatización o API" />
             <div className="flex flex-wrap gap-2" aria-label="Tipo de export">
               {[['visual', 'Visuales'], ['api', 'API'], ['todos', 'Todos']].map(([valor, etiqueta]) => <button key={valor} type="button" aria-pressed={tipo === valor} onClick={() => { updateUrlState({ tipo: valor }); setLimite(60) }} className={`min-h-11 rounded-xl border px-4 text-sm font-semibold ${tipo === valor ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{etiqueta}</button>)}
             </div>
           </div>
-          <div className="mx-auto mt-3 flex max-w-7xl gap-2 overflow-x-auto pb-1" aria-label="Categorías">
+          <div className="catalog-categories" aria-label="Categorías">
             {['Todas', ...CATEGORIAS_CATALOGO].map((item) => <button key={item} type="button" aria-pressed={categoria === item} onClick={() => { updateUrlState({ categoria: item }); setLimite(60) }} className={`min-h-11 shrink-0 rounded-xl border px-3 text-sm font-medium ${categoria === item ? 'border-fono bg-fono/15 text-fono-text' : 'border-interactivo bg-ink text-mute hover:text-fore'}`}>{item}</button>)}
           </div>
         </section>
 
+        <div className="catalog-content">
         {seleccionado ? (
-          <section id="ficha-export" tabIndex="-1" aria-live="polite" className="mt-6 rounded-2xl border border-fono/30 bg-fono/10 p-5 outline-none">
+          <section id="ficha-export" tabIndex="-1" aria-live="polite" className="selected-preview rounded-2xl border border-fono/30 bg-fono/10 p-4 outline-none">
             <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.14em] text-fono-text">Ficha seleccionada</p><h2 className="mt-1 text-xl font-bold">{seleccionado.nombre}</h2><p className="mt-2 text-sm text-mute">{seleccionado.categoria} · {seleccionado.tipo === 'visual' ? 'export visual disponible en la entrada raíz' : 'API documentada sin render visual'}.</p></div><button type="button" className="min-h-11 rounded-lg px-3 text-sm font-semibold text-fono-dark hover:underline dark:text-fono-light" onClick={() => updateUrlState({ exportName: null })}>Cerrar ficha</button></div>
             <a href={shareHref} aria-label={`Enlace directo a ${seleccionado.nombre}`} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-fono-dark underline dark:text-fono-light">Enlace a esta ficha</a>
             {seleccionado.presentacion ? <div key={seleccionado.nombre} className="mt-4 min-w-0"><ErrorBoundary>{seleccionado.presentacion === 'individual' ? <ComponentPreview name={seleccionado.nombre} /> : <Presentacion id={seleccionado.presentacion} />}</ErrorBoundary></div> : <p className="mt-3 text-sm text-mute">Sin preview curado todavía.</p>}
           </section>
         ) : null}
 
-        <div className="mt-6"><EmailPreview /></div>
-        <section id="catalogo" aria-labelledby="titulo-catalogo" className="mt-8">
+        <div className="catalog-email"><EmailPreview /></div>
+        <section aria-labelledby="titulo-catalogo" className="catalog-results">
           <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 id="titulo-catalogo" className="text-2xl font-bold">Catálogo completo</h2><p className="text-sm text-mute" role="status">{resultados.length} resultados</p></div>
           {resultados.length > 0 ? (
-            <><div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{resultados.slice(0, limite).map((item, index) => <React.Fragment key={item.nombre}>{index === 0 || galleryEntryTier(item) !== galleryEntryTier(resultados[index - 1]) ? <h3 className="col-span-full text-lg font-semibold">{['Vistas destacadas', 'Componentes con miniaturas', 'Demos disponibles al abrir la ficha', 'API, modelos y utilidades'][galleryEntryTier(item)]}</h3> : null}<Ficha item={item} onAbrir={abrirFicha} /></React.Fragment>)}</div>{resultados.length > limite ? <div className="mt-6 text-center"><Button variant="outline" onClick={() => setLimite((actual) => actual + 60)}>Mostrar más exports</Button></div> : null}</>
+            <><div className="catalog-grid">{resultados.slice(0, limite).map((item, index) => <React.Fragment key={item.nombre}>{index === 0 || galleryEntryTier(item) !== galleryEntryTier(resultados[index - 1]) ? <h3 className="col-span-full text-lg font-semibold">{['Vistas destacadas', 'Componentes con miniaturas', 'Demos disponibles al abrir la ficha', 'API, modelos y utilidades'][galleryEntryTier(item)]}</h3> : null}<Ficha item={item} onAbrir={abrirFicha} /></React.Fragment>)}</div>{resultados.length > limite ? <div className="mt-6 text-center"><Button variant="outline" onClick={() => setLimite((actual) => actual + 60)}>Mostrar más exports</Button></div> : null}</>
           ) : <div className="mt-5"><EmptyState title="No encontramos ese export" description="Probá otra palabra o cambiá los filtros." action={<Button variant="outline" onClick={() => { updateUrlState({ consulta: '', categoria: 'Todas', tipo: 'visual' }); setLimite(60) }}>Limpiar filtros</Button>} /></div>}
         </section>
+        </div>
+        </div>
       </main>
 
-      <ProductPrefooter modelo="completo" titulo="Adopción sin copias locales" descripcion="Usá el export compartido y extendé su contrato por props." columnas={[{ titulo: 'Biblioteca', enlaces: [{ href: '#catalogo', etiqueta: 'Todos los exports' }, { href: '/status.json', etiqueta: 'Estado del build' }, { href: '/blog/', etiqueta: 'Blog y guías' }] }, { titulo: 'Calidad', enlaces: [{ href: '#contenido', etiqueta: 'Volver arriba' }] }]} accion={{ titulo: 'Estado verificable', descripcion: `${visuales} exports visuales y ${api} exports de API catalogados.`, enlace: { href: '/status.json', etiqueta: 'Abrir status.json' } }} />
+      <ProductPrefooter className="gallery-prefooter" modelo="completo" titulo="Adopción sin copias locales" descripcion="Usá el export compartido y extendé su contrato por props." columnas={[{ titulo: 'Biblioteca', enlaces: [{ href: '#catalogo', etiqueta: 'Todos los exports' }, { href: '/status.json', etiqueta: 'Estado del build' }, { href: '/blog/', etiqueta: 'Blog y guías' }] }, { titulo: 'Calidad', enlaces: [{ href: '#contenido', etiqueta: 'Volver arriba' }] }]} accion={{ titulo: 'Estado verificable', descripcion: `${visuales} exports visuales y ${api} exports de API catalogados.`, enlace: { href: '/status.json', etiqueta: 'Abrir status.json' } }} />
       <ProductFooter identidad={IDENTIDAD} modelo="distribuido" enlaces={[{ href: '/blog/', etiqueta: 'Blog' }, { href: '/status.json', etiqueta: 'Estado' }]} />
     </div>
   )
