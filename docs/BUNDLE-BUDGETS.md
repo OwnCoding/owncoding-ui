@@ -131,3 +131,25 @@ change per build. Consumers/tarballs must preserve all emitted relative chunks.
 Rollback the multi-entry build, closure guard/tests and this new asset/metadata
 batch together; keep previously published gallery fixtures and original assets.
 Before final proof, regenerate dist; after source freeze use check-only commands.
+
+## Whitespace-only build funding (2026-10-03)
+
+The shared esbuild options enable only `minifyWhitespace`. Identifier and syntax
+minification remain explicitly disabled; no property mangling, export removal,
+asset conversion, dependency change or ceiling increase is involved. Source maps
+and client banners remain linked. Source remains readable; generated JavaScript
+is compact and its regeneration creates a large diff, intentionally isolated
+from future feature work. Artwork closure tests inspect actual `data:image/`
+payloads rather than formatting-dependent esbuild source comments.
+
+| Artifact | Before raw / gzip B | After raw / gzip B |
+| --- | ---: | ---: |
+| Root reachable closure | 3,261,439 / 1,975,779 | 3,097,019 / 1,953,833 |
+| Financial reachable closure | 2,657,131 / 1,835,894 | 2,643,361 / 1,833,618 |
+
+Root raw headroom increases from **561 B** to **164,981 B** under the unchanged
+3,262,000 B cap. This funds bounded follow-up work, not unlimited additions.
+Consumer export parity, representative function names, source maps, utility
+tree-shaking, native Node SSR and packed asset hashes remain checked. Package
+packed/unpacked measurements include this documentation and are reported by
+`npm run check:bundle`; no generated files are excluded from its inventory.

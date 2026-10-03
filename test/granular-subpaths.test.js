@@ -33,9 +33,9 @@ describe('subpaths granulares publicados', () => {
       const closure = await measureClosure(`dist/${entry}.js`, { pure: true })
       expect(closure.files.every(file => !file.source.includes('data:image/'))).toBe(true)
     }
-    const artwork = financial.files.filter(file => file.source.includes('// src/assets/financial/'))
+    const artwork = financial.files.filter(file => /data:image\/[\w.+-]+;base64,[A-Za-z0-9+/]{16}/.test(file.source))
     expect(artwork).toHaveLength(1)
-    expect(root.files.filter(file => file.source.includes('// src/assets/financial/')).map(file => file.file)).toEqual(artwork.map(file => file.file))
+    expect(root.files.filter(file => /data:image\/[\w.+-]+;base64,[A-Za-z0-9+/]{16}/.test(file.source)).map(file => file.file)).toEqual(artwork.map(file => file.file))
     for (const file of [...root.files, ...financial.files]) expect(file.source.startsWith('"use client"')).toBe(true)
   })
 

@@ -18,6 +18,10 @@ const opciones = {
   platform: 'neutral',
   jsx: 'automatic',
   sourcemap: true,
+  // Remove formatting only; preserve identifiers, properties and syntax.
+  minifyWhitespace: true,
+  minifyIdentifiers: false,
+  minifySyntax: false,
   external: DECLARED_EXTERNALS,
   loader: { '.svg': 'dataurl', '.png': 'dataurl', '.webp': 'dataurl', '.ico': 'dataurl', '.gif': 'dataurl' },
   logLevel: 'info',
