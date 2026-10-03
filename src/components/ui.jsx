@@ -80,12 +80,19 @@ export function PasswordInput({ className, ...props }) {
 // foco y avance automático al completar. Los dígitos no se dibujan (ver
 // .pin-oculto en index.css): el componente pinta un punto por dígito, sin
 // depender de -webkit-text-security ni de glifos de la fuente.
-export function PinInput({ value, onChange, onComplete, length = 4, autoFocus = false, disabled = false, inputRef, ariaLabel, className, id }) {
+export function PinInput({ value, onChange, onComplete, length = 4, autoFocus = false, disabled = false, inputRef, ariaLabel, className, id, masked = true, ...inputProps }) {
   const largoMax = Math.min(6, Math.max(4, Number(length) || 4))
   const largo = String(value || '').length
+  function actualizar(raw) {
+    if (disabled) return
+    const next = raw.replace(/\D/g, '').slice(0, largoMax)
+    onChange(next)
+    if (next.length === largoMax) onComplete?.()
+  }
   return (
-    <span className={cn('relative mx-auto block h-16 w-44 transition-transform duration-150 focus-within:scale-[1.03]', disabled && 'opacity-50', className)}>
+    <span className={cn('relative mx-auto block h-16 transition-transform duration-150 focus-within:scale-[1.03]', masked ? 'w-44' : 'w-full max-w-xs', disabled && 'opacity-50', className)}>
       <input
+        {...inputProps}
         ref={inputRef}
         id={id}
         type="text"
@@ -95,21 +102,27 @@ export function PinInput({ value, onChange, onComplete, length = 4, autoFocus = 
         value={value}
         autoFocus={autoFocus}
         disabled={disabled}
-        onChange={(event) => {
-          const next = event.target.value.replace(/\D/g, '').slice(0, largoMax)
-          onChange(next)
-          if (next.length === largoMax) onComplete?.()
+        onChange={(event) => actualizar(event.target.value)}
+        onPaste={(event) => {
+          inputProps.onPaste?.(event)
+          if (event.defaultPrevented || disabled) return
+          const inserted = event.clipboardData.getData('text').replace(/\D/g, '')
+          if (!inserted) return
+          event.preventDefault()
+          const input = event.currentTarget
+          const current = String(value || '')
+          actualizar(current.slice(0, input.selectionStart ?? 0) + inserted + current.slice(input.selectionEnd ?? current.length))
         }}
         placeholder=""
         aria-label={ariaLabel || `PIN de ${largoMax} dígitos`}
         className="pin-oculto h-full w-full rounded-2xl border border-interactivo bg-paper text-center text-3xl font-bold tracking-[.45em] shadow-card transition-all duration-150 focus:border-fono focus:ring-2 focus:ring-fono/30 focus:outline-none"
       />
-      <span aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center gap-[.5em]">
+      <span aria-hidden="true" className={cn("pointer-events-none absolute inset-0 flex items-center justify-center", masked ? "gap-[.5em]" : "gap-2 px-3")}>
         {Array.from({ length: largoMax }, (_, indice) => (
           <span
             key={indice}
-            className={cn('h-2.5 w-2.5 rounded-full transition-colors', indice < largo ? 'bg-fore' : 'bg-mute/25')}
-          />
+            className={cn(masked ? 'h-2.5 w-2.5 rounded-full transition-colors' : 'flex h-10 min-w-0 max-w-8 flex-1 items-center justify-center rounded-lg border border-interactivo text-xl font-semibold tabular-nums', masked && (indice < largo ? 'bg-fore' : 'bg-mute/25'))}
+          >{!masked && String(value || '')[indice]}</span>
         ))}
       </span>
     </span>

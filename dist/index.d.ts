@@ -70,11 +70,12 @@ export const Input: ForwardRefExoticComponent<InputProps & RefAttributes<HTMLInp
 
 export function PasswordInput(props: InputProps): ReactElement
 
-export function PinInput(props: {
+export function PinInput(props: Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
   value: string
   onChange: (value: string) => void
   onComplete?: () => void
   length?: number
+  masked?: boolean
   autoFocus?: boolean
   disabled?: boolean
   inputRef?: Ref<HTMLInputElement>
@@ -1827,3 +1828,12 @@ export type MotionSurfaceProps = {
   children: ReactElement; hover?: boolean; press?: boolean; elevation?: boolean; motion?: boolean; className?: string
 }
 export function MotionSurface(props: MotionSurfaceProps): ReactElement
+
+/** Application owns asynchronous state/results and the remaining cooldown. */
+export type OtpVerificationProps = {
+  value: string; onChange: (value: string) => void; onVerify: (value: string) => void; onResend?: () => void
+  status?: 'idle' | 'loading' | 'success' | 'error'; length?: 4 | 5 | 6; secondsRemaining?: number
+  disabled?: boolean; masked?: boolean; motion?: boolean; label?: string; hint?: ReactNode; error?: ReactNode
+  statusMessage?: ReactNode; verifyLabel?: string; resendLabel?: string; id?: string; className?: string
+}
+export function OtpVerification(props: OtpVerificationProps): ReactElement

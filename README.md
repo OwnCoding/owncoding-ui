@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 585 exports, 163 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 586 exports, 164 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -111,10 +111,10 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **585** |
-| Exports visuales | **163** |
+| Exports de la entrada raíz | **586** |
+| Exports visuales | **164** |
 | API, modelos y utilidades | **422** |
-| Vistas curadas con fixtures controlados | **163** |
+| Vistas curadas con fixtures controlados | **164** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -496,3 +496,6 @@ Headers públicos y administrativos, perfiles y cambio de cuenta, Combobox simpl
 `AnimatedStatus` anuncia estados controlados; `MotionSurface` compone tarjetas y
 controles existentes sin cambiar su semántica. [Contrato y adopción](docs/MOTION.md).
 Las nuevas vistas son fixtures locales, no integraciones con servicios.
+
+`OtpVerification` compone el PIN compartido y feedback de estado; la app controla
+verificación, resultado y cooldown. [Contrato OTP](docs/OTP-VERIFICATION.md).
