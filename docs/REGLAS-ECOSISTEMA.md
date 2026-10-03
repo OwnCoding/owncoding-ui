@@ -3,8 +3,9 @@
 Reglas **vigentes del ecosistema**, complementan a `docs/REGLAS.md` §15
 (transversales) y aplican a **todas las apps del grupo** (MobOS, ScaleOS,
 LedBox, PagaYa…). Este es el **anexo de ecosistema** —acceso, permisos,
-seguridad, infraestructura, pagos, correo, publicación y **datos personales
-(Ley 7593/2025, §12)**—; la interfaz (campos, avisos, shell, pie,
+seguridad, infraestructura, pagos, correo, publicación, **memoria de agentes
+(Engram, §13)** y **datos personales (Ley 7593/2025, §12)**—; la interfaz
+(campos, avisos, shell, pie,
 notificaciones) sigue en `docs/REGLAS.md`.
 
 **Docs canónicos del Segundo Cerebro (`Apps/Reglas/`):**
@@ -238,6 +239,22 @@ correo y demos; el encuadre legal de cada negocio lo valida su asesoría.
 - [ ] Encargados y retención documentados, con borrado/anonimización al vencer.
 - [ ] Exportación y eliminación con doble confirmación y período recuperable;
       revocación accesible.
+
+---
+
+## 13. Memoria persistente de agentes (Engram)
+
+- **Engram es la memoria por defecto del ecosistema.** Todo agente
+  (orquestador, slots e integrador) busca contexto antes de tocar y guarda
+  proactivamente decisiones, bugs, descubrimientos, convenciones y cambios de
+  configuración.
+- Flujo mínimo: `mem_context` → `mem_search` → `mem_get_observation` para
+  recuperar; `mem_save` al decidir o descubrir algo; `mem_session_summary`
+  antes de dar una tarea por terminada.
+- Guardar es bookkeeping, no entrega: la respuesta al dueño va completa al
+  final, sin colapsarla en un «guardado».
+- Nunca guardar secretos, tokens ni datos personales. La memoria da
+  continuidad; no autoriza acciones externas por sí sola.
 
 ---
 
