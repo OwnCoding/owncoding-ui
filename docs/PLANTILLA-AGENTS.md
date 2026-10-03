@@ -7,6 +7,15 @@ y `<COMANDO_RELEASE>` por los valores reales. Borrá lo que no aplique.
 Complementa `owncoding-ui/docs/MODOS-DE-TRABAJO.md` (topología y ciclo) y
 `owncoding-ui/docs/REGLAS.md` (objetos y patrones de interfaz).
 
+## Memoria de agentes (Engram)
+
+- Engram es la memoria por defecto del ecosistema: antes de tocar algo, buscá
+  contexto (`mem_context` → `mem_search` → `mem_get_observation`); guardá
+  proactivamente decisiones, bugs, descubrimientos y convenciones
+  (`mem_save`); cerrá con `mem_session_summary`.
+- Nunca guardes secretos, tokens ni datos personales.
+- Guardar es bookkeeping: el handover va completo igual.
+
 ## Componentes y reglas de interfaz
 
 - **Buscar antes de crear:** campos, avisos, celdas, estados y acciones salen de
