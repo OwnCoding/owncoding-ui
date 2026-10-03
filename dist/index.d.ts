@@ -1837,3 +1837,12 @@ export type OtpVerificationProps = {
   statusMessage?: ReactNode; verifyLabel?: string; resendLabel?: string; id?: string; className?: string
 }
 export function OtpVerification(props: OtpVerificationProps): ReactElement
+
+export type CarouselSlide = { id: string; label: string; content: ReactNode }
+/** Controlled manual carousel; no autoplay or swipe gestures. */
+export type CarouselProps = {
+  slides: CarouselSlide[]; index: number; onIndexChange: (index: number) => void; label?: string
+  previousLabel?: string; nextLabel?: string; emptyLabel?: ReactNode
+  disabled?: boolean; motion?: boolean; className?: string
+}
+export function Carousel(props: CarouselProps): ReactElement

@@ -83,3 +83,7 @@ void motionContracts
 import { OtpVerification } from 'owncoding-ui'
 const otpContract = <OtpVerification value="123456" onChange={() => {}} onVerify={code => { void code }} secondsRemaining={30} motion={false} />
 void otpContract
+
+import { Carousel } from 'owncoding-ui'
+const carouselContract = <Carousel slides={[{ id: 'first', label: 'First', content: <p>Content</p> }]} index={0} onIndexChange={() => {}} motion={false} />
+void carouselContract

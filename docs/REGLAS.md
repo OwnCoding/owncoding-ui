@@ -1270,3 +1270,7 @@ de `docs/ADOPCION-V2.md` §10 y el checklist de arriba.
 - `OtpVerification`: flujo de código controlado que compone `PinInput`, no otro
   input OTP. La app controla verificación, reenvío, resultado y espera; completar
   el campo nunca envía automáticamente. [Contrato](OTP-VERIFICATION.md).
+
+- `Carousel`: contenido controlado con botones nativos y solo slide activo
+  montado; sin autoplay ni swipe. La app aporta contenido/alt y conserva estado
+  que deba sobrevivir al desmontaje. [Contrato](CAROUSEL.md).

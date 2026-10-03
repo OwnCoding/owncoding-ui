@@ -553,3 +553,5 @@ export { default as AnimatedStatus } from './components/AnimatedStatus.jsx'
 export { default as MotionSurface } from './components/MotionSurface.jsx'
 
 export { default as OtpVerification } from './components/OtpVerification.jsx'
+
+export { default as Carousel } from './components/Carousel.jsx'

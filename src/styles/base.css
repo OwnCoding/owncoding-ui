@@ -412,3 +412,14 @@ input::placeholder, textarea::placeholder {
   [data-oc-status] .oc-status-icon, [data-oc-status] svg, [data-oc-status] path { animation: none !important; stroke-dashoffset: 0; transform: none; }
   .oc-motion-surface { transform: none !important; transition: none !important; }
 }
+
+/* Manual pointer-driven slide entry; unsupported @starting-style stays instant. */
+.oc-carousel-slide[data-motion="on"] {
+  opacity: 1;
+  transition: opacity var(--oc-motion-fast) var(--oc-motion-ease);
+}
+@starting-style { .oc-carousel-slide[data-motion="on"] { opacity: 0; } }
+.oc-carousel-slide[data-motion="off"] { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .oc-carousel-slide { transition: none !important; }
+}
