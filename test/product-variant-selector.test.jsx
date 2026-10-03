@@ -36,3 +36,19 @@ it('separate instances have unique radio names and demo exposes actual availabil
   fireEvent.click(radios[0]); expect(radios[3].disabled).toBe(true)
   fireEvent.click(screen.getByRole('button', { name: 'Alternar pendiente demo' })); expect(radios[0].disabled).toBe(true)
 })
+
+it('disabled options cannot fund an available combination, including stale controlled values', () => {
+  const restricted = [{ ...groups[0], options: groups[0].options.map(option => ({ ...option, disabled: option.id === 'a' })) }, groups[1]]
+  const matrix = variants.slice(0, 1)
+  const change = vi.fn()
+  const { rerender } = render(<ProductVariantSelector groups={restricted} variants={matrix} value={{}} onChange={change} />)
+  expect(screen.getAllByRole('radio').every(input => input.disabled)).toBe(true)
+  for (const value of [{ color: 'a' }, { color: 'a', size: 's' }]) {
+    rerender(<ProductVariantSelector groups={restricted} variants={matrix} value={value} onChange={change} />)
+    expect(screen.getByRole('status').textContent).toContain('no está disponible')
+    expect(screen.getByRole('radio', { name: /Azul/ }).checked).toBe(true)
+    expect(screen.getByRole('radio', { name: /Pequeño/ }).disabled).toBe(true)
+  }
+  expect(change).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: 'Limpiar selección' })); expect(change).toHaveBeenCalledWith({})
+})

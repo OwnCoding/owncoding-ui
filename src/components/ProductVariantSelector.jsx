@@ -8,7 +8,7 @@ export default function ProductVariantSelector({ groups = [], variants = [], val
   const id = useId()
   const locked = disabled || pending || !onChange
   const keys = groups.map(group => group.id)
-  const matrix = variants.filter(variant => variant.available && groups.every(group => group.options.some(option => option.id === variant.values[group.id])))
+  const matrix = variants.filter(variant => variant.available && groups.every(group => group.options.some(option => option.id === variant.values[group.id] && !option.disabled)))
   const matches = (variant, selection) => keys.every(key => !selection[key] || variant.values[key] === selection[key])
   const complete = groups.length > 0 && groups.every(group => group.options.some(option => option.id === value[group.id]))
   const available = matrix.some(variant => matches(variant, value))
