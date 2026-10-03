@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 587 exports, 165 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 590 exports, 168 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.65.0" src="https://img.shields.io/badge/versi%C3%B3n-0.65.0-05a36f" />
+  <img alt="Versión 0.66.0" src="https://img.shields.io/badge/versi%C3%B3n-0.66.0-05a36f" />
   <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
   <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
 </p>
@@ -111,10 +111,10 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **587** |
-| Exports visuales | **165** |
+| Exports de la entrada raíz | **590** |
+| Exports visuales | **168** |
 | API, modelos y utilidades | **422** |
-| Vistas curadas con fixtures controlados | **165** |
+| Vistas curadas con fixtures controlados | **168** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -165,10 +165,10 @@ contrato en
 
 ### 1. Instalar una versión fija
 
-La versión del paquete es `v0.65.0`. Al publicar su tag, la instalación fija es:
+La versión del paquete es `v0.66.0`. Al publicar su tag, la instalación fija es:
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.65.0
+npm install github:dariodeoli/owncoding-ui#v0.66.0
 ```
 
 Para probar la rama principal sin fijar un release:
@@ -502,3 +502,12 @@ verificación, resultado y cooldown. [Contrato OTP](docs/OTP-VERIFICATION.md).
 
 `Carousel` presenta contenido controlado con navegación manual accesible, sin
 autoplay ni swipe. [Contrato de carrusel](docs/CAROUSEL.md).
+
+`CartSummary` presenta cantidades e importes controlados por la app, sin calcular
+precios ni ejecutar pagos. [Contrato](docs/CART-SUMMARY.md).
+
+`ProductVariantSelector` emite selecciones controladas contra una matriz de
+disponibilidad aportada por la app. [Contrato](docs/PRODUCT-VARIANT-SELECTOR.md).
+
+`PricingCard` presenta planes y precios provistos por la app, con selección
+explícita sin contratos ni cobros locales. [Contrato](docs/PRICING-CARD.md).

@@ -1,5 +1,8 @@
 // Dynamic imports are intentionally isolated from the metadata-only registry.
 export const PREVIEW_LOADERS = {
+  'pricing': () => import('./pricing-previews.jsx').then(module => module.PricingCardPreview),
+  'variants': () => import('./variants-previews.jsx').then(module => module.ProductVariantSelectorPreview),
+  'cart': () => import('./cart-previews.jsx').then(module => module.CartSummaryPreview),
   'carousel': () => import('./carousel-previews.jsx').then(module => module.CarouselPreview),
   'otp': () => import('./otp-previews.jsx').then(module => module.OtpPreview),
   'motion': () => import('./motion-previews.jsx').then(module => module.MotionPreview),

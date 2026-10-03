@@ -68,7 +68,7 @@ test('Itaú contained slot has targeted larger sizing without changing other mar
 })
 
 test('every curated mapping is auditable against actual JSX or documented composition', async () => {
-  const source = ['gallery/carousel-previews.jsx', 'gallery/otp-previews.jsx', 'gallery/motion-previews.jsx', 'gallery/reusable-previews.jsx', 'gallery/main.jsx', 'gallery/component-previews.jsx', 'gallery/shell-previews.jsx', 'gallery/operation-previews.jsx', 'gallery/document-previews.jsx', 'gallery/review-previews.jsx', 'gallery/receiving-previews.jsx', 'gallery/search-board-previews.jsx', 'gallery/specialized-previews.jsx'].map(path => readFileSync(path, 'utf8')).join('\n')
+  const source = ['gallery/pricing-previews.jsx', 'gallery/variants-previews.jsx', 'gallery/cart-previews.jsx', 'gallery/carousel-previews.jsx', 'gallery/otp-previews.jsx', 'gallery/motion-previews.jsx', 'gallery/reusable-previews.jsx', 'gallery/main.jsx', 'gallery/component-previews.jsx', 'gallery/shell-previews.jsx', 'gallery/operation-previews.jsx', 'gallery/document-previews.jsx', 'gallery/review-previews.jsx', 'gallery/receiving-previews.jsx', 'gallery/search-board-previews.jsx', 'gallery/specialized-previews.jsx'].map(path => readFileSync(path, 'utf8')).join('\n')
   const composed = {
     CountryPhoneSelect: readFileSync('src/components/PhoneField.jsx', 'utf8'),
     FormActions: source,

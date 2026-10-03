@@ -1846,3 +1846,28 @@ export type CarouselProps = {
   disabled?: boolean; motion?: boolean; className?: string
 }
 export function Carousel(props: CarouselProps): ReactElement
+
+export type CartItem = { id: string; label: string; description?: ReactNode; quantity: number; maxQuantity?: number; amount: number; unavailable?: boolean }
+export type CartTotal = { id: string; label: string; amount: number }
+export type CartSummaryProps = {
+  items: CartItem[]; total: number; totals?: CartTotal[]; currency?: 'PYG' | 'USD'
+  onQuantityChange?: (id: string, quantity: number) => void; onRemove?: (id: string) => void; onCheckout?: () => void
+  pending?: boolean; disabled?: boolean; motion?: boolean; title?: string; emptyLabel?: string; checkoutLabel?: string; message?: ReactNode; className?: string
+}
+export function CartSummary(props: CartSummaryProps): ReactElement
+
+export type ProductVariantGroup = { id: string; label: string; options: Array<{ id: string; label: string; disabled?: boolean }> }
+export type ProductVariant = { id: string; values: Record<string, string>; available: boolean }
+export type ProductVariantSelectorProps = {
+  groups: ProductVariantGroup[]; variants: ProductVariant[]; value: Record<string, string>; onChange: (value: Record<string, string>) => void
+  disabled?: boolean; pending?: boolean; title?: string; clearLabel?: string; className?: string
+}
+export function ProductVariantSelector(props: ProductVariantSelectorProps): ReactElement
+
+export type PricingFeature = { id: string; label: string; included: boolean }
+export type PricingCardProps = {
+  title: string; description?: ReactNode; price: number; currency?: 'PYG' | 'USD'; period?: string; features?: PricingFeature[]; badge?: ReactNode
+  selected?: boolean; unavailable?: boolean; pending?: boolean; disabled?: boolean; onSelect?: () => void; motion?: boolean
+  selectLabel?: string; selectedLabel?: string; unavailableLabel?: string; message?: ReactNode; className?: string
+}
+export function PricingCard(props: PricingCardProps): ReactElement

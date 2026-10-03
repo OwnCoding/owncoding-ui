@@ -76,7 +76,7 @@
       <rect width="366" height="246" rx="22" fill="#1f2430" stroke="#3e475a"/>
       <text x="24" y="34" fill="#7cffc9" font-size="11" font-weight="700" letter-spacing="1.4">MÉTRICAS</text>
       <text x="24" y="78" fill="#aab3c2" font-size="12">Componentes visuales</text>
-      <text x="24" y="122" fill="#f4f6fa" font-size="42" font-weight="780">165</text>
+      <text x="24" y="122" fill="#f4f6fa" font-size="42" font-weight="780">168</text>
       <rect x="24" y="144" width="318" height="12" rx="6" fill="#181d27"/>
       <rect x="24" y="144" width="232" height="12" rx="6" fill="#05f19c"/>
       <text x="24" y="188" fill="#aab3c2" font-size="12">Catálogo con guard automático</text>

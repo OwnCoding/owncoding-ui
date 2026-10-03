@@ -555,3 +555,9 @@ export { default as MotionSurface } from './components/MotionSurface.jsx'
 export { default as OtpVerification } from './components/OtpVerification.jsx'
 
 export { default as Carousel } from './components/Carousel.jsx'
+
+export { default as CartSummary } from './components/CartSummary.jsx'
+
+export { default as ProductVariantSelector } from './components/ProductVariantSelector.jsx'
+
+export { default as PricingCard } from './components/PricingCard.jsx'

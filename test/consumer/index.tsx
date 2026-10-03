@@ -87,3 +87,14 @@ void otpContract
 import { Carousel } from 'owncoding-ui'
 const carouselContract = <Carousel slides={[{ id: 'first', label: 'First', content: <p>Content</p> }]} index={0} onIndexChange={() => {}} motion={false} />
 void carouselContract
+import { CartSummary } from 'owncoding-ui'
+const cartContract = <CartSummary items={[{ id: 'sample', label: 'Sample', quantity: 1, amount: 10 }]} total={10} onQuantityChange={(id: string, quantity: number) => {}} />
+void cartContract
+
+import { ProductVariantSelector } from 'owncoding-ui'
+const variantContract = <ProductVariantSelector groups={[]} variants={[]} value={{}} onChange={(value: Record<string, string>) => {}} />
+void variantContract
+
+import { PricingCard } from 'owncoding-ui'
+const pricingContract = <PricingCard title="Sample" price={100} features={[{ id: 'reports', label: 'Reports', included: true }]} onSelect={() => {}} />
+void pricingContract
