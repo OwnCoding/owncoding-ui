@@ -242,6 +242,13 @@ html.dark {
   letter-spacing: -0.03em;
 }
 
+/* Shared motion tokens; presentation is opt-in through base.css. */
+:root {
+  --oc-motion-fast: 160ms;
+  --oc-motion-feedback: 240ms;
+  --oc-motion-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
 /* ============================================================================
    OwnCoding UI — base global (opt-in)
    Estilos del documento: html/body, tipografías, foco, placeholders, números
@@ -626,4 +633,33 @@ input::placeholder, textarea::placeholder {
 .tema-v2 .from-fono-dark.via-fono.to-fono,
 .v2-piloto .from-fono-dark.via-fono.to-fono {
   background-image: linear-gradient(to bottom right, rgb(var(--c-fono)), rgb(var(--c-fono) / .92));
+}
+
+/* Shared opt-in motion: status and existing surface composition. */
+.oc-status-icon { display: inline-flex; flex-shrink: 0; }
+[data-oc-status][data-motion="on"] .oc-status-icon {
+  animation: oc-status-enter var(--oc-motion-fast) var(--oc-motion-ease);
+}
+[data-oc-status="loading"][data-motion="on"] svg { animation: oc-status-spin 900ms linear infinite; }
+[data-oc-status="success"][data-motion="on"] path {
+  stroke-dasharray: 32;
+  animation: oc-status-draw var(--oc-motion-feedback) var(--oc-motion-ease);
+}
+@keyframes oc-status-enter { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes oc-status-spin { to { transform: rotate(360deg); } }
+@keyframes oc-status-draw { from { stroke-dashoffset: 32; } to { stroke-dashoffset: 0; } }
+.oc-motion-surface[data-motion="on"] {
+  transition: transform var(--oc-motion-fast) var(--oc-motion-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .oc-motion-surface[data-motion="on"][data-oc-hover="on"]:not(:disabled):not([aria-disabled="true"]):hover { transform: translateY(-2px); }
+  .oc-motion-surface[data-motion="on"][data-oc-elevation="on"]:not(:disabled):not([aria-disabled="true"]):hover { box-shadow: var(--oc-shadow-float); }
+}
+.oc-motion-surface[data-motion="on"][data-oc-press="on"]:is(button, a[href]):not(:disabled):not([aria-disabled="true"]):not(:focus-visible):active { transform: scale(.98); }
+/* Keyboard actions and disabled controls never wait for presentation. */
+.oc-motion-surface:is(:focus-visible, :disabled, [aria-disabled="true"]),
+.oc-motion-surface[data-motion="off"] { transform: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  [data-oc-status] .oc-status-icon, [data-oc-status] svg, [data-oc-status] path { animation: none !important; stroke-dashoffset: 0; transform: none; }
+  .oc-motion-surface { transform: none !important; transition: none !important; }
 }

@@ -3,6 +3,9 @@
 // aprobados se renderizan en la galería. scripts/gallery-check.mjs exige paridad.
 
 export const CATALOGO_EXPORTS = [
+{"nombre": "AnimatedStatus", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "MotionSurface", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+
 {"nombre": "Combobox", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "Popover", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "Tooltip", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},

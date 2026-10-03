@@ -75,3 +75,7 @@ export function ReusableConsumer() {
     <AccountSwitcher accounts={items} value={team ?? undefined} onChange={setTeam} />
   </>
 }
+
+import { AnimatedStatus, MotionSurface } from 'owncoding-ui'
+const motionContracts = <><AnimatedStatus state="loading" motion={false}>Saving</AnimatedStatus><MotionSurface hover press elevation><button disabled>Save</button></MotionSurface></>
+void motionContracts
