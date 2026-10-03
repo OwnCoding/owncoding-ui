@@ -551,3 +551,5 @@ export { Combobox, Popover, Tooltip, CloseButton, AppHeader, PublicHeader, Profi
 
 export { default as AnimatedStatus } from './components/AnimatedStatus.jsx'
 export { default as MotionSurface } from './components/MotionSurface.jsx'
+
+export { default as OtpVerification } from './components/OtpVerification.jsx'

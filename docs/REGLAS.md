@@ -1266,3 +1266,7 @@ de `docs/ADOPCION-V2.md` §10 y el checklist de arriba.
   convertir un `div` en acción. [Contrato](MOTION.md).
 - Respetar movimiento reducido, puntero fino y teclado; nunca esperar una
   animación para ejecutar una acción. Estados reales pertenecen a la app.
+
+- `OtpVerification`: flujo de código controlado que compone `PinInput`, no otro
+  input OTP. La app controla verificación, reenvío, resultado y espera; completar
+  el campo nunca envía automáticamente. [Contrato](OTP-VERIFICATION.md).

@@ -79,3 +79,7 @@ export function ReusableConsumer() {
 import { AnimatedStatus, MotionSurface } from 'owncoding-ui'
 const motionContracts = <><AnimatedStatus state="loading" motion={false}>Saving</AnimatedStatus><MotionSurface hover press elevation><button disabled>Save</button></MotionSurface></>
 void motionContracts
+
+import { OtpVerification } from 'owncoding-ui'
+const otpContract = <OtpVerification value="123456" onChange={() => {}} onVerify={code => { void code }} secondsRemaining={30} motion={false} />
+void otpContract
