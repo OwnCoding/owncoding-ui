@@ -12626,7 +12626,7 @@ function Header({ title, logo, items = [], actions, children, className, publicM
     document.addEventListener("keydown", escape);
     return () => document.removeEventListener("keydown", escape);
   }, [open]);
-  return /* @__PURE__ */ jsxs91("header", { className: cn("min-w-0 border-b border-interactivo bg-ink px-4 py-3 text-fore", className), children: [
+  return /* @__PURE__ */ jsxs91("header", { className: cn("min-w-0 rounded-xl border border-interactivo bg-ink px-4 py-3 text-fore", className), children: [
     /* @__PURE__ */ jsxs91("div", { className: "flex flex-wrap items-center gap-3", children: [
       /* @__PURE__ */ jsxs91("div", { className: "flex min-w-0 flex-1 items-center gap-2", children: [
         logo,
@@ -12754,10 +12754,10 @@ function ActionToolbar({ label = "Acciones", children, className }) {
   return /* @__PURE__ */ jsx108("div", { role: "group", "aria-label": label, className: cn("flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-interactivo bg-ink p-2", className), children });
 }
 function FooterPreset({ variant = "app", name, version, links = [], columns = [], callToAction, children, className }) {
-  return /* @__PURE__ */ jsxs91("div", { className, children: [
-    variant === "public" && /* @__PURE__ */ jsx108(ProductPrefooter, { modelo: callToAction ? "completo" : "enlaces", titulo: "Conoc\xE9 m\xE1s", columnas: columns, accion: callToAction }),
+  return /* @__PURE__ */ jsxs91("div", { className: cn("rounded-xl", className), children: [
+    variant === "public" && /* @__PURE__ */ jsx108(ProductPrefooter, { className: "rounded-t-xl", modelo: callToAction ? "completo" : "enlaces", titulo: "Conoc\xE9 m\xE1s", columnas: columns, accion: callToAction }),
     children,
-    /* @__PURE__ */ jsx108(ProductFooter, { nombre: name, version, enlaces: links, modelo: variant === "auth" ? "apilado" : "distribuido" })
+    /* @__PURE__ */ jsx108(ProductFooter, { className: variant === "public" ? "rounded-b-xl" : "rounded-xl", nombre: name, version, enlaces: links, modelo: variant === "auth" ? "apilado" : "distribuido" })
   ] });
 }
 export {

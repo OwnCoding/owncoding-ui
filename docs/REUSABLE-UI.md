@@ -29,3 +29,9 @@
 Base UI 1.8.0 MIT se usa únicamente para combobox y overlays, compatible con React 18. No se copió código de las bibliotecas de referencia: https://github.com/mui/base-ui (interacciones accesibles), https://github.com/emilkowalski/sonner (acciones de avisos), https://github.com/shadcn-ui/ui (composición de shell). Se conserva la licencia original en el paquete dependiente. Sin dependencias Sonner/shadcn/cmdk adicionales.
 
 Todas las nuevas fichas tienen previews interactivos diferidos, tokens compartidos claro/oscuro y fixtures locales explícitos. Extras elegidos por brecha real: CopyButton y ActionToolbar; Stepper, ThemeToggle, Button, iconos y navegación ya existían y no se duplicaron.
+
+## Superficies y orden de exploración
+
+AppHeader/PublicHeader usan bordes completos `rounded-xl`; FooterPreset aplica radios a sus hijos pintados (prefooter superior y pie inferior en el modelo público; radio completo del pie en app/acceso), sin recortar el contenedor con overflow-hidden. Los menús, portales y anillos de foco conservan espacio visible. Las páginas pueden personalizar las bases con className.
+
+El catálogo filtrado conserva bancos/pagos, teléfono, ciudad/departamento y CI/RUC primero, en ese orden. Después prioriza las miniaturas realmente visibles en la tarjeta, seguidas de las demos visuales disponibles al abrir la ficha y las entradas textuales de API. El mismo predicado compartido controla la vista compacta y su orden; tener presentacion individual no significa tener una miniatura inline. API, modelos y utilidades aparecen después con encabezado propio. La ordenación no altera el catálogo original, conteos, filtros ni enlaces compartidos.

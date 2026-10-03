@@ -51,6 +51,7 @@ import {
 } from '../src/index.js'
 import { ComponentPreview, EmailPreview } from './component-previews.jsx'
 import { CATALOGO_EXPORTS, CATEGORIAS_CATALOGO, DESTACADOS_CATALOGO } from './catalog.js'
+import { galleryEntryTier, hasInlineGalleryPreview, orderGalleryEntries } from './catalog-order.js'
 import {
   BANCO_DESTACADO,
   BANCOS_PREVIEW,
@@ -650,7 +651,7 @@ function Ficha({ item, onAbrir }) {
         </a>
       ) : item.presentacion === 'individual' ? (
         <p className="mt-3 text-sm text-mute">Demo interactiva en la ficha ampliada.</p>
-      ) : item.presentacion ? (
+      ) : hasInlineGalleryPreview(item) ? (
         <div className="mt-4 min-w-0 overflow-hidden rounded-xl border border-ink-600 bg-ink-800 p-3"><ErrorBoundary><Presentacion id={item.presentacion} /></ErrorBoundary></div>
       ) : null}
       <button type="button" onClick={() => onAbrir(item)} className="mt-4 inline-flex min-h-11 items-center rounded-lg px-1 text-sm font-semibold text-fono-dark underline-offset-4 hover:underline dark:text-fono-light">Ver ficha del export</button>
@@ -668,17 +669,12 @@ export function App() {
 
   const resultados = useMemo(() => {
     const termino = consultaDiferida.trim().toLocaleLowerCase('es')
-    return CATALOGO_EXPORTS
+    return orderGalleryEntries(CATALOGO_EXPORTS
       .filter((item) => {
         if (tipo !== 'todos' && item.tipo !== tipo) return false
         if (categoria !== 'Todas' && item.categoria !== categoria) return false
         return !termino || `${item.nombre} ${item.categoria} ${item.tipo} ${item.destacado?.titulo || ''}`.toLocaleLowerCase('es').includes(termino)
-      })
-      .sort((a, b) => (
-        (a.destacado?.prioridad ?? Number.POSITIVE_INFINITY)
-        - (b.destacado?.prioridad ?? Number.POSITIVE_INFINITY)
-        || a.nombre.localeCompare(b.nombre, 'es')
-      ))
+      }))
   }, [categoria, consultaDiferida, tipo])
 
   const { api, visuales } = METRICAS_CATALOGO
@@ -767,7 +763,7 @@ export function App() {
         <section id="catalogo" aria-labelledby="titulo-catalogo" className="mt-8">
           <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 id="titulo-catalogo" className="text-2xl font-bold">Catálogo completo</h2><p className="text-sm text-mute" role="status">{resultados.length} resultados</p></div>
           {resultados.length > 0 ? (
-            <><div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{resultados.slice(0, limite).map((item) => <Ficha key={item.nombre} item={item} onAbrir={abrirFicha} />)}</div>{resultados.length > limite ? <div className="mt-6 text-center"><Button variant="outline" onClick={() => setLimite((actual) => actual + 60)}>Mostrar más exports</Button></div> : null}</>
+            <><div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{resultados.slice(0, limite).map((item, index) => <React.Fragment key={item.nombre}>{index === 0 || galleryEntryTier(item) !== galleryEntryTier(resultados[index - 1]) ? <h3 className="col-span-full text-lg font-semibold">{['Vistas destacadas', 'Componentes con miniaturas', 'Demos disponibles al abrir la ficha', 'API, modelos y utilidades'][galleryEntryTier(item)]}</h3> : null}<Ficha item={item} onAbrir={abrirFicha} /></React.Fragment>)}</div>{resultados.length > limite ? <div className="mt-6 text-center"><Button variant="outline" onClick={() => setLimite((actual) => actual + 60)}>Mostrar más exports</Button></div> : null}</>
           ) : <div className="mt-5"><EmptyState title="No encontramos ese export" description="Probá otra palabra o cambiá los filtros." action={<Button variant="outline" onClick={() => { updateUrlState({ consulta: '', categoria: 'Todas', tipo: 'visual' }); setLimite(60) }}>Limpiar filtros</Button>} /></div>}
         </section>
       </main>
