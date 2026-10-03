@@ -1,5 +1,6 @@
 // Names only: never import demo modules from this eagerly loaded registry.
 export const PREVIEW_GROUPS = {
+  "cart": ["CartSummary"],
   "carousel": ["Carousel"],
   "otp": ["OtpVerification"],
   "motion": ["AnimatedStatus", "MotionSurface"],

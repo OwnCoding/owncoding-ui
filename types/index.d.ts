@@ -1846,3 +1846,12 @@ export type CarouselProps = {
   disabled?: boolean; motion?: boolean; className?: string
 }
 export function Carousel(props: CarouselProps): ReactElement
+
+export type CartItem = { id: string; label: string; description?: ReactNode; quantity: number; maxQuantity?: number; amount: number; unavailable?: boolean }
+export type CartTotal = { id: string; label: string; amount: number }
+export type CartSummaryProps = {
+  items: CartItem[]; total: number; totals?: CartTotal[]; currency?: 'PYG' | 'USD'
+  onQuantityChange?: (id: string, quantity: number) => void; onRemove?: (id: string) => void; onCheckout?: () => void
+  pending?: boolean; disabled?: boolean; motion?: boolean; title?: string; emptyLabel?: string; checkoutLabel?: string; message?: ReactNode; className?: string
+}
+export function CartSummary(props: CartSummaryProps): ReactElement
