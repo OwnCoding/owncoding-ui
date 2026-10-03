@@ -8,6 +8,22 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.66.1 — 2026-10-03
+
+- **Galería más compacta:** hero con navegación e inventario inmediato; tarjetas
+  prioritarias sin columnas anidadas. Bancos/pagos y clientes ocupan ancho
+  completo; teléfono/ciudad comparten fila en escritorio y se apilan en mobile.
+- **Catálogo visual:** dos columnas cómodas, ancho completo explícito para escenas
+  complejas, categorías laterales en escritorio y filtros desplazables en mobile.
+  Miniaturas acotadas reutilizan primitivas; los demos individuales siguen diferidos.
+- **README visual primero:** inventario e instalación fija al inicio, configuración
+  desplegable y seis paneles editoriales compactos. Se conservan contratos,
+  referencias, fixtures de ciudad y cada payload financiero del baseline.
+- **Compatibilidad:** sin cambios de API, dependencias, presupuestos ni servicios.
+  Búsqueda/URL/historial/foco, orden canónico, temas y movimiento reducido conservados.
+  La evidencia publicada del README corresponde al release previo; este rediseño
+  requiere su integración y despliegue por separado.
+
 ## v0.66.0 — 2026-10-03
 
 - **Carrito controlado:** `CartSummary` presenta importes de línea y totales
