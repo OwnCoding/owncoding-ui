@@ -8,6 +8,22 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.67.0 — 2026-10-03
+
+- **Integración OwnData:** adaptadores puros de respuesta/error y proveedor con
+  transporte inyectado desde un backend autenticado. Identidad del RUC exacta,
+  nombre oficial y procedencia conservados; errores seguros por código, sin
+  reintentos ni mensajes externos. La aplicación confirma antes de aplicar datos.
+- **RUC de nueve dígitos:** `RucField` admite `maxBaseDigits={9}` de forma opcional,
+  sin truncar la base ni reinterpretar su último dígito como verificador. El
+  comportamiento predeterminado de ocho dígitos se conserva.
+- **Documentación y galería:** guía de backend/clave privada y panel de contrato
+  explícitamente simulado; 593 exports, 168 visuales y 425 API. La API comercial
+  de OwnData permanece deshabilitada, pendiente de autorización escrita de fuente;
+  este release no habilita consultas reales ni publica claves de clientes.
+- **Alcance:** sin nuevos servicios, dependencias ni presupuestos. Integración,
+  tag y despliegue se verifican por separado.
+
 ## v0.66.1 — 2026-10-03
 
 - **Galería más compacta:** hero con navegación e inventario inmediato; tarjetas
