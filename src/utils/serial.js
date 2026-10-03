@@ -26,13 +26,66 @@ export function serialEnmascarado(serial) {
   return cola ? `••••${cola}` : ''
 }
 
-// IMEI de 15 dígitos con dígito control (Luhn): el proveedor y el backend
+// IMEI: 15 dígitos con dígito control (Luhn). El proveedor y el backend
 // rechazan los que no pasan, así que la UI puede avisar antes de enviar.
+// `normalizarImei` limpia y acota lo que se escribe o pega; `estadoImei` y
+// `analizarImei` traducen el valor al estado que dibuja `ImeiField`.
+export const LARGO_IMEI = 15
+
+function soloDigitosImei(valor) {
+  return String(valor ?? '').replace(/\D/g, '')
+}
+
+/** Solo dígitos, sin espacios ni guiones, acotado a 15 (para el input). */
+export function normalizarImei(valor) {
+  return soloDigitosImei(valor).slice(0, LARGO_IMEI)
+}
+
+export const MENSAJES_IMEI = {
+  vacio: `El IMEI tiene ${LARGO_IMEI} dígitos.`,
+  obligatorio: 'Completá el IMEI.',
+  incompleto: (faltan) => (faltan === 1 ? 'Falta 1 dígito para completar el IMEI.' : `Faltan ${faltan} dígitos para completar el IMEI.`),
+  invalido: 'El IMEI no es válido: revisá el dígito control.',
+  valido: 'IMEI válido.',
+  revisando: 'Revisando el IMEI…',
+}
+
+/**
+ * Estado del IMEI para el feedback en vivo: `vacio` (sin dígitos),
+ * `incompleto` (faltan dígitos), `invalido` (15 dígitos sin Luhn o de más) o
+ * `valido`.
+ */
+export function estadoImei(valor) {
+  const digitos = soloDigitosImei(valor)
+  if (!digitos) return 'vacio'
+  if (digitos.length < LARGO_IMEI) return 'incompleto'
+  if (digitos.length > LARGO_IMEI) return 'invalido'
+  return imeiValido(digitos) ? 'valido' : 'invalido'
+}
+
+/**
+ * Análisis completo para la UI: el IMEI limpio, el largo, cuántos dígitos
+ * faltan y los banderines `completo`/`valido` junto con el `estado`.
+ */
+export function analizarImei(valor) {
+  const digitos = soloDigitosImei(valor)
+  const estado = estadoImei(valor)
+  return {
+    imei: digitos.slice(0, LARGO_IMEI),
+    largo: digitos.length,
+    faltan: Math.max(0, LARGO_IMEI - digitos.length),
+    completo: estado === 'valido' || estado === 'invalido',
+    valido: estado === 'valido',
+    estado,
+  }
+}
+
+/** IMEI de 15 dígitos exactos con dígito control (Luhn). */
 export function imeiValido(valor) {
-  const imei = String(valor ?? '').replace(/\D/g, '')
-  if (imei.length !== 15) return false
+  const imei = soloDigitosImei(valor)
+  if (imei.length !== LARGO_IMEI) return false
   let suma = 0
-  for (let i = 0; i < 15; i += 1) {
+  for (let i = 0; i < LARGO_IMEI; i += 1) {
     let digito = Number(imei[14 - i])
     if (i % 2 === 1) {
       digito *= 2

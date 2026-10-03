@@ -26,6 +26,7 @@ export const PREVIEW_GROUPS = {
     "Eyebrow",
     "Icon",
     "IconoCategoria",
+    "ImeiField",
     "PanelDerecho",
     "PlanPagos",
     "PreviewFusion",

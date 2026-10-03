@@ -593,7 +593,43 @@ export function extraerRuc(texto: string): string
 export function esRuc(valor: string): boolean
 export const RUC_RE: RegExp
 export function SerialTexto(props: { serial?: string; className?: string; tonoCola?: string; vacio?: string; enmascarar?: boolean }): ReactElement
+export function ImeiField(props: {
+  label?: string
+  value?: string
+  onChange?: (imei: string) => void
+  onBlur?: (event: any) => void
+  hint?: ReactNode
+  error?: ReactNode
+  required?: boolean
+  revisando?: boolean
+  disabled?: boolean
+  id?: string
+  name?: string
+  placeholder?: string
+  className?: string
+  inputClassName?: string
+} & Record<string, any>): ReactElement
 export function imeiValido(valor?: string | null): boolean
+export function normalizarImei(valor?: string | null): string
+export const LARGO_IMEI: number
+export const MENSAJES_IMEI: {
+  vacio: string
+  obligatorio: string
+  incompleto: (faltan: number) => string
+  invalido: string
+  valido: string
+  revisando: string
+}
+export type EstadoImei = 'vacio' | 'incompleto' | 'invalido' | 'valido'
+export function estadoImei(valor?: string | null): EstadoImei
+export function analizarImei(valor?: string | null): {
+  imei: string
+  largo: number
+  faltan: number
+  completo: boolean
+  valido: boolean
+  estado: EstadoImei
+}
 export function separarSeriales(texto?: string, opciones?: { maxLargo?: number }): string[]
 export function normalizarSeriales(texto?: string, opciones?: { validar?: (serial: string) => boolean; limite?: number; maxLargo?: number }): { seriales: string[]; repetidos: string[]; invalidos: string[] }
 export function CampoSeriales(props: {

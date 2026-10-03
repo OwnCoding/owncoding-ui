@@ -1932,11 +1932,45 @@ function serialEnmascarado(serial) {
   const cola = ultimos4(serial);
   return cola ? `\u2022\u2022\u2022\u2022${cola}` : "";
 }
+var LARGO_IMEI = 15;
+function soloDigitosImei(valor) {
+  return String(valor ?? "").replace(/\D/g, "");
+}
+function normalizarImei(valor) {
+  return soloDigitosImei(valor).slice(0, LARGO_IMEI);
+}
+var MENSAJES_IMEI = {
+  vacio: `El IMEI tiene ${LARGO_IMEI} d\xEDgitos.`,
+  obligatorio: "Complet\xE1 el IMEI.",
+  incompleto: (faltan) => faltan === 1 ? "Falta 1 d\xEDgito para completar el IMEI." : `Faltan ${faltan} d\xEDgitos para completar el IMEI.`,
+  invalido: "El IMEI no es v\xE1lido: revis\xE1 el d\xEDgito control.",
+  valido: "IMEI v\xE1lido.",
+  revisando: "Revisando el IMEI\u2026"
+};
+function estadoImei(valor) {
+  const digitos = soloDigitosImei(valor);
+  if (!digitos) return "vacio";
+  if (digitos.length < LARGO_IMEI) return "incompleto";
+  if (digitos.length > LARGO_IMEI) return "invalido";
+  return imeiValido(digitos) ? "valido" : "invalido";
+}
+function analizarImei(valor) {
+  const digitos = soloDigitosImei(valor);
+  const estado = estadoImei(valor);
+  return {
+    imei: digitos.slice(0, LARGO_IMEI),
+    largo: digitos.length,
+    faltan: Math.max(0, LARGO_IMEI - digitos.length),
+    completo: estado === "valido" || estado === "invalido",
+    valido: estado === "valido",
+    estado
+  };
+}
 function imeiValido(valor) {
-  const imei = String(valor ?? "").replace(/\D/g, "");
-  if (imei.length !== 15) return false;
+  const imei = soloDigitosImei(valor);
+  if (imei.length !== LARGO_IMEI) return false;
   let suma = 0;
-  for (let i = 0; i < 15; i += 1) {
+  for (let i = 0; i < LARGO_IMEI; i += 1) {
     let digito = Number(imei[14 - i]);
     if (i % 2 === 1) {
       digito *= 2;
@@ -3798,6 +3832,7 @@ export {
   IA_TOOLTIP,
   ICONO_CATEGORIA,
   INCIDENCIAS,
+  LARGO_IMEI,
   LIMITE_MONTO_ALMACENABLE,
   LIMITE_MONTO_GENERAL,
   LIMITE_MONTO_VENTAS,
@@ -3807,6 +3842,7 @@ export {
   MARCAS_CON_RELACION_FINANCIERA,
   MARCAS_MEDIOS_PAGO,
   MEDIOS_PAGO_CON_MARCA,
+  MENSAJES_IMEI,
   MENSAJES_VALIDACION,
   MENSAJE_RUC,
   MENSAJE_RUC_CONSULTA,
@@ -3848,6 +3884,7 @@ export {
   VERSION_APP_RE,
   agregarEstado,
   agruparPorDia,
+  analizarImei,
   anchoParaLargo,
   bloqueFirma,
   buscarCiudad,
@@ -3908,6 +3945,7 @@ export {
   estadoCompra,
   estadoDeDiagnostico,
   estadoEnvio,
+  estadoImei,
   estadoItem,
   estadoLock,
   estadoNecesidad,
@@ -3989,6 +4027,7 @@ export {
   normalizarBanco,
   normalizarBusqueda,
   normalizarCategoria,
+  normalizarImei,
   normalizarMarcaPago,
   normalizarMontoInput,
   normalizarNombre,

@@ -25,6 +25,7 @@ se crea en `owncoding-ui` y se adopta en todas las apps.
 | Teléfono | `PhoneField` | código de país editable (default +595), valida con `telefonoValido`; guardar con `componerTelefono`. El número conserva **ancho mínimo** (`min-w-[8.5rem]`) y la fila código + número **envuelve** cuando el contenedor es corto (p. ej. `TAMANOS_CAMPO.telefono` = `w-44` o una grilla de dos columnas): el campo crece a lo alto en vez de aplastar el número |
 | Correo | `EmailField` | sugiere dominios mientras se tipea, sin romper pegado/autofill |
 | Serial/IMEI | `SerialField` | mayúsculas, sin espacios ni prefijo; varios seriales con normalización propia (prop `normalizar`) |
+| IMEI (chequeo) | `ImeiField` (+`estadoImei`/`analizarImei`/`normalizarImei`) | 15 dígitos con **Luhn en vivo**: limpia a solo dígitos, avisa cuántos faltan, marca error junto al campo con `role="alert"` si el dígito control no cierra, confirma «IMEI válido» y muestra «Revisando…» con `revisando` para la consulta externa que decida la app |
 | Fechas/horas | `Input type="date"`/`datetime-local` | 24 h; para mostrar, `fechaHora`/`fechaDia`/`fechaCorta` |
 | Booleano | `Switch` | interruptor estilo iPhone, guarda `onChange(event.target.checked)` |
 | Selección múltiple | `Input type="checkbox"` | para listas con varias filas |

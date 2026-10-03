@@ -1,10 +1,10 @@
 import React, { useId, useState } from 'react'
 import {
   BloquePago, CeldaMoneda, DestinoRecepcion, Eyebrow, Icon, IconoCategoria,
-  PanelDerecho, PlanPagos, PreviewFusion, ResumenDestinos, ResumenIncidencias,
-  ResumenRecepcion, SectionState, SelectorIncidencia, TarjetaAjuste,
-  TarjetaCompra, TarjetaLote, TarjetaNecesidad, TarjetaRecepcion, TileEquipo,
-  TileRol, Button, Input, Label, SegmentedField,
+  ImeiField, PanelDerecho, PlanPagos, PreviewFusion, ResumenDestinos,
+  ResumenIncidencias, ResumenRecepcion, SectionState, SelectorIncidencia,
+  TarjetaAjuste, TarjetaCompra, TarjetaLote, TarjetaNecesidad, TarjetaRecepcion,
+  TileEquipo, TileRol, Button, Input, Label, SegmentedField,
 } from '../src/index.js'
 
 const destinations = [{ id: 'central', etiqueta: 'Depósito ficticio Central', cantidad: 2 }, { id: 'norte', etiqueta: 'Depósito ficticio Norte', cantidad: 1 }]
@@ -18,6 +18,18 @@ export const RECEIVING_DEMOS = {
   Eyebrow: ({ text, setText, id }) => <><Label htmlFor={id}>Texto del encabezado</Label><Input id={id} value={text} onChange={event => setText(event.target.value)} /><Eyebrow>{text || 'Encabezado de muestra'}</Eyebrow></>,
   Icon: ({ selected, setSelected }) => <><SegmentedField ariaLabel="Glifo de muestra" options={[['box', 'Caja'], ['check', 'Confirmación'], ['search', 'Búsqueda']]} value={selected} onChange={setSelected} /><Icon name={selected === 'central' ? 'box' : selected} className="h-8 w-8" /></>,
   IconoCategoria: ({ enabled, setEnabled }) => <><IconoCategoria icono={enabled ? 'mobile' : 'laptop'} className="h-10 w-10" /><p>{enabled ? 'Teléfono ficticio' : 'Portátil ficticio'}</p><Button variant="outline" onClick={() => setEnabled(!enabled)}>Alternar categoría local</Button></>,
+  ImeiField: ({ imei, setImei, reviewing, setReviewing }) => (
+    <div className="space-y-3">
+      <ImeiField label="IMEI de muestra" value={imei} onChange={setImei} required revisando={reviewing} />
+      <div className="flex flex-wrap items-center gap-2">
+        <Button variant="outline" onClick={() => setImei('490154203237518')}>Cargar IMEI válido</Button>
+        <Button variant="outline" onClick={() => setImei('490154203237510')}>Dígito control inválido</Button>
+        <Button variant="outline" onClick={() => setImei('')}>Vaciar</Button>
+        <label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={reviewing} onChange={event => setReviewing(event.target.checked)} />Simular revisión externa</label>
+      </div>
+      <p className="text-xs text-mute">Luhn local con fixtures ficticios; no se consulta ningún proveedor ni se registra el IMEI.</p>
+    </div>
+  ),
   PanelDerecho: ({ text, setText, id }) => <PanelDerecho panel={<p role="status">Referencia local: {text || 'Sin referencia'}</p>}><Label htmlFor={id}>Referencia del panel</Label><Input id={id} value={text} onChange={event => setText(event.target.value)} /></PanelDerecho>,
   PlanPagos: ({ enabled, setEnabled }) => <><PlanPagos anticipo={50000} cuotas={[{ id: 'demo', etiqueta: 'Cuota ficticia', monto: 125000, vence: '2026-10-15', estado: enabled ? 'pendiente' : 'pagado', nota: 'Estado de muestra, no pago real' }]} total={175000} condiciones="Plan ficticio; no se transfiere ni cobra dinero." /><Button variant="outline" onClick={() => setEnabled(!enabled)}>Alternar cuota local</Button></>,
   PreviewFusion: ({ selected, setSelected }) => <PreviewFusion entidades={entities} principalId={selected === 'central' ? 'a' : selected} onElegirPrincipal={setSelected} categorias={[{ id: 'notas', etiqueta: 'Notas ficticias', cantidad: 2 }]} nota="Solo se elige una ficha principal en memoria. No se fusiona ni archiva información." />,
@@ -41,7 +53,9 @@ export function ReceivingPreview({ name }) {
   const [selected, setSelected] = useState('central')
   const [text, setText] = useState('Referencia ficticia')
   const [incidence, setIncidence] = useState(null)
+  const [imei, setImei] = useState('')
+  const [reviewing, setReviewing] = useState(false)
   const [status, setStatus] = useState('')
   const Demo = RECEIVING_DEMOS[name]
-  return <div className="grid min-w-0 gap-3" data-demo-export={name} data-demo-family="receiving"><p className="text-xs text-mute">Simulación local con datos ficticios; sin envíos, cobros ni persistencia.</p><Demo {...{ id, enabled, setEnabled, selected, setSelected, text, setText, incidence, setIncidence, setStatus }} />{status && <p role="status" className="text-sm">{status}</p>}</div>
+  return <div className="grid min-w-0 gap-3" data-demo-export={name} data-demo-family="receiving"><p className="text-xs text-mute">Simulación local con datos ficticios; sin envíos, cobros ni persistencia.</p><Demo {...{ id, enabled, setEnabled, selected, setSelected, text, setText, incidence, setIncidence, imei, setImei, reviewing, setReviewing, setStatus }} />{status && <p role="status" className="text-sm">{status}</p>}</div>
 }

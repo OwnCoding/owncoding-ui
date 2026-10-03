@@ -338,6 +338,26 @@ export function diasHasta(fecha: unknown, opciones?: { hoy?: unknown; timeZone?:
 export function tonoVencimiento(fecha: unknown, opciones?: { hoy?: unknown; diasAviso?: number }): '' | 'bad' | 'warn'
 
 export function imeiValido(valor?: string | null): boolean
+export function normalizarImei(valor?: string | null): string
+export const LARGO_IMEI: number
+export const MENSAJES_IMEI: {
+  vacio: string
+  obligatorio: string
+  incompleto: (faltan: number) => string
+  invalido: string
+  valido: string
+  revisando: string
+}
+export type EstadoImei = 'vacio' | 'incompleto' | 'invalido' | 'valido'
+export function estadoImei(valor?: string | null): EstadoImei
+export function analizarImei(valor?: string | null): {
+  imei: string
+  largo: number
+  faltan: number
+  completo: boolean
+  valido: boolean
+  estado: EstadoImei
+}
 export function separarSeriales(texto?: string, opciones?: { maxLargo?: number }): string[]
 export function normalizarSeriales(texto?: string, opciones?: { validar?: (serial: string) => boolean; limite?: number; maxLargo?: number }): { seriales: string[]; repetidos: string[]; invalidos: string[] }
 export function ultimos4(serial: string): string

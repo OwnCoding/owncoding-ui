@@ -8,6 +8,23 @@ documenta acá y en el README).
 
 - Sin cambios todavía.
 
+## v0.63.0 — 2026-10-03
+
+- **IMEI check (#17):** `ImeiField` valida el IMEI de 15 dígitos con Luhn en
+  vivo: limpia lo que se escribe o pega (solo dígitos), muestra cuántos faltan,
+  deja el error junto al campo (`role="alert"`, `aria-invalid`) cuando el
+  dígito control no cierra y confirma «IMEI válido» con `role="status"`. La
+  prop `revisando` cubre el estado de la consulta externa sin adelantar el
+  resultado y `required` pide completar recién al salir del campo.
+- **Utilidades afines:** `normalizarImei`, `estadoImei`, `analizarImei`,
+  `LARGO_IMEI` y `MENSAJES_IMEI` en `utils/serial.js`, reusando `imeiValido`.
+- **Galería y docs:** ficha `ImeiField` con demo interactiva (válido, dígito
+  control inválido, vacío y revisión simulada) y fila propia en `REGLAS.md` §1
+  y el README.
+- **Tests:** `test/imei-field.test.jsx` cubre las utilidades, el vacío, el
+  incompleto al salir, el no numérico, el control inválido, `required` y
+  `revisando`; la demo de la galería se verifica aparte.
+
 ## v0.62.0 — 2026-10-02
 
 - **Modal/drawer estándar (#323):** `Modal` y `Drawer` suman la prop `dirty`

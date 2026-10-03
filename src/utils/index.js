@@ -127,7 +127,19 @@ export {
   diasHasta,
   tonoVencimiento,
 } from './fecha.js'
-export { imeiValido, separarSeriales, normalizarSeriales, ultimos4, partirSerial, serialEnmascarado } from './serial.js'
+export {
+  imeiValido,
+  normalizarImei,
+  estadoImei,
+  analizarImei,
+  LARGO_IMEI,
+  MENSAJES_IMEI,
+  separarSeriales,
+  normalizarSeriales,
+  ultimos4,
+  partirSerial,
+  serialEnmascarado,
+} from './serial.js'
 export { RUC_RE, extraerRuc, esRuc } from './ruc.js'
 export {
   PATRON_RUC,

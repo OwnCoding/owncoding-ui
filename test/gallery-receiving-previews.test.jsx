@@ -8,7 +8,7 @@ import { CATALOGO_EXPORTS } from '../gallery/catalog.js'
 const observed = vi.hoisted(() => new Set())
 vi.mock('../src/index.js', async importOriginal => {
   const actual = await importOriginal()
-  const names = ['BloquePago', 'CeldaMoneda', 'DestinoRecepcion', 'Eyebrow', 'Icon', 'IconoCategoria', 'PanelDerecho', 'PlanPagos', 'PreviewFusion', 'ResumenDestinos', 'ResumenIncidencias', 'ResumenRecepcion', 'SectionState', 'SelectorIncidencia', 'TarjetaAjuste', 'TarjetaCompra', 'TarjetaLote', 'TarjetaNecesidad', 'TarjetaRecepcion', 'TileEquipo', 'TileRol']
+  const names = ['BloquePago', 'CeldaMoneda', 'DestinoRecepcion', 'Eyebrow', 'Icon', 'IconoCategoria', 'ImeiField', 'PanelDerecho', 'PlanPagos', 'PreviewFusion', 'ResumenDestinos', 'ResumenIncidencias', 'ResumenRecepcion', 'SectionState', 'SelectorIncidencia', 'TarjetaAjuste', 'TarjetaCompra', 'TarjetaLote', 'TarjetaNecesidad', 'TarjetaRecepcion', 'TileEquipo', 'TileRol']
   return { ...actual, ...Object.fromEntries(names.map(name => [name, props => { observed.add(name); return React.createElement(actual[name], props) }])) }
 })
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
@@ -47,4 +47,16 @@ test('error retry and empty destinations update controlled local state', async (
   expect(host.textContent).toContain('Reintento simulado sin solicitudes')
   await render('ResumenDestinos'); click('Alternar destinos vacíos')
   expect(host.textContent).toContain('Sin destinos en el fixture')
+})
+test('IMEI check shows empty, valid, reviewing and invalid states with local fixtures', async () => {
+  await render('ImeiField')
+  expect(host.textContent).toContain('El IMEI tiene 15 dígitos.')
+  click('Cargar IMEI válido')
+  expect(host.textContent).toContain('IMEI válido.')
+  act(() => host.querySelector('input[type="checkbox"]').click())
+  expect(host.textContent).toContain('Revisando el IMEI…')
+  click('Dígito control inválido')
+  expect(host.textContent).toContain('revisá el dígito control')
+  click('Vaciar')
+  expect(host.textContent).toContain('El IMEI tiene 15 dígitos.')
 })

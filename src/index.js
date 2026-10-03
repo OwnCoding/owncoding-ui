@@ -65,7 +65,17 @@ export { default as EmailField, DOMINIOS_EMAIL, sugerenciasDe } from './componen
 export { default as PhoneField } from './components/PhoneField.jsx'
 export { default as CountryPhoneSelect } from './components/CountryPhoneSelect.jsx'
 export { default as SerialField, normalizarSerial } from './components/SerialField.jsx'
-export { imeiValido, separarSeriales, normalizarSeriales } from './utils/serial.js'
+export { default as ImeiField } from './components/ImeiField.jsx'
+export {
+  imeiValido,
+  normalizarImei,
+  estadoImei,
+  analizarImei,
+  LARGO_IMEI,
+  MENSAJES_IMEI,
+  separarSeriales,
+  normalizarSeriales,
+} from './utils/serial.js'
 export { default as InstagramField, normalizarInstagram } from './components/InstagramField.jsx'
 export { default as ProductCombobox } from './components/ProductCombobox.jsx'
 export {

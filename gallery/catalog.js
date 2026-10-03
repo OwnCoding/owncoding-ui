@@ -17,6 +17,12 @@ export const CATALOGO_EXPORTS = [
 {"nombre": "FooterPreset", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "CopyButton", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
 {"nombre": "ActionToolbar", "tipo": "visual", "categoria": "Componentes generales", "presentacion": "individual"},
+{"nombre": "ImeiField", "tipo": "visual", "categoria": "Campos y formularios", "presentacion": "individual"},
+{"nombre": "LARGO_IMEI", "tipo": "api", "categoria": "API y modelos", "presentacion": null},
+{"nombre": "MENSAJES_IMEI", "tipo": "api", "categoria": "API y modelos", "presentacion": null},
+{"nombre": "analizarImei", "tipo": "api", "categoria": "API y modelos", "presentacion": null},
+{"nombre": "estadoImei", "tipo": "api", "categoria": "API y modelos", "presentacion": null},
+{"nombre": "normalizarImei", "tipo": "api", "categoria": "API y modelos", "presentacion": null},
   {
     "nombre": "agregarEstado",
     "tipo": "api",

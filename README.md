@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 563 exports, 146 exports visuales y 14 categorías" />
+  <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 583 exports, 161 exports visuales y 14 categorías" />
 </p>
 
 <h1 align="center">OwnCoding UI</h1>
@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.62.0" src="https://img.shields.io/badge/versi%C3%B3n-0.62.0-05a36f" />
+  <img alt="Versión 0.63.0" src="https://img.shields.io/badge/versi%C3%B3n-0.63.0-05a36f" />
   <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
   <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
 </p>
@@ -75,7 +75,11 @@ ajenos al formato y coloca el guion antes del noveno dígito cuando no se ingres
 La extracción sigue siendo **simulada y confirmable**, con tres empresas demo
 y resolución determinista por RUC; los resultados se rotulan como ficticios.
 La galería no consulta un proveedor real ni afirma que una CI se convierta
-universalmente en RUC.
+universalmente en RUC. `ImeiField` completa la familia de seriales: valida el
+IMEI de 15 dígitos con Luhn en vivo, limpia lo que se escribe o pega (solo
+dígitos), avisa cuántos faltan y, si el dígito control no cierra, deja el error
+junto al campo; con `revisando` muestra el estado de la consulta externa sin
+adelantar el resultado.
 
 | Orden estable de la galería | Export principal | Preview ID |
 | ---: | --- | --- |
@@ -107,10 +111,10 @@ El inventario se deriva de `src/index.js` y se comprueba contra
 
 | Cobertura | Cantidad |
 | --- | ---: |
-| Exports de la entrada raíz | **577** |
-| Exports visuales | **160** |
-| API, modelos y utilidades | **417** |
-| Vistas curadas con fixtures controlados | **160** |
+| Exports de la entrada raíz | **583** |
+| Exports visuales | **161** |
+| API, modelos y utilidades | **422** |
+| Vistas curadas con fixtures controlados | **161** |
 | Categorías del catálogo | **14** |
 
 La galería nunca ejecuta un export arbitrario por nombre. Cada vista visual
@@ -161,10 +165,10 @@ contrato en
 
 ### 1. Instalar una versión fija
 
-La versión del paquete es `v0.62.0`. Al publicar su tag, la instalación fija es:
+La versión del paquete es `v0.63.0`. Al publicar su tag, la instalación fija es:
 
 ```bash
-npm install github:dariodeoli/owncoding-ui#v0.62.0
+npm install github:dariodeoli/owncoding-ui#v0.63.0
 ```
 
 Para probar la rama principal sin fijar un release:
