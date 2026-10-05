@@ -34,6 +34,37 @@ async function abrir() {
 }
 
 describe('CampanaAvisos (bandeja)', () => {
+  test.each([
+    ['enlace', 'Pedido', { href: '#pedido' }, 'a[href]'],
+    ['enlace', 'Pedido con un título extenso que conserva todos sus detalles aunque se trunque visualmente en la bandeja de avisos', { href: '#pedido' }, 'a[href]'],
+    ['botón', 'Pedido', {}, 'button'],
+    ['botón', 'Pedido con un título extenso que conserva todos sus detalles aunque se trunque visualmente en la bandeja de avisos', {}, 'button'],
+  ])('el %s expone el título completo "%s" sin cambiar la interacción', async (_tipo, titulo, ruta, selector) => {
+    const onAbrir = vi.fn()
+    const onElegir = vi.fn()
+    const onClick = vi.fn()
+    const aviso = { id: 'pedido', titulo, ...ruta, onClick, leido: false }
+    await montar(<CampanaAvisos avisos={[aviso]} onAbrir={onAbrir} onElegir={onElegir} />)
+    const campana = contenedor.querySelector('[data-testid="campana-avisos"]')
+    await abrir()
+    await act(async () => { await new Promise((resolve) => requestAnimationFrame(resolve)) })
+    const fila = contenedor.querySelector(`[role="dialog"] ${selector}`)
+    const tituloVisible = fila.querySelector('span.truncate')
+    expect(tituloVisible.textContent.trim()).toBe(titulo)
+    expect(tituloVisible.getAttribute('title')).toBe(titulo)
+    expect(fila.querySelector('a, button, [tabindex]')).toBeNull()
+    expect(document.activeElement).toBe(fila)
+    expect(onAbrir).toHaveBeenCalledTimes(1)
+    expect(onAbrir).toHaveBeenCalledWith(true)
+    await act(async () => { fila.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
+    await act(async () => { await new Promise((resolve) => requestAnimationFrame(resolve)) })
+    expect(onElegir).toHaveBeenCalledTimes(1)
+    expect(onElegir).toHaveBeenCalledWith(aviso)
+    expect(onClick).toHaveBeenCalledTimes(1)
+    expect(contenedor.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.activeElement).toBe(campana)
+  })
+
   test('la campana expone su testid y el contador 99+', async () => {
     const avisos = Array.from({ length: 120 }, (_, i) => ({ id: `a${i}`, titulo: `Aviso ${i}`, leido: false }))
     await montar(<CampanaAvisos avisos={avisos} />)
