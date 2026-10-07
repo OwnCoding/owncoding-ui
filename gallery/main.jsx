@@ -7,6 +7,7 @@ import { BLOG_POSTS, articlePath } from './blog/metadata.js'
 import '../src/styles/tokens.css'
 import '../src/styles/base.css'
 import './styles.css'
+import './identity.css'
 
 import {
   Aviso,
@@ -685,9 +686,9 @@ export function App() {
     <div className="min-h-dvh bg-paper text-fore">
       <header className="gallery-header border-b border-fore/10 bg-ink/95 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[.16em] text-fono-dark dark:text-fono-light">OwnCoding ecosystem</p>
-            <p className="mt-1 text-lg font-bold">UI Gallery <span className="font-normal text-mute">{IDENTIDAD.etiquetaVersion}</span></p>
+          <div className="gallery-brand-group">
+            <a href="#contenido" className="gallery-brand" aria-label="OwnCoding UI — Inicio"><img src="/favicon.svg" alt="" width="40" height="40" /><span className="gallery-wordmark">owncoding<span>/ui</span></span></a>
+            <span className="gallery-version">{IDENTIDAD.etiquetaVersion}</span>
           </div>
           <nav aria-label="Acciones de la galería" className="flex flex-wrap items-center gap-2">
             <a className="toque-44 inline-flex min-h-11 items-center px-2 text-sm font-semibold" href="#catalogo">Catálogo</a>
@@ -704,7 +705,7 @@ export function App() {
             <Badge color="green">Catálogo verificable</Badge>
             <h1>Una base común.<br />Interfaces que funcionan.</h1>
             <p>Componentes reales, estados claros y contratos compartidos. Explore campos, operaciones y los {METRICAS_CATALOGO.total} exports del sistema.</p>
-            <a className="hero-catalog-link" href="#catalogo">Explorar catálogo →</a>
+            <div className="hero-actions"><a className="hero-catalog-link" href="#catalogo">Explorar catálogo →</a><a className="hero-state-link" href="/status.json">Ver estado del build</a></div>
             <nav aria-label="Vistas principales" className="hero-priority-nav">
               {DESTACADOS_CATALOGO.map((item) => (
                 <a key={item.destacado.id} href={`#preview-${item.destacado.id}`}>
@@ -715,6 +716,7 @@ export function App() {
             </nav>
           </div>
           <aside className="hero-index" aria-label="Inventario de la biblioteca">
+            <div className="hero-system-label"><span>INVENTARIO DEL SISTEMA</span><span>fixtures locales</span></div>
             <dl className="hero-metrics">{[['Exports', METRICAS_CATALOGO.total], ['Visuales', visuales], ['API', api]].map(([label, count]) => <div key={label}><dt>{label}</dt><dd>{count}</dd></div>)}</dl>
             <p>Pruebe antes de integrar</p><ul><li>Formularios y datos locales</li><li>Composiciones de operación</li><li>Estados controlados por la app</li></ul>
             <span className="fixture-label">Fixtures locales · sin servicios externos</span>

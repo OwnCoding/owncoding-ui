@@ -27,13 +27,13 @@ function shell({ title, description, path, schema, body }) {
 <title>${e(title)}</title><meta name="description" content="${e(description)}">
 <meta name="robots" content="index, follow, max-image-preview:large"><meta name="theme-color" content="#0e1116"><meta name="color-scheme" content="dark light">
 <link rel="canonical" href="${e(canonical)}">
-<link rel="icon" href="/favicon.ico?v=b25d5a23f3e6" sizes="16x16 32x32 192x192" type="image/x-icon">
-<link rel="icon" href="/favicon.svg?v=b25d5a23f3e6" sizes="any" type="image/svg+xml">
-<link rel="icon" href="/favicon-32x32.png?v=b25d5a23f3e6" sizes="32x32" type="image/png">
-<link rel="icon" href="/favicon-16x16.png?v=b25d5a23f3e6" sizes="16x16" type="image/png">
-<link rel="mask-icon" href="/mask-icon.svg?v=b25d5a23f3e6" color="#05a36f">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=b25d5a23f3e6" sizes="180x180">
-<link rel="manifest" href="/manifest.json?v=b25d5a23f3e6" type="application/json">
+<link rel="icon" href="/favicon.ico?v=1deaba5f7f1b" sizes="16x16 32x32 192x192" type="image/x-icon">
+<link rel="icon" href="/favicon.svg?v=1deaba5f7f1b" sizes="any" type="image/svg+xml">
+<link rel="icon" href="/favicon-32x32.png?v=1deaba5f7f1b" sizes="32x32" type="image/png">
+<link rel="icon" href="/favicon-16x16.png?v=1deaba5f7f1b" sizes="16x16" type="image/png">
+<link rel="mask-icon" href="/mask-icon.svg?v=1deaba5f7f1b" color="#2340E6">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=1deaba5f7f1b" sizes="180x180">
+<link rel="manifest" href="/manifest.json?v=1deaba5f7f1b" type="application/json">
 <link rel="stylesheet" href="/blog/blog.css">
 <meta property="og:type" content="${path === '/blog/' ? 'website' : 'article'}"><meta property="og:site_name" content="OwnCoding UI"><meta property="og:locale" content="es_PY">
 <meta property="og:url" content="${e(canonical)}"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(description)}">
@@ -41,7 +41,7 @@ function shell({ title, description, path, schema, body }) {
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${e(title)}"><meta name="twitter:description" content="${e(description)}"><meta name="twitter:image" content="${SITE_URL}/og-owncoding-ui.png"><meta name="twitter:image:alt" content="OwnCoding UI: una base compartida para productos digitales consistentes">
 <script type="application/ld+json">${scriptJson({ '@context': 'https://schema.org', '@graph': schema })}</script>
 </head><body><a class="skip-link" href="#contenido">Saltar al contenido</a>
-<header class="site-header"><div class="wrap header-inner"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="36" height="36"><span>OwnCoding <b>UI</b></span></a><nav aria-label="Navegación principal"><a href="/">Galería</a><a href="/blog/"${path === '/blog/' ? ' aria-current="page"' : ''}>Blog</a><a href="https://github.com/dariodeoli/owncoding-ui">Código</a></nav></div></header>
+<header class="site-header"><div class="wrap header-inner"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="36" height="36"><span>owncoding<b>/ui</b></span></a><nav aria-label="Navegación principal"><a href="/">Galería</a><a href="/blog/"${path === '/blog/' ? ' aria-current="page"' : ''}>Blog</a><a href="https://github.com/dariodeoli/owncoding-ui">Código</a></nav></div></header>
 <main id="contenido" class="wrap">${body}</main>
 <footer class="site-footer wrap"><p><strong>OwnCoding UI</strong> · Guías y ejemplos verificables.</p><nav aria-label="Enlaces del pie"><a href="/">Galería</a><a href="/blog/">Blog</a><a href="/status.json">Estado del build</a><a href="https://github.com/dariodeoli/owncoding-ui">Repositorio</a></nav><p class="fine-print">Los ejemplos de la galería son locales. Los logos no implican respaldo institucional ni integración activa.</p></footer>
 </body></html>\n`

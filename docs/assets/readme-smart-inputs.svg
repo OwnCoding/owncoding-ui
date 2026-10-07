@@ -3,30 +3,30 @@
   <desc id="desc">Representación editorial con fixtures locales del CityAutocomplete que deriva el departamento y de BuscadorCliente y RucField que completan datos ficticios con confirmación.</desc>
   <defs>
     <linearGradient id="smartSurface" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1f2430" />
+      <stop offset="0" stop-color="#14171D" />
       <stop offset="1" stop-color="#171c25" />
     </linearGradient>
   </defs>
   <rect width="1200" height="580" rx="24" fill="#0e1116" />
-  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
-    <text x="56" y="30" fill="#7cffc9" font-size="11" font-weight="750">03–04 · CONTEXTO EN FORMULARIOS</text>
+  <g font-family="Schibsted Grotesk, ui-sans-serif, system-ui, sans-serif">
+    <text x="56" y="30" fill="#8FA0FF" font-size="11" font-weight="750">03–04 · CONTEXTO EN FORMULARIOS</text>
     <text x="56" y="64" fill="#f4f6fa" font-size="28" font-weight="750">Ciudad, departamento y clientes. Sin volver a escribir.</text>
     <text x="56" y="88" fill="#aab3c2" font-size="13" font-weight="500">Catálogo local y proveedor RUC simulado · resultados ficticios, revisión explícita</text>
     <g transform="translate(56 110)">
-      <rect width="516" height="438" rx="20" fill="url(#smartSurface)" stroke="#3e475a" />
+      <rect width="516" height="438" rx="20" fill="url(#smartSurface)" stroke="#393E4A" />
       <text x="26" y="40" fill="#9fb5ff" font-size="11" font-weight="750" letter-spacing="1.5">CITYAUTOCOMPLETE</text>
       <text x="26" y="73" fill="#f4f6fa" font-size="20" font-weight="720">Ciudad → departamento automático</text>
       <rect x="341" y="26" width="149" height="28" rx="14" fill="#18233e" stroke="#35538d" />
       <text x="415" y="44" fill="#cbd6ff" font-size="9" font-weight="700" text-anchor="middle">CATÁLOGO LOCAL PY</text>
       <text x="26" y="119" fill="#d9dee8" font-size="12" font-weight="650">Ciudad</text>
-      <rect x="26" y="131" width="464" height="52" rx="14" fill="#151a23" stroke="#7c879b" />
+      <rect x="26" y="131" width="464" height="52" rx="14" fill="#14171D" stroke="#7c879b" />
       <text x="44" y="164" fill="#f4f6fa" font-size="14">Bella Vista</text>
       <path d="m461 151 7 7 7-7" fill="none" stroke="#aab3c2" stroke-width="2" />
-      <rect x="26" y="196" width="464" height="132" rx="16" fill="#151a23" stroke="#3e475a" />
+      <rect x="26" y="196" width="464" height="132" rx="16" fill="#14171D" stroke="#393E4A" />
       <g data-city-fixture="Bella Vista" data-department-fixture="Itapúa">
         <rect x="38" y="208" width="440" height="48" rx="11" fill="#063426" />
         <text x="54" y="237" fill="#f4f6fa" font-size="13" font-weight="700">Bella Vista</text>
-        <text x="462" y="237" fill="#7cffc9" font-size="11" text-anchor="end">Itapúa</text>
+        <text x="462" y="237" fill="#8FA0FF" font-size="11" text-anchor="end">Itapúa</text>
       </g>
       <g data-city-fixture="Bella Vista Norte" data-department-fixture="Amambay">
         <text x="54" y="288" fill="#d9dee8" font-size="13">Bella Vista Norte</text>
@@ -37,21 +37,21 @@
       <text x="44" y="394" fill="#f4f6fa" font-size="18" font-weight="760">Itapúa</text>
     </g>
     <g transform="translate(596 110)">
-      <rect width="548" height="438" rx="20" fill="url(#smartSurface)" stroke="#3e475a" />
-      <text x="26" y="40" fill="#7cffc9" font-size="11" font-weight="750" letter-spacing="1.5">BUSCADORCLIENTE · RUCFIELD</text>
+      <rect width="548" height="438" rx="20" fill="url(#smartSurface)" stroke="#393E4A" />
+      <text x="26" y="40" fill="#8FA0FF" font-size="11" font-weight="750" letter-spacing="1.5">BUSCADORCLIENTE · RUCFIELD</text>
       <text x="26" y="73" fill="#f4f6fa" font-size="20" font-weight="720">Buscar y completar con confirmación</text>
       <rect x="372" y="26" width="150" height="28" rx="14" fill="#18233e" stroke="#35538d" />
       <text x="447" y="44" fill="#cbd6ff" font-size="9" font-weight="700" text-anchor="middle">FIXTURE SIMULADO</text>
       <text x="26" y="118" fill="#d9dee8" font-size="12" font-weight="650">Cliente por nombre, CI o RUC</text>
-      <rect x="26" y="130" width="496" height="52" rx="14" fill="#151a23" stroke="#7c879b" />
+      <rect x="26" y="130" width="496" height="52" rx="14" fill="#14171D" stroke="#7c879b" />
       <text x="44" y="163" fill="#f4f6fa" font-size="14">4567890</text>
       <rect x="26" y="194" width="496" height="72" rx="14" fill="#063426" stroke="#087a57" />
       <text x="44" y="220" fill="#f4f6fa" font-size="13" font-weight="700">Ana Ejemplo</text>
       <text x="44" y="243" fill="#9ed8ba" font-size="10">4567890 · +595 971 555 010 · ana@ejemplo.com.py</text>
       <text x="26" y="301" fill="#d9dee8" font-size="12" font-weight="650">RUC para extracción confirmable</text>
-      <rect x="26" y="313" width="496" height="52" rx="14" fill="#151a23" stroke="#7c879b" />
+      <rect x="26" y="313" width="496" height="52" rx="14" fill="#14171D" stroke="#7c879b" />
       <text x="44" y="346" fill="#f4f6fa" font-size="14">80012345-6</text>
-      <rect x="422" y="321" width="90" height="36" rx="10" fill="#05f19c" />
+      <rect x="422" y="321" width="90" height="36" rx="10" fill="#2340E6" />
       <text x="467" y="344" fill="#061e14" font-size="10" font-weight="780" text-anchor="middle">EXTRAER</text>
       <rect x="26" y="379" width="496" height="38" rx="12" fill="#18233e" stroke="#35538d" />
       <text x="44" y="403" fill="#cbd6ff" font-size="10">Resultado ficticio · “Usar estos datos” aplica solo después de confirmar.</text>

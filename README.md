@@ -2,7 +2,7 @@
   <img src="docs/assets/readme-hero.svg" width="1200" alt="OwnCoding UI: sistema compartido con 598 exports, 169 exports visuales y 14 categorías" />
 </p>
 
-<h1 align="center">OwnCoding UI</h1>
+<h1 align="center">owncoding/ui</h1>
 
 <p align="center">
   Una base compartida para formularios, operaciones e identidad.<br />
@@ -11,9 +11,9 @@
 
 <p align="center">
   <a href="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml"><img alt="CI de la rama principal" src="https://github.com/dariodeoli/owncoding-ui/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Versión 0.67.1" src="https://img.shields.io/badge/versi%C3%B3n-0.67.1-05a36f" />
-  <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-4d7cfe" />
-  <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-7557a6" />
+  <img alt="Versión 0.67.1" src="https://img.shields.io/badge/versi%C3%B3n-0.67.1-2340E6" />
+  <img alt="React 18 o superior" src="https://img.shields.io/badge/React-18%2B-2340E6" />
+  <img alt="Objetivo WCAG 2.1 AA" src="https://img.shields.io/badge/objetivo-WCAG%202.1%20AA-555A63" />
 </p>
 
 <p align="center">
@@ -30,6 +30,8 @@
 > Esta es evidencia del release previo, no prueba de despliegue de este rediseño.
 > Las demostraciones usan fixtures locales, sin activar servicios externos.
 > Para explorar localmente: `npm run gallery:dev`.
+
+La [identidad visual de la galería](docs/IDENTITY.md) es independiente de los tokens predeterminados de las aplicaciones consumidoras.
 
 ## Catálogo actual
 

@@ -1,35 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="title desc">
-  <title id="title">OwnCoding UI, base compartida de interfaces</title>
-  <desc id="desc">Representación editorial compacta: métricas verificables y primitivas compartidas; no es una captura de producto.</desc>
-  <rect width="1200" height="340" rx="24" fill="#0e1116"/>
-  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
-    <rect x="32" y="32" width="46" height="46" rx="14" fill="#05f19c"/>
-    <path d="M46 47h18M46 55h12M46 63h16" stroke="#06271b" stroke-width="3" stroke-linecap="round"/>
-    <text x="92" y="51" fill="#f4f6fa" font-size="18" font-weight="750">OwnCoding UI</text>
-    <text x="92" y="72" fill="#aab3c2" font-size="12">v0.67.1 · React 18+ · Tailwind CSS 3.4+</text>
-    <text x="32" y="134" fill="#f4f6fa" font-size="40" font-weight="750">Una base común.</text>
-    <text x="32" y="181" fill="#f4f6fa" font-size="40" font-weight="750">Interfaces que funcionan.</text>
-    <text x="32" y="217" fill="#aab3c2" font-size="15">Campos, operaciones y estados con contratos claros.</text>
-    <g transform="translate(32 254)" font-size="13" font-weight="700">
-      <rect width="138" height="44" rx="13" fill="#063426" stroke="#087a57"/>
-      <text x="69" y="28" text-anchor="middle" fill="#7cffc9">598 exports</text>
-      <rect x="150" width="138" height="44" rx="13" fill="#18233e" stroke="#35538d"/>
-      <text x="219" y="28" text-anchor="middle" fill="#cbd6ff">169 visuales</text>
-      <rect x="300" width="138" height="44" rx="13" fill="#25202f" stroke="#624d79"/>
-      <text x="369" y="28" text-anchor="middle" fill="#ddc7fa">14 categorías</text>
-    </g>
-    <g transform="translate(650 32)">
-      <rect width="518" height="276" rx="20" fill="#1f2430" stroke="#3e475a"/>
-      <text x="24" y="34" fill="#7cffc9" font-size="11" font-weight="700">PRIMITIVAS COMPARTIDAS · MUESTRA EDITORIAL</text>
-      <text x="24" y="65" fill="#f4f6fa" font-size="16" font-weight="700">Operación Demo</text>
-      <rect x="24" y="80" width="470" height="46" rx="12" fill="#181d27" stroke="#7c879b"/>
-      <text x="40" y="109" fill="#d9dee8" font-size="13">Datos proporcionados por la aplicación</text>
-      <rect x="24" y="142" width="142" height="44" rx="12" fill="#05f19c"/>
-      <text x="95" y="170" text-anchor="middle" fill="#06271b" font-size="13" font-weight="750">Acción principal</text>
-      <rect x="178" y="142" width="138" height="44" rx="12" fill="none" stroke="#7c879b"/>
-      <text x="247" y="170" text-anchor="middle" fill="#d9dee8" font-size="13">Secundaria</text>
-      <rect x="24" y="204" width="470" height="46" rx="12" fill="#18233e" stroke="#35538d"/>
-      <text x="40" y="232" fill="#cbd6ff" font-size="12">Fixtures locales. Sin servicios ni resultados inventados.</text>
-    </g>
-  </g>
-</svg>
+<title id="title">owncoding/ui — Una base común</title><desc id="desc">Componentes reales y contratos compartidos para productos digitales. Galería verificable de OwnCoding UI.</desc>
+<rect width="1200" height="340" fill="#F6F5F2"/>
+<g transform="translate(48 28) scale(.75)"><rect width="64" height="64" rx="14" fill="#0E1116"/><rect x="14" y="14" width="16" height="16" rx="3" fill="#F6F5F2"/><rect x="34" y="14" width="16" height="16" rx="3" fill="#2340E6"/><rect x="14" y="34" width="16" height="16" rx="3" fill="#F6F5F2"/><rect x="34" y="34" width="16" height="16" rx="3" fill="none" stroke="#F6F5F2" stroke-width="2.5"/></g>
+<g font-family="Schibsted Grotesk, Arial, sans-serif" fill="#0E1116">
+<text x="112" y="64" font-size="30" font-weight="800" letter-spacing="-1.5">owncoding<tspan fill="#2340E6" font-family="JetBrains Mono, monospace" font-weight="500">/ui</tspan></text>
+<text x="48" y="154" font-size="54" font-weight="800" letter-spacing="-3">Una base común.</text><text x="48" y="214" font-size="54" font-weight="800" letter-spacing="-3">Interfaces que funcionan.</text>
+<text x="48" y="253" font-size="19" fill="#555A63">Componentes reales. Estados claros. Contratos compartidos.</text>
+<rect x="48" y="278" width="1072" height="1" fill="#D9D6CF"/>
+<text x="1152" y="60" font-size="16" fill="#555A63" text-anchor="end">v0.67.1 · 14 categorías</text>
+<text x="48" y="314" font-size="20" fill="#555A63">598 exports · 169 visuales · 429 API</text>
+<text x="1152" y="314" font-size="20" fill="#2340E6" text-anchor="end">controlaria.online</text>
+</g></svg>
