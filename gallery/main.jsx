@@ -8,6 +8,7 @@ import '../src/styles/tokens.css'
 import '../src/styles/base.css'
 import './styles.css'
 import './identity.css'
+import './previews.css'
 
 import {
   Aviso,
@@ -382,7 +383,7 @@ function VistaTelefono() {
         <div className="preview-panel__heading">
           <div>
             <p className="preview-kicker">PhoneField</p>
-            <h4>🇵🇾 Paraguay listo por defecto</h4>
+            <h4>Paraguay listo por defecto</h4>
           </div>
           <Badge color={valido ? 'green' : 'orange'}>{valido ? 'Válido' : 'Revisar'}</Badge>
         </div>

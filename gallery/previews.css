@@ -1,0 +1,88 @@
+/* Previews de la galería con la identidad 2026 (solo galería).
+   Resultados en panel de tinta, etiquetas en mono, acciones con estado
+   lleno en cobalto y campos inteligentes como tarjetas. */
+.ownui-gallery .preview-layout { gap: 1rem; }
+.ownui-gallery .preview-panel {
+  border-color: rgb(var(--c-ink-600));
+  border-radius: 1rem;
+  padding: clamp(1.1rem, 2.6vw, 1.6rem);
+  background: rgb(var(--c-ink));
+}
+.ownui-gallery .preview-panel__heading { margin-bottom: 1.25rem; }
+.ownui-gallery .preview-panel__heading h4 { margin-top: .35rem; font-size: clamp(1.1rem, 2vw, 1.35rem); font-weight: 700; letter-spacing: -.02em; }
+.ownui-gallery .preview-kicker { font-weight: 600; letter-spacing: .1em; }
+.ownui-gallery .preview-note { font-size: .8rem; }
+.ownui-gallery .fixture-label {
+  border-color: rgb(var(--c-ink-600));
+  background: rgb(var(--c-ink-800));
+  color: rgb(var(--c-mute));
+  font-size: .68rem;
+  font-weight: 500;
+}
+
+/* Salidas: E.164, departamento derivado y cliente/RUC aplicados */
+.ownui-gallery :is(.phone-output, .derived-value, .customer-result) {
+  gap: .35rem;
+  margin-top: 1rem;
+  border: 1px solid #262A33;
+  border-radius: .9rem;
+  padding: 1.1rem 1.25rem;
+  background: #0E1116;
+  color: #F6F5F2;
+}
+.ownui-gallery :is(.phone-output span, .derived-value span, .customer-result > span) {
+  color: #8B909A;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+}
+.ownui-gallery .phone-output code {
+  color: #8FA0FF;
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+.ownui-gallery .phone-output strong { color: #C9CCD3; font-size: .85rem; font-weight: 500; }
+.ownui-gallery .derived-value strong { color: #F6F5F2; font-size: clamp(1.4rem, 3vw, 1.85rem); font-weight: 800; letter-spacing: -.035em; }
+.ownui-gallery .customer-result strong { color: #F6F5F2; font-size: 1.1rem; font-weight: 700; letter-spacing: -.015em; }
+.ownui-gallery .customer-result small { color: #B9BDC6; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: .75rem; }
+
+/* Ejemplos rápidos y estados */
+.ownui-gallery .preview-actions { gap: .5rem; margin-top: 1rem; }
+.ownui-gallery .preview-actions button {
+  border-color: rgb(var(--c-ink-600));
+  border-radius: .7rem;
+  padding: .5rem .95rem;
+  background: rgb(var(--c-ink-800));
+  color: rgb(var(--c-fore));
+  font-size: .85rem;
+  font-weight: 600;
+}
+.ownui-gallery .preview-actions button:hover { border-color: #2340E6; }
+.ownui-gallery .preview-actions button[aria-pressed="true"] { border-color: #2340E6; background: #2340E6; color: #FFFFFF; }
+
+/* Campos inteligentes como tarjetas */
+.ownui-gallery .smart-inputs { border-radius: 1rem; box-shadow: none; }
+.ownui-gallery .smart-inputs summary strong { font-size: 1.05rem; font-weight: 700; letter-spacing: -.015em; }
+.ownui-gallery .smart-inputs summary small { font-size: .8rem; }
+.ownui-gallery .smart-inputs__toggle { border-color: transparent; font-size: 1.5rem; }
+.ownui-gallery .smart-inputs__grid { gap: .75rem; padding: 1.1rem; }
+.ownui-gallery .smart-inputs__grid > div {
+  border: 1px solid rgb(var(--c-ink-600));
+  border-radius: .85rem;
+  padding: 1rem;
+  background: rgb(var(--c-ink-800));
+}
+
+/* Medios de pago: tarjetas con logo y estado */
+.ownui-gallery :is(.payment-grid li, .payment-peer-grid li, .connected-brand-grid li) {
+  border-color: rgb(var(--c-ink-600));
+  border-radius: .85rem;
+  background: rgb(var(--c-ink));
+}
+.ownui-gallery .payment-peer-group { border-color: rgb(var(--c-ink-600)); background: rgb(var(--c-ink-800)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ownui-gallery .preview-actions button { transition: none; }
+}

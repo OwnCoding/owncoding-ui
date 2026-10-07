@@ -6,7 +6,10 @@ documenta acá y en el README).
 
 ## Sin publicar
 
-- Sin cambios todavía.
+- **Previews de la galería:** teléfono, ciudad, cliente/RUC, campos inteligentes y
+  medios de pago adoptan la identidad 2026 (`gallery/previews.css`): resultados en
+  panel de tinta con etiquetas mono, ejemplos con estado lleno en cobalto y campos
+  como tarjetas. Solo galería; sin cambios en componentes ni tokens.
 
 ## v0.67.1 — 2026-10-03
 
