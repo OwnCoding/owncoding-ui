@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose new product capabilities and enhancements.
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the requested capability and intended benefit. Do not include personal data or secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and reproduction
+      description: Provide the request context and supporting evidence. Distinguish known facts from open decisions.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior and acceptance criteria
+      description: Describe the expected outcome and how it can be verified.
+    validations:
+      required: true
