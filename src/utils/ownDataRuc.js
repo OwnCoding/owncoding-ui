@@ -2,14 +2,18 @@ const RUC = /^[1-9][0-9]{0,8}(-[0-9])?$/
 const ERROR_STATUS = {
   INVALID_RUC_FORMAT: 400,
   API_KEY_REQUIRED: 401, API_KEY_INVALID: 401, API_KEY_REVOKED: 401, API_KEY_EXPIRED: 401, ENVIRONMENT_MISMATCH: 401,
+  API_KEY_ENVIRONMENT_MISMATCH: 401,
   INSUFFICIENT_SCOPE: 403, PLAN_REQUIRED: 403, REGISTERED_RUC_NOT_FOUND: 404,
   DAILY_QUOTA_REACHED: 429, COMMERCIAL_API_DISABLED: 503, COMMERCIAL_API_UNAVAILABLE: 503, DNIT_DATA_UNAVAILABLE: 503,
+  FREE_API_DISABLED: 503,
 }
 const ERROR_MESSAGES = {
   INVALID_RUC_FORMAT: 'El formato del RUC no es válido.',
   REGISTERED_RUC_NOT_FOUND: 'No se encontró el RUC registrado.',
   DAILY_QUOTA_REACHED: 'Se alcanzó la cuota diaria. No se reintentó la consulta.',
   COMMERCIAL_API_DISABLED: 'La API comercial de OwnData está deshabilitada.',
+  API_KEY_ENVIRONMENT_MISMATCH: 'La clave de OwnData no corresponde al ambiente configurado. Complete los datos manualmente.',
+  FREE_API_DISABLED: 'La API gratuita de OwnData está deshabilitada. Complete los datos manualmente.',
 }
 function safeRequestId(value) { return typeof value === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(value) ? value : undefined }
 function failure(code, envelope) {
