@@ -860,6 +860,12 @@ export const CATALOGO_EXPORTS = [
     "presentacion": "individual"
   },
   {
+    "nombre": "CurrencyConversion",
+    "tipo": "visual",
+    "categoria": "Finanzas y pagos",
+    "presentacion": "individual"
+  },
+  {
     "nombre": "CurrencySelect",
     "tipo": "visual",
     "categoria": "Finanzas y pagos",

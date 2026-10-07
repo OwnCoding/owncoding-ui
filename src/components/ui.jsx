@@ -1,7 +1,7 @@
 import { Children, cloneElement, createContext, forwardRef, isValidElement, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../utils/cn.js'
-import { formatGs, formatGsInput, formatUsdInput, normalizarMontoInput, caretTrasDigitos, excedeMonto, LIMITE_MONTO_GENERAL, largoMaximoMonto, SIMBOLOS_MONEDA } from '../utils/moneda.js'
+import { formatMoney, formatGs, formatGsInput, formatUsdInput, normalizarMontoInput, caretTrasDigitos, excedeMonto, LIMITE_MONTO_GENERAL, largoMaximoMonto, SIMBOLOS_MONEDA } from '../utils/moneda.js'
 import { TAMANOS_CAMPO } from '../utils/tamanos.js'
 import { CIERRE_CON_CAMBIOS, TAMANO_MODAL_PREDETERMINADO, TAMANOS_MODAL } from '../utils/modal.js'
 import { mensajeFallo, mensajeResultado } from '../utils/resultado.js'
@@ -200,7 +200,10 @@ export const MoneyInput = forwardRef(function MoneyInput({ currency = 'PYG', sym
 // dólares con separador en-US, sin convertir moneda. Un valor no finito
 // se muestra como raya para no inventar cifras. `simbolo` pisa el prefijo
 // (p. ej. `Gs.` o `₲` en un panel que escribe distinto el guaraní).
-export function Money({ value, currency = 'PYG', simbolo, className }) {
+export function Money({ value, currency = 'PYG', simbolo, className, locale, currencyDisplay, numberFormatOptions, vacio }) {
+  if (locale !== undefined) {
+    return <span className={className}>{formatMoney(value, currency, { locale, currencyDisplay, numberFormatOptions, vacio })}</span>
+  }
   const amount = Number(value)
   if (!Number.isFinite(amount)) return <span className={className}>—</span>
   return (

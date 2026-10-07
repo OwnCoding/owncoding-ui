@@ -3,7 +3,7 @@ import { DeferredPreview } from './deferred-preview.jsx'
 import React, { useId, useMemo, useState } from 'react'
 import {
   PasswordInput, PinInput, SearchField, IconAction, Card, ErrorState, Nota, Input,
-  EmailField, MoneyInput, Money, SerialField, RangoFecha, Label, ThemeToggle,
+  EmailField, MoneyInput, Money, CurrencyConversion, SerialField, RangoFecha, Label, ThemeToggle,
   BuscadorCliente, DataTable, SegmentedField, ListGridToggle, PageHeader,
   Modal, Drawer, ConfirmDialog, EstadoGuardado, BarraProgreso, ProgresoChecklist,
   ProductFooter, ProductPrefooter, Button, crearIdentidadApp,
@@ -41,6 +41,7 @@ function BasicPreview({ name }) {
     case 'Nota': return <Nota tono="warn">Nota de muestra: verificá los datos antes de confirmar.</Nota>
     case 'EmailField': return field('Correo de muestra', <EmailField id={id} value={value} onChange={setValue} />)
     case 'MoneyInput': return field('Importe de muestra', <MoneyInput id={id} value={value} onValueChange={setValue} />)
+    case 'CurrencyConversion': return <CurrencyConversion originalAmount={100} originalCurrency="EUR" convertedAmount={650} convertedCurrency="BRL" rate={6.5} source="Fixture local; sin proveedor" asOf="2026-10-07T12:00:00Z" status="stale" locale="es-PY" timeZone="America/Asuncion" labels={{ title: 'Conversión de muestra', original: 'Importe original', converted: 'Importe convertido', rate: 'Tipo de cambio', source: 'Fuente', asOf: 'Fecha de cotización', stale: 'Cotización desactualizada' }} />
     case 'Money': return <Money value={1250000} />
     case 'SerialField': return field('Serial de muestra', <SerialField id={id} value={value} onChange={setValue} />)
     case 'RangoFecha': return <RangoFecha periodoPorDefecto="este-mes" />

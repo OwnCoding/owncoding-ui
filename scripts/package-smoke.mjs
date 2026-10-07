@@ -50,6 +50,9 @@ export async function runPackageSmoke() {
         if (catalog.resolveLocality('Asunción', 'Central').status !== 'unknown') throw new Error('conflicting department must remain unresolved')
         if (catalog.resolveLocality('oc:locality:py:033').record?.city !== 'Asunción') throw new Error('installed locality identity changed')
       }
+      const conversion = renderToStaticMarkup(React.createElement(root.CurrencyConversion, { originalAmount: 10, originalCurrency: 'EUR', convertedAmount: 77, convertedCurrency: 'BRL', rate: 2, source: 'Fixture', asOf: '2026-10-07T12:00:00Z', status: 'stale', locale: 'en-US' }))
+      if (!conversion.includes('Stale quote') || !conversion.includes('77.00') || !conversion.includes('1 EUR = 2 BRL')) throw new Error('installed conversion must display caller values without arithmetic')
+      if (utils.formatMoney(null, 'EUR', { locale: 'en-US' }) !== '—' || !utils.formatMoney(10, 'BRL', { locale: 'pt-BR' }).includes('BRL')) throw new Error('installed localized currency contract failed')
       const ueno = financial.logoDeBanco('ueno bank', 'compacto')
       if (!ueno?.visual?.asset?.startsWith('data:image/') || !ueno?.redistribucion?.permitida) throw new Error('asset autorizado de ueno ausente')
       const markup = renderToStaticMarkup(React.createElement(financial.BancoLogo, { banco: 'ueno bank', variante: 'compacto' }))

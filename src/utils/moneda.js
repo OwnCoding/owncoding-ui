@@ -164,6 +164,21 @@ export function formatUsd(value) {
 // su moneda y, cuando aplica, su cotización congelada en el backend. El símbolo
 // del guaraní se puede pisar con `{ simbolo }` (misma opción que `formatGs`).
 export function formatMoney(value, currency = 'PYG', opciones) {
+  // Explicit locale opts into strict, generalized presentation. Legacy calls
+  // retain their existing symbols, parsing and currency fallback unchanged.
+  if (opciones && typeof opciones === 'object' && opciones.locale !== undefined) {
+    const missing = opciones.vacio ?? '—'
+    const numeric = typeof value === 'number' || (typeof value === 'string' &&
+      /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value.trim()))
+    if (!numeric || !Number.isFinite(Number(value)) || typeof currency !== 'string' || !/^[A-Z]{3}$/.test(currency)) return missing
+    try {
+      return new Intl.NumberFormat(opciones.locale, {
+        ...opciones.numberFormatOptions,
+        style: 'currency', currency,
+        currencyDisplay: opciones.currencyDisplay ?? 'code',
+      }).format(Number(value))
+    } catch { return missing }
+  }
   return currency === 'USD' ? formatUsd(value) : formatGs(value, opciones)
 }
 

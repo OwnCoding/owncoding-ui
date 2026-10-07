@@ -321,6 +321,13 @@ export function codigoDeDispositivo(modelo?: any): string
 
 // ── Dinero, fechas, seriales, RUC y teléfono ────────────────────────────────
 
+/** Strict localized display is opt-in; no currency conversion is performed. */
+export type LocalizedMoneyOptions = {
+  locale: string
+  currencyDisplay?: 'code' | 'symbol' | 'narrowSymbol' | 'name'
+  numberFormatOptions?: Omit<Intl.NumberFormatOptions, 'style' | 'currency' | 'currencyDisplay'>
+  vacio?: string
+}
 export type OpcionesSimbolo = { simbolo?: string } | string
 /** `opciones` puede ser un vacío (`string`) o `{ vacio, simbolo }`. */
 export type OpcionesMonto = { vacio?: string; simbolo?: string }
@@ -335,7 +342,7 @@ export function parseGsInput(value: unknown): number
 export function formatUsd(value: unknown): string
 export function formatUsdInput(value: unknown): string
 export function parseUsdInput(value: unknown): string
-export function formatMoney(value: unknown, currency?: Moneda, opciones?: OpcionesSimbolo): string
+export function formatMoney(value: unknown, currency?: Moneda, opciones?: OpcionesSimbolo | LocalizedMoneyOptions): string
 export function montoGs(value: unknown, vacio?: string | OpcionesMonto, opciones?: OpcionesMonto): string
 export function montoUsd(value: unknown, vacio?: string | OpcionesMonto, opciones?: OpcionesMonto): string
 export function montoTexto(value: unknown, currency?: Moneda, vacio?: string | OpcionesMonto, opciones?: OpcionesMonto): string
