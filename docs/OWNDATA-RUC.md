@@ -89,7 +89,12 @@ No cambie de proveedor en cada render: una referencia nueva invalida la consulta
 Cambiar RUC/proveedor/disabled invalida resultados viejos; no se aplican sin confirmar.
 
 La galería conserva sus fixtures habituales y agrega un **contrato OwnData
-simulado** que usa el mapper real, con error deshabilitado o éxito ficticio explícito.
+simulado** que usa el mapper real: comienza con éxito ficticio y requiere confirmación
+manual. Ofrece tres empresas DEMO seleccionables; cada RUC devuelve solo su
+fixture exacto. Otros RUC muestran un error de ejemplo no disponible. El error
+de API deshabilitada se prueba mediante una casilla opcional; no refleja el
+estado de una consulta real. La procedencia del fixture usa una URI local
+`urn:owncoding-ui:local-demo`, no una publicación DNIT real.
 No hay llamadas a contribuyentes, claves, autorización comercial ni datos DNIT reales.
 
 ### Metadatos específicos de la fuente
@@ -103,8 +108,9 @@ y valores no textuales de `publishedText` se rechazan.
 ## Consulta de cuenta y base documental
 
 [Abrir consulta autenticada en OwnData](https://app.controlaria.online/panel/ruc)
-abre el endpoint web de cuenta existente: requiere sesión y correo verificado.
-El enlace no prueba que una nueva integración RucField esté desplegada. La galería
+abre la consulta web de cuenta existente: requiere sesión y respeta los límites
+y controles de disponibilidad de OwnData. No se exige correo verificado desde
+esta integración. La galería
 permanece simulada, sin peticiones reales, claves ni proxy propio implementado.
 
 La consulta de cuenta usa `POST /api/account/ruc` con cookies same-origin y

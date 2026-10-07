@@ -4,7 +4,7 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { RucField, createOwnDataRucProvider, mapOwnDataRucResponse, mapOwnDataRucError } from '../src/index.js'
 import { OwnDataIntegrationPreview, simulatedOwnDataEnvelope } from '../gallery/owndata-ruc-preview.jsx'
-afterEach(cleanup)
+afterEach(() => { cleanup(); vi.restoreAllMocks() })
 it.each([
   ['API_KEY_ENVIRONMENT_MISMATCH', 401, 'La clave de OwnData no corresponde al ambiente configurado. Complete los datos manualmente.'],
   ['FREE_API_DISABLED', 503, 'La API gratuita de OwnData está deshabilitada. Complete los datos manualmente.'],
@@ -104,15 +104,50 @@ it('RucField still requires explicit confirmation and drops stale adapter result
   resolve(simulatedOwnDataEnvelope()); await waitFor(() => expect(screen.queryByText('Usar estos datos')).toBeNull())
   expect(apply).not.toHaveBeenCalled()
 })
-it('gallery uses disabled/success simulated contract only; successful mapping still waits for confirmation', async () => {
+it('gallery succeeds by default, confirms manually, and recovers from opt-in failure', async () => {
+  const fetcher = vi.spyOn(globalThis, 'fetch')
   render(<OwnDataIntegrationPreview />)
-  fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
-  expect(await screen.findByRole('alert')).toHaveProperty('textContent', 'La API comercial de OwnData está deshabilitada.')
-  fireEvent.click(screen.getByRole('checkbox', { name: 'Simular API deshabilitada' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
+  const extract = () => fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
+  const failure = screen.getByRole('checkbox', { name: 'Probar error: API deshabilitada' })
+  expect(failure.checked).toBe(false)
+  extract()
   const confirm = await screen.findByRole('button', { name: 'Usar estos datos' })
   expect(screen.queryByText(/Confirmado solo en demo/)).toBeNull()
-  fireEvent.click(confirm); expect(screen.getByText(/Confirmado solo en demo/)).toBeTruthy()
+  fireEvent.click(confirm)
+  expect(screen.getByText(/Confirmado solo en demo/)).toBeTruthy()
+  fireEvent.click(failure)
+  expect(screen.queryByText(/Confirmado solo en demo/)).toBeNull()
+  extract()
+  expect(await screen.findByRole('alert')).toHaveProperty('textContent', 'La API comercial de OwnData está deshabilitada.')
+  fireEvent.click(failure)
+  extract()
+  expect(await screen.findByRole('button', { name: 'Usar estos datos' })).toBeTruthy()
+  expect(screen.queryByRole('alert')).toBeNull()
+  expect(fetcher).not.toHaveBeenCalled()
+})
+it('gallery offers distinct local companies, invalidates previous confirmation, and rejects unknown demo RUCs', async () => {
+  const fetcher = vi.spyOn(globalThis, 'fetch')
+  render(<OwnDataIntegrationPreview />)
+  const select = screen.getByRole('combobox', { name: 'Empresa de ejemplo' })
+  const input = screen.getByRole('textbox', { name: 'RUC de ejemplo OwnData' })
+  const names = new Set()
+  for (const option of Array.from(select.options).filter(item => item.value)) {
+    fireEvent.change(select, { target: { value: option.value } })
+    expect(screen.queryByText(/Confirmado solo en demo/)).toBeNull()
+    expect(input.value).toBe(option.value)
+    fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
+    const confirm = await screen.findByRole('button', { name: 'Usar estos datos' })
+    names.add(screen.getByText(/EMPRESA DEMO/, { selector: 'b' }).textContent)
+    fireEvent.click(confirm)
+    expect(screen.getByText(/Confirmado solo en demo/).textContent).toContain('DEMO')
+  }
+  expect(names.size).toBeGreaterThanOrEqual(3)
+  fireEvent.change(input, { target: { value: '99999999-1' } })
+  expect(screen.queryByText(/Confirmado solo en demo/)).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
+  expect((await screen.findByRole('alert')).textContent).toMatch(/RUC no incluido en esta demo/)
+  expect(screen.queryByRole('button', { name: 'Usar estos datos' })).toBeNull()
+  expect(fetcher).not.toHaveBeenCalled()
 })
 it('opt-in nine-digit RucField preserves base/full identity across controlled refeed and confirms without DV repair', async () => {
   const envelope = simulatedOwnDataEnvelope(); envelope.data.ruc = '123456789'; envelope.data.fullRuc = '123456789-6'
@@ -169,9 +204,33 @@ it('links the existing authenticated account surface without turning the gallery
   const link = screen.getByRole('link', { name: 'Abrir consulta autenticada en OwnData' })
   expect(link.getAttribute('href')).toBe('https://app.controlaria.online/panel/ruc')
   expect(link.getAttribute('target')).toBe('_blank')
-  expect(screen.getByText(/no acredita el despliegue de una nueva integración RucField/)).toBeTruthy()
-  expect(screen.getByText(/no envía consultas reales ni incluye claves/)).toBeTruthy()
-  expect(screen.getByRole('checkbox', { name: 'Simular API deshabilitada' }).checked).toBe(true)
+  expect(screen.getByText(/La consulta real requiere iniciar sesión en OwnData/)).toBeTruthy()
+  expect(screen.getByText(/no realiza consultas reales ni incluye claves/)).toBeTruthy()
+  expect(screen.getByRole('checkbox', { name: 'Probar error: API deshabilitada' }).checked).toBe(false)
   expect(fetcher).not.toHaveBeenCalled()
   fetcher.mockRestore()
+})
+
+it('local fixtures preserve request identity and never repair a mismatched DV', () => {
+  for (const fullRuc of ['80012345-6', '80054321-2', '80098765-4']) {
+    const base = fullRuc.split('-')[0]
+    for (const requested of [base, fullRuc]) {
+      const envelope = simulatedOwnDataEnvelope(requested)
+      expect(mapOwnDataRucResponse(envelope, requested).fullRuc).toBe(fullRuc)
+      expect(envelope.meta.provenance.sourcePage).toBe('urn:owncoding-ui:local-demo')
+      expect(envelope.meta.provenance.publishedText).toContain('no publicación real')
+    }
+  }
+  expect(simulatedOwnDataEnvelope('80012345-7').error.code).toBe('REGISTERED_RUC_NOT_FOUND')
+})
+it('demo rejects letters and discards pending results when the company changes', async () => {
+  render(<OwnDataIntegrationPreview />)
+  const input = screen.getByRole('textbox', { name: 'RUC de ejemplo OwnData' })
+  fireEvent.change(input, { target: { value: 'letters' } })
+  expect(input.value).toBe('80012345-6')
+  fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
+  await screen.findByRole('button', { name: 'Usar estos datos' })
+  fireEvent.change(screen.getByRole('combobox', { name: 'Empresa de ejemplo' }), { target: { value: '80054321-2' } })
+  expect(screen.queryByRole('button', { name: 'Usar estos datos' })).toBeNull()
+  expect(screen.queryByText(/Confirmado solo en demo/)).toBeNull()
 })
