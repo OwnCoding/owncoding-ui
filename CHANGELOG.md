@@ -6,6 +6,22 @@ documenta acá y en el README).
 
 ## Sin publicar
 
+- **Dependencias de desarrollo (seguridad, 2026-10-07):** `source-map-js`
+  actualiza a 1.2.2 y `postcss-selector-parser` a 7.1.6 mediante `overrides`.
+  En este lockfile, `npm audit` pasa de 8 avisos (6 altos, 2 moderados) a 5
+  altos; `npm audit --omit=dev` informa 0 antes y después. Este resultado no
+  audita los árboles de dependencias propios de las aplicaciones consumidoras.
+  El CSS generado de la biblioteca y la galería permanece idéntico byte a byte.
+- **Seguimiento de seguridad:** los 5 avisos restantes corresponden a `braces`
+  y su cadena de herramientas de Tailwind 3.4 (`chokidar`, `micromatch`,
+  `fast-glob`, `tailwindcss`). [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+  no publica una versión corregida al 2026-10-07: patrones de llaves muy
+  anidados pueden agotar la pila de Node.js. No se deben procesar patrones no
+  confiables durante el build. `npm audit` propone Tailwind 4.3.3 como cambio
+  mayor; esta actualización conserva Tailwind 3 y el preset existente. Una
+  migración requiere validar la compatibilidad de las aplicaciones; el riesgo
+  pendiente no se considera resuelto ni formalmente aceptado por este cambio.
+
 - **Previews de la galería:** teléfono, ciudad, cliente/RUC, campos inteligentes y
   medios de pago adoptan la identidad 2026 (`gallery/previews.css`): resultados en
   panel de tinta con etiquetas mono, ejemplos con estado lleno en cobalto y campos
