@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { BANCOS_PARAGUAY, normalizarBanco, sugerenciasDeBanco, resolveInstitution } from '../utils/bancos.js'
 import { Input } from './ui.jsx'
 import BancoLogo from './BancoLogo.jsx'
+import { logoDeBanco } from '../financial/resolvers.js'
 import { cn } from '../utils/cn.js'
 import useComboboxNavigation from '../hooks/useComboboxNavigation.js'
 
@@ -21,6 +22,8 @@ export default function BancoCombobox({
   className,
   catalogo = BANCOS_PARAGUAY,
   logoProps,
+  showSelectedLogo = true,
+  showHorizontalLogo = true,
 }) {
   const [abierto, setAbierto] = useState(false)
   const raiz = useRef(null)
@@ -43,6 +46,7 @@ export default function BancoCombobox({
     setAbierto(false)
   }
 
+  const selectedLogo = showSelectedLogo && logoDeBanco(value, 'compacto')?.visual?.archivo
   const listaVisible = abierto && sugerencias.length > 0
   const navegacion = useComboboxNavigation({
     options: sugerencias,
@@ -54,7 +58,9 @@ export default function BancoCombobox({
 
   return (
     <div ref={raiz} className={cn('relative', className)}>
+      {selectedLogo && <span data-bank-selected className="pointer-events-none absolute left-3 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center"><BancoLogo banco={value} variante="compacto" alto="h-7" decorativo {...logoProps} /></span>}
       <Input
+        className={selectedLogo ? 'pl-12' : undefined}
         id={id}
         ref={navegacion.inputRef}
         role="combobox"
@@ -88,6 +94,7 @@ export default function BancoCombobox({
             >
               <BancoLogo banco={banco} variante="compacto" alto="h-6" decorativo {...logoProps} />
               <span className="min-w-0 flex-1 truncate">{banco}</span>
+              {showHorizontalLogo && logoDeBanco(banco, 'horizontal')?.visual?.archivo && <BancoLogo banco={banco} alto="h-6" className="hidden max-w-24 shrink-0 sm:inline-flex" decorativo {...logoProps} variante="horizontal" />}
             </li>
           ))}
         </ul>

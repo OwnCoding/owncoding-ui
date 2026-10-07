@@ -944,7 +944,7 @@ export function AvisoPrivacidad(props: { finalidad?: ReactNode; detalle?: ReactN
 export function ConsentimientoDatos(props: { checked?: boolean; onChange?: (event: any) => void; finalidad?: ReactNode; detalle?: ReactNode; politicaUrl?: string; politicaTexto?: string; onPolitica?: (evento: any) => void; version?: string | number; error?: ReactNode; disabled?: boolean; required?: boolean; id?: string; className?: string; [clave: string]: any }): ReactElement
 export function AjustesImpresion(props: Record<string, any> & { impresoras?: any[]; onGuardar?: (ajustes: any) => void }): ReactElement
 export function BotonImprimir(props: Record<string, any> & { onImprimir?: () => void; etiqueta?: string }): ReactElement
-export function BancoCombobox(props: Record<string, any> & { value?: string; onChange?: (valor: string) => void; onSelect?: (banco: string) => void; onIdentitySelect?: (result: CatalogResolution<InstitutionIdentity, unknown>) => void }): ReactElement
+export function BancoCombobox(props: Record<string, any> & { showSelectedLogo?: boolean; showHorizontalLogo?: boolean; value?: string; onChange?: (valor: string) => void; onSelect?: (banco: string) => void; onIdentitySelect?: (result: CatalogResolution<InstitutionIdentity, unknown>) => void }): ReactElement
 /** @deprecated Usá `compacto`. Se mantendrá por al menos dos releases menores. */
 export type VarianteLogoFinancieroLegacy = 'compact'
 export type VarianteLogoFinanciero = 'compacto' | 'horizontal' | VarianteLogoFinancieroLegacy
