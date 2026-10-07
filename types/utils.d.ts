@@ -141,6 +141,35 @@ export type CoberturaMarcaFinanciera = {
   variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
 }
 
+/** Explicit OwnCoding identifiers; never official institution or government codes. */
+export type CatalogProvenance = Readonly<{
+  identifierScheme: 'owncoding-internal'
+  sourceUrl: string
+  verifiedAt?: string
+  status?: 'inherited-catalog'
+  source?: string
+}>
+export type InstitutionIdentity = Readonly<{
+  id: string
+  name: string
+  category: string
+  aliases: readonly string[]
+  provenance: CatalogProvenance
+}>
+export type LocalityIdentity = Readonly<{
+  id: string
+  city: string
+  department: string
+  provenance: CatalogProvenance
+}>
+export type CatalogResolution<RecordType, InputType> =
+  | { status: 'resolved'; input: InputType; record: RecordType; matchedBy: 'id' | 'name' | 'alias' | 'historical'; historicalName?: string }
+  | { status: 'unknown' | 'ambiguous'; input: InputType; record: null }
+export const INSTITUTIONS_PARAGUAY: readonly InstitutionIdentity[]
+export function resolveInstitution(input: unknown): CatalogResolution<InstitutionIdentity, unknown>
+export const LOCALITIES_PARAGUAY: readonly LocalityIdentity[]
+export function resolveLocality(city: unknown, department?: unknown, catalog?: readonly LocalityIdentity[]): CatalogResolution<LocalityIdentity, { city: unknown; department: unknown }>
+
 export const BANCOS_PARAGUAY: string[]
 export const BANCOS_Y_FINANCIERAS_PARAGUAY: string[]
 export const COOPERATIVAS_PARAGUAY: string[]

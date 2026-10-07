@@ -7,48 +7,42 @@ import { institucionesSugeridasPorMarca } from './relacionesFinancieras.js'
 
 export const FECHA_VERIFICACION_MARCAS_FINANCIERAS = '2026-10-02'
 
-// User-curated selectable catalog; legacy metadata remains available separately.
-export const BANCOS_Y_FINANCIERAS_PARAGUAY = [
-  'Banco Atlas',
-  'Banco Basa',
-  'Banco Continental',
-  'Banco de la Nación Argentina',
-  'Banco Familiar',
-  'Banco GNB Paraguay',
-  'Interfisa Banco',
-  'Itaú',
-  'Banco Nacional de Fomento',
-  'Sudameris',
-  'Bancop',
-  'Citi',
-  'Financiera FIC',
-  'Financiera Paraguayo Japonesa',
-  'Finlatina',
-  'Solar Banco',
-  'Tu Financiera',
-  'ueno bank',
-  'Zeta Banco',
+// Internal IDs are explicit, never derived from display labels or row positions.
+// Keep an existing ID when renaming a label; append new identities, never reuse IDs.
+const INSTITUTION_IDENTITIES = [
+  ['oc:institution:py:001', 'Banco Atlas'],
+  ['oc:institution:py:002', 'Banco Basa'],
+  ['oc:institution:py:003', 'Banco Continental'],
+  ['oc:institution:py:004', 'Banco de la Nación Argentina'],
+  ['oc:institution:py:005', 'Banco Familiar'],
+  ['oc:institution:py:006', 'Banco GNB Paraguay'],
+  ['oc:institution:py:007', 'Interfisa Banco'],
+  ['oc:institution:py:008', 'Itaú'],
+  ['oc:institution:py:009', 'Banco Nacional de Fomento'],
+  ['oc:institution:py:010', 'Sudameris'],
+  ['oc:institution:py:011', 'Bancop'],
+  ['oc:institution:py:012', 'Citi'],
+  ['oc:institution:py:013', 'Financiera FIC'],
+  ['oc:institution:py:014', 'Financiera Paraguayo Japonesa'],
+  ['oc:institution:py:015', 'Finlatina'],
+  ['oc:institution:py:016', 'Solar Banco'],
+  ['oc:institution:py:017', 'Tu Financiera'],
+  ['oc:institution:py:018', 'ueno bank'],
+  ['oc:institution:py:019', 'Zeta Banco'],
+  ['oc:institution:py:020', 'Coomecipar'],
+  ['oc:institution:py:021', 'Medalla Milagrosa'],
+  ['oc:institution:py:022', 'San Cristóbal'],
+  ['oc:institution:py:023', 'Universitaria'],
+  ['oc:institution:py:024', 'Luque'],
+  ['oc:institution:py:025', 'Coopeduc'],
+  ['oc:institution:py:026', 'Capiatá'],
+  ['oc:institution:py:027', 'Ñemby'],
+  ['oc:institution:py:028', 'Lambaré'],
+  ['oc:institution:py:029', 'Coodeñe'],
+  ['oc:institution:py:030', 'Mburicaó'],
+  ['oc:institution:py:031', 'Mercado Nº 4'],
+  ['oc:institution:py:032', 'San Lorenzo'],
 ]
-
-export const COOPERATIVAS_PARAGUAY = [
-  'Coomecipar',
-  'Medalla Milagrosa',
-  'San Cristóbal',
-  'Universitaria',
-  'Luque',
-  'Coopeduc',
-  'Capiatá',
-  'Ñemby',
-  'Lambaré',
-  'Coodeñe',
-  'Mburicaó',
-  'Mercado Nº 4',
-  'San Lorenzo',
-]
-
-// Conserva el nombre histórico de la exportación. La categoría real de cada
-// entrada vive en LOGOS_BANCOS y también se publican los dos subconjuntos.
-export const BANCOS_PARAGUAY = [...BANCOS_Y_FINANCIERAS_PARAGUAY, ...COOPERATIVAS_PARAGUAY]
 
 const EMPAQUETADO = (archivo, estado = 'oficial', presentacion = {}) => ({ tipo: 'archivo', archivo, estado, empaquetado: `bancos/${archivo}`, ...presentacion })
 const CONTENIDO = (archivo, estado = 'oficial', presentacion = {}) => ({ ...EMPAQUETADO(archivo, estado, presentacion), tipo: 'horizontal-contained' })
@@ -277,6 +271,43 @@ export const LOGOS_BANCOS = {
   'Financiera El Comercio': { redirigeA: 'ueno bank', alias: ['el comercio'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   'Visión Banco': { redirigeA: 'ueno bank', alias: ['vision', 'banco vision', 'visión'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
   'Banco Río': { redirigeA: 'Banco Continental', alias: ['rio', 'banco rio', 'banco río'], categoria: 'legado', estado: 'legado', verificadoEn: FECHA_VERIFICACION_MARCAS_FINANCIERAS },
+}
+
+// Metadata reuses the existing institution source, aliases and historical redirects.
+export const INSTITUTIONS_PARAGUAY = Object.freeze(INSTITUTION_IDENTITIES.map(([id, name]) => {
+  const metadata = LOGOS_BANCOS[name]
+  return Object.freeze({
+    id, name, category: metadata.categoria,
+    aliases: Object.freeze([...(metadata.alias || [])]),
+    provenance: Object.freeze({
+      identifierScheme: 'owncoding-internal',
+      sourceUrl: metadata.fuenteOficial,
+      verifiedAt: metadata.verificadoEn,
+    }),
+  })
+}))
+
+// Preserve legacy ordering and shapes, deriving subsets from category, not row position.
+export const BANCOS_Y_FINANCIERAS_PARAGUAY = INSTITUTIONS_PARAGUAY.filter(record => record.category !== 'cooperativa').map(record => record.name)
+export const COOPERATIVAS_PARAGUAY = INSTITUTIONS_PARAGUAY.filter(record => record.category === 'cooperativa').map(record => record.name)
+export const BANCOS_PARAGUAY = INSTITUTIONS_PARAGUAY.map(record => record.name)
+
+const INSTITUTIONS_BY_ID = new Map(INSTITUTIONS_PARAGUAY.map(record => [record.id, record]))
+const INSTITUTIONS_BY_NAME = new Map(INSTITUTIONS_PARAGUAY.map(record => [record.name, record]))
+
+export function resolveInstitution(input) {
+  const unknown = { status: 'unknown', input, record: null }
+  if (typeof input !== 'string' || !input.trim()) return unknown
+  const byId = INSTITUTIONS_BY_ID.get(input)
+  if (byId) return { status: 'resolved', input, record: byId, matchedBy: 'id' }
+  const resolved = resolverEntrada(input)
+  const record = resolved && INSTITUTIONS_BY_NAME.get(resolved.nombre)
+  if (!record) return unknown
+  return {
+    status: 'resolved', input, record,
+    matchedBy: resolved.aliasHistorico ? 'historical' : input.trim() === record.name ? 'name' : 'alias',
+    ...(resolved.aliasHistorico ? { historicalName: resolved.aliasHistorico } : {}),
+  }
 }
 
 export const COLORES_BANCO_RESPALDO = ['#33414F', '#1D4E9E', '#0B6E4F', '#8A3A1B', '#6C3FA0', '#12659E']

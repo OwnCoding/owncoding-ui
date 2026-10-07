@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Input } from './ui.jsx'
-import { buscarCiudad, departamentoDe } from '../catalog/ciudades.js'
+import { buscarCiudad, departamentoDe, resolveLocality } from '../catalog/ciudades.js'
 import { cn } from '../utils/cn.js'
 import useComboboxNavigation from '../hooks/useComboboxNavigation.js'
 
@@ -29,6 +29,7 @@ function departamentoDeFila(fila) {
 export default function CityAutocomplete({
   value = '',
   onSelect,
+  onIdentitySelect,
   onChange,
   placeholder = 'Ej: Asunción, Ciudad del Este…',
   disabled = false,
@@ -135,6 +136,7 @@ export default function CityAutocomplete({
     // si no, queda vacío hasta que el usuario elija una sugerencia.
     onChange?.(texto)
     onSelect?.(texto, departamentoDe(texto))
+    onIdentitySelect?.(resolveLocality(texto))
     resolver(texto)
   }
 
@@ -145,6 +147,7 @@ export default function CityAutocomplete({
     activeQuery.current = String(ciudad || '').trim()
     onChange?.(ciudad)
     onSelect?.(ciudad, departamento)
+    onIdentitySelect?.(resolveLocality(ciudad, departamento))
     setSugerencias([])
     setAbierto(false)
   }
@@ -162,7 +165,10 @@ export default function CityAutocomplete({
     // Al salir del campo, si tipearon una ciudad del catálogo, el departamento
     // se completa igual (dependiente de la ciudad).
     const departamento = departamentoDe(value)
-    if (departamento) onSelect?.(value, departamento)
+    if (departamento) {
+      onSelect?.(value, departamento)
+      onIdentitySelect?.(resolveLocality(value, departamento))
+    }
   }
 
   return (

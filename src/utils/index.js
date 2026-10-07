@@ -13,6 +13,8 @@
 export { cn, primerNombre } from './cn.js'
 export { normalizarNombre, nombrePartes, esApellidosPrimero, esRazonSocial } from './nombre.js'
 export {
+  INSTITUTIONS_PARAGUAY,
+  resolveInstitution,
   BANCOS_PARAGUAY,
   BANCOS_Y_FINANCIERAS_PARAGUAY,
   COOPERATIVAS_PARAGUAY,
@@ -66,7 +68,7 @@ export { RESULTADOS_VALIDOS, mensajeResultado, mensajeFallo } from './resultado.
 export { ROTULO_DATO, CELDA_ENCABEZADO, ROTULO_SECCION, CELDA_DATO, CELDA_NUMERO, CELDA_IDENTIDAD, CELDA_IDENTIDAD_GRANDE } from './tabla.js'
 
 // ── Catálogos por defecto ───────────────────────────────────────────────────
-export { CIUDADES_PARAGUAY, DEPARTAMENTOS_PARAGUAY, departamentoDe, buscarCiudad } from '../catalog/ciudades.js'
+export { LOCALITIES_PARAGUAY, resolveLocality, CIUDADES_PARAGUAY, DEPARTAMENTOS_PARAGUAY, departamentoDe, buscarCiudad } from '../catalog/ciudades.js'
 export {
   MODELOS_IPHONE,
   CAPACIDADES_IPHONE,
