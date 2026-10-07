@@ -28,10 +28,18 @@ no reintenta y no inventa razón social, teléfono, correo o domicilio.
   mensaje upstream, claves ni causa. Excepción de transporte produce
   `OWNDATA_TRANSPORT_ERROR`; no hay retry automático.
 - Códigos: 400 `INVALID_RUC_FORMAT`; 401 `API_KEY_REQUIRED`, `API_KEY_INVALID`,
-  `API_KEY_REVOKED`, `API_KEY_EXPIRED`, `ENVIRONMENT_MISMATCH`; 403
+  `API_KEY_REVOKED`, `API_KEY_EXPIRED`, `API_KEY_ENVIRONMENT_MISMATCH`; 403
   `INSUFFICIENT_SCOPE`, `PLAN_REQUIRED`; 404 `REGISTERED_RUC_NOT_FOUND`; 429
-  `DAILY_QUOTA_REACHED`; 503 `COMMERCIAL_API_DISABLED`, `COMMERCIAL_API_UNAVAILABLE`,
-  `DNIT_DATA_UNAVAILABLE`. Código desconocido falla cerrado con mensaje genérico.
+  `DAILY_QUOTA_REACHED`; 503 `FREE_API_DISABLED`, `COMMERCIAL_API_DISABLED`,
+  `COMMERCIAL_API_UNAVAILABLE`, `DNIT_DATA_UNAVAILABLE`. El código anterior
+  `ENVIRONMENT_MISMATCH` sigue reconocido como 401 por compatibilidad.
+  Un código desconocido o no textual falla cerrado con mensaje genérico.
+
+El [contrato OpenAPI 1.1.0](https://app.controlaria.online/api/v1/openapi.json)
+documenta `API_KEY_ENVIRONMENT_MISMATCH` (401) y `FREE_API_DISABLED` (503).
+El adaptador muestra mensajes propios para estos estados y mantiene la entrada
+manual disponible, sin aplicar datos, reintentar ni habilitar ningún servicio.
+Nunca muestra mensajes ni cuerpos de diagnóstico del proveedor.
 
 ## Backend de la aplicación (ejemplo, no ruta implementada por la biblioteca)
 

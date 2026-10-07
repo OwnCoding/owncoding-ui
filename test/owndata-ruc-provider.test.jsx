@@ -1,10 +1,50 @@
 // @vitest-environment jsdom
-import React from 'react'
+import React, { useState } from 'react'
 import { afterEach, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { RucField, createOwnDataRucProvider, mapOwnDataRucResponse, mapOwnDataRucError } from '../src/index.js'
 import { OwnDataIntegrationPreview, simulatedOwnDataEnvelope } from '../gallery/owndata-ruc-preview.jsx'
 afterEach(cleanup)
+it.each([
+  ['API_KEY_ENVIRONMENT_MISMATCH', 401, 'La clave de OwnData no corresponde al ambiente configurado. Complete los datos manualmente.'],
+  ['FREE_API_DISABLED', 503, 'La API gratuita de OwnData está deshabilitada. Complete los datos manualmente.'],
+])('maps current contract code %s to safe actionable text', (code, status, message) => {
+  const error = mapOwnDataRucError({ error: { code, message: 'unsafe-provider-detail', retryAfter: 9 }, requestId: 'req-safe' })
+  expect(error).toMatchObject({ code, status, message, requestId: 'req-safe' })
+  expect(error.retryAfter).toBeUndefined()
+  expect(String(error)).not.toContain('unsafe-provider-detail')
+})
+it.each([undefined, null, 401, {}, ['API_KEY_INVALID'], '__proto__', 'toString', 'unsafe-provider-detail'])('fails closed for unknown or non-string code %j', code => {
+  const error = mapOwnDataRucError({ error: { code, message: 'unsafe-provider-detail' }, requestId: 'unsafe\nprovider-detail', body: 'unsafe-provider-detail' })
+  expect(error).toMatchObject({ code: 'OWNDATA_INVALID_RESPONSE', status: 502 })
+  expect(error.message).toBe('No se pudo consultar OwnData. Complete los datos manualmente.')
+  expect(error).not.toHaveProperty('requestId')
+  expect(error).not.toHaveProperty('body')
+  expect(error).not.toHaveProperty('cause')
+  expect(String(error)).not.toContain('unsafe-provider-detail')
+})
+it.each(['API_KEY_ENVIRONMENT_MISMATCH', 'FREE_API_DISABLED', 'ENVIRONMENT_MISMATCH', 'UNKNOWN_PROVIDER_ERROR'])('keeps manual entry available after %s without retrying or applying data', async code => {
+  const lookup = vi.fn(async () => ({ error: { code, message: 'unsafe-provider-detail' } }))
+  const provider = createOwnDataRucProvider({ lookup }), apply = vi.fn()
+  function ManualEntry() {
+    const [ruc, setRuc] = useState('80012345-6'), [name, setName] = useState('Manual name')
+    return <><RucField ariaLabel="RUC" value={ruc} onChange={setRuc} consultar={provider} onAplicar={apply} />
+      <input aria-label="Legal name" value={name} onChange={event => setName(event.target.value)} /></>
+  }
+  render(<ManualEntry />)
+  fireEvent.click(screen.getByRole('button', { name: 'Extraer los datos del RUC' }))
+  const alert = await screen.findByRole('alert')
+  expect(alert.textContent).not.toContain('unsafe-provider-detail')
+  expect(screen.getByRole('textbox', { name: 'RUC' }).disabled).toBe(false)
+  expect(screen.getByRole('textbox', { name: 'Legal name' }).value).toBe('Manual name')
+  fireEvent.change(screen.getByRole('textbox', { name: 'Legal name' }), { target: { value: 'Edited manually' } })
+  fireEvent.change(screen.getByRole('textbox', { name: 'RUC' }), { target: { value: '80054321-2' } })
+  expect(screen.getByRole('textbox', { name: 'Legal name' }).value).toBe('Edited manually')
+  expect(screen.getByRole('textbox', { name: 'RUC' }).value).toBe('80054321-2')
+  expect(screen.queryByRole('button', { name: 'Usar estos datos' })).toBeNull()
+  expect(apply).not.toHaveBeenCalled()
+  expect(lookup).toHaveBeenCalledExactlyOnceWith('80012345-6')
+})
 it('preserves exact official identity, raw state and whitelisted snapshot metadata without inventing contacts', () => {
   const envelope = simulatedOwnDataEnvelope(); envelope.data.nameOfficial = '  RAZÓN OFICIAL, S.A.  '
   envelope.data.email = 'unexpected-secret'; envelope.meta.extraSecret = 'secret'
