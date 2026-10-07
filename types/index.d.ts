@@ -98,7 +98,27 @@ export const MoneyInput: ForwardRefExoticComponent<
   } & RefAttributes<HTMLInputElement>
 >
 
-export function Money(props: { value: number | string | null | undefined; currency?: Moneda; simbolo?: string; className?: string }): ReactElement
+export type QuotePresentationStatus = 'fresh' | 'stale' | 'loading' | 'unavailable'
+export type CurrencyConversionLabels = Partial<Record<'title' | 'original' | 'converted' | 'rate' | 'source' | 'asOf' | 'fresh' | 'stale' | 'loading' | 'unavailable' | 'missing', string>>
+export type CurrencyConversionProps = {
+  originalAmount: number | string | null | undefined
+  originalCurrency: string
+  convertedAmount?: number | string | null
+  convertedCurrency?: string
+  rate?: number | null
+  source?: string | null
+  /** ISO 8601 date-time including Z or an explicit UTC offset. */
+  asOf?: string | null
+  status?: QuotePresentationStatus
+  locale?: string
+  timeZone?: string
+  labels?: CurrencyConversionLabels
+  amountFormatOptions?: LocalizedMoneyOptions['numberFormatOptions']
+  rateFormatOptions?: Omit<Intl.NumberFormatOptions, 'style' | 'currency'>
+  className?: string
+}
+export function CurrencyConversion(props: CurrencyConversionProps): ReactElement
+export function Money(props: { value: number | string | null | undefined; currency?: Moneda; simbolo?: string; className?: string; locale?: string; currencyDisplay?: LocalizedMoneyOptions['currencyDisplay']; numberFormatOptions?: LocalizedMoneyOptions['numberFormatOptions']; vacio?: string }): ReactElement
 
 export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>
 export function Select(props: SelectProps): ReactElement
@@ -1607,6 +1627,13 @@ export function buscarEnCatalogo(consulta: string, catalogo?: any[]): any[]
 
 // ── Dinero ─────────────────────────────────────────────────────────────────
 
+/** Strict localized display is opt-in; no currency conversion is performed. */
+export type LocalizedMoneyOptions = {
+  locale: string
+  currencyDisplay?: 'code' | 'symbol' | 'narrowSymbol' | 'name'
+  numberFormatOptions?: Omit<Intl.NumberFormatOptions, 'style' | 'currency' | 'currencyDisplay'>
+  vacio?: string
+}
 export type OpcionesSimbolo = { simbolo?: string } | string
 /** `opciones` puede ser un vacío (`string`) o `{ vacio, simbolo }`. */
 export type OpcionesMonto = { vacio?: string; simbolo?: string }
@@ -1629,7 +1656,7 @@ export function formatUsdInput(value: unknown): string
 export function parseUsdInput(value: unknown): string
 export function normalizarMontoInput(texto: unknown, moneda?: Moneda, opciones?: { integerOnly?: boolean }): string
 export function caretTrasDigitos(display: string, digitos: number): number
-export function formatMoney(value: unknown, currency?: Moneda, opciones?: OpcionesSimbolo): string
+export function formatMoney(value: unknown, currency?: Moneda, opciones?: OpcionesSimbolo | LocalizedMoneyOptions): string
 export function montoGs(value: unknown, vacio?: string | OpcionesMonto, opciones?: OpcionesMonto): string
 export function montoUsd(value: unknown, vacio?: string | OpcionesMonto, opciones?: OpcionesMonto): string
 export function montoTexto(value: unknown, currency?: Moneda, vacio?: string | OpcionesMonto, opciones?: OpcionesMonto): string
