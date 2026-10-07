@@ -4,6 +4,8 @@ export type DetalleCorreo = Readonly<{ etiqueta: string; valor: string }>
 export type AccionCorreo = Readonly<{ etiqueta: string; url: string }>
 export type CorreoTransaccional = Readonly<{
   identidad: AppIdentity
+  tema?: 'editorial'
+  idioma?: 'es' | 'en'
   asunto: string
   preheader: string
   motivo: string
@@ -15,6 +17,8 @@ export type CorreoTransaccional = Readonly<{
 
 export function crearCorreoTransaccional(datos: {
   identidad: AppIdentity | Parameters<typeof import('./utils.js').crearIdentidadApp>[0]
+  tema?: 'editorial'
+  idioma?: 'es' | 'en'
   asunto: string
   preheader?: string
   motivo: string

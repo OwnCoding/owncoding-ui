@@ -51,9 +51,13 @@ export function crearCorreoTransaccional({
   motivo,
   detalles = [],
   accion,
-  cierre = 'Si no solicitaste esta acción, podés ignorar este correo.',
+  cierre,
   firma,
+  tema,
+  idioma = 'es',
 } = {}) {
+  if (tema !== undefined && tema !== 'editorial') throw new TypeError('tema no admitido')
+  if (!['es', 'en'].includes(idioma)) throw new TypeError('idioma no admitido')
   const app = normalizarIdentidad(identidad)
   const asuntoSeguro = texto(asunto, 'asunto', true)
   const motivoSeguro = texto(motivo, 'motivo', true)
@@ -66,13 +70,15 @@ export function crearCorreoTransaccional({
 
   return Object.freeze({
     identidad: app,
+    ...(tema ? { tema } : {}),
+    ...(idioma === 'en' ? { idioma } : {}),
     asunto: asuntoSeguro,
     preheader: texto(preheader || motivoSeguro, 'preheader'),
     motivo: motivoSeguro,
     detalles: Object.freeze((Array.isArray(detalles) ? detalles : []).map(congelarDetalle)),
     accion: accionSegura,
-    cierre: texto(cierre, 'cierre'),
-    firma: texto(firma || `${app.nombre} · Desarrollado por Owncoding`, 'firma', true),
+    cierre: texto(cierre === undefined ? (idioma === 'en' ? 'If you did not request this action, you can ignore this email.' : 'Si no solicitaste esta acción, podés ignorar este correo.') : cierre, 'cierre'),
+    firma: texto(firma || `${app.nombre} · ${idioma === 'en' ? 'Developed by Owncoding' : 'Desarrollado por Owncoding'}`, 'firma', true),
   })
 }
 
@@ -111,29 +117,39 @@ export function renderCorreoHtml(correo) {
   const modelo = correoSeguro(correo)
   const app = modelo.identidad
   const e = escaparCorreoHtml
-  const colorAccion = colorSobre(app.color)
+  const editorial = modelo.tema === 'editorial'
+  const ink = editorial ? '#0B1220' : COLOR_TEXTO
+  const muted = editorial ? '#5A6478' : COLOR_SUAVE
+  const border = editorial ? '#D9DEE7' : COLOR_BORDE
+  const action = editorial ? '#1D4ED8' : app.color
+  const wrap = editorial ? ';overflow-wrap:anywhere;word-break:break-word' : ''
+  const colorAccion = colorSobre(action)
+  const fallback = modelo.idioma === 'en' ? 'If the button does not work, open this link:' : 'Si el botón no funciona, abrí este enlace:'
   const detalles = modelo.detalles.length > 0
-    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0;border-collapse:collapse">${modelo.detalles.map(({ etiqueta, valor }) => `<tr><th scope="row" align="left" style="padding:10px 12px;border-bottom:1px solid ${COLOR_BORDE};color:${COLOR_SUAVE};font-size:13px;font-weight:600">${e(etiqueta)}</th><td align="right" style="padding:10px 12px;border-bottom:1px solid ${COLOR_BORDE};color:${COLOR_TEXTO};font-size:14px">${e(valor)}</td></tr>`).join('')}</table>`
+    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0;border-collapse:collapse">${modelo.detalles.map(({ etiqueta, valor }) => `<tr><th scope="row" align="left" style="padding:10px 12px;border-bottom:1px solid ${border};color:${muted};font-size:13px;font-weight:600${wrap}">${e(etiqueta)}</th><td align="right" style="padding:10px 12px;border-bottom:1px solid ${border};color:${ink};font-size:14px${wrap}">${e(valor)}</td></tr>`).join('')}</table>`
     : ''
   const accion = modelo.accion
-    ? `<div style="margin:28px 0;text-align:center"><a href="${e(modelo.accion.url)}" style="display:inline-block;min-height:44px;box-sizing:border-box;border-radius:10px;background:${e(app.color)};color:${colorAccion};font-size:15px;font-weight:700;line-height:24px;padding:10px 20px;text-decoration:none">${e(modelo.accion.etiqueta)}</a><p style="margin:16px 0 0;color:${COLOR_SUAVE};font-size:12px;line-height:18px;overflow-wrap:anywhere">Si el botón no funciona, abrí este enlace:<br><a href="${e(modelo.accion.url)}" style="color:${e(app.color)}">${e(modelo.accion.url)}</a></p></div>`
+    ? `<div style="margin:28px 0;text-align:center"><a href="${e(modelo.accion.url)}" style="display:inline-block;min-height:44px;box-sizing:border-box;border-radius:10px;background:${e(action)};color:${colorAccion};font-size:15px;font-weight:700;line-height:24px;padding:10px 20px;text-decoration:none">${e(modelo.accion.etiqueta)}</a><p style="margin:16px 0 0;color:${muted};font-size:12px;line-height:18px;overflow-wrap:anywhere">${fallback}<br><a href="${e(modelo.accion.url)}" style="color:${e(action)}">${e(modelo.accion.url)}</a></p></div>`
     : ''
   const logo = app.logoUrl && /^https?:\/\//i.test(app.logoUrl)
     ? `<img src="${e(app.logoUrl)}" width="48" height="48" alt="" style="display:block;margin:0 0 16px;border:0;border-radius:12px">`
     : ''
 
+  const header = editorial
+    ? `<tr><td style="padding:28px 24px;background:#0B1220;border-bottom:4px solid #60A5FA;border-radius:16px 16px 0 0">${logo}<p style="margin:0;color:#F5F7FA;font-family:Arial,sans-serif;font-size:26px;font-weight:700;letter-spacing:-.02em">${e(app.nombre)}</p></td></tr>`
+    : ''
   return `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(modelo.asunto)}</title></head>
-<body style="margin:0;background:#f1f4f8;color:${COLOR_TEXTO};font-family:Inter,Arial,sans-serif">
+<html lang="${modelo.idioma ?? 'es'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(modelo.asunto)}</title></head>
+<body style="margin:0;background:${editorial ? '#F5F7FA' : '#f1f4f8'};color:${ink};font-family:Inter,Arial,sans-serif">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(modelo.preheader)}</div>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;border:1px solid ${COLOR_BORDE};border-radius:16px;background:#ffffff"><tr><td style="padding:32px">
-${logo}<p style="margin:0 0 8px;color:${COLOR_SUAVE};font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">${e(app.nombre)}</p>
-<h1 style="margin:0 0 18px;color:${COLOR_TEXTO};font-size:24px;line-height:32px">${e(modelo.asunto)}</h1>
-<p style="margin:0;color:${COLOR_TEXTO};font-size:16px;line-height:26px">${e(modelo.motivo)}</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;border:1px solid ${border};border-radius:16px;background:#ffffff">${header}<tr><td style="padding:${editorial ? '28px 24px' : '32px'}${wrap}">
+${editorial ? '' : `${logo}<p style="margin:0 0 8px;color:${muted};font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">${e(app.nombre)}</p>`}
+<h1 style="margin:0 0 18px;color:${ink};font-size:24px;line-height:32px">${e(modelo.asunto)}</h1>
+<p style="margin:0;color:${ink};font-size:16px;line-height:26px">${e(modelo.motivo)}</p>
 ${detalles}${accion}
-${modelo.cierre ? `<p style="margin:24px 0 0;color:${COLOR_SUAVE};font-size:14px;line-height:22px">${e(modelo.cierre)}</p>` : ''}
-<p style="margin:28px 0 0;border-top:1px solid ${COLOR_BORDE};padding-top:20px;color:${COLOR_SUAVE};font-size:12px;line-height:19px">${e(modelo.firma)} · ${e(app.etiquetaVersion)}</p>
+${modelo.cierre ? `<p style="margin:24px 0 0;color:${muted};font-size:14px;line-height:22px">${e(modelo.cierre)}</p>` : ''}
+<p style="margin:28px 0 0;border-top:1px solid ${border};padding-top:20px;color:${muted};font-size:12px;line-height:19px">${e(modelo.firma)} · ${e(app.etiquetaVersion)}</p>
 </td></tr></table>
 </td></tr></table></body></html>`
 }

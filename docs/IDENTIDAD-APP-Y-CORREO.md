@@ -91,3 +91,13 @@ Este paquete solo arma la **presentación**. El relay WEEM, el alias propio de
 cada app bajo `weem.com.py`, las credenciales, el enlace firmado, la cola, los
 reintentos, la entrega final y el tracking pertenecen al backend. Una
 aceptación HTTP del relay no prueba entrega.
+
+### Optional editorial mail presentation
+
+`crearCorreoTransaccional({ ..., tema: 'editorial', idioma: 'en' })` opts into a
+conservative table/inline ink, paper, cobalt and signal palette. `idioma` accepts
+`es` (default) or `en` and localizes the document language and fallback-link label;
+callers still supply translated subject, content and signature. Omit `tema` to
+preserve the existing presentation. The application name remains visible even
+when the hosted logo is blocked. Plaintext, escaping and secure-action URL
+validation are shared across both themes. Transport acceptance is not delivery.
