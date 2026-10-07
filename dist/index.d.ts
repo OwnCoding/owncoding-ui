@@ -924,13 +924,13 @@ export function AvisoPrivacidad(props: { finalidad?: ReactNode; detalle?: ReactN
 export function ConsentimientoDatos(props: { checked?: boolean; onChange?: (event: any) => void; finalidad?: ReactNode; detalle?: ReactNode; politicaUrl?: string; politicaTexto?: string; onPolitica?: (evento: any) => void; version?: string | number; error?: ReactNode; disabled?: boolean; required?: boolean; id?: string; className?: string; [clave: string]: any }): ReactElement
 export function AjustesImpresion(props: Record<string, any> & { impresoras?: any[]; onGuardar?: (ajustes: any) => void }): ReactElement
 export function BotonImprimir(props: Record<string, any> & { onImprimir?: () => void; etiqueta?: string }): ReactElement
-export function BancoCombobox(props: Record<string, any> & { value?: string; onChange?: (valor: string) => void; onSelect?: (banco: string) => void }): ReactElement
+export function BancoCombobox(props: Record<string, any> & { value?: string; onChange?: (valor: string) => void; onSelect?: (banco: string) => void; onIdentitySelect?: (result: CatalogResolution<InstitutionIdentity, unknown>) => void }): ReactElement
 /** @deprecated Usá `compacto`. Se mantendrá por al menos dos releases menores. */
 export type VarianteLogoFinancieroLegacy = 'compact'
 export type VarianteLogoFinanciero = 'compacto' | 'horizontal' | VarianteLogoFinancieroLegacy
 export function BancoLogo(props: Record<string, any> & { banco?: string; variante?: VarianteLogoFinanciero; alto?: string; className?: string; soloCatalogo?: boolean; /** @deprecated Los assets ya vienen empaquetados. */ baseAssets?: string; marcas?: Record<string, any>; decorativo?: boolean }): ReactElement | null
 export function MedioPagoLogo(props: Record<string, any> & { marca?: string; variante?: VarianteLogoFinanciero; alto?: string; className?: string; soloCatalogo?: boolean; /** @deprecated Los assets ya vienen empaquetados. */ baseAssets?: string; decorativo?: boolean }): ReactElement | null
-export function CityAutocomplete(props: Record<string, any> & { value?: string; onSelect?: (ciudad: string, departamento?: string) => void; onChange?: (valor: string) => void }): ReactElement
+export function CityAutocomplete(props: Record<string, any> & { value?: string; onSelect?: (ciudad: string, departamento?: string) => void; onIdentitySelect?: (result: CatalogResolution<LocalityIdentity, { city: unknown; department: unknown }>) => void; onChange?: (valor: string) => void }): ReactElement
 
 // ── Clases de tabla ────────────────────────────────────────────────────────
 
@@ -1447,6 +1447,35 @@ export type CoberturaMarcaFinanciera = {
   relacionFinanciera?: RelacionFinanciera | null
   variantes: { compacto: VisualFinanciero; horizontal: VisualFinanciero }
 }
+
+/** Explicit OwnCoding identifiers; never official institution or government codes. */
+export type CatalogProvenance = Readonly<{
+  identifierScheme: 'owncoding-internal'
+  sourceUrl: string
+  verifiedAt?: string
+  status?: 'inherited-catalog'
+  source?: string
+}>
+export type InstitutionIdentity = Readonly<{
+  id: string
+  name: string
+  category: string
+  aliases: readonly string[]
+  provenance: CatalogProvenance
+}>
+export type LocalityIdentity = Readonly<{
+  id: string
+  city: string
+  department: string
+  provenance: CatalogProvenance
+}>
+export type CatalogResolution<RecordType, InputType> =
+  | { status: 'resolved'; input: InputType; record: RecordType; matchedBy: 'id' | 'name' | 'alias' | 'historical'; historicalName?: string }
+  | { status: 'unknown' | 'ambiguous'; input: InputType; record: null }
+export const INSTITUTIONS_PARAGUAY: readonly InstitutionIdentity[]
+export function resolveInstitution(input: unknown): CatalogResolution<InstitutionIdentity, unknown>
+export const LOCALITIES_PARAGUAY: readonly LocalityIdentity[]
+export function resolveLocality(city: unknown, department?: unknown, catalog?: readonly LocalityIdentity[]): CatalogResolution<LocalityIdentity, { city: unknown; department: unknown }>
 
 export const BANCOS_PARAGUAY: string[]
 export const BANCOS_Y_FINANCIERAS_PARAGUAY: string[]

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BANCOS_PARAGUAY, normalizarBanco, sugerenciasDeBanco } from '../utils/bancos.js'
+import { BANCOS_PARAGUAY, normalizarBanco, sugerenciasDeBanco, resolveInstitution } from '../utils/bancos.js'
 import { Input } from './ui.jsx'
 import BancoLogo from './BancoLogo.jsx'
 import { cn } from '../utils/cn.js'
@@ -14,6 +14,7 @@ export default function BancoCombobox({
   value = '',
   onChange,
   onSelect,
+  onIdentitySelect,
   required = false,
   disabled = false,
   placeholder,
@@ -38,6 +39,7 @@ export default function BancoCombobox({
   function elegir(banco) {
     onChange?.(banco)
     onSelect?.(banco)
+    onIdentitySelect?.(resolveInstitution(banco))
     setAbierto(false)
   }
 

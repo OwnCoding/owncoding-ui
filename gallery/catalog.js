@@ -163,6 +163,30 @@ export const CATALOGO_EXPORTS = [
     "presentacion": "bancos"
   },
   {
+    "nombre": "INSTITUTIONS_PARAGUAY",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "LOCALITIES_PARAGUAY",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "resolveInstitution",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
+    "nombre": "resolveLocality",
+    "tipo": "api",
+    "categoria": "API y modelos",
+    "presentacion": null
+  },
+  {
     "nombre": "BANCOS_PARAGUAY",
     "tipo": "api",
     "categoria": "API y modelos",

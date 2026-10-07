@@ -427,6 +427,8 @@ export {
 export { RESULTADOS_VALIDOS, mensajeResultado, mensajeFallo } from './utils/resultado.js'
 export { normalizarNombre, nombrePartes, esApellidosPrimero, esRazonSocial } from './utils/nombre.js'
 export {
+  INSTITUTIONS_PARAGUAY,
+  resolveInstitution,
   BANCOS_PARAGUAY,
   BANCOS_Y_FINANCIERAS_PARAGUAY,
   COOPERATIVAS_PARAGUAY,
@@ -485,7 +487,7 @@ export { paginaDePrueba, paginaDePruebaSimple, TIPOS_PRUEBA, TIPOS_TICKET_PRUEBA
 export { TAMANOS_CAMPO, anchoParaLargo } from './utils/tamanos.js'
 export { TAMANOS_MODAL, TAMANO_MODAL_PREDETERMINADO, CIERRE_CON_CAMBIOS } from './utils/modal.js'
 export { GRILLA_DOS_COLUMNAS, GRILLA_DOS_COLUMNAS_COMPACTA, PIE_ACCIONES, PIE_ACCIONES_REVERSO } from './utils/formulario.js'
-export { CIUDADES_PARAGUAY, DEPARTAMENTOS_PARAGUAY, departamentoDe, buscarCiudad } from './catalog/ciudades.js'
+export { LOCALITIES_PARAGUAY, resolveLocality, CIUDADES_PARAGUAY, DEPARTAMENTOS_PARAGUAY, departamentoDe, buscarCiudad } from './catalog/ciudades.js'
 export {
   MODELOS_IPHONE,
   CAPACIDADES_IPHONE,

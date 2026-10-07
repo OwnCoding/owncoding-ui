@@ -44,6 +44,12 @@ export async function runPackageSmoke() {
       if (!root.Button || !root.CargaIA || !utils.formatGs || !phone.PhoneField || !financial.BancoLogo) throw new Error('exports visuales ausentes')
       if (!ia.motorIA || !metadata.LOGOS_BANCOS || !identity.crearIdentidadApp || !email.renderCorreoHtml) throw new Error('exports puros ausentes')
       if (metadata.logoDeBanco('ueno bank')?.visual?.asset) throw new Error('financial-metadata no debe incluir bytes visuales')
+      for (const catalog of [root, utils]) {
+        if (catalog.INSTITUTIONS_PARAGUAY.length !== 32 || catalog.LOCALITIES_PARAGUAY.length !== 263) throw new Error('identity catalog missing from installed package')
+        if (catalog.resolveInstitution('vision').record?.id !== 'oc:institution:py:018') throw new Error('historical institution identity changed')
+        if (catalog.resolveLocality('Asunción', 'Central').status !== 'unknown') throw new Error('conflicting department must remain unresolved')
+        if (catalog.resolveLocality('oc:locality:py:033').record?.city !== 'Asunción') throw new Error('installed locality identity changed')
+      }
       const ueno = financial.logoDeBanco('ueno bank', 'compacto')
       if (!ueno?.visual?.asset?.startsWith('data:image/') || !ueno?.redistribucion?.permitida) throw new Error('asset autorizado de ueno ausente')
       const markup = renderToStaticMarkup(React.createElement(financial.BancoLogo, { banco: 'ueno bank', variante: 'compacto' }))
