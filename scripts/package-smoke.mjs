@@ -34,6 +34,7 @@ export async function runPackageSmoke() {
       import React from 'react'
       import { renderToStaticMarkup } from 'react-dom/server'
       import * as root from 'owncoding-ui'
+      import * as fields from 'owncoding-ui/fields'
       import * as utils from 'owncoding-ui/utils'
       import * as ia from 'owncoding-ui/ia'
       import * as phone from 'owncoding-ui/phone'
@@ -42,6 +43,7 @@ export async function runPackageSmoke() {
       import * as identity from 'owncoding-ui/app-identity'
       import * as email from 'owncoding-ui/email'
       if (!root.Button || !root.CargaIA || !utils.formatGs || !phone.PhoneField || !financial.BancoLogo) throw new Error('exports visuales ausentes')
+      for (const name of ['CityAutocomplete', 'PhoneField', 'EmailField']) if (fields[name] !== root[name]) throw new Error('public field implementation differs: ' + name)
       if (!ia.motorIA || !metadata.LOGOS_BANCOS || !identity.crearIdentidadApp || !email.renderCorreoHtml) throw new Error('exports puros ausentes')
       if (metadata.logoDeBanco('ueno bank')?.visual?.asset) throw new Error('financial-metadata no debe incluir bytes visuales')
       for (const catalog of [root, utils]) {
@@ -64,10 +66,12 @@ export async function runPackageSmoke() {
     execFileSync(process.execPath, ['smoke.mjs'], { cwd: app, stdio: 'inherit' })
 
     const paquete = resolve(app, 'node_modules/owncoding-ui')
-    for (const archivo of ['dist/index.d.ts', 'dist/utils.d.ts', 'dist/ia.d.ts', 'dist/phone.d.ts', 'dist/financial.d.ts', 'dist/financial-metadata.d.ts', 'dist/app-identity.d.ts', 'dist/email.d.ts']) {
+    for (const archivo of ['dist/index.d.ts', 'dist/fields.d.ts', 'dist/utils.d.ts', 'dist/ia.d.ts', 'dist/phone.d.ts', 'dist/financial.d.ts', 'dist/financial-metadata.d.ts', 'dist/app-identity.d.ts', 'dist/email.d.ts']) {
       readFileSync(join(paquete, archivo))
     }
     const visualClosure = await measureClosure(join(paquete, 'dist/financial.js'), { distRoot: join(paquete, 'dist') })
+    const fieldsClosure = await measureClosure(join(paquete, 'dist/fields.js'), { distRoot: join(paquete, 'dist') })
+    if (fieldsClosure.files.some(file => file.source.includes('AUTORIZACION_ASSETS_FINANCIEROS') || file.source.includes('data:image/png;base64'))) throw new Error('public fields closure contains financial artwork')
     await measureClosure(join(paquete, 'dist/index.js'), { distRoot: join(paquete, 'dist') })
     await measureClosure(join(paquete, 'dist/financial-metadata.js'), { distRoot: join(paquete, 'dist'), pure: true })
     if (!visualClosure.files.some(file => file.source.includes('data:image/'))) throw new Error('financial closure has no artwork')

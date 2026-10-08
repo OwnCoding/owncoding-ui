@@ -32,7 +32,7 @@ const opciones = {
 // the client boundary; pure entries below are independent, asset-free builds.
 await build({
   ...opciones,
-  entryPoints: { index: 'src/index.js', financial: 'src/financial/index.js' },
+  entryPoints: { index: 'src/index.js', financial: 'src/financial/index.js', fields: 'src/fields/index.js' },
   outdir: 'dist',
   splitting: true,
   chunkNames: 'chunks/[name]-[hash]',
@@ -91,6 +91,7 @@ copyFileSync('src/styles/base.css', 'dist/base.css')
 // concatenando, así ninguna herramienta tiene que resolver `@import`.
 writeFileSync('dist/styles.css', `${tokens.trimEnd()}\n\n${base}`)
 copyFileSync('types/index.d.ts', 'dist/index.d.ts')
+copyFileSync('types/fields.d.ts', 'dist/fields.d.ts')
 copyFileSync('types/utils.d.ts', 'dist/utils.d.ts')
 copyFileSync('types/ia.d.ts', 'dist/ia.d.ts')
 copyFileSync('types/email.d.ts', 'dist/email.d.ts')

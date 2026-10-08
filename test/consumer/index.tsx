@@ -1,4 +1,5 @@
 import { createRef, useState } from 'react'
+import { CityAutocomplete as FieldCity, PhoneField as FieldPhone, EmailField as FieldEmail } from 'owncoding-ui/fields'
 import {
   BancoCombobox,
   CityAutocomplete,
@@ -45,6 +46,9 @@ export function ConsumerFixture() {
   const ref = createRef<HTMLInputElement>()
   return (
     <>
+      <FieldCity value={valor} onChange={setValor} onSelect={(city, department) => String(city + department)} />
+      <FieldPhone phone={valor} country="PY" onChange={setValor} />
+      <FieldEmail value={valor} onChange={setValor} />
       <CurrencyConversion originalAmount="1.25" originalCurrency="EUR" convertedAmount={6.75} convertedCurrency="BRL" rate={5.4} source="Fixture" asOf="2026-10-07T12:00:00Z" status="stale" locale="de-DE" labels={{ stale: 'Veraltet' }} />
       <Money value={null} currency="BRL" locale="pt-BR" numberFormatOptions={{ maximumFractionDigits: 4 }} />
       <MoneyInput ref={ref} value={1000} onValueChange={(monto) => String(monto)} />
