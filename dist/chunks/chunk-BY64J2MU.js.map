@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/utils/cn.js"],
+  "sourcesContent": ["import { clsx } from 'clsx'\nimport { twMerge } from 'tailwind-merge'\n\n// Une clases resolviendo conflictos de Tailwind (el \u00FAltimo gana).\nexport function cn(...inputs) {\n  return twMerge(clsx(inputs))\n}\n\n// Primer nombre: en una l\u00EDnea de tiempo el apellido no aporta y ocupa lugar.\nexport function primerNombre(nombre = '') {\n  return String(nombre ?? '').trim().split(/\\s+/)[0] || ''\n}\n"],
+  "mappings": ";AAAA,OAAS,SAAY,OACrB,OAAS,YAAe,iBAGjB,SAAS,MAAM,OAAQ,CAC5B,OAAO,QAAQ,KAAK,MAAM,CAAC,CAC7B,CAGO,SAAS,aAAa,OAAS,GAAI,CACxC,OAAO,OAAO,QAAU,EAAE,EAAE,KAAK,EAAE,MAAM,KAAK,EAAE,CAAC,GAAK,EACxD",
+  "names": []
+}

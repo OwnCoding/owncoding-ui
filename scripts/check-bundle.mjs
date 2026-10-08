@@ -3,6 +3,8 @@ import { execNpmSync } from './npm-command.mjs'
 
 const budgets = {
   'dist/index.js': { raw: 3_262_000, gzip: 1_981_000 },
+  // New public entry: measured closure 115889/32023, finite <4% headroom.
+  'dist/fields.js': { raw: 120_000, gzip: 33_000 },
   'dist/utils.js': { raw: 168_702, gzip: 40_949 },
   'dist/ia.js': { raw: 20_000, gzip: 6_000 },
   'dist/phone.js': { raw: 35_000, gzip: 11_000 },
@@ -16,7 +18,7 @@ const budgets = {
 
 let fallo = false
 for (const [archivo, limite] of Object.entries(budgets)) {
-  const { raw, gzip, files } = await measureClosure(archivo, { pure: !['dist/index.js', 'dist/financial.js', 'dist/phone.js'].includes(archivo) })
+  const { raw, gzip, files } = await measureClosure(archivo, { pure: !['dist/index.js', 'dist/financial.js', 'dist/phone.js', 'dist/fields.js'].includes(archivo) })
   const tamanos = { raw, gzip }
   const excedidos = Object.entries(tamanos).filter(([tipo, bytes]) => bytes > limite[tipo])
   console.log(`${archivo} (${files.length} reachable files): ${tamanos.raw} B raw / ${tamanos.gzip} B gzip (budget ${limite.raw}/${limite.gzip})`)
