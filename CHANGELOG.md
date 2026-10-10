@@ -4,8 +4,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es/1.0.0/). Versionado
 0.x: mientras la biblioteca se forma, un objeto puede cambiar de nombre (se
 documenta acá y en el README).
 
-## Sin publicar
+## v0.67.2 — 2026-10-10
 
+- **Operación unificada `hd` (2026-10-10):** `docs/COMANDOS.md`,
+  `docs/MODOS-DE-TRABAJO.md` y `docs/PLANTILLA-AGENTS.md` describen un **único
+  ciclo `hd`** —integración `--no-ff`, checks afectados, versión/CHANGELOG,
+  push + tag, deploy y verificación de identidad servida—; se retiran `hdd` y
+  `ht`. La política automática queda en **300 s / 10 commits únicos / 600 s** y
+  `tools/auto-ht.sh` pasa a `tools/auto-hd.sh` (conteo único, lock local). La
+  **QA visual/browser diferida** se registra `QA_NOT_RUN_DEFERRED_OWNER`, no se
+  convierte en PASS ni cierra issues como terminados, y los fallos concretos
+  (permisos, documentos públicos, datos, migraciones) no quedan omitidos.
+- **App Store (2026-10-10):** nuevo `docs/APP-STORE.md` con el checklist
+  canónico y condicionales (fuentes Apple; cuenta disponible según el dueño,
+  sin verificación independiente; Xcode 26/SDK 26 desde el 28-04-2026 solo por
+  fuente oficial), enlazado desde `REGLAS-ECOSISTEMA.md`, `REGLAS.md`,
+  `PLANTILLA-AGENTS.md`, `MODOS-DE-TRABAJO.md` y el README. La autonomía
+  técnica incluye API móvil/backend y cliente compatible; sin runtime iOS ni
+  build firmado no hay `AppStoreREADY`.
 - **Dependencias de desarrollo (seguridad, 2026-10-07):** `source-map-js`
   actualiza a 1.2.2 y `postcss-selector-parser` a 7.1.6 mediante `overrides`.
   En este lockfile, `npm audit` pasa de 8 avisos (6 altos, 2 moderados) a 5
