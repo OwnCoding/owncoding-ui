@@ -24,23 +24,28 @@ Complementa `owncoding-ui/docs/MODOS-DE-TRABAJO.md` (topología y ciclo) y
 - Los agentes no copian clases ni patrones entre pantallas: usan la clase o el
   objeto compartido y lo fijan con un test de aserción de fuente.
 
-## Comandos `hd` (rápido) y `hdd` (completo) — integrar y desplegar
+## Comando `hd` — integrar y desplegar
 
-- **`hd` (rápido, rutina):** el integrador ejecuta: (0) preámbulo: matar
-  servidores zombies del repo y verificar que no haya otro merge en curso
-  (`.git/MERGE_HEAD`); (1) `git fetch origin --prune` y relevar ramas con
-  trabajo; (2) integrar a `main` una rama por vez (API antes que frontend),
-  verificando el árbol mergeado y los **specs afectados** por lo que entró;
-  (3) conflictos: si la rama quedó superseded, resolver del lado de `main` y
-  verificar diff neto vacío; si hay trabajo real en conflicto, parar y
-  preguntar; (4) pushear con `<APP>_INTEGRATOR=1`; (5) release con
-  `<COMANDO_RELEASE>`. Sin suite completa, sin smoke y sin cierres.
-- **`hdd` (completo, ronda):** todo lo del `hd` y además la **suite completa**,
-  el **CI verde**, el **smoke de producción** hasta que sirva la versión nueva
-  y el **cierre de issues**. `ht` es el alias histórico de este ciclo.
-- Los tres comandos son **exclusivos del integrador**: los worktrees nunca los
-  ejecutan. El glosario de términos (suite, smoke, gate, release, ronda…) está
-  en `docs/COMANDOS.md`.
+- **`hd` (ciclo único):** el integrador ejecuta: (0) preámbulo sin daño:
+  verificar que no haya otro merge ni ciclo en curso (`.git/MERGE_HEAD`, marca
+  del chequeo automático); no se matan procesos ajenos; (1) `git fetch origin
+  --prune` y relevar ramas con trabajo (`pd`, commits únicos); (2) integrar a
+  `main` una rama por vez (`--no-ff`, API antes que frontend), verificando el
+  árbol mergeado y los **checks afectados**; (3) conflictos: rama superseded →
+  resolver del lado de `main` y verificar diff neto vacío; trabajo real en
+  conflicto → parar y preguntar; (4) release: bump de patch + CHANGELOG/
+  NOVEDADES + tag anotado; (5) push con `<APP>_INTEGRATOR=1`; (6) deploy y
+  verificación de identidad servida (versión + SHA40), sin presentar local como
+  publicado.
+- `hd` es **exclusivo del integrador**: los worktrees nunca lo ejecutan. El
+  glosario (suite, specs afectados, gate, release, QA diferida…) está en
+  `docs/COMANDOS.md`.
+- La QA visual/browser/flujo real está **temporalmente diferida** por el dueño:
+  se registra `QA_NOT_RUN_DEFERRED_OWNER` sin PASS falso y el issue no se cierra
+  como terminado por health. Los fallos concretos (permisos, docs públicos,
+  datos, migraciones) no quedan omitidos y la evidencia necesaria para resolver
+  el cambio se corre con foco acotado. Protocolo completo:
+  `docs/MODOS-DE-TRABAJO.md` (QA temporalmente diferida).
 
 ## Hook y protección de main
 
@@ -50,9 +55,26 @@ Complementa `owncoding-ui/docs/MODOS-DE-TRABAJO.md` (topología y ciclo) y
 
 ## Despliegues
 
-- Cada deploy incrementa la versión y pasa por `<COMANDO_RELEASE>` (árboles
-  limpios, bump, build, deploy, smoke). No se publica sin bump ni sin smoke.
+- Cada deploy incrementa la versión y pasa por el circuito de la app (árboles
+  limpios, bump, build, tag anotado, push, deploy): `<COMANDO_RELEASE>`. No se
+  publica sin bump. La identidad servida se verifica por health/`status.json`
+  (versión + SHA40); local y servido se informan por separado.
+- Deduplicación por SHA: si el deployment del mismo SHA ya existe, se sigue y
+  no se re-dispara; el fallback por API persiste la intención antes del POST.
 - Las sesiones de worktree nunca despliegan.
+
+## App Store (apps móviles)
+
+- Checklist canónico: **`docs/APP-STORE.md`** (condicionales y fuentes Apple).
+  Cuenta, acuerdos, firma, identidad legal, billing, mercados y submission son
+  inputs/decisiones del dueño cuando faltan; no se marcan como verificados.
+- La autonomía técnica incluye API móvil/backend, cliente Expo u otro
+  compatible y adaptaciones: **no** se repite la autorización general. Si un
+  endpoint falta, se implementa de verdad antes de decir que la app está
+  conectada; un scaffold no entrega.
+- Sin runtime iOS, toolchain ni build firmado **no** hay `AppStoreREADY`. La QA
+  diferida no exime pruebas de dispositivo, capturas ni flujos requeridos al
+  enviar; no se hace upload/submission ni sign-in de cuentas por acuse.
 
 ## Trabajo en worktrees
 
