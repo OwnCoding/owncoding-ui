@@ -21,6 +21,7 @@
   · <a href="docs/ADOPCION.md">Adopción</a>
   · <a href="docs/REGLAS.md">Reglas</a>
   · <a href="docs/ACCESIBILIDAD.md">Accesibilidad</a>
+  · <a href="docs/APP-STORE.md">App Store</a>
   · <a href="CHANGELOG.md">Changelog</a>
 </p>
 
