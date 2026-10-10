@@ -29,11 +29,10 @@ Dueño ──▶ ORQUESTADOR ──▶ SLOTS (worktrees, ramas persistentes)
 
 ## Ciclo de un pedido
 
-> Los comandos abreviados del dueño (`pp`, `pd`, `al`, `hd`, `hdd`, `ht`) están
-> en **`docs/COMANDOS.md`**: `hd` es el deploy **rápido** (merge + specs
-> afectados + push + release) y `hdd` el **completo** (todo lo del rápido +
-> suite completa + CI verde + smoke + cierres); `ht` es el alias histórico del
-> completo. El mismo doc tiene un **glosario en simple** para el dueño.
+> Los comandos abreviados del dueño (`pp`, `pd`, `al`, `xx`, `hd`, `cm`) están
+> en **`docs/COMANDOS.md`**: `hd` es el **ciclo único** (integración `--no-ff` +
+> checks afectados + versión/CHANGELOG + push + deploy + identidad/health). El
+> mismo doc tiene un **glosario en simple** para el dueño.
 
 1. El dueño le cuenta el problema al orquestador, en lenguaje de producto.
 2. El orquestador abre un issue (plantilla) y elige el slot por dominio.
@@ -42,15 +41,22 @@ Dueño ──▶ ORQUESTADOR ──▶ SLOTS (worktrees, ramas persistentes)
    de IA, citando `Refs #N`), corre los checks, pushea su rama y entrega
    handover.
 5. El integrador verifica por contenido contra `origin/main`, mergea una rama
-   por vez, corre los checks del árbol mergeado, pushea y cierra el issue.
-6. El deploy es solo con pedido explícito (o el comando abreviado acordado con
-   el dueño) y se valida con el smoke de producción.
+   por vez (`--no-ff`), corre los checks afectados del árbol mergeado, publica
+   (bump + tag anotado + push) y sigue el deploy hasta verificar la **identidad
+   servida** (versión + SHA40 del build). Los commits y handovers citan
+   `Refs #N`.
+6. El deploy se decide por candidato con autorización vigente; la verificación
+   distingue **local** (tag/artefacto) de **servido** (HTTP real). La QA
+   visual/browser diferida queda registrada como `QA_NOT_RUN_DEFERRED_OWNER`:
+   no bloquea ni se convierte en PASS.
 
 ## Handover (obligatorio)
 
-- Rama y `git log --oneline origin/main..HEAD`.
+- Rama y `git log --oneline origin/main..HEAD`, con `Refs #N` por issue.
 - Qué hace cada commit y rutas tocadas.
 - Resultado de cada check.
+- Estado de QA: `QA_NOT_RUN_DEFERRED_OWNER` cuando aplique (alcance, owner y
+  siguiente paso de recuperación).
 - Bloque **Novedades para el dueño**: 2–5 bullets en lenguaje de producto, sin
   jerga técnica (ver `docs/NOVEDADES.md` de cada app).
 - Riesgos, pendientes y conflictos de dominio detectados.
@@ -59,24 +65,100 @@ Dueño ──▶ ORQUESTADOR ──▶ SLOTS (worktrees, ramas persistentes)
 
 1. Lint con 0 errores.
 2. Build de la app (y del API si aplica) con artefacto verificado.
-3. Suite de tests en verde.
+3. Tests afectados en verde; la suite completa corre en el CI del SHA publicado.
 4. Cero marcadores de conflicto.
-5. e2e smoke con puertos/base aislados por worktree cuando haya app.
+5. e2e smoke con puertos/base aislados por worktree cuando haya app; la QA de
+   flujo real diferida no lo reemplaza.
 6. Si se tocó el schema: validación + migración idempotente + `db:check`.
 
-## QA
+## QA temporalmente diferida (autoridad vigente)
 
-- Cada dominio tiene su spec e2e; el smoke subset es el gate rápido y la suite
-  completa es el gate de release.
-- QA visual en 360/768/1440 y en claro/oscuro.
-- Los bugs se reproducen con evidencia (captura o spec) antes de arreglarlos.
+Autoridad: `qa-diferida-carril-rapido-autorizado-20261010.md` (dueño, 10-10).
+Se reanuda cuando el dueño lo indique o al necesitar su evidencia para resolver
+un cambio concreto; no hay fecha inventada.
+
+### Avanzar ahora
+
+- Implementación en paralelo en carriles/worktrees existentes, ownership
+  disjunto. Reviews, handoffs, conflictos en ramas propias y preparación de
+  integración.
+- Tests afectados significativos, lint, tipos y build del candidato; los
+  resultados válidos se conservan y no se repiten por acuses.
+- El integrador avanza cuando los gates de código aplicables están acreditados;
+  no se importan WIP/candidatos no admitidos ni se mueven cuts inmutables sin
+  repin y gates propios.
+- El orquestador coordina, no implementa. `al` va con trabajo concreto: sin
+  filler y sin volver a despachar lo que ya está en curso o entregado.
+
+### Diferir temporalmente
+
+- QA visual, de navegador y de flujos reales no necesarios para resolver el
+  cambio. Cada unidad/source registra **`QA_NOT_RUN_DEFERRED_OWNER`** (alcance,
+  owner y siguiente paso de recuperación).
+- La ausencia de QA **no** es PASS y el issue no se cierra como terminado. La
+  QA deferida no bloquea el trabajo ejecutable.
+- Excepción: evidencia QA necesaria para diagnosticar/corregir el cambio, o
+  gates de permisos, documentos públicos, pérdida de datos o migraciones con
+  fallo conocido. Esos fallos se resuelven con foco acotado, no como espera
+  global. Las pruebas funcionales nuevas (incluido un PostgreSQL aislado de una
+  corrección) no quedan omitidas por llamarlas QA.
+
+### Coordinación simplificada
+
+- Lo ligero no requiere acuerdos globales ni reserva de recursos.
+- Lo pesado usa **un responsable de ventana** que verifica jobs realmente
+  activos e incompatibilidades actuales, y entrega directo al owner listo.
+- Se reutilizan los compromisos vigentes; se actualizan solo si cambia
+  owner/job/fuente/alcance/estado. No se renueva por cada ACK ni se repite
+  aprobación.
+- Si el evento requiere GRANT: source/argv/budget/owner exactos, `START_BY`
+  emitido cuando el ejecutor está listo, y START/terminal/release reales. Un
+  lease expirado no se usa: se resuelve el mismo evento sin nueva cola/reprep.
+- Sin disponibilidad CPU global como gate, sin límites permanentes, sin polls,
+  sin kills ajenos, sin sucesores reservados/FIFO ni leases heredadas.
+
+### Publicación y cierre
+
+- El deploy se decide por candidato con las autorizaciones existentes; la pausa
+  de QA por sí sola no autoriza deploy ni revoca holds específicos.
+- No se repite push/POST/deploy por un aviso. La identidad servida/healthcheck y
+  los estados reales se distinguen del build local.
+- El cierre final del issue queda pendiente de la QA diferida: se reporta
+  implementado / checks PASS / integrado / publicado / QA pendiente por
+  separado, nunca todo como terminado.
+
+Automatización: vigía **300 s**, umbral **10 únicos**, cooldown **600 s** y
+holds propios sin cambios automáticos. No se adoptan los defaults antiguos
+(15 commits / 20 min).
+
+## App Store y cliente móvil
+
+- Checklist canónico **`docs/APP-STORE.md`**; no garantiza aprobación y no
+  contiene credenciales. Cuenta Apple Developer **disponible según el dueño**;
+  membresía, App Store Connect y acuerdos sin verificación independiente.
+- El alcance aprobado **incluye** desarrollar API móvil/backend, preparar Expo
+  u otro cliente compatible y adaptaciones: no se repite la autorización
+  general ni por dependencia técnica. Si falta un endpoint, se implementa de
+  verdad antes de afirmar que la app está conectada; un scaffold no entrega.
+- Arquitectura contra el inventario real (iOS/Expo/API/contratos) de cada app;
+  se reutiliza la movilidad existente y **Swift no es obligatorio**.
+- Sin runtime iOS, toolchain ni build firmado no hay `AppStoreREADY`. La QA
+  diferida no exime las pruebas de dispositivo/capturas/flujo requeridas al
+  enviar; upload/submission, acuerdos, billing y mercados son del dueño.
+- Cada orquestador registra el alcance App Store por app y crea unidades
+  implementables por gap demostrado, con ownership disjunto y evidencia.
 
 ## Releases y deploy
 
-- Una sola fuente de versión; el release bueno sube patch, corre checks,
-  publica y avisa la versión desplegada explícita.
-- Nadie presenta local como publicado; si falta un dato del proveedor, se
-  informa “no disponible”.
+- Una sola fuente de versión; el release sube patch, corre los checks
+  aplicables, publica (tag anotado + push) y avisa la versión desplegada
+  explícita.
+- La identidad servida se acredita con health/`status.json` (versión + SHA40 del
+  build); **local y servido se informan por separado**. Nadie presenta local
+  como publicado; si falta un dato del proveedor, se informa “no disponible”.
+- Antes de reintentar un deploy se deduplica por SHA: si el deployment ya
+  existe (aun fallido), se diagnostica ese mismo y no se re-dispara en
+  automático.
 
 ## La biblioteca (esta repo)
 

@@ -63,6 +63,9 @@ notificaciones) sigue en `docs/REGLAS.md`.
 - Un solo activo visual canónico para logo, favicon, PWA, emails y tarjetas.
 - Cada ruta debe tener URL recuperable, autorización y footer común con versión real.
 - Antes de publicar: build, flujos críticos, permisos sin privilegios, HTTPS, dominio, health y smoke test.
+- **App Store (apps móviles):** checklist canónico y autonomía técnica en
+  `docs/APP-STORE.md`; cuenta, acuerdos, firma, billing, mercados y submission
+  son decisiones del dueño cuando faltan.
 
 ## 6. Versionado y pendientes
 
@@ -285,3 +288,4 @@ apps.
 | IA sobre texto pegado (proveedor encargado, aviso, rate-limit por organización) | **§18 «Carga con IA»** (`BotonCargaIA`/`DialogoCargaIA`, `EsquemaIA`) + §12.5 de este anexo |
 | Seguridad de datos personales (auditoría, PII enmascarada, demos sin datos reales, brechas) | §2 y §4 (aislamiento y secretos), §11 (demos) y **§12.3** |
 | Reutilización antes de crear | Este paquete + `docs/ALIMENTAR.md` y `docs/PLANTILLA-OBJETOS.md` |
+| Publicación móvil (App Store): utilidad real, privacidad, condicionales y envío | Checklist canónico `docs/APP-STORE.md`; la UI móvil reutiliza los objetos de esta biblioteca |

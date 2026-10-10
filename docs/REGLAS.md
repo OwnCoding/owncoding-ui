@@ -1258,6 +1258,10 @@ de `docs/ADOPCION-V2.md` §10 y el checklist de arriba.
 - `dist/` se regenera solo con `npm run build`. CI compila un consumidor
   TypeScript real, instala el tarball en un directorio temporal y controla
   presupuestos raw/gzip.
+- Las apps móviles (Expo u otro cliente compatible) consumen los mismos
+  subpaths y objetos; su publicación sigue el checklist `docs/APP-STORE.md`.
+  Swift no es obligatorio y no se agrega un stack paralelo si la movilidad
+  existente alcanza.
 
 ### Movimiento compartido (opt-in)
 
